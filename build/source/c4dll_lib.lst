@@ -1,5 +1,0 @@
-user32.lib
-gdi32.lib
-comdlg32.lib
-wsock32.lib
-zlib.lib
