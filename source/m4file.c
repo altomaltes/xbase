@@ -15,11 +15,6 @@
 /* m4file.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved.  */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 /*
    S4FOX memo handling ...
@@ -156,7 +151,7 @@
    #ifdef S4MFOX
       // LY Jul 20/04 : added !S4MACINTOSH
       #if !defined( S4LUPACH ) && !defined( S4MACINTOSH ) /* LY July 7/03 */
-         assert5port( "added compressed memo entries support" ) ;
+//         assert5port( "added compressed memo entries support" ) ;
       #endif
       int memo4fileReadPart( MEMO4FILE *f4memo, long memoId, char **ptrPtr, unsigned *lenPtr, unsigned long offset, const unsigned readMax, long *type, Bool5 uncompress )
       {

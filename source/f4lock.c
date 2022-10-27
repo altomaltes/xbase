@@ -25,10 +25,6 @@
    #endif
 #endif
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
-
 #ifdef S4TEMP
    #include "t4test.h"
 #endif
@@ -43,7 +39,7 @@
             #include <fcntl.h>
          #endif
       #else
-         #ifndef S4WIN32
+         #ifndef __WIN32
             #if !defined( __TURBOC__ ) && !defined( S4IBMOS2 )
                #include <sys\locking.h>
                #define S4LOCKING
@@ -66,7 +62,7 @@
    #endif /* S4MUTEX4LOCK else */
 #endif /* !S4SINGLE */
 
-#if !defined( S4WIN32 ) && !defined( S4PALM )
+#if !defined( __WIN32 ) && !defined( S4PALM )
 /*   #include <fcntl.h>*/
    #include <errno.h>
 #endif
@@ -321,8 +317,11 @@
 
 
 // AS Nov 8/02 - isolate this code out to make code more readable
-static int file4lockLow( FILE4 *file, unsigned long posStart, long posStartHi, unsigned long numBytes, long numBytesHi )
-{
+static int file4lockLow( FILE4 *file
+                       , unsigned long posStart, long posStartHi
+                       , unsigned long numBytes, long numBytesHi )
+{ int numAttempts= 0; // JACS
+
    int rc = 0 ;
 
    #ifdef S4MUTEX4LOCK
@@ -339,7 +338,7 @@ static int file4lockLow( FILE4 *file, unsigned long posStart, long posStartHi, u
          #endif
          rc = locking( file->hand, LK_NBLCK, numBytes ) ;
       #else
-         #ifdef S4UNIX
+         #ifdef __unix__
             #ifndef S4NO_LOCKF
                lseek( file->hand, posStart, 0 ) ;
             #else
@@ -397,7 +396,7 @@ static int file4lockLow( FILE4 *file, unsigned long posStart, long posStartHi, u
                      rc = fcntl( file->hand, F_SETLK, &fstruct ) ;
                #endif
             #endif  /*  !S4MULTIC4  */
-         #endif  /*  S4UNIX  */
+         #endif  /*  __unix__  */
 
          #ifdef S4IBMOS2
             L4RANGE.FileOffset = posStart ;
@@ -417,7 +416,7 @@ static int file4lockLow( FILE4 *file, unsigned long posStart, long posStartHi, u
             rc = MACParmBlk.ioParam.ioResult ;
          #endif
 
-         #if defined(S4WIN32) && !defined(S4WINCE) /* LY 2002/11/12 : added !S4WINCE */
+         #if defined(__WIN32) && !defined(S4WINCE) /* LY 2002/11/12 : added !S4WINCE */
             if ( LockFile( (HANDLE)file->hand, posStart, posStartHi, numBytes, numBytesHi ) )
                rc = NO_ERROR ;
             else
@@ -445,7 +444,7 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
    #else
       int rc, numAttempts ;
       CODE4 *c4 ;
-      #ifdef S4UNIX
+      #ifdef __unix__
          #ifdef S4MULTIC4
             int pid, status;
          #endif
@@ -518,7 +517,7 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
          if ( numAttempts == 0 )
             numAttempts = 1 ;
       #endif
-      #ifndef S4WIN32
+      #ifndef __WIN32
          errno = 0 ;
       #endif
 
@@ -541,7 +540,7 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
                   #ifdef S4MACINTOSH
                      if (rc == 0 )
                   #else
-                     #ifdef S4WIN32
+                     #ifdef __WIN32
                         if (rc == NO_ERROR )
                      #else
                         if (rc == 0 || errno == EINVAL)
@@ -560,7 +559,7 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
          #ifdef S4MUTEX4LOCK
             if ( rc != r4locked )
          #else
-            #ifdef S4WIN32
+            #ifdef __WIN32
                if ( rc != ERROR_LOCK_VIOLATION )
             #else
                #ifdef _MSC_VER
@@ -720,7 +719,7 @@ int S4FUNCTION file4unlockInternal( FILE4 *file, unsigned long posStart, long po
          l4lockRemove( file->codeBase, file->hand, file->name, posStart, numBytes ) ;
       #endif
 
-      #ifndef S4WIN32
+      #ifndef __WIN32
          errno = 0 ;
       #endif
 
@@ -736,7 +735,7 @@ int S4FUNCTION file4unlockInternal( FILE4 *file, unsigned long posStart, long po
             #endif
             rc = locking( file->hand, LK_UNLCK, numBytes ) ;
          #else
-            #ifdef S4UNIX
+            #ifdef __unix__
                #ifndef S4NO_LOCKF /* lockf() replaces locking() for SUN OS, AT&T */
                   lseek( file->hand, posStart, 0 ) ;
                   rc = lockf( file->hand, F_ULOCK, numBytes ) ;
@@ -767,7 +766,7 @@ int S4FUNCTION file4unlockInternal( FILE4 *file, unsigned long posStart, long po
                rc = MACParmBlk.ioParam.ioResult ;
             #endif
 
-            #if defined(S4WIN32) && !defined(S4WINCE) /* LY 2002/11/12 : added !S4WINCE */
+            #if defined(__WIN32) && !defined(S4WINCE) /* LY 2002/11/12 : added !S4WINCE */
                if ( UnlockFile( (HANDLE)file->hand, posStart, posStartHi, numBytes, numBytesHi ) )
                   rc = NO_ERROR ;
                else
@@ -785,7 +784,7 @@ int S4FUNCTION file4unlockInternal( FILE4 *file, unsigned long posStart, long po
       #else
          #if defined(S4IBMOS2) || defined(S4MACINTOSH)
             if (rc != 0 )
-         #elif defined(S4WIN32)
+         #elif defined(__WIN32)
             if( rc != NO_ERROR )
          #else
             if ( rc < 0  && errno != EINVAL )

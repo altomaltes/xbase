@@ -16,22 +16,18 @@
 
 #include "d4all.h"
 
-#if !defined( S4UNIX ) && defined( __TURBOC__ )
-   #pragma hdrstop
-#endif
-
 #ifdef S4TESTING
-   #if defined( S4WINDOWS ) && !defined( S4WIN32 )
+   #if defined( S4WINDOWS ) && !defined( __WIN32 )
       #include <dos.h>
    #endif
    extern FILE4 s4test ;
 #endif
 
-#if defined( S4WINTEL ) && !defined( S4WIN32 )
+#if defined( S4WINTEL ) && !defined( __WIN32 )
    #include <sys\timeb.h>
 #endif
 
-#ifdef S4UNIX
+#ifdef __unix__
    #include <sys/times.h>
    #if !defined( S4LINUX ) && defined( S4NO_USLEEP )
       #ifdef S4NO_SELECT
@@ -196,11 +192,11 @@ void *S4FUNCTION u4allocFreeDefault( CODE4 *c4, long n )
 #ifndef S4PALM
    void S4FUNCTION u4delayHundredth( const unsigned int numHundredths )
    {
-      #if !defined( S4WIN32 ) && !defined( S4UNIX )
+      #if !defined( __WIN32 ) && !defined( __unix__ )
          int sec ;
          unsigned int hundredths ;
       #endif
-      #if defined( S4WINTEL ) && !defined( S4WIN32 )
+      #if defined( S4WINTEL ) && !defined( __WIN32 )
          struct timeb oldTime, newTime ;
       #endif
       #ifdef S4WIN16
@@ -208,7 +204,7 @@ void *S4FUNCTION u4allocFreeDefault( CODE4 *c4, long n )
             MSG msg;
          #endif
       #endif
-      #ifdef S4UNIX
+      #ifdef __unix__
          #ifdef S4NO_USLEEP
             #ifndef S4NO_SELECT
                struct timeval waitTime ;
@@ -222,12 +218,12 @@ void *S4FUNCTION u4allocFreeDefault( CODE4 *c4, long n )
           UnsignedWide oldTime, newTime ;
       #endif
 
-      #if defined( S4UNIX ) && defined( S4NO_USLEEP ) && !defined( S4NO_SELECT )
+      #if defined( __unix__ ) && defined( S4NO_USLEEP ) && !defined( S4NO_SELECT )
          waitTime.tv_sec = numHundredths / 100 ;
          waitTime.tv_usec = (numHundredths % 100 ) * 10000 ;
       #endif
 
-      #if defined( S4WINTEL ) && !defined( S4WIN32 )
+      #if defined( S4WINTEL ) && !defined( __WIN32 )
          ftime( &oldTime) ;
          sec = numHundredths / 100 ;
          hundredths = numHundredths % 100 ;
@@ -272,7 +268,7 @@ void *S4FUNCTION u4allocFreeDefault( CODE4 *c4, long n )
                if ( ( (long)(newTime.millitm - oldTime.millitm ) / 10 ) > (long)hundredths )
                   break ;
         }
-      #elif defined( S4UNIX )
+      #elif defined( __unix__ )
          #ifdef S4NO_USLEEP
             #ifdef S4NO_SELECT
                poll(0, NULL, numHundredths * 10 ) ;
@@ -290,7 +286,7 @@ void *S4FUNCTION u4allocFreeDefault( CODE4 *c4, long n )
                hundredths = numHundredths * 10000 ;
             usleep(hundredths ) ;
          #endif
-      #elif defined( S4WIN32 )
+      #elif defined( __WIN32 )
          Sleep( 10 * numHundredths ) ;
       #else
          for ( ;; )
@@ -416,7 +412,7 @@ unsigned long S4FUNCTION u4ncpy( char *to, const char *from, const unsigned int 
    #ifdef S4WINTEL
       S4EXPORT void S4FUNCTION u4terminate( void )
       {
-         #ifdef S4WIN32
+         #ifdef __WIN32
             #ifdef S4WINCE /* LY 2002/08/28 */
                ExitThread( 1 ) ;
             #else
@@ -1009,7 +1005,7 @@ void S4FUNCTION u4writeErr( const char *errStr, int newLine )
 
 void S4FUNCTION u4yymmdd( char *yymmdd )
 {
-   #if   defined(S4WINCE) || defined(S4WIN32)
+   #if   defined(S4WINCE) || defined(__WIN32)
       SYSTEMTIME st ;
       GetLocalTime( &st ) ;
       // AS 04/30/98 year 2000 issue, fox uses '0x00', dBASE '0x64'
@@ -1035,7 +1031,7 @@ void S4FUNCTION u4yymmdd( char *yymmdd )
       #endif
       yymmdd[1] = (char)timeNow.month ;
       yymmdd[2] = (char)timeNow.day ;
-   #elif defined( S4UNIX_THREADS )
+   #elif defined( __unix___THREADS )
       time_t timeVal ;
       struct tm result ;
 
@@ -1224,7 +1220,7 @@ int S4FUNCTION u4rename( const char *oldName, const char *newName )
          return bRes ;
       #else
          #ifdef S4NO_RENAME
-            #ifdef S4UNIX
+            #ifdef __unix__
                c4memcpy( (void *)buf, "mv ", 3 ) ; /* system rename or move call */
             #else
                c4memcpy( (void *)buf, "rename ", 7 ) ; /* system copy call */
@@ -2559,7 +2555,7 @@ int S4FUNCTION u4rename( const char *oldName, const char *newName )
 
 
 
-      S4EXPORT COLLATE4 * S4FUNCTION collation4getExport( Collate4name collateName )
+      S4EXPORT COLLATE4 * S4FUNCTION collation4getExport( enum Collate4name collateName )
       {
          // required by OLE-DB to retrieve collating info
          return collation4get( collateName ) ;
@@ -2567,7 +2563,7 @@ int S4FUNCTION u4rename( const char *oldName, const char *newName )
 
 
 
-      int collate4setupReadFromDisk( CODE4 *c4, Collate4name collateName )
+      int collate4setupReadFromDisk( CODE4 *c4, enum Collate4name collateName )
       {
          // reads a collation from disk files...
          /*
@@ -2706,7 +2702,7 @@ int S4FUNCTION u4rename( const char *oldName, const char *newName )
 
          // BCR 09/22/00 -- 4 byte alignment on LINUX, maybe other systems as well.
          // LY Aug 16/04 : added S4MACINTOSH
-         #if defined( S4DATA_ALIGN ) || defined( S4UNIX ) || defined( S4MACINTOSH ) /* LY 00/08/15 : t4indx3 */
+         #if defined( S4DATA_ALIGN ) || defined( __unix__ ) || defined( S4MACINTOSH ) /* LY 00/08/15 : t4indx3 */
             unsigned char bytesPerChar = 2 + even4up(collate->keySizeCharPerCharAdd) ;
             collate->unicodeToKeyTranslationArray = u4alloc( bytesPerChar * 0x10000 ) ;
          #else

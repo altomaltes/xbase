@@ -15,11 +15,6 @@
 /* i4check.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifdef I4PRINT
    #include <sys\timeb.h>
@@ -395,7 +390,7 @@ int t4check( TAG4 *t4 )
    }
 
    #ifndef S4OFF_MULTI
-      rc = d4lockFileInternal( d4, 1 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
+      rc = d4lockFileInternal( d4, 1, lock4any ) ;   /* returns -1 if error4code( codeBase ) < 0 */
       if ( rc != 0 )
          return rc ;
       #ifdef S4CLIPPER

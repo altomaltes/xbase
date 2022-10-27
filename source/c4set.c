@@ -22,11 +22,6 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif  /* __TUROBC__ */
-
-
 #ifndef S4SERVER
    void S4FUNCTION code4autoIncrementStart( CODE4 *c4, double val )
    {
@@ -391,7 +386,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
 
 
-   #if defined( S4WIN32 ) && defined(__cplusplus) && defined(OLEDB5BUILD)
+   #if defined( __WIN32 ) && defined(__cplusplus) && defined(OLEDB5BUILD)
       Mem5zeroAllocator *S4FUNCTION c4getMemZeroAllocator( const CODE4 *c4 )
       {
          return( c4->memZeroAllocator );
@@ -774,8 +769,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
 
    void S4FUNCTION c4setMemSizeBuffer( CODE4 *c4, unsigned val )
-   {
-      c4->memSizeBuffer = val ;
+   { c4->memSizeBuffer = val ;
    }
 
 
@@ -926,7 +920,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
 // AS Jan 9/02 - code written for use via OLE-DB to timeout on accepting a connection (was previously a define
 // set to 300 seconds).
-#if defined( S4WIN32 ) && !defined( S4OFF_THREAD ) && defined( S4CLIENT )
+#if defined( __WIN32 ) && !defined( S4OFF_THREAD ) && defined( S4CLIENT )
    void S4FUNCTION c4setAcceptTimeOut( CODE4 *c4, long val )
    {
       #ifdef E4PARM_HIGH

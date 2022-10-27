@@ -15,9 +15,6 @@
 /* i4index.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #ifdef I4PRINT
    #include <sys\timeb.h>
@@ -1107,7 +1104,7 @@
             strcpy( (char*)buf, fileName ) ;
          }
 
-         if ((code4serverOS( c4 ) & 0x07) == OS4WIN32)
+         if ((code4serverOS( c4 ) & 0x07) == O__WIN32)
             c4upper( (char*)buf ) ;
          INDEX4 *i4 = d4index( d4, (char S4PTR*)buf ) ;
 
@@ -3214,7 +3211,7 @@
 
 
 
-   #ifdef S4WIN32
+   #ifdef __WIN32
       /* AS 07/21/99 - added extra parm for win 95/98 to avoid endless laze writes */
       /* AS 04/05/01 - if the client requests the open after a create and it is temp, mark it as such - added extra parm */
       INDEX4 *I4open( DATA4 *data, const char *name, char accessMode, int errDefaultUnique, char readOnly, char singleClient, char openForCreate, char fileFlush, char safety, char createTemp )

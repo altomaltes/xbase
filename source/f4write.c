@@ -15,9 +15,6 @@
 /* f4write.c (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #ifdef S4TEMP
    #include "t4test.h"
@@ -56,7 +53,7 @@
 unsigned file4writeLowDoInternal( FILE4 *f4, FILE4LONG pos, const void *ptr, unsigned len )
 {
    /* returns the length written */
-   #if defined( S4WIN32 ) || defined( S4MACINTOSH )
+   #if defined( __WIN32 ) || defined( S4MACINTOSH )
       unsigned long urc ;
    #endif
    #ifdef S4MACINTOSH
@@ -65,7 +62,7 @@ unsigned file4writeLowDoInternal( FILE4 *f4, FILE4LONG pos, const void *ptr, uns
 
    critical4sectionVerify( &f4->critical4file ) ;
 
-   #if defined( S4WIN32 )
+   #if defined( __WIN32 )
       DWORD dwres ;
       DWORD err ;
       // AS Feb 17/06 - for Windows CE, it is possible to get errors if the card is not ready...retry if access denied error
@@ -127,7 +124,7 @@ unsigned file4writeLowDoInternal( FILE4 *f4, FILE4LONG pos, const void *ptr, uns
 
    if ( ptr != 0 )
    {
-      #if defined( S4WIN32 )
+      #if defined( __WIN32 )
          BOOL blRes ;  // CS 2011/05/19 Declare outside of for loop.
          // AS Feb 17/06 - for Windows CE, it is possible to get errors if the card is not ready...retry if access denied error
          // Microsoft knowledgebase article #811693

@@ -16,12 +16,6 @@
 
 #include "d4all.h"
 
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
-
 #ifndef S4CLIENT
 #ifndef S4INDEX_OFF
 

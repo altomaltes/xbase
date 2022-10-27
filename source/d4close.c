@@ -15,11 +15,6 @@
 /* d4close.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif  /* __TUROBC__ */
-#endif  /* S4UNIX */
 
 #ifndef S4OFF_MEMO
    extern unsigned short f4memoNullChar ;

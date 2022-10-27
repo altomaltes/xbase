@@ -15,11 +15,6 @@
 /* i4info.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 unsigned short S4FUNCTION tfile4isDescending( TAG4FILE *tag )
 {
@@ -120,7 +115,7 @@ int S4FUNCTION tfile4keyLenExport( TAG4FILE *tag )
             #ifdef S4CLIPPER
                rc = u4namecmp(tagName,tagInfo[i].name) ;
             #else
-               #ifdef S4UNIX
+               #ifdef __unix__
                   rc = strcasecmp(tagName,tagInfo[i].name) ;
                #else
                   rc = stricmp(tagName,tagInfo[i].name) ;

@@ -26,16 +26,15 @@
 /* without also modifying c4comws.c & c4comws.h */
 #ifdef E4VBASIC
 static ERROR4INFO_ARRAY error4array4[] =
-{
-   { 00000L, "" },
-   { 40101L, "code4autoOpen()" },
-   { 40102L, "code4createError()" },
-   { 40103L, "code4dateFormatVB()" },
-   { 40104L, "code4defaultUniqueError()" },
-   { 40105L, "code4errorCode()" },
-   { 40106L, "code4exclusive()" },
-   { 40107L, "code4exprError()" },
-   { 40108L, "code4fieldNameError()" },
+{{ 00000L, "" }
+,{ 40101L, "code4autoOpen()" }
+,{ 40102L, "code4createError()" }
+,{ 40103L, "code4dateFormatVB()" }
+,{ 40104L, "code4defaultUniqueError()" }
+,{ 40105L, "code4errorCode()" }
+,{ 40106L, "code4exclusive()" }
+,{ 40107L, "code4exprError()" }
+,{ 40108L, "code4fieldNameError()" },
    { 40109L, "code4goError()" },
    { 40110L, "code4hInst()" },
    { 40111L, "code4hWnd()" },
@@ -87,23 +86,21 @@ static ERROR4INFO_ARRAY error4array4[] =
    { 40156L, "code4unlockAuto()" },
    { 40157L, "code4unlockAutoSet()" }
 };
-
 #endif
+
 #ifdef S4TESTING
 static ERROR4INFO_ARRAY error4array5[] =
-{
-   { 00000L, "" },
-   { 50101L, "testing error: expected memDisplay not initialized" }
+{{ 00000L, "" }
+,{ 50101L, "testing error: expected memDisplay not initialized" }
 };
 
 #endif
 #ifdef S4CBPP
 static ERROR4INFO_ARRAY error4array6[] =
-{
-   { 00000L, "" },
-   { 60101L, "Code4::Code4" },
-   { 60102L, "Code4::calcCreate" },
-   { 60103L, "Code4::closeAll" },
+{{ 00000L, "" }
+,{ 60101L, "Code4::Code4" }
+,{ 60102L, "Code4::calcCreate" }
+,{ 60103L, "Code4::closeAll" },
    { 60104L, "Code4::data" },
    { 60105L, "Code4::error" },
    { 60106L, "Code4::errorLog" },
@@ -343,10 +340,9 @@ static ERROR4INFO_ARRAY error4array6[] =
 #endif
 #ifdef S4SERVER
 static ERROR4INFO_ARRAY error4array7[] =
-{
-   { 00000L, "" },
-   { 70101L, "failure to initialize server" },
-   { 70102L, "server failure" },
+{{ 00000L, "" }
+,{ 70101L, "failure to initialize server" }
+,{ 70102L, "server failure" },
    { 70103L, "server4securityInit" },
    { 70104L, "invalid table authorization file" },
    { 70105L, "server4init" },

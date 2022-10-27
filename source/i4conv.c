@@ -16,15 +16,11 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
-
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
 
-#if defined( S4WIN32 ) || defined( S4MACINTOSH )    /* LY 00/01/24: for 32-bit only */
+#if defined( __WIN32 ) || defined( S4MACINTOSH )    /* LY 00/01/24: for 32-bit only */
    // include longlong conversion...
    #include "c4long.c"
 #endif
@@ -854,7 +850,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) && ( defined( S4WIN32 ) || defined( S4MACINTOSH ) )
+#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) && ( defined( __WIN32 ) || defined( S4MACINTOSH ) )
    void t4strToLongLong( COLLATE4 *collate, char *result, const char *input, const int len, int *lenOut )
    {
       assert5( collate == 0 && lenOut != 0 ) ;  // should not be used.
@@ -869,7 +865,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) && ( defined( S4WIN32 ) || defined( S4MACINTOSH ) )
+#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) && ( defined( __WIN32 ) || defined( S4MACINTOSH ) )
    void t4dblToLongLong( char *result, const double input )
    {
       LONGLONG *lngLng = (LONGLONG *)result ;
@@ -1088,7 +1084,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       else /* negative */
          result[7] += (unsigned)0x80 ;
    }
-#endif /* ( defined( S4FOX ) || defined( OLEDB5BUILD ) ) || defined( S4CLIENT ) ) && defined( S4WIN32 ) */
+#endif /* ( defined( S4FOX ) || defined( OLEDB5BUILD ) ) || defined( S4CLIENT ) ) && defined( __WIN32 ) */
 
 
 
@@ -1113,7 +1109,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       else /* negative */
          result[0] -= (unsigned)0x80 ;
    }
-#endif //S4NO_LONGLONG && S4WIN32 && ( S4FOX || OLEDB5BUILD || S4CLIENT )
+#endif //S4NO_LONGLONG && __WIN32 && ( S4FOX || OLEDB5BUILD || S4CLIENT )
 
 
 

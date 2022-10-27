@@ -15,9 +15,6 @@
 /* d4file.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif  /* __TUROBC__ */
 
 #ifndef S4CLIENT
    /* fromDisk set to 1 if ensure that a disk read is done, instead of a buffer read */
@@ -396,7 +393,7 @@ S4CONST char * S4FUNCTION d4fullPath( S4CONST DATA4 *d4 )
 
 
 #ifndef S4CLIENT
-   #ifndef S4WIN32
+   #ifndef __WIN32
       FILE4LONG S4FUNCTION dfile4recordPosition( DATA4FILE *d4, long rec )
       {
          FILE4LONG val ;

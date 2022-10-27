@@ -15,11 +15,6 @@
 /* e4functi.c  (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
-#endif
 
 #if !defined( S4NO_POW ) && !defined( S4PALM )
    #include <math.h>
@@ -233,7 +228,7 @@ const E4FUNCTIONS v4functions[EXPR4NUM_FUNCTIONS] =
    { e4recno,      "RECNO",  370, 5, 0,  r4numDoub, 0,          0, 0, 0 },                  /* 146 - */
    { e4val,          "VAL",  380, 3, 0,  r4numDoub, 1,      r4str, 0, 0 },                  /* 147 - */
 
-   #ifndef S4UNIX
+   #ifndef __unix__
       { e4l2bin,      "L2BIN",  385, 5, 0,      r4str, 1,  r4numDoub, 0, 0 },               /* 148 - */
    #else
       { 0,                  0,  385, 5, 0,      r4str, 1,  r4numDoub, 0, 0 },               /* 148 - */
@@ -2702,7 +2697,7 @@ void e4wideToStr()
       c4utoaLen( tempBuff, ptr, expr4infoPtrLen(expr4infoPtr) ) ;
       u4free( tempBuff ) ;
    #else
-      #ifdef S4WIN32
+      #ifdef __WIN32
          // AS Aug 1/08 - change to use the Ansi code page since if you have foreign characters they otherwise don't get converted well
          WideCharToMultiByte( CP_ACP, 0, (LPCWSTR)expr4[-1], expr4infoPtrLen(expr4infoPtr), ptr, expr4infoPtrLen(expr4infoPtr), NULL, NULL ) ;
          //WideCharToMultiByte( CP_OEMCP, 0, (LPCWSTR)expr4[-1], expr4infoPtrLen(expr4infoPtr), ptr, expr4infoPtrLen(expr4infoPtr), NULL, NULL ) ;
@@ -2879,7 +2874,7 @@ void e4upper()
 {
    expr4[-1][expr4infoPtrLen(expr4infoPtr)] = 0 ;
    // AS Jun 17/03 - Also applies to CLIENT if fox
-   #if defined(S4CLIENT_OR_FOX) && ( defined(S4WIN32) || defined(S4WIN16) )
+   #if defined(S4CLIENT_OR_FOX) && ( defined(__WIN32) || defined(S4WIN16) )
       DATA4FILE *dataFile = expr4ptr->data->dataFile ;
       if ( code4indexFormat( dataFile->c4 ) == r4cdx )
       {
@@ -2912,7 +2907,7 @@ void e4upper()
 
 
 
-#ifndef S4UNIX
+#ifndef __unix__
    void e4l2bin()
    {
       // for non-UNIX only...
@@ -2923,7 +2918,7 @@ void e4upper()
       c4memcpy( ptr, (void *)&result, sizeof(result) ) ;
       expr4[-1] = (char *)ptr ;
    }
-#endif /* !S4UNIX */
+#endif /* !__unix__ */
 
 
 

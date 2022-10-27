@@ -15,11 +15,6 @@
 /* d4go.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 
 int S4FUNCTION d4goLow( DATA4 *data, const long recNo, short goForWrite )
@@ -282,7 +277,7 @@ int S4FUNCTION d4goLow( DATA4 *data, const long recNo, short goForWrite )
                   didLock = 1 ;
                }
             #else
-               rc = d4lockInternal( data, recNo, 1 ) ;
+               rc = d4lockInternal( data, recNo, 1, lock4any  ) ;
                if ( rc )
                   return rc ;
                didLock = 1 ;

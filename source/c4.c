@@ -16,10 +16,6 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif  /* __TUROBC__ */
-
 #ifdef E4VBASIC
    int S4FUNCTION c4parm_check( const void *ptr, int doCheck, const long message )
    {
@@ -397,7 +393,7 @@ unsigned long S4FUNCTION c4atoul( const char *str, const int l )
 
 
 // LY Aug 13/04 : added S4MACINTOSH
-#if ( defined( S4WIN32 ) || defined( S4MACINTOSH ) ) && !defined( S4NO_LONGLONG )
+#if ( defined( __WIN32 ) || defined( S4MACINTOSH ) ) && !defined( S4NO_LONGLONG )
 LONGLONG S4FUNCTION c4atoLongLong( const char *str, const int l )
 {
    char buf[128] ;

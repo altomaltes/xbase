@@ -15,9 +15,6 @@
 /* m4create.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved.  */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #ifndef S4CLIENT
 #ifndef S4MEMO_OFF
@@ -123,7 +120,7 @@ int memo4fileCreate( MEMO4FILE *m4file, CODE4 *c4, DATA4FILE *d4, const char *na
          i++ ;
 
          u4delayHundredth( 50 ) ;
-         #if defined(S4WINCE) || defined(S4WIN32)
+         #if defined(S4WINCE) || defined(__WIN32)
             SYSTEMTIME st ;
             GetLocalTime(&st) ;
             WORD t = st.wMilliseconds ;

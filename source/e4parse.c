@@ -63,9 +63,6 @@
 */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #ifndef S4PALM
    #include <ctype.h>

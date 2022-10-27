@@ -15,9 +15,6 @@
 /* f4open.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #ifdef S4TEMP
    #include "t4test.h"
@@ -207,7 +204,7 @@
    }
 #endif /* S4MACINTOSH */
 
-#ifdef S4UNIX
+#ifdef __unix__
    static int file4openLow( FILE4 *file, CODE4 *c4, const char *name )
    {
       int rc = 0 ;
@@ -329,7 +326,7 @@
       #endif
       return 0 ;
    }
-#endif /* S4UNIX */
+#endif /* __unix__ */
 
 #ifdef S4PALM
    static int file4openLow( FILE4 *file, CODE4 *c4, const char *name )
@@ -438,7 +435,7 @@
 
 
 
-#ifdef S4WIN32
+#ifdef __WIN32
    static int file4openLow( FILE4 *file, CODE4 *c4, const char *name )
    {
       DWORD fdwAccess, fdwShareMode, fAttributes, err ;
@@ -633,7 +630,7 @@
       #endif
       return 0 ;
    }
-#endif /* S4WIN32 */
+#endif /* __WIN32 */
 
 #ifdef S4WIN16
    static int file4openLow( FILE4 *file, CODE4 *c4, const char *name )
@@ -703,7 +700,7 @@
    }
 #endif /* S4WIN16 */
 
-#if defined( S4WINTEL ) && !defined( S4WIN16 ) && !defined( S4WIN32 )
+#if defined( S4WINTEL ) && !defined( S4WIN16 ) && !defined( __WIN32 )
    #ifndef S4OS2
       #ifdef __TURBOC__
          #define S4USE_CHMOD
@@ -812,7 +809,7 @@
    #ifdef S4USE_CHMOD
       #undef S4USE_CHMOD
    #endif
-#endif /* S4WIN32 && !S4WIN16 && !S4WINTEL */
+#endif /* __WIN32 && !S4WIN16 && !S4WINTEL */
 
 
 

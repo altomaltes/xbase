@@ -22,11 +22,6 @@ is put.
 */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 void s4deleteSpoolEntry( SORT4 *s4 )
 {

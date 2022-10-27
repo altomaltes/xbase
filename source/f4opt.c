@@ -16,15 +16,10 @@
 /* file-level optimizations */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifndef S4OPTIMIZE_OFF
 #ifdef E4ANALYZE_ALL
-#ifndef S4UNIX
+#ifndef __unix__
    #include <sys\stat.h>
    #include <share.h>
 #endif
@@ -41,19 +36,19 @@ int file4partLenSet( FILE4 *file, unsigned long newLen )
    #ifdef S4NO_CHSIZE
       int saveHand ;
    #endif
-   #ifdef S4WIN32
+   #ifdef __WIN32
       DWORD res ;
    #endif
 
    rc = 0 ;
-   #ifdef S4WIN32
+   #ifdef __WIN32
       h1 = CreateFile( file->dupName, GENERIC_READ | GENERIC_WRITE, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 ) ;
    #else
       h1 = sopen( file->dupName, (int)(O_BINARY | O_RDWR), SH_DENYRW, 0 ) ;
    #endif
    if ( h1 != INVALID4HANDLE )
    {
-      #ifdef S4WIN32
+      #ifdef __WIN32
          if ( SetFilePointer( h1, newLen, NULL, FILE_BEGIN ) == (DWORD)-1 )
          {
             CloseHandle( h1 ) ;
@@ -104,7 +99,7 @@ int file4partLenSet( FILE4 *file, unsigned long newLen )
 
    if ( h1 > 0 )
    {
-      #ifdef S4WIN32
+      #ifdef __WIN32
          CloseHandle( h1 ) ;
       #else
          close( h1 ) ;
@@ -134,7 +129,7 @@ int file4writePart( const void *buf, FILE4 *file, unsigned long pos, unsigned le
 
    for ( ;; )
    {
-      #ifdef S4WIN32
+      #ifdef __WIN32
          h1 = CreateFile( file->dupName, GENERIC_WRITE | GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 ) ;
          /* if ( h1 == INVALID4HANDLE ) */
          /*   h1 = -1 ;  */
@@ -151,7 +146,7 @@ int file4writePart( const void *buf, FILE4 *file, unsigned long pos, unsigned le
          bufWriteLen = pos - fileLen ;
          if ( bufWriteLen > (long)sizeof( emptyBuf ) )
             bufWriteLen = (long)sizeof( emptyBuf ) ;
-         #ifdef S4WIN32
+         #ifdef __WIN32
             rc1 = SetFilePointer( h1, fileLen, NULL, FILE_BEGIN ) ;
             if ( rc1 != (DWORD)-1 )
                rc1 = fileLen ;
@@ -160,7 +155,7 @@ int file4writePart( const void *buf, FILE4 *file, unsigned long pos, unsigned le
          #endif
          if ( rc1 != fileLen )
             break ;
-         #ifdef S4WIN32
+         #ifdef __WIN32
             WriteFile( h1, emptyBuf, (int)bufWriteLen, (unsigned long *)&rc1, NULL ) ;
          #else
             rc1 = (long)write( h1, emptyBuf, (int)bufWriteLen ) ;
@@ -169,7 +164,7 @@ int file4writePart( const void *buf, FILE4 *file, unsigned long pos, unsigned le
             break;
          fileLen = file4longGetLo( u4filelength( h1 ) ) ;
       }
-      #ifdef S4WIN32
+      #ifdef __WIN32
          rc1 = SetFilePointer( h1, pos, NULL, FILE_BEGIN ) ;
          if ( rc1 != (DWORD)-1 )
             rc1 = pos ;
@@ -179,7 +174,7 @@ int file4writePart( const void *buf, FILE4 *file, unsigned long pos, unsigned le
       if ( rc1 != pos )
          break ;
 
-      #ifdef S4WIN32
+      #ifdef __WIN32
          WriteFile( h1, buf, (int)len, (unsigned long *)&rc1, NULL ) ;
       #else
          rc1 = (long)write( h1, buf, len ) ;
@@ -193,7 +188,7 @@ int file4writePart( const void *buf, FILE4 *file, unsigned long pos, unsigned le
 
    if ( h1 != INVALID4HANDLE )
    {
-      #ifdef S4WIN32
+      #ifdef __WIN32
          CloseHandle( h1 ) ;
       #else
          close( h1 ) ;
@@ -225,7 +220,7 @@ int file4cmpPart( CODE4 *c4, void *bufIn, FILE4 *file, unsigned long pos, unsign
    if ( error4code( c4 ) != 0 )
       return -1 ;
 
-   #ifdef S4WIN32
+   #ifdef __WIN32
       h1 = CreateFile( file->dupName, GENERIC_WRITE | GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 ) ;
       /* if ( h1 == (int)INVALID_HANDLE_VALUE ) */
          /* h1 = -1 ; */
@@ -236,7 +231,7 @@ int file4cmpPart( CODE4 *c4, void *bufIn, FILE4 *file, unsigned long pos, unsign
    if ( h1 > 0 )
       for( ;; )
       {
-         #ifdef S4WIN32
+         #ifdef __WIN32
             rc1 = SetFilePointer( h1, pos, NULL, FILE_BEGIN ) ;
             if ( rc1 != (DWORD)-1 )
                rc1 = pos ;
@@ -246,7 +241,7 @@ int file4cmpPart( CODE4 *c4, void *bufIn, FILE4 *file, unsigned long pos, unsign
          if ( rc1 != pos )
             break ;
 
-         #ifdef S4WIN32
+         #ifdef __WIN32
             ReadFile( h1, buf1, sizeof( buf1 ) > len ? len : sizeof( buf1 ), (unsigned long *)&rc1, NULL ) ;
          #else
             rc1 = (unsigned)read( h1, buf1, sizeof( buf1 ) > len ? len : sizeof( buf1 ) ) ;
@@ -269,7 +264,7 @@ int file4cmpPart( CODE4 *c4, void *bufIn, FILE4 *file, unsigned long pos, unsign
 
    if ( h1 != INVALID4HANDLE )
    {
-      #ifdef S4WIN32
+      #ifdef __WIN32
          CloseHandle( h1 ) ;
       #else
          close( h1 ) ;
@@ -304,7 +299,7 @@ int file4cmp( FILE4 *f1 )
 
    p1 = 0L ;
 
-   #ifdef S4WIN32
+   #ifdef __WIN32
       h1 = CreateFile( f1->dupName, GENERIC_WRITE | GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 ) ;
       /* if ( h1 == (int)INVALID_HANDLE_VALUE ) */
          /* h1 = -1 ; */
@@ -315,7 +310,7 @@ int file4cmp( FILE4 *f1 )
    if ( h1 != INVALID4HANDLE )
       for( ;; )
       {
-         #ifdef S4WIN32
+         #ifdef __WIN32
             rct = SetFilePointer( h1, p1, NULL, FILE_BEGIN ) ;
             if ( rct != (DWORD)-1 )
                rct = p1 ;
@@ -325,7 +320,7 @@ int file4cmp( FILE4 *f1 )
          if ( rct != p1 )
             break ;
 
-         #ifdef S4WIN32
+         #ifdef __WIN32
             ReadFile( h1, buf1, sizeof( buf1 ), (unsigned long *)&rc1, NULL ) ;
          #else
             rc1 = (unsigned)read( h1, buf1, sizeof( buf1 ) ) ;
@@ -352,7 +347,7 @@ int file4cmp( FILE4 *f1 )
 
    if ( h1 != INVALID4HANDLE )
    {
-      #ifdef S4WIN32
+      #ifdef __WIN32
          CloseHandle( h1 ) ;
       #else
          close( h1 ) ;
@@ -379,7 +374,7 @@ int file4copyx( CODE4 *c4, FILE4 *f1, char *f2 )
    unsigned rc1, rc2 ;
    char buf[1024] ;
    long p1 ;
-   #ifdef S4WIN32
+   #ifdef __WIN32
       unsigned urc ;
    #endif
 
@@ -388,7 +383,7 @@ int file4copyx( CODE4 *c4, FILE4 *f1, char *f2 )
 
    p1 = 0L ;
 
-   #ifdef S4WIN32
+   #ifdef __WIN32
       h2 = CreateFile( f2, GENERIC_WRITE | GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 ) ;
       /* if ( h2 == (int)INVALID_HANDLE_VALUE )  */
          /* h2 = -1 ; */
@@ -400,7 +395,7 @@ int file4copyx( CODE4 *c4, FILE4 *f1, char *f2 )
    if ( h1 != INVALID4HANDLE && h2 != INVALID4HANDLE )
       for( ;; )
       {
-         #ifdef S4WIN32
+         #ifdef __WIN32
             rct = SetFilePointer( h1, p1, NULL, FILE_BEGIN ) ;
             if ( rct != (DWORD)-1 )
                rct = p1 ;
@@ -435,7 +430,7 @@ int file4copyx( CODE4 *c4, FILE4 *f1, char *f2 )
 
    if ( h2 != INVALID4HANDLE )
    {
-      #ifdef S4WIN32
+      #ifdef __WIN32
          CloseHandle( h2 ) ;
       #else
          close( h2 ) ;
@@ -558,7 +553,7 @@ int S4FUNCTION file4optimizeLow( FILE4 *file, const int optFlagIn, const int fil
          #ifdef E4ANALYZE_ALL
             #ifndef S4OPTIMIZE_OFF
                tmpnam( file->dupName ) ;
-               #ifdef S4WIN32
+               #ifdef __WIN32
                   hand = CreateFile( file->dupName, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_WRITE | FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0 ) ;
                #else
                   hand = sopen( file->dupName, O_CREAT | O_TRUNC | O_RDWR, SH_DENYWR, S_IREAD  | S_IWRITE ) ;
@@ -569,7 +564,7 @@ int S4FUNCTION file4optimizeLow( FILE4 *file, const int optFlagIn, const int fil
                   file->hasDup = 0 ;
                else
                {
-                  #ifdef S4WIN32
+                  #ifdef __WIN32
                      CloseHandle( hand ) ;
                   #else
                      close( hand ) ;

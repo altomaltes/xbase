@@ -191,11 +191,6 @@
    #endif
 #endif
 
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 
 
@@ -1860,7 +1855,7 @@
       }
    #endif /* S4CB51 */
 
-   #if !defined(S4CLIENT) && defined(S4WIN32)
+   #if !defined(S4CLIENT) && defined(__WIN32)
       DATA4 *S4FUNCTION code4directory( CODE4 *c4, char *directory )
       {
          error4( c4, e4notSupported, 0 ) ;
@@ -1920,7 +1915,7 @@
       {
          return error4( c4, e4notSupported, 0 ) ;
       }
-   #endif  /* !S4CLIENT && S4WIN32 */
+   #endif  /* !S4CLIENT && __WIN32 */
 
    #ifdef S4OFF_WRITE_MEMO
       #ifdef P4ARGS_USED
@@ -3156,7 +3151,7 @@
 
 
 
-#if !defined( S4WIN32 ) || defined( S4OFF_WRITE ) || defined( S4CLIENT ) || defined( S4OFF_INDEX )
+#if !defined( __WIN32 ) || defined( S4OFF_WRITE ) || defined( S4CLIENT ) || defined( S4OFF_INDEX )
    INDEX4 * S4FUNCTION I4createOpen
    (
       DATA4 *data,
@@ -3218,7 +3213,7 @@
    }
 #endif
 
-#if defined( S4WIN32 ) && (defined( S4OFF_THREAD ) || !defined( S4CLIENT ))
+#if defined( __WIN32 ) && (defined( S4OFF_THREAD ) || !defined( S4CLIENT ))
    void S4FUNCTION c4setAcceptTimeOut( CODE4 *c4, long val )
    {
       // setting this value to 0 or -1 means to retry forever

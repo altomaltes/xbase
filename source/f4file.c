@@ -15,9 +15,6 @@
 /* f4file.c (c)Copyright Sequiter Software Inc., 1988-2006.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #ifdef S4TEMP
    #include "t4test.h"
@@ -47,7 +44,7 @@
 
 // AS Apr 11/05 - enabled general access to thse functions...
 // AS Sep 8/04 - changed for debugging support
-#if defined( S4WIN32 )
+#if defined( __WIN32 )
    void critical4sectionInit( CRITICAL4SECTION *criticalSection )
    {
       memset( criticalSection, 0, sizeof(CRITICAL4SECTION) ) ;
@@ -103,7 +100,7 @@
 
          return fileLen ;
       }
-   #elif defined( S4WIN32 )
+   #elif defined( __WIN32 )
 
 
 
@@ -170,7 +167,7 @@
 
          return rc ;
       }
-   #elif defined( S4UNIX )
+   #elif defined( __unix__ )
 
 
 
@@ -680,7 +677,7 @@ static int file4lenSetLowDo( FILE4 *f4, FILE4LONG newLen )
 
    #if defined( S4MACINTOSH )
       rc = SetEOF( f4->hand, newLen ) ;
-   #elif defined( S4WIN32 )
+   #elif defined( __WIN32 )
       // AS Dec 11/02 - Renamed for clarification
       #ifdef S4DELAY_WRITE_MT
          critical4sectionEnter( &f4->critical4file ) ;
@@ -1231,7 +1228,7 @@ static unsigned file4readLowPhysical( FILE4 *f4, FILE4LONG pos, void *ptr, unsig
    unsigned long urc ;
    #if defined( S4MACINTOSH )
       long rc ;
-   #elif !defined( S4WIN32 )
+   #elif !defined( __WIN32 )
       unsigned long rc ;
    #endif
    #if !defined( S4OFF_OPTIMIZE ) && defined( S4OPTIMIZE_STATS )
@@ -1242,7 +1239,7 @@ static unsigned file4readLowPhysical( FILE4 *f4, FILE4LONG pos, void *ptr, unsig
 
    critical4sectionVerify( &f4->critical4file ) ;
 
-   #if defined( S4WIN32 )
+   #if defined( __WIN32 )
       // AS Feb 17/06 - for Windows CE, it is possible to get errors if the card is not ready...retry if access denied error
       // Microsoft knowledgebase article #811693
       DWORD dwres ;
@@ -1306,7 +1303,7 @@ static unsigned file4readLowPhysical( FILE4 *f4, FILE4LONG pos, void *ptr, unsig
       return 0 ;
    }
 
-   #if defined( S4WIN32 )
+   #if defined( __WIN32 )
       // AS Aug 4/03 - Help debugging when reading
       // AS Feb 17/06 - for Windows CE, it is possible to get errors if the card is not ready...retry if access denied error
       // Microsoft knowledgebase article #811693

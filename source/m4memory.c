@@ -20,10 +20,6 @@
    #include "malloc.h"
 #endif
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
-
 #if defined( S4SERVER ) && defined( S4MEM_PRINT ) && defined( S4TESTING )
    // include files for outputting memory stuff
    #include "t4test.c"
@@ -49,7 +45,7 @@
 
 /* for 32 bit, allow more than 20000 memory allocations... */
 
-#ifdef S4WIN32
+#ifdef __WIN32
    // AS Apr 15/09 - allow this to be larger since it is not all that high for some cases...
    #define MEM4MAX_POINTERS 1000000
 #else
@@ -99,16 +95,16 @@ typedef struct
    MEM4  types[mem4numTypes] ;
 } MEMORY4GROUP ;
 
-#ifdef S4SEMAPHORE   /* LY 2002/02/20 : switched with S4WIN32 */
-   // LY Sep 10/04 : changed from S4LINUX to S4UNIX
-   #if defined( S4WIN32 ) || defined( S4UNIX ) /* LY 2002/02/20 : added S4LINUX */
+#ifdef S4SEMAPHORE   /* LY 2002/02/20 : switched with __WIN32 */
+   // LY Sep 10/04 : changed from S4LINUX to __unix__
+   #if defined( __WIN32 ) || defined( __unix__ ) /* LY 2002/02/20 : added S4LINUX */
       #ifdef S4LINUX  /* LY July 8/03 : added static */
          static int memoryInitialized = 0 ;  // keeps a count of # of inits, must match # resets
       #else
          int memoryInitialized = 0 ;  // keeps a count of # of inits, must match # resets
       #endif
    #endif
-   #ifdef S4WIN32
+   #ifdef __WIN32
       /* multi-thread support */
       CRITICAL_SECTION critical4memory, critical4expression ;
       #ifndef S4STAND_ALONE
@@ -145,8 +141,8 @@ typedef struct
          }
       #endif
    #endif
-   // LY Sep 10/04 : changed from S4LINUX to S4UNIX
-   #ifdef S4UNIX /* LY 2002/02/20 */
+   // LY Sep 10/04 : changed from S4LINUX to __unix__
+   #ifdef __unix__ /* LY 2002/02/20 */
       #include <errno.h>
       pthread_mutex_t critical4memory ;
       // LY Sep 10/04 : removed static initialize from critical4expression for non-Linux implementations
@@ -171,8 +167,8 @@ typedef struct
 int resetInProgress = 0 ;
 
 #ifdef S4SEMAPHORE
-// LY Sep 10/04 : changed from !S4LINUX to !S4UNIX
-#if !defined( S4WIN32 ) && !defined(S4UNIX) /* added !S4LINUX */
+// LY Sep 10/04 : changed from !S4LINUX to !__unix__
+#if !defined( __WIN32 ) && !defined(__unix__) /* added !S4LINUX */
 static int mem4start( CODE4 *c4 )
 {
    APIRET rc ;
@@ -200,9 +196,9 @@ static void mem4stop( CODE4 *c4 )
 
    DosReleaseMutexSem( c4->hmtxMem ) ;
 }
-#endif /* S4WIN32 && S4UNIX */
-// LY Sep 10/04 : changed from S4LINUX to S4UNIX
-#ifdef S4UNIX /* LY 2002/02/20 */
+#endif /* __WIN32 && __unix__ */
+// LY Sep 10/04 : changed from S4LINUX to __unix__
+#ifdef __unix__ /* LY 2002/02/20 */
    /* LY July 9/03 : removed static to avoid odd Linux compiler error */
    int S4FUNCTION mem4start( CODE4 *c4 )
    {
@@ -750,8 +746,8 @@ void *S4FUNCTION mem4allocErrDefault( MEM4 *memoryType, CODE4 *c4, int doZero )
    ptr = mem4allocLow( memoryType ) ;
 
    #ifdef S4SEMAPHORE
-      // LY Sep 10/04 : changed from S4LINUX to S4UNIX
-      #if defined( S4WIN32 ) || defined( S4UNIX ) /* LY 2002/02/20 : added S4LINUX */
+      // LY Sep 10/04 : changed from S4LINUX to __unix__
+      #if defined( __WIN32 ) || defined( __unix__ ) /* LY 2002/02/20 : added S4LINUX */
          mem4stop( c4 ) ;
       #else
          mem4stop( memoryType->codeBase ) ;
@@ -1135,9 +1131,9 @@ void *S4FUNCTION u4allocDefault( long n )
       HANDLE  handle, *hPtr ;
    #endif
 
-   #ifdef S4SEMAPHORE   /* LY 99/6/8 : S4UNIX */
-      // LY Sep 10/04 : changed from S4LINUX to S4UNIX
-      #if defined( S4WIN32 ) || defined( S4UNIX ) /* LY 2002/02/20 : added S4LINUX */
+   #ifdef S4SEMAPHORE   /* LY 99/6/8 : __unix__ */
+      // LY Sep 10/04 : changed from S4LINUX to __unix__
+      #if defined( __WIN32 ) || defined( __unix__ ) /* LY 2002/02/20 : added S4LINUX */
          assert5( memoryInitialized >= 1 ) ;  // cannot use if not initialized...
       #endif
    #endif
@@ -1199,7 +1195,7 @@ void *S4FUNCTION u4allocDefault( long n )
 
       if ( handle == (HANDLE)0 )
       {
-         #if defined( S4WIN32 ) && defined( E4ANALYZE )
+         #if defined( __WIN32 ) && defined( E4ANALYZE )
             /* for debugger purposes */
             DWORD err = GetLastError() ;
          #endif
@@ -1359,9 +1355,9 @@ int S4FUNCTION u4freeDefault( void *ptr )
       long amount ;
    #endif
 
-   #ifdef S4SEMAPHORE   /* LY 99/6/8 : S4UNIX */
-      // LY Sep 10/04 : changed from S4LINUX to S4UNIX
-      #if defined( S4WIN32 ) || defined( S4UNIX ) /* LY 2002/02/20 : added S4LINUX */
+   #ifdef S4SEMAPHORE   /* LY 99/6/8 : __unix__ */
+      // LY Sep 10/04 : changed from S4LINUX to __unix__
+      #if defined( __WIN32 ) || defined( __unix__ ) /* LY 2002/02/20 : added S4LINUX */
          assert5( memoryInitialized >= 1 ) ;  // cannot use if not initialized...
       #endif
    #endif
@@ -1527,9 +1523,9 @@ int S4FUNCTION mem4reset( void )
    //    return error4( 0, e4result, E85904 ) ;
    // #endif
 
-   #ifdef S4SEMAPHORE   /* LY 99/6/8 : S4UNIX */
-      // LY Sep 10/04 : changed from S4LINUX to S4UNIX
-      #if defined( S4WIN32 ) || defined( S4UNIX ) /* LY 2002/02/20 : added S4LINUX */
+   #ifdef S4SEMAPHORE   /* LY 99/6/8 : __unix__ */
+      // LY Sep 10/04 : changed from S4LINUX to __unix__
+      #if defined( __WIN32 ) || defined( __unix__ ) /* LY 2002/02/20 : added S4LINUX */
          if ( memoryInitialized > 1 )
          {
             memoryInitialized-- ;
@@ -1622,14 +1618,14 @@ int S4FUNCTION mem4reset( void )
       }
    #endif
 
-   #ifdef S4SEMAPHORE   /* LY 99/6/8 : S4UNIX, removed extra #ifdef's */
-      // LY Sep 10/04 : changed from S4LINUX to S4UNIX
-      #if defined( S4WIN32 ) || defined( S4UNIX ) /* LY 2002/02/20 : added S4LINUX */
+   #ifdef S4SEMAPHORE   /* LY 99/6/8 : __unix__, removed extra #ifdef's */
+      // LY Sep 10/04 : changed from S4LINUX to __unix__
+      #if defined( __WIN32 ) || defined( __unix__ ) /* LY 2002/02/20 : added S4LINUX */
          assert5( memoryInitialized == 1 ) ;
          memoryInitialized = 0 ;  // force mem4init to reset everything... - should decrement down here anyway...
          mem4init() ;
 
-         #ifdef S4WIN32 /* LY 2002/02/20 */
+         #ifdef __WIN32 /* LY 2002/02/20 */
             DeleteCriticalSection( &critical4memory ) ;
             DeleteCriticalSection( &critical4expression ) ;
             #ifndef S4STAND_ALONE
@@ -1663,9 +1659,9 @@ void S4FUNCTION mem4init( void )
    // AS 06/07/99 allowed multiple handlers onto init/reset for outside of CodeBase
    // capabilities...
 
-   #ifdef S4SEMAPHORE   /* LY 99/6/8 : S4UNIX, remove extra #ifdef's */
-      // LY Sep 10/04 : changed from S4LINUX to S4UNIX
-      #if defined( S4WIN32 ) || defined( S4UNIX ) /* LY 2002/02/20 : added S4LINUX */
+   #ifdef S4SEMAPHORE   /* LY 99/6/8 : __unix__, remove extra #ifdef's */
+      // LY Sep 10/04 : changed from S4LINUX to __unix__
+      #if defined( __WIN32 ) || defined( __unix__ ) /* LY 2002/02/20 : added S4LINUX */
          if ( memoryInitialized )
          {
             memoryInitialized++ ;
@@ -1677,11 +1673,11 @@ void S4FUNCTION mem4init( void )
    #endif
 
    #ifdef S4SEMAPHORE
-      // LY Sep 10/04 : changed from S4LINUX to S4UNIX
-      #if defined( S4WIN32 ) || defined( S4UNIX ) /* LY 2002/02/20 : addes S4LINUX */
+      // LY Sep 10/04 : changed from S4LINUX to __unix__
+      #if defined( __WIN32 ) || defined( __unix__ ) /* LY 2002/02/20 : addes S4LINUX */
          if ( resetInProgress == 0 )
          {
-            #ifdef S4WIN32 /* LY 2002/02/20 */
+            #ifdef __WIN32 /* LY 2002/02/20 */
                InitializeCriticalSection( &critical4memory ) ;
                InitializeCriticalSection( &critical4expression ) ;
                #ifndef S4STAND_ALONE

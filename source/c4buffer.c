@@ -53,7 +53,7 @@
          RECT rect ;
          HDC hdc ;
          int height, width ;
-         #ifdef S4WIN32
+         #ifdef __WIN32
             SIZE dword;
          #else
             DWORD dword ;
@@ -69,7 +69,7 @@
 
       #ifdef S4WINDOWS
          hdc = GetDC(disp->hWnd) ;
-         #ifndef S4WIN32
+         #ifndef __WIN32
             dword = GetTextExtent( hdc, str, len ) ;
             height = HIWORD( dword ) ;
             width  = LOWORD( dword ) ;
@@ -426,7 +426,7 @@
       // to avoid firewall problem.
 
       #ifdef S4OLD_CODE
-         #if defined(S4COM_PRINT) && defined(S4CLIENT) && defined(S4UNIX)
+         #if defined(S4COM_PRINT) && defined(S4CLIENT) && defined(__unix__)
             printf( "Sending Message:  STREAM4RECONNECT\n" ) ;
          #endif
 
@@ -487,7 +487,7 @@
          connect4lowExitExclusive( connectBuffer ) ;
          connect4lowClose( &listenSocket ) ;
       #else
-         #if defined(S4COM_PRINT) && defined(S4CLIENT) && defined(S4UNIX)
+         #if defined(S4COM_PRINT) && defined(S4CLIENT) && defined(__unix__)
             printf( "Sending Message:  STREAM4RECONNECT_NEW\n" ) ;
          #endif
 
@@ -749,7 +749,7 @@ int connect4bufferInit( CONNECT4BUFFER *connectBuffer, CONNECT4 *connect, CONNEC
       return e4codeBase ;
    }
 
-   #ifdef S4WIN32
+   #ifdef __WIN32
       connectBuffer->lowAccessMutex = CreateMutex( NULL, FALSE, NULL ) ;
    #endif
    connect4lowEnterExclusive( connectBuffer ) ;
@@ -903,7 +903,7 @@ void connect4bufferInitUndo( CONNECT4BUFFER *connectBuffer )
       u4free( connectBuffer->workingWriteBuffer ) ;
    #endif
 
-   #ifdef S4WIN32
+   #ifdef __WIN32
       connect4lowEnterExclusive( connectBuffer ) ;
    #endif
    if ( connect4bufferLowGet( connectBuffer ) != 0 )
@@ -936,7 +936,7 @@ void connect4bufferInitUndo( CONNECT4BUFFER *connectBuffer )
       // ourselves and causing gpf's.
 
    }
-   #ifdef S4WIN32
+   #ifdef __WIN32
       connect4lowExitExclusive( connectBuffer ) ;
       CloseHandle( connectBuffer->lowAccessMutex ) ;
    #endif

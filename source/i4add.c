@@ -15,11 +15,7 @@
 /* i4add.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
+
 
 #if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT )
    int S4FUNCTION t4uniqueModify( TAG4 *tag, int newUnique )
@@ -743,7 +739,8 @@
 
             tagFile->header.exprLen = c4strlen( tagFile->expr->source ) + 1 ;
 
-            Collate4name collateNameForTag ;
+            enum Collate4name collateNameForTag ;
+
             if ( tagFile->isUnicode )
                collateNameForTag = c4->collateNameUnicode ;
             else

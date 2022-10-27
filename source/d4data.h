@@ -16,7 +16,7 @@
 
 // AS Feb 6/06 - add some logging to help diagnose relate suspend issues
 #ifdef RELATE4LOG
-   #ifdef S4UNIX
+   #ifdef __unix__
       #include <sys/timeb.h>
    #else
       #include <sys\timeb.h>
@@ -29,30 +29,27 @@ typedef int S4CALL S4CMP_FUNCTION( S4CMP_PARM, S4CMP_PARM, size_t) ;
 typedef int (S4CALL *S4CMP_FUNCTION_PTR)( S4CMP_PARM, S4CMP_PARM, size_t ) ;
 typedef short BOOL4  ;
 
+/* the various collation types in terms of their characteristics */
+/* this can either be used as the entry directly or as a bit mask. */
 enum Collate4type
-{
-   /* the various collation types in terms of their characteristics */
-   /* this can either be used as the entry directly or as a bit mask. */
-   collate4machineByteOrder = 0,
-   collate4simple = 1,
-   collate4subSort = 2,
-   collate4compress = 4,
-   collate4subSortCompress = 6,   /* subSort + compress */
-   collate4unknown = 16        /* unloaded/unknow sequences */
+{ collate4machineByteOrder = 0
+, collate4simple = 1
+, collate4subSort = 2
+, collate4compress = 4
+, collate4subSortCompress = 6   /* subSort + compress */
+, collate4unknown = 16        /* unloaded/unknow sequences */
 } ;
 
 
 
-typedef struct
-{
-   /* 1 entry of this struct object for every collation we support */
-   enum Collate4type collateType ;           // used to determine what translation function is required
+typedef struct /* 1 entry of this struct object for every collation we support */
+{ enum Collate4type collateType ;           // used to determine what translation function is required
 
-   void *charToKeyTranslationArray ;    // if NULL then the translation must be read from disk
+  void *charToKeyTranslationArray ;    // if NULL then the translation must be read from disk
 
-   void *unicodeToKeyTranslationArray ;
+  void *unicodeToKeyTranslationArray ;
 
-   void *charToKeyCompressionArray ;   // if NULL then the translation must be read from disk or
+  void *charToKeyCompressionArray ;   // if NULL then the translation must be read from disk or
                                        // generated from charToKeyTranslationArray
 
    void *unicodeToKeyCompressionArray ;
@@ -108,12 +105,12 @@ enum Collate4name
    collate4generalCp1252 = 2,  // general collation for CodePage 1252
    collate4generalCp437 = 3,   // general collation for CodePage 437 or 0
    collate4test = 4,           // test collation.  Users may use this one for customized ones...
-   collate4croatianCp1250 = 5, // Croatian Collation for CodeBase 1250
-   collate4croatianUpperCp1250 = 6,  // Upper Case Croatian Collation for CodeBase 1250
-   collate4generalCp850 = 7,     // general collation for CodePage 850
-   collate4avaya1252 = 8,  // LY Nov 29/04 : custom collation for Avaya (case-insensitive & accent-insensitive)
-   collate4spanishCp1252 = 9,          // 2nd test collation (if multiple code pages required as an example).  Users may use this one for customized ones...
-   collate4spanishCp850 = 10,          // 2nd test collation (if multiple code pages required as an example).  Users may use this one for customized ones...
+   collate4croatianCp1250     = 5, // Croatian Collation for CodeBase 1250
+   collate4croatianUpperCp1250= 6,  // Upper Case Croatian Collation for CodeBase 1250
+   collate4generalCp850       = 7,     // general collation for CodePage 850
+   collate4avaya1252          = 8,  // LY Nov 29/04 : custom collation for Avaya (case-insensitive & accent-insensitive)
+   collate4spanishCp1252      = 9,          // 2nd test collation (if multiple code pages required as an example).  Users may use this one for customized ones...
+   collate4spanishCp850       = 10,          // 2nd test collation (if multiple code pages required as an example).  Users may use this one for customized ones...
 } ;
 
 
@@ -282,7 +279,7 @@ struct DATA4FILESt ;
 #endif
 
 // AS Feb 9/06 - added clipper support for packwithstatus
-#if defined( TIME4STATUS ) && defined( S4WIN32 ) && !defined( S4OFF_WRITE )
+#if defined( TIME4STATUS ) && defined( __WIN32 ) && !defined( S4OFF_WRITE )
    struct REINDEX4STATUSSt ;
 #endif
 
@@ -388,11 +385,11 @@ typedef struct MEM4st
 /* temporarily allow everything to work if S4FILE_EXTENDED not defined (for development purposes only) */
 #ifdef S4FILE_EXTENDED
    #ifndef S464BIT
-      #ifndef S4UNIX
+      #ifndef __unix__
          typedef struct
          {
             unsigned long longLo ;  /* must be unsigned, can be up to 4 gig */
-            #ifdef S4WIN32
+            #ifdef __WIN32
                /* for 64 bit file addressing (files > 4 GIG) */
                long longHi ;  /* signed value, negative could be error or that the whole value is negative (-1 means longLo is negative) */
             #endif
@@ -490,7 +487,7 @@ typedef struct MEM4st
          #define file4longLessLong( f1, f2 ) ( (f1) < (f2) )
          /* LY 2001/07/18 : added longSubtractLong */
          #define file4longSubtractLong( f1, f2 ) ( *(f1) -= *(f2) )
-      #endif /* #ifndef S4UNIX */
+      #endif /* #ifndef __unix__ */
    #else
       #define FILE4LONG off_t /* LY 2002/08/21 : changed from S4LONG */
       #define file4longCoerce( val ) ( val )
@@ -572,7 +569,7 @@ typedef struct FILE4LONG_EXTENDSt
 
 
 // AS Sep 8/04 - changed for debugging support
-#ifdef S4WIN32
+#ifdef __WIN32
    // AS Apr 11/05 - enabled general access to thse functions...
    // #ifdef E4ANALYZE
       typedef struct
@@ -672,7 +669,7 @@ typedef struct FILE4LONG_EXTENDSt
 
       LIST4 optFiles ;
 
-      #ifdef S4WIN32
+      #ifdef __WIN32
          #ifdef S4WRITE_DELAY
             LIST4 delayAvail ;   /* extra blocks to allow efficient delay-writing */
             char S4PTR *delayWriteBuffer ;
@@ -690,7 +687,7 @@ typedef struct FILE4LONG_EXTENDSt
          #endif
       #endif
 
-      #ifdef S4WIN32
+      #ifdef __WIN32
          #ifdef S4ADVANCE_READ
             char S4PTR *advanceLargeBuffer ;
             CRITICAL4SECTION critical4optRead ;  // AS Sep 8/04 - changed for debugging support
@@ -736,15 +733,15 @@ typedef struct FILE4LONG_EXTENDSt
 
 // AS Jan 15/03 - Only needed if building server or building OLE-DB
 #if defined( S4SERVER ) || defined( OLEDB5BUILD )
-   #if defined(__cplusplus) && ( defined(S4WIN32) || ( defined(S4UNIX) && !defined(S4STAND_ALONE ) ) ) && !defined(OLEERRORSTRING)
+   #if defined(__cplusplus) && ( defined(__WIN32) || ( defined(__unix__) && !defined(S4STAND_ALONE ) ) ) && !defined(OLEERRORSTRING)
       class S4EXPORT Find4file
       {
       private:
-         #ifdef S4WIN32
+         #ifdef __WIN32
             WIN32_FIND_DATA findData ;
             HANDLE rc ;
          #endif
-         #ifdef S4UNIX
+         #ifdef __unix__
             DIR *findData ;
          #endif
          char ext[8];
@@ -860,7 +857,7 @@ typedef struct FILE4LONG_EXTENDSt
    typedef struct SEMAPHORE4St
    {
       LINK4 link ;   /* Allows the SEMAPHORE4 to be on a list of SEMAPHORE3s */
-      #ifdef S4WIN32
+      #ifdef __WIN32
          HANDLE handle ; /* Handle to the semaphore itself */
       #endif
    } SEMAPHORE4 ;
@@ -907,7 +904,7 @@ typedef struct FILE4St
    // function is is file4setTemporary( FILE4 *file, Bool5 flag ) ;
    Bool5 isTemporary ;             /* True if it is a temporary file */
 
-   #if defined(S4WIN32)
+   #if defined(__WIN32)
       HANDLE hand ;
    #elif defined(S4WIN16)
       HFILE hand ;
@@ -1043,7 +1040,7 @@ typedef struct FILE4St
       FILE4LONG space44 ;  // LY May 21/04 : changed from long to match above definition (sizeof(FILE4LONG) can be > sizeof(long))
    #endif
 
-   #ifdef S4WIN32
+   #ifdef __WIN32
       // AS Dec 11/02 - Renamed for clarification
       // all low-level reads and writes are protected through this critical section to ensure one thread is not reading the file
       // whilst another is writing to it.
@@ -1443,7 +1440,7 @@ enum TRAN4FILE_STATUS
       {
          LINK4 link ;       /* allows the EVENT4 to be on a list of EVENT4s*/
 
-         #ifdef S4WIN32
+         #ifdef __WIN32
             HANDLE handle ; /* a handle to the event itself */
          #endif
       } EVENT4 ;
@@ -1656,7 +1653,7 @@ enum TRAN4FILE_STATUS
       typedef struct
       {
          LINK4 link ;
-         #ifdef S4WIN32
+         #ifdef __WIN32
             OVERLAPPED overlap ; /* also used as a LINK4 when on the avail list */
          #endif
          #ifdef E4ANALYZE
@@ -1697,7 +1694,7 @@ enum TRAN4FILE_STATUS
             struct CODE4St *cb ;
          #endif
 
-         #ifdef S4WIN32
+         #ifdef __WIN32
             DWORD windowsErr ;   /* AS Sept 18/02 - track the actual windows error if overlap fails */
          #endif
 
@@ -1924,7 +1921,7 @@ typedef struct
 } TAG4INFO ;
 
 
-#ifdef S4WIN32
+#ifdef __WIN32
 typedef void (__stdcall *ERROR_CALLBACK)
 #else
 typedef void (*ERROR_CALLBACK)
@@ -2032,7 +2029,7 @@ typedef void (*ERROR_CALLBACK)
    } L4LOCK_INFO ;
 #endif
 // #ifdef S4ODBC_BUILD
-#ifdef S4WIN32 // LY Jul 16/04
+#ifdef __WIN32 // LY Jul 16/04
    // AS Apr 4/01 - Made available in stand/alone for odbc stored procedures
    #ifndef S4FUNCTION2
       #define S4FUNCTION2 __stdcall
@@ -2278,7 +2275,7 @@ typedef struct CODE4St
       #endif
 
       #ifndef S4DOS
-         #ifdef S4WIN32
+         #ifdef __WIN32
             HINSTANCE hInst ;
             HINSTANCE hInstLocal ;
          #else
@@ -2339,7 +2336,7 @@ typedef struct CODE4St
          int logOpen ;
       #endif
 
-      #ifdef S4WIN32
+      #ifdef __WIN32
          #ifdef S4WRITE_DELAY
             int delayWritesEnabled ;
             Bool5 delayWritesDisabled ;  // AS Nov 21/05 - due to an apparent vb/xp sequencing problem, use this to indicate we were unable
@@ -2376,7 +2373,7 @@ typedef struct CODE4St
       #endif
       long largeFileOffset ;
 
-      #ifdef S4WIN32
+      #ifdef __WIN32
          #ifdef S4READ_ADVANCE
             int advanceReadsEnabled ;
             Bool5 advanceReadsDisabled ;  // AS Nov 21/05 - due to an apparent vb/xp sequencing problem, use this to indicate we were unable
@@ -2493,7 +2490,7 @@ typedef struct CODE4St
       short openForCreate ;
       #ifdef S4CLIENT
          enum index4format indexFormat ;
-         long serverOS ;   // bit mask: OS4UNKNOWN, OS4WIN32, OS4LINUX...
+         long serverOS ;   // bit mask: OS4UNKNOWN, O__WIN32, OS4LINUX...
       #else
          int doIndexVerify ;       /* for internal purposes only at this point */
          struct RELATION4St S4PTR *currentRelation ;
@@ -2607,7 +2604,7 @@ typedef struct CODE4St
 
       // AS Jan 9/02 - code written for use via OLE-DB to timeout on accepting a connection (was previously a define
       // set to 300 seconds).
-      #if defined( S4WIN32 ) && !defined( S4OFF_THREAD ) && defined( S4CLIENT )
+      #if defined( __WIN32 ) && !defined( S4OFF_THREAD ) && defined( S4CLIENT )
          long acceptTimeOut ;   // amount of time to wait for server to accept our connection before timing out.
       #endif
 
@@ -2619,7 +2616,7 @@ typedef struct CODE4St
          Timer5 *masterTimer ;
       #endif
 
-      #if defined( S4WIN32 )
+      #if defined( __WIN32 )
          #if defined(__cplusplus) && defined(OLEDB5BUILD)
             Mem5zeroAllocator *memZeroAllocator ;
             Mem5allocator *memNonZeroAllocator ;
@@ -2646,7 +2643,7 @@ typedef struct CODE4St
          long incrementVal ;
          long incrementMax ;
          // AS Feb 9/06 - added clipper support for packwithstatus
-         #if defined( TIME4STATUS ) && defined( S4WIN32 ) && !defined( S4OFF_WRITE )
+         #if defined( TIME4STATUS ) && defined( __WIN32 ) && !defined( S4OFF_WRITE )
             // AS Jun 30/03 - test d4reindexWithProgress
             // AS Mar 25/04 - requires change for C++ build
             struct REINDEX4STATUSSt *packStatus ;  // if set we are doing a pack status, not a reindex status
@@ -2766,7 +2763,7 @@ typedef struct CODE4St
          #endif
       #endif
       // #ifdef S4ODBC_BUILD
-      #ifdef S4WIN32 // LY Jul 16/04
+      #ifdef __WIN32 // LY Jul 16/04
          // AS Apr 4/01 - Made available in stand/alone for odbc stored procedures
          HINSTANCE addDll ;
          S4ADD_FUNCTION *addFunction ;
@@ -2806,7 +2803,7 @@ typedef struct CODE4St
       struct timeb statusTime ;
    #endif
 
-   #ifdef S4WIN32
+   #ifdef __WIN32
       // AS Apr 5/07 - adjust...if the calling thread is not high priority we don't need to sleep
       int highPriority ;
    #endif
@@ -2834,7 +2831,7 @@ typedef struct CODE4St
 
 
 // AS Feb 9/06 - added clipper support for packwithstatus
-#if defined( TIME4STATUS ) && defined( S4WIN32 ) && !defined( S4OFF_WRITE )
+#if defined( TIME4STATUS ) && defined( __WIN32 ) && !defined( S4OFF_WRITE )
    // AS Jun 30/03 - moved to d4data.h, for support for d4packWithProgress
    // AS Mar 25/04 - moved lower down for C++ build support
    typedef struct REINDEX4STATUSSt
@@ -3357,7 +3354,7 @@ typedef struct DATA4FILESt
          the data file changes */
       long versionNumberOld ;    // the last version number that was returned to the user
       long versionNumber ;       // internal version number counter (not necessarily same number returned to user)
-      #ifdef S4WIN32
+      #ifdef __WIN32
          FILETIME timeStamp ;         // the latest time stamp checked for the file
       #endif
    #endif
@@ -4077,7 +4074,7 @@ typedef struct TAG4FILESt
          S4LONG       changed ;
       #endif
 
-      #ifdef S4UNIX
+      #ifdef __unix__
          int keyType ;
       #endif
       #ifdef S4COMIX
@@ -4237,7 +4234,7 @@ typedef struct INDEX4St
 
 
 // AS Feb 9/06 - added clipper support for packwithstatus
-#if defined( TIME4STATUS ) && defined( S4WIN32 ) && !defined( S4OFF_WRITE )
+#if defined( TIME4STATUS ) && defined( __WIN32 ) && !defined( S4OFF_WRITE )
    // AS Jun 30/03 - moved to d4data.h, for support for d4packWithProgress
    typedef struct
    {

@@ -45,7 +45,7 @@
          This function does whatever intialization is required to create a valid
            semaphore.
 
-         In S4WIN32, this function calls the WIN32 API function CreateSemaphore
+         In __WIN32, this function calls the WIN32 API function CreateSemaphore
            to create a valid semaphore handle, and stores that handle in the
            SEMAPHORE4 structure.
 
@@ -99,7 +99,7 @@
          This function does whatever intialization is required to create a valid
            semaphore.
 
-         In S4WIN32, this function calls the WIN32 API function CreateSemaphore
+         In __WIN32, this function calls the WIN32 API function CreateSemaphore
            to create a valid semaphore handle, and stores that handle in the
            SEMAPHORE4 structure.
 
@@ -145,7 +145,7 @@
          This function does whatever unintialization is required to create a valid
            semaphore.
 
-         In S4WIN32, this function calls the WIN32 API function CloseHandle on
+         In __WIN32, this function calls the WIN32 API function CloseHandle on
            SEMAPHORE4.handle
 
          RETURNS
@@ -197,7 +197,7 @@
            thread waiting on the SEMAPHORE4 to be activated and able to respond to
            this semaphore.
 
-         In S4WIN32, this function calls the WIN32 API function ReleaseSemaphore
+         In __WIN32, this function calls the WIN32 API function ReleaseSemaphore
            on the semaphore handle to release the semaphore.
 
          #ifdef E4PARM_LOW
@@ -243,7 +243,7 @@
          This function is used to suspend a thread until the given SEMAPHORE4 has
            been releaseed or the timeout has elapsed
 
-         in S4WIN32, this function calls the WIN32 API function
+         in __WIN32, this function calls the WIN32 API function
            WaitForSingleObject() on SEMAPHORE4.handle
 
          #ifdef E4PARM_LOW

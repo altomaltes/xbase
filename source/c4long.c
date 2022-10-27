@@ -17,7 +17,7 @@
 /* this file is included directly... */
 
 #ifndef S4NO_LONGLONG
-char *c4longlongToA( char *out, LONGLONG val )
+char *c4longlongToA( char *out, long long val )
 {
    // assumes out is large enough to hold a longlong conversion (i.e. 21 bytes if null included)
    // returns a pointer to the result, which will somewhere in 'out'

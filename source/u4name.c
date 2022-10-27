@@ -43,9 +43,6 @@
 */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #ifdef S4WINTEL
    #ifndef S4WINCE
@@ -263,7 +260,7 @@ int S4FUNCTION u4nameRemoveGivenExtension( char *name, const char *extensionToRe
       extPos++ ;
 
    // AS 01/19/01 - For WIN32, make this case insensitive...
-   #ifdef S4WIN32
+   #ifdef __WIN32
       #ifdef S4WINCE
          /* LY 2001/08/23 : cast extensionToRemove to char* for WinCE */
          if ( c4stricmp( &name[extPos], (char*)extensionToRemove ) == 0 )  // matches, so remove...
@@ -359,7 +356,7 @@ static int u4nameFix( char *buf )
 
    for( i = 0 ; i < len - 2 ; i++ )
    {
-      #ifdef S4UNIX
+      #ifdef __unix__
          if ( c4memcmp(buf+i, "../", 3 ) == 0 )
       #else
          if ( c4memcmp( buf + i, "..\\", 3 ) == 0 )
@@ -389,7 +386,7 @@ static int u4nameFix( char *buf )
 
    for( i = 0 ; i < len - 1 ; i++ )
    {
-   #ifdef S4UNIX
+   #ifdef __unix__
       if ( c4memcmp( buf + i, "./", 2 ) == 0 )
    #else
       if ( c4memcmp( buf + i, ".\\", 2 ) == 0 )
@@ -739,7 +736,7 @@ int S4FUNCTION u4nameCreateMultiDirectories( char *outName, unsigned int outName
             #ifndef S4WINCE
                if ( noName == 1 || name[1] != ':' )   /* must get the default drive */
                {
-                  #ifdef S4WIN32
+                  #ifdef __WIN32
                      #ifdef __BORLANDC__
                         driveNo = getdisk() + 1 ;  /* get disk returns one less than get drive */
                      #else
@@ -1030,7 +1027,7 @@ int S4FUNCTION u4namePiece( char *result, const unsigned int lenResult, const ch
       {
          #ifndef S4MACINTOSH
             // CJ Oct 24/01 add support for pathes that contain '/' for Windows OS's
-            #ifndef S4UNIX /* LY July 7/03 : duplicate case error */
+            #ifndef __unix__ /* LY July 7/03 : duplicate case error */
                case S4DIR2:
             #endif
             case S4DIR:
@@ -1230,7 +1227,7 @@ int S4FUNCTION u4namecmp( const char *string1, const char *string2, short ignore
       #ifdef S4CASE_SEN
          rc = c4strcmp( string1, string2 ) ;
       #else
-         #ifdef S4UNIX
+         #ifdef __unix__
             rc = strcasecmp( string1, string2 ) ;
          #else
             #ifdef S4WINCE
@@ -1243,7 +1240,7 @@ int S4FUNCTION u4namecmp( const char *string1, const char *string2, short ignore
    #else
       if ( ignoreCase )
       {
-         #ifdef S4UNIX
+         #ifdef __unix__
             rc = strcasecmp( string1, string2 ) ;
          #else
             rc = c4stricmp( string1, string2 ) ;
@@ -1271,7 +1268,7 @@ int S4FUNCTION u4namencmp( const char *string1, const char *string2, size_t coun
       #ifdef S4CASE_SEN
          rc = strncmp( string1, string2, count ) ;
       #else
-         #ifdef S4UNIX
+         #ifdef __unix__
             rc = strncasecmp( string1, string2, count ) ;
          #else
             rc = strnicmp( string1, string2, count ) ;
@@ -1280,7 +1277,7 @@ int S4FUNCTION u4namencmp( const char *string1, const char *string2, size_t coun
    #else
       if ( ignoreCase )
       {
-         #ifdef S4UNIX
+         #ifdef __unix__
             rc = strncasecmp( string1, string2, count ) ;
          #else
             #ifdef S4NO_STRNICMP
@@ -1379,14 +1376,14 @@ int u4nameRetExt( char *result, const int lenIn, const char *from )
    int S4FUNCTION u4pathSet( const char *defPath )
    {
       // returns -2 if cannot set drive, -1 if cannot set path
-      #ifndef S4UNIX
+      #ifndef __unix__
          // change drive if required...
          if ( defPath[1] == ':' )
          {
             int driveLetter = toupper( defPath[0] ) ;  // ensure upper case so subtract from 'A' works
             unsigned int drv1 = (unsigned int)( driveLetter - 'A' + 1 ) ;
             unsigned int drv2 ;
-            #ifdef S4WIN32
+            #ifdef __WIN32
                _chdrive( drv1 ) ;
                drv2 = _getdrive() ;
             #else

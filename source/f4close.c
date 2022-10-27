@@ -15,9 +15,6 @@
 /* f4close.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #ifdef S4TEMP
    #include "t4test.h"
@@ -130,7 +127,7 @@ static int file4closeHandle( FILE4 *file )
       log5( buf ) ;
    #endif
 
-   #if defined(S4WIN32)
+   #if defined(__WIN32)
       // AS Feb 17/06 - for Windows CE, it is possible to get errors if the card is not ready...retry if access denied error
       // Microsoft knowledgebase article #811693
       #ifdef S4WINCE

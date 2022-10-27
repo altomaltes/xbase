@@ -18,10 +18,6 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif  /* __TUROBC__ */
-
 #ifdef S4CLIENT
    void code4serverSetSlowDelay( CODE4 *c4, long delayInHundredths )
    {

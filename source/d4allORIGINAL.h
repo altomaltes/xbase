@@ -39,9 +39,9 @@
 #define S4DLL
 
 /* Choose Operating System */
-   #define S4WIN32           /* for Windows NT and Windows 95 */
+   #define __WIN32           /* for Windows NT and Windows 95 */
 /* #define S4WINCE      */   /* for Windows CE */
-/* #define S4UNIX       */   /* requires CodeBase Portability version */
+/* #define __unix__       */   /* requires CodeBase Portability version */
 /* #define S4MACINTOSH  */   /* requires CodeBase Mac version */
 /* #define S4WIN64      */   /* for IA-64 Windows */
 

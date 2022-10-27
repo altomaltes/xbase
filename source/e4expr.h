@@ -78,7 +78,7 @@ typedef struct
    unsigned char   nameLen ;
    char   priority ;
    char   returnType ;
-   #ifdef S4UNIX
+   #ifdef __unix__
       signed char  numParms ;  /* -1 means that the number is flexible */
    #else
       S4CONV( signed char numParms, signed char num_parms ) ;  /* -1 means that the number is flexible */
@@ -491,7 +491,7 @@ void e4trim( void ) ;
 void expr4trueFunction( void ) ;
 void e4upper( void ) ;
 void e4val( void ) ;
-#ifndef S4UNIX
+#ifndef __unix__
    void e4l2bin( void ) ;
 #endif
 void e4year( void ) ;

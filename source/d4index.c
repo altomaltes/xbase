@@ -15,11 +15,8 @@
 /* d4index.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
-#if defined( TIME4STATUS ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4UNIX ) && !defined( S4MACINTOSH )
+#if defined( TIME4STATUS ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( __unix__ ) && !defined( S4MACINTOSH )
    #include <process.h>
 #endif
 
@@ -244,7 +241,7 @@ INDEX4FILE *dfile4index( DATA4FILE *data, const char *indexName )
 }
 #endif
 
-#ifdef S4WIN32
+#ifdef __WIN32
    // AS Feb 9/06 - added clipper support for packwithstatus
    #if defined( TIME4STATUS ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
       // AS Jun 30/03 - moved to d4data.h, for support for d4packWithProgress

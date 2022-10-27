@@ -16,12 +16,6 @@
 
 #include "d4all.h"
 
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
-
 #ifdef S4OLEDEBUG_PRINT
    #include "util5.hpp"
 #endif
@@ -160,7 +154,7 @@
    //Some work may have to be done for WINCE
    void tran4getTime( CODE4 *c4 )
    {
-      #ifdef S4WIN32
+      #ifdef __WIN32
          SYSTEMTIME nowT ;
 
          GetLocalTime( &nowT ) ;
@@ -1946,7 +1940,7 @@
 
          #ifndef S4OFF_MULTI
             if ( d4lockTest( data, recNo, lock4write ) != 1 )
-               if ( d4lockInternal( data, recNo, 0 ) != 0 )
+               if ( d4lockInternal( data, recNo, 0, lock4any ) != 0 )
                {
                   // AS Mar 4/10 - log more info about what is going on in this case
                   CODE4 *c4 = trans->c4trans->c4 ;

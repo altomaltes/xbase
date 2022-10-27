@@ -15,11 +15,6 @@
 /* d4field.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 FIELD4 *S4FUNCTION d4field( DATA4 *data, const char *fieldName )
 {

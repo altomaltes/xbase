@@ -15,16 +15,13 @@
 /* d4data.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif  /* __TUROBC__ */
 
 #ifndef S4WINCE   /* LY 2002/08/28 */
    #include <time.h>
 #endif
 
 /* LY 2001/08/21 : added ifdef to avoid compile error on non-WIN32 */
-#if defined(S4WIN32) && !defined(S4STAND_ALONE)
+#if defined(__WIN32) && !defined(S4STAND_ALONE)
    #include <sys\types.h>
    #include <sys\stat.h>
 #endif
@@ -243,7 +240,7 @@ void S4FUNCTION d4blank( DATA4 *data )
    #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( data->codeBase->lockEnforce && data->recNum > 0L )
-            if ( d4lockTest( data, data->recNum ) != 1 )
+            if ( d4lockTest( data, data->recNum, lock4any ) != 1 )
             {
                error4( data->codeBase, e4lock, E93303 ) ;
                return ;
@@ -308,7 +305,7 @@ int S4FUNCTION d4bof( DATA4 *data )
          #ifndef S4SERVER
             #ifndef S4OFF_ENFORCE_LOCK
                if ( data->codeBase->lockEnforce && data->recNum > 0L )
-                  if ( d4lockTest( data, data->recNum ) != 1 )
+                  if ( d4lockTest( data, data->recNum, lock4any ) != 1 )
                   {
                      error4( data->codeBase, e4lock, E93305 ) ;
                      return ;
@@ -914,7 +911,7 @@ int d4verify( DATA4 *d4, const int subs )
 
 
 /* LY 00/11/16 : exporting function due to failure of Microsoft IA-64 compiler */
-#if defined( S4FILE_EXTENDED ) && !defined( S464BIT ) && !defined( S4UNIX ) && (!defined(__cplusplus) || defined(S4WIN64))
+#if defined( S4FILE_EXTENDED ) && !defined( S464BIT ) && !defined( __unix__ ) && (!defined(__cplusplus) || defined(S4WIN64))
    FILE4LONG S4FUNCTION file4longCoerce( LONGLONG val )
    {
       // assert5( sizeof( val ) == sizeof( FILE4LONG ) ) ;
@@ -967,7 +964,7 @@ int d4verify( DATA4 *d4, const int subs )
 #endif
 
 // available in client/server or stand alone if WIN32
-#if defined( S4WIN32 ) || !defined( S4STAND_ALONE )
+#if defined( __WIN32 ) || !defined( S4STAND_ALONE )
    #ifdef S4STAND_ALONE
       void dfile4versionIncrement( DATA4FILE *dataFile )
       {
@@ -1041,7 +1038,7 @@ int d4verify( DATA4 *d4, const int subs )
          #endif
 
          // in windows 32 bit try to check the physical date time as well if not open exclusive
-         #if defined( S4WIN32 ) && !defined( S4OFF_MULTI )
+         #if defined( __WIN32 ) && !defined( S4OFF_MULTI )
             if ( dataFile->file.lowAccessMode == OPEN4DENY_NONE )   // not denying writes, so other users may have changed it
             {
                // means file may have been changed externally, so update the date stamp
@@ -1083,7 +1080,7 @@ int d4verify( DATA4 *d4, const int subs )
          return dataFile->versionNumber ;
       #endif
    }
-#endif /* #if defined( S4WIN32 ) || !defined( S4STAND_ALONE ) */
+#endif /* #if defined( __WIN32 ) || !defined( S4STAND_ALONE ) */
 
 
 #ifdef S4VB_DOS

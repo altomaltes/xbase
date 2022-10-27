@@ -15,11 +15,6 @@
 /* d4date.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif  /* __TUROBC__ */
-#endif  /* S4UNIX */
 
 // AS 08/14/00 - moved defs to d4date.c for mdx odbc
 
@@ -581,7 +576,7 @@ void S4FUNCTION date4init( char *datePtr, const char *dateData, char *picture )
    if ( centuryCount == 2 )
    {
       /* check the century on the system clock if possible */
-      #if defined(S4WINCE) || defined(S4WIN32)
+      #if defined(S4WINCE) || defined(__WIN32)
          SYSTEMTIME st ;
          GetLocalTime(&st) ;
          currentCentury = st.wYear / 100 ;
@@ -702,7 +697,7 @@ long S4FUNCTION date4long( const char *datePtr )
 
 void S4FUNCTION date4timeNow( char *timeData )
 {
-   #if defined(S4WINCE) || defined(S4WIN32)
+   #if defined(S4WINCE) || defined(__WIN32)
       SYSTEMTIME st;
       GetLocalTime( &st );
       c4ltoa45( (long)st.wHour, timeData, -2) ;
@@ -715,7 +710,7 @@ void S4FUNCTION date4timeNow( char *timeData )
       c4ltoa45( (long)timeNow.minute, timeData + 3, -2) ;
       c4ltoa45( (long)timeNow.second, timeData + 6, -2) ;
    #else
-      #ifdef S4UNIX_THREADS
+      #ifdef __unix___THREADS
          long timeVal ;
          struct tm result ;
 
@@ -725,7 +720,7 @@ void S4FUNCTION date4timeNow( char *timeData )
          c4ltoa45( (long)result.tm_hour, timeData, -2) ;
          c4ltoa45( (long)result.tm_min, timeData + 3, -2) ;
          c4ltoa45( (long)result.tm_sec, timeData + 6, -2) ;
-      #else  /* !S4WINCE, !S4WIN32, !S4UNIX_THREADS */
+      #else  /* !S4WINCE, !__WIN32, !__unix___THREADS */
          time_t timeVal ;
          struct tm *tmPtr ;
 
@@ -745,7 +740,7 @@ void S4FUNCTION date4timeNow( char *timeData )
 
 void S4FUNCTION date4today( char *datePtr )
 {
-   #if defined(S4WINCE) || defined(S4WIN32)
+   #if defined(S4WINCE) || defined(__WIN32)
       SYSTEMTIME st;
       GetLocalTime( &st );
 
@@ -759,7 +754,7 @@ void S4FUNCTION date4today( char *datePtr )
       c4ltoa45( timeNow.month, datePtr + 4, -2 ) ;
       c4ltoa45( timeNow.day, datePtr + 6, -2 ) ;
    #else
-      #ifdef S4UNIX_THREADS
+      #ifdef __unix___THREADS
          time_t timeVal ;
          struct tm result ;
 
@@ -769,7 +764,7 @@ void S4FUNCTION date4today( char *datePtr )
          c4ltoa45( 1900L + result.tm_year, datePtr, -4 ) ;
          c4ltoa45( (long)result.tm_mon + 1, datePtr + 4, -2 ) ;
          c4ltoa45( (long)result.tm_mday, datePtr + 6, -2 ) ;
-      #else  /* !S4WINCE, !S4WIN32, !S4UNIX_THREADS */
+      #else  /* !S4WINCE, !__WIN32, !__unix___THREADS */
          time_t timeVal ;
          struct tm *tmPtr ;
 
@@ -793,7 +788,7 @@ void date4timeNowFull( void *timeData )
       assert5port( "added autoTimestampField support" ) ;
    #endif
    // AS Mar 11/03 - support for new feature r4autoTimestamp
-   #if defined(S4WINCE) || defined(S4WIN32)
+   #if defined(S4WINCE) || defined(__WIN32)
       SYSTEMTIME st;
       GetSystemTime( &st );  // use Co-ordinated Universal Time in case machines are run accross time-zone boundaries.
 

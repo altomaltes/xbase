@@ -19,11 +19,6 @@
    operate normally */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif  /* __TUROBC__ */
-#endif  /* S4UNIX */
 
 /*
    MODULE
@@ -93,7 +88,7 @@
 #ifndef S4OFF_COMMUNICATIONS
 #ifndef S4SERVER
    #ifndef S4MACINTOSH
-      #ifndef S4UNIX
+      #ifndef __unix__
          #include <sys\timeb.h>
       #else
          #ifndef S4NO_FTIME
@@ -1305,7 +1300,7 @@ int S4FUNCTION connection4sendMessageLow( CONNECTION4 *connection, char doFreeXP
 
    #ifdef S4COM_PRINT
       #ifdef S4CLIENT
-         #ifdef S4UNIX
+         #ifdef __unix__
             printf( "Sending Message:  %s\n",
                s4connectionPrint( connection4type( connection ) ) ) ;
          #endif

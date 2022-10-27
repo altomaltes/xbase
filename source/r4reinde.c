@@ -16,12 +16,6 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif  /* __TURBOC__ */
-
-
-
 #if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER ) && !defined( S4CLIENT )
    #include "r4reinde.h"
 #endif /* #if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER ) && !defined( S4CLIENT ) */

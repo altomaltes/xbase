@@ -16,11 +16,6 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
-
-
 #if !defined( S4CLIENT ) && defined( S4MDX )
    #ifdef P4ARGS_USED
       #pragma argsused
@@ -254,7 +249,7 @@
          default:
             return error4( t4->codeBase, e4index, E82901 ) ;  /* AS 02/10/99 changed from e4info so stop-critical doesn't halt in ole-db */
       }
-      #ifdef S4UNIX  // CS 2000/05/25
+      #ifdef __unix__  // CS 2000/05/25
          t4->keyType = keyType ;
       #endif
 
@@ -412,7 +407,7 @@
          int sortOrdinal = c4atoi( header->sortSeq + 2, 5 ) ;
          if ( collate4arrayIndex( sortOrdinal ) >= NUM4AVAIL_COLLATION_ENTRIES ) // # > than collations we support
             return error4( c4, e4index, E84907 ) ;
-         t4->collateName = (Collate4name)sortOrdinal ;
+         t4->collateName = (enum Collate4name)sortOrdinal ;
       }
       else
          return error4( c4, e4index, E84907 ) ;
@@ -688,7 +683,7 @@
                t4->dtok = t4dblToInt ;
                t4->pChar = '\0' ;
                break ;
-            #if defined( S4WIN32 ) || defined( S4MACINTOSH )   // LY Aug 13/04
+            #if defined( __WIN32 ) || defined( S4MACINTOSH )   // LY Aug 13/04
                /* LY 4/29/99 : no equivalent of atoi64() for Mac => no c4atoLongLong => t4strToLongLong */
                // #ifndef S4NO_ATOLONGLONG
                   case r5i8:
@@ -735,7 +730,7 @@
          default:
             return error4( t4->codeBase, e4info, E82901 ) ;
       }
-      #ifdef S4UNIX
+      #ifdef __unix__
          switch( type )
          {
             case r4numDoub:
@@ -789,7 +784,7 @@
             t4->cmp = (S4CMP_FUNCTION *)u4memcmp ;
             t4->stok = t4noChangeStr ;
             t4->dtok = t4dateDoubToStr ;
-            #ifdef S4UNIX
+            #ifdef __unix__
                t4->keyType = r4date ;
             #endif
             break ;
@@ -798,7 +793,7 @@
             t4->cmp = (S4CMP_FUNCTION *)u4memcmp ;
             t4->stok = t4strToClip ;
             t4->dtok = 0 ;
-            #ifdef S4UNIX
+            #ifdef __unix__
                t4->keyType = r4num ;
             #endif
             break ;
@@ -806,7 +801,7 @@
             t4->cmp = (S4CMP_FUNCTION *)u4memcmp ;
             t4->stok = t4noChangeStr ;
             t4->dtok = 0 ;
-            #ifdef S4UNIX
+            #ifdef __unix__
                t4->keyType = r4str ;
             #endif
             break ;
@@ -817,7 +812,7 @@
             // t4->stok = t4noChangeStr ;
             t4->stok = t4unicodeToMachine ;
             t4->dtok = 0 ;
-            #ifdef S4UNIX
+            #ifdef __unix__
                t4->keyType = keyType ;
             #endif
             break ;

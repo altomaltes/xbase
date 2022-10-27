@@ -16,6 +16,8 @@
 #ifndef E4ERROR_OFF
 #ifndef S4LANGUAGE
 
+#include "d4all.h"
+
 /* LY July 8/03 : added static */
 static S4CONST char *bad4data = "Invalid or Unknown Error Code" ;
 ERROR4DATA e4errorData[] =
@@ -497,28 +499,33 @@ const char *S4FUNCTION error4text( CODE4 *c4, const long errCode2 )
                   szArray = sizeof( error4array4 ) ;
                   break ;
             #endif
+
             #ifdef S4TESTING
                case 5:
                   array = error4array5 ;
                   szArray = sizeof( error4array5 ) ;
                   break ;
             #endif
+
             #ifdef S4CBPP
                case 6:
                   array = error4array6 ;
                   szArray = sizeof( error4array6 ) ;
                   break ;
             #endif
+
             #ifdef S4SERVER
                case 7:
                   array = error4array7 ;
                   szArray = sizeof( error4array7 ) ;
                   break ;
             #endif
+
             case 8:
                array = error4array8 ;
                szArray = sizeof( error4array8 ) ;
-               break ;
+            break ;
+
             case 9:
                array = error4array9 ;
                szArray = sizeof( error4array9 ) ;

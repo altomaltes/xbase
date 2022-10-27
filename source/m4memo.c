@@ -15,11 +15,6 @@
 /* m4memo.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved.  */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 // AS June 18/02 - Code for compression of memo fields
 int S4FUNCTION code4memoCompress( CODE4 *c4, short flag )
@@ -151,7 +146,7 @@ int S4FUNCTION code4memoCompress( CODE4 *c4, short flag )
          return rc ;
 
       #ifndef S4OFF_MULTI
-         rc = d4lockFileInternal( data, 1 ) ;
+         rc = d4lockFileInternal( data, 1, lock4any ) ;
          if ( rc )
             return rc ;
       #endif
@@ -517,9 +512,9 @@ int S4FUNCTION code4memoCompress( CODE4 *c4, short flag )
       if ( data->recNum > 0 )
       {
          #ifdef S4SERVER
-            rc = d4lockInternal( data, data->recNum, 0 ) ;
+            rc = d4lockInternal( data, data->recNum, 0, lock4any ) ;
          #else
-            rc = d4lockInternal( data, data->recNum, 1 ) ;
+            rc = d4lockInternal( data, data->recNum, 1, lock4any ) ;
          #endif
          if ( rc )
             return rc ;

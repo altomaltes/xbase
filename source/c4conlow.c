@@ -1136,7 +1136,7 @@ int connect4lowListen(CONNECT4LOW *hear, CODE4 *c4, short *portNo, int maxPendin
       return e4socket ;
    }
 
-   #ifdef S4UNIX
+   #ifdef __unix__
       memset(&localSin, 0, sizeof(sockaddr_in));
    #endif
    localSin.sin_family = AF_INET ;
@@ -1268,7 +1268,7 @@ static int connect4lowReadDo( CONNECT4LOW *conlow, char *buffer, int len, long t
       else
          timeout.tv_sec = timeoutInSeconds ;
 
-      // #if defined( S4WIN32 ) && !defined( S4OFF_THREAD ) && defined( S4CLIENT )
+      // #if defined( __WIN32 ) && !defined( S4OFF_THREAD ) && defined( S4CLIENT )
       //    // we wait for this interval time before timeout out.  the caller of this function will use c4->acceptTimeOut to
       //    // determine the number of times to call the lowRead function prior to timing out
       //    timeout.tv_sec = CON4LOW_ACCEPT_INTERVAL ;

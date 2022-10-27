@@ -16,12 +16,6 @@
 
 #include "d4all.h"
 
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
-
 #ifdef E4ANALYZE
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -91,21 +85,11 @@ int lock4groupLock( LOCK4GROUP *lock )
 
    switch( lock->id.type )
    {
-      case LOCK4ALL:
-         rc = d4lockAllInternal( lock->data, 0 ) ;
-         break ;
-      case LOCK4APPEND:
-         rc = d4lockAppendInternal( lock->data, 0 ) ;
-         break ;
-      case LOCK4FILE:
-         rc = d4lockFileInternal( lock->data, 0 ) ;
-         break ;
-      case LOCK4RECORD:
-         rc = d4lockInternal( lock->data, lock->id.recNum, 0 ) ;
-         break ;
-      default:
-         rc = error4( lock->data->codeBase, e4lock, E83901 ) ;
-         break ;
+      case LOCK4ALL:    rc = d4lockAllInternal( lock->data, 0 ) ;         break ;
+      case LOCK4APPEND: rc = d4lockAppendInternal( lock->data, 0 ) ;         break ;
+      case LOCK4FILE:   rc = d4lockFileInternal( lock->data, 0, lock4any ) ;         break ;
+      case LOCK4RECORD: rc = d4lockInternal( lock->data, lock->id.recNum, 0, lock4any ) ;         break ;
+      default:          rc = error4( lock->data->codeBase, e4lock, E83901 ) ;         break ;
    }
 
    return rc ;

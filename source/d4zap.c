@@ -15,11 +15,6 @@
 /* d4zap.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifndef S4OFF_WRITE
 int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
@@ -162,7 +157,7 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
       #endif
 
       #ifndef S4SINGLE
-         rc = d4lockFileInternal( data, 1 ) ;
+         rc = d4lockFileInternal( data, 1, lock4any ) ;
          if ( rc )
             return rc ;
       #endif
@@ -237,7 +232,7 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
 
       // AS Aug 15/01 - Code for 'version number' handling so users can know if the file has changed.
       /* LY 2001/08/21 : added ifdef to avoid compile error on non-WIN32 */
-      #if defined(S4WIN32) || !defined(S4STAND_ALONE)
+      #if defined(__WIN32) || !defined(S4STAND_ALONE)
          dfile4versionIncrement( d4 ) ;
       #endif
 

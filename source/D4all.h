@@ -36,14 +36,15 @@
 
 /* Specify Library Type (choose one) */
 /* #define S4STATIC */
-#define S4DLL
+/* #define S4DLL    */
 
-/* Choose Operating System */
-#define S4WIN32       /* for Windows NT and Windows 95 */
-/* #define S4WINCE      */   /* for Windows CE */
-/* #define S4UNIX       */   /* requires CodeBase Portability version */
-/* #define S4MACINTOSH  */   /* requires CodeBase Mac version */
-/* #define S4WIN64     */   /* for IA-64 Windows */
+/* Choose Operating System JASC, removed
+ 
+ #define S4WINCE        for Windows CE 
+ #define __unix__       requires CodeBase Portability version 
+ #define S4MACINTOSH    requires CodeBase Mac version 
+ #define S4WIN64        for IA-64 Windows 
+*/
 
 /* Selected default communications option */
 /* #define S4BERKSOCK */
@@ -137,5 +138,10 @@
 #define S4VERSION 6503014
 
 #include "d4inc.h"
+
+
+#ifdef __TURBOC__
+   #pragma hdrstop
+#endif  /* __TUROBC__ */
 
 #endif /* D4ALL_INC */

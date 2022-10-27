@@ -15,9 +15,6 @@
 /* r4relate.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 // AS Apr 18/05 - new callback functionality - currently only for windows 32 bit...
 // AS - moved to R4RELATE.H
@@ -718,7 +715,7 @@ static int relate4sortSeek( RELATION4 *relation ) ;
          relate->codeBase->expectedCount = -1 ;
       #endif
 
-      #ifdef S4WIN32
+      #ifdef __WIN32
          // AS Jul 25/05 - con't perform callbacks during this special count process (debugging only)
          QUERY_CALLBACK callback = relate->callback ;
          relate->callback = 0 ;
@@ -728,7 +725,7 @@ static int relate4sortSeek( RELATION4 *relation ) ;
       unsigned long count = relate4count( relate ) ;
       if ( count == ULONG_MAX - 1 )  // means in the count function already, just return
       {
-         #ifdef S4WIN32
+         #ifdef __WIN32
             relate->callback = callback ;
          #endif
          return ;
@@ -752,7 +749,7 @@ static int relate4sortSeek( RELATION4 *relation ) ;
       relate4changed( relate ) ;
       inCount = 0 ;
 
-      #ifdef S4WIN32
+      #ifdef __WIN32
          relate->callback = callback ;
       #endif
    }
@@ -1173,7 +1170,7 @@ int S4FUNCTION relate4changed( RELATE4 *relate )
 
 
 
-#ifdef S4WIN32
+#ifdef __WIN32
    // AS Feb 3/06 - add some logging to help diagnose relate suspend issues
    #ifdef RELATE4LOG
       static void relate4log( RELATE4 *relate, const char *out )
@@ -4080,7 +4077,7 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
    relate->relation->exprSource = 0 ;
 
    // AS Nov 2/05 - new callback functionality - to adjust the query prior to it actually being set
-   #ifdef S4WIN32
+   #ifdef __WIN32
       if ( relate->querySetCallback != 0 )
          expr = relate->querySetCallback( relate, expr ) ;
    #endif
@@ -4516,7 +4513,7 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
          suspend->relate = relate ;
       #endif
       suspend->isInit = 1 ;
-      #ifdef S4WIN32
+      #ifdef __WIN32
                         // CS 2011/05/18 ftime not supported on WinCE
                         suspend->relStartTime = GetTickCount();
       #else
@@ -4524,7 +4521,7 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
                 #endif
       // AS Feb 28/06 - only used in server version
       #ifndef S4SERVER
-                        #ifdef S4WIN32
+                        #ifdef __WIN32
                                 // CS 2011/05/18 ftime not supported on WinCE
                                 suspend->relLastCallTime = GetTickCount();
                         #else
@@ -4562,7 +4559,7 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
       #else
          assert5( suspend->relate->callback != 0 ) ;
          return suspend->relate->callback( 0 ) ;
-                        #ifdef S4WIN32
+                        #ifdef __WIN32
                                 // CS 2011/05/18 ftime not supported on WinCE
                                 suspend->relLastCallTime = GetTickCount();
                         #else
@@ -4578,7 +4575,7 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
    {
       #ifdef S4STAND_ALONE
          // in stand-alone we try to be more accurate with our timing...
-                        #ifdef S4WIN32
+                        #ifdef __WIN32
                                 // CS 2011/05/18 timeb not supported in WinCE.
                                 DWORD relCurrentTime = GetTickCount();
                                 // elapsed time in millseconds
@@ -4598,7 +4595,7 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
                sprintf( buf, "relate4suspendCheck: elapsedTime: %f\n", elapsedTime ) ;
                relate4log( suspend->relate, buf ) ;
             #endif
-                                #ifdef S4WIN32
+                                #ifdef __WIN32
                                         // CS 2011/05/18 ftime not supported on WinCE
                                         suspend->relLastCallTime = GetTickCount();
                                 #else
@@ -4626,7 +4623,7 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
          long numMicroseconds = suspend->relate->callbackMicroseconds ;
       #endif
 
-      #ifdef S4WIN32
+      #ifdef __WIN32
          // CS 2011/05/18 timeb not supported in WinCE.
          DWORD relCurrentTime = GetTickCount();
          // elapsed time in millseconds
@@ -4687,7 +4684,7 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
             // in this case we actually want to recalculate again after we finish the expected number of iterations...
             suspend->relCnt = suspend->relCntVal ;  // reset the iteration counter for next suspension
             suspend->relCntStart = suspend->relCntVal ;
-                                #ifdef S4WIN32
+                                #ifdef __WIN32
                                         // CS 2011/05/18 ftime not supported on WinCE
                                         suspend->relStartTime = GetTickCount();
                                 #else

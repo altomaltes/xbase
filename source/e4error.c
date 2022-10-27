@@ -20,10 +20,6 @@
    #include "e4palm.h"
 #endif
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif   /* __TUROBC__ */
-
 #ifdef S4WINTEL
    #if !defined(S4WINDOWS) && !defined(S4WINCE)    /* LY 00/07/04 */
       #include <conio.h>

@@ -25,12 +25,6 @@
       extern HINSTANCE cb5inst ;
    #endif
 
-   #ifndef S4UNIX
-      #ifdef __TURBOC__
-         #pragma hdrstop
-      #endif
-   #endif
-
    short c4setLog( short *logValue, short newValue )
    {                             /* if value is true, return VB True value (-1) */
       short temp;
@@ -319,7 +313,7 @@
 
    long S4FUNCTION code4hInst( CODE4 *cb, long value )
    {
-      #ifdef S4WIN32
+      #ifdef __WIN32
          void *temp ;
       #else
          short temp ;
@@ -332,7 +326,7 @@
       if ( value < 0 && value != r4check ) return (long) r4check ;
       if ( value == r4check ) return (long) cb->hInst ;
       temp = cb->hInst ;
-      #ifdef S4WIN32
+      #ifdef __WIN32
          cb->hInst = (HINSTANCE) value ;
       #else
          cb->hInst = (int) value ;
@@ -345,7 +339,7 @@
       #ifndef S4WINDOWS
          return 0 ;
       #else
-         #ifdef S4WIN32
+         #ifdef __WIN32
             void *temp ;
          #else
             short temp ;
@@ -358,7 +352,7 @@
          if ( value < 0 && value != r4check ) return (long) r4check ;
          if ( value == r4check ) return (long) cb->hWnd ;
          temp = cb->hWnd ;
-         #ifdef S4WIN32
+         #ifdef __WIN32
             cb->hWnd = (HWND) value ;
          #else
             cb->hWnd = (unsigned int) value ;
@@ -888,7 +882,7 @@
 
          #ifdef S4WINDOWS
          c4->hWnd = 0 ;
-            #ifdef S4WIN32
+            #ifdef __WIN32
                // AS Dec 11/07 - 64 bit windows fix - need to put #ifdef 64 bit around this...
                // CS 2012/02/02 GetWindowLongPtr used because it supercedes GetWindowLong and GWL_HINSTANCE is not supported in 64-bit.
                #ifdef S4WINDOWS_VS5_PLUS
@@ -1363,7 +1357,7 @@
       return (short)relate4type( r4, (int)type ) ;
    }
 
-   #if defined(S4WIN32) || defined(S4WIN16)
+   #if defined(__WIN32) || defined(S4WIN16)
       int S4FUNCTION report4decimal_v( PREPORT4 report, char *decimal )
       {
          #ifndef S4OFF_REPORT
@@ -1662,7 +1656,7 @@
       again if the FIELD4INFO struct ever changes.
 
 
-   #ifdef S4WIN32
+   #ifdef __WIN32
 
       This function is required for VB 32-bit because it uses 4 byte alignment,
       which adds an extra two bytes to the FIELD4INFO structure, which is only

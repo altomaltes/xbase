@@ -106,7 +106,7 @@
    // BCR 08/18/00 - stricmp() is not supported under all operating systems. Use stricmp where it is available,
    // otherwise use c4stricmp() (defined in c4.c). On LINUX stricmp() is strcasecmp().
    #ifndef S4WINCE
-      #ifdef S4UNIX  /* LY 2001/07/18 : changed from S4LINUX */
+      #ifdef __unix__  /* LY 2001/07/18 : changed from S4LINUX */
          #define c4stricmp( a, b ) strcasecmp( a, b )
       #else
          // AS Dec 13/05 - under Windows stricmp is becoming deprecated...
@@ -169,7 +169,7 @@
    extern "C" {
 #endif
 
-#if defined( S4WIN16 ) || defined( S4WIN32 )
+#if defined( S4WIN16 ) || defined( __WIN32 )
    typedef short (CALLBACK* REINDEX_CALLBACK)(double);
 #else
    typedef short ( * REINDEX_CALLBACK)(double);
@@ -213,7 +213,7 @@
 /* EXTERNAL FUNCTIONS : */
 
 /* CONVERSIONS */
-#if defined( S4WIN32 ) || defined( S4MACINTOSH )    /* LY 00/01/24: for 32-bit only */
+#if defined( __WIN32 ) || defined( S4MACINTOSH )    /* LY 00/01/24: for 32-bit only */
    char *c4longlongToA( char *out, LONGLONG val ) ;  // not exported...
    S4EXPORT LONGLONG S4FUNCTION f4longLong( FIELD4 *field ) ;  // LY Oct 28/04 : export for t4field.c
 #endif
@@ -230,7 +230,7 @@ S4EXPORT long S4FUNCTION c4atol( const char S4PTR *, const int ) ;
 S4EXPORT float S4FUNCTION c4atofloat( const char S4PTR *, const int ) ;
 S4EXPORT unsigned long S4FUNCTION c4atoul( const char S4PTR *, const int ) ;
 S4EXPORT long S4FUNCTION date4yymmddToJulianLong( const int year, const int month, const int day ) ;
-#if defined( S4WIN32 ) || defined( S4MACINTOSH )
+#if defined( __WIN32 ) || defined( S4MACINTOSH )
    S4EXPORT LONGLONG S4FUNCTION c4atoLongLong( const char *str, const int l ) ;
 #endif
 #if defined(S4WINCE) || defined(S4PALM)
@@ -565,9 +565,9 @@ S4EXPORT int S4FUNCTION d4lockVB( DATA4 *, const long ) ;
       S4EXPORT int S4FUNCTION d4lockInternal( DATA4 *, const long, Bool5, Lock4type lockType = lock4write ) ;
       S4EXPORT int S4FUNCTION d4lockTest( DATA4 S4PTR *, const long, Lock4type lockType = lock4write ) ;
    #else
-      S4EXPORT int S4FUNCTION d4lockFileInternal( DATA4 *, Bool5, enum Lock4type lockType ) ;
-      S4EXPORT int S4FUNCTION d4lockInternal( DATA4 *, const long, Bool5, enum Lock4type lockType ) ;
-      S4EXPORT int S4FUNCTION d4lockTest( DATA4 S4PTR *, const long, enum Lock4type lockType ) ;
+      S4EXPORT int S4FUNCTION d4lockFileInternal( DATA4 S4PTR *, Bool5, enum Lock4type lockType ) ;
+      S4EXPORT int S4FUNCTION d4lockInternal(     DATA4 S4PTR *, const long, Bool5, enum Lock4type lockType ) ;
+      S4EXPORT int S4FUNCTION d4lockTest(         DATA4 S4PTR *, const long, enum Lock4type lockType ) ;
    #endif
 
    #ifndef S4INTERNAL_COMPILE_CHECK
@@ -611,7 +611,7 @@ S4EXPORT int S4FUNCTION d4pack( DATA4 S4PTR * ) ;
 // AS Jun 30/03 - support d4packWithProgress
 // AS Nov 24/03 - no support for clipper
 // AS Feb 9/06 - added clipper support for packwithstatus
-#if defined( TIME4STATUS ) && defined( S4WIN32 ) && !defined( S4OFF_WRITE )
+#if defined( TIME4STATUS ) && defined( __WIN32 ) && !defined( S4OFF_WRITE )
    void r4reindexStatusNextTag( REINDEX4STATUS *reindexStatus ) ;
    // REINDEX4STATUS *r4reindexStatusInit( REINDEX4STATUS *reindexStatus, INDEX4FILE *i4file ) ;
    REINDEX4STATUS *r4reindexStatusInit( REINDEX4STATUS *reindexStatus, INDEX4 *i4 ) ;
@@ -851,7 +851,7 @@ S4EXPORT void S4FUNCTION f4assignDouble( FIELD4 S4PTR *, const double ) ;
 S4EXPORT void S4FUNCTION f4assignField( FIELD4 S4PTR *, const FIELD4 S4PTR * ) ;
 S4EXPORT void S4FUNCTION f4assignInt( FIELD4 S4PTR *, const int ) ;
 S4EXPORT void S4FUNCTION f4assignLong( FIELD4 S4PTR *, const long ) ;
-#ifdef S4WIN32
+#ifdef __WIN32
    S4EXPORT void S4FUNCTION f4assignLongLong( FIELD4 S4PTR *, const LONGLONG ) ;
 #else
    S4EXPORT void S4FUNCTION f4assignLongLong( FIELD4 S4PTR *, const long long ) ;
@@ -937,7 +937,7 @@ S4EXPORT FILE4LONG S4FUNCTION file4lenLow( FILE4 S4PTR * ) ;
 // AS Sep. 17/01 - Must use function to change temporary setting to update validation tables
 void file4setTemporary( FILE4 *file, Bool5 flag, Bool5 isDataFile ) ;
 #define file4getTemporary( file ) ((file)->isTemporary)
-#if defined(S4WIN32) || defined(S4UNIX) || defined(S4PALM)
+#if defined(__WIN32) || defined(__unix__) || defined(S4PALM)
    S4EXPORT int S4FUNCTION file4exists( const char *fileName ) ;
 #endif
 
@@ -1352,10 +1352,10 @@ S4EXPORT long S4FUNCTION c4getTimeout( CODE4 S4PTR * ) ;
       S4EXPORT short S4FUNCTION code4errDefaultUnique( CODE4 *cb, short value ) ;
       S4EXPORT short S4FUNCTION code4errorCode( CODE4 *cb, short value ) ;
       S4EXPORT short S4FUNCTION code4errorCode2( CODE4 *cb, short value ) ;
-      S4EXPORT short S4FUNCTION code4exclusive( CODE4 *cb, short value ) ;
-      S4EXPORT short S4FUNCTION code4accessMode( CODE4 *cb, short value ) ;
-      S4EXPORT short S4FUNCTION code4exprError( CODE4 *cb, short value ) ;
-      S4EXPORT short S4FUNCTION code4errExpr( CODE4 *cb, short value ) ;
+      S4EXPORT short S4FUNCTION code4exclusive(      CODE4 *cb, short value ) ;
+      S4EXPORT short S4FUNCTION code4accessMode(     CODE4 *cb, short value ) ;
+      S4EXPORT short S4FUNCTION code4exprError(      CODE4 *cb, short value ) ;
+      S4EXPORT short S4FUNCTION code4errExpr(        CODE4 *cb, short value ) ;
       S4EXPORT short S4FUNCTION code4fieldNameError( CODE4 *cb, short value ) ;
       S4EXPORT short S4FUNCTION code4errFieldName( CODE4 *cb, short value ) ;
       S4EXPORT short S4FUNCTION code4fileFlush( CODE4 *cb, short value ) ;
@@ -1432,7 +1432,7 @@ S4EXPORT long S4FUNCTION c4getTimeout( CODE4 S4PTR * ) ;
    S4EXPORT int S4FUNCTION c4getLockAttemptsSingle( const CODE4 S4PTR * ) ;   /* LY 2001/09/06 */
    S4EXPORT int S4FUNCTION c4getLockDelay( const CODE4 S4PTR * ) ;   /* LY 2001/09/06 */
    S4EXPORT int S4FUNCTION c4getLockEnforce( const CODE4 S4PTR * ) ;
-   #if defined(S4WIN32) && defined(__cplusplus) && defined(OLEDB5BUILD) /* CS 1999/09/20 */
+   #if defined(__WIN32) && defined(__cplusplus) && defined(OLEDB5BUILD) /* CS 1999/09/20 */
       S4EXPORT Mem5zeroAllocator *S4FUNCTION c4getMemZeroAllocator( const CODE4 S4PTR *) ;
    #endif
    // AS Aug 29/03 - This value is stored on a client by client basis
@@ -1569,10 +1569,10 @@ INDEX4 *I4open( DATA4 *, const char *, char, int, char, char, char, char, char, 
    #else
       unsigned d4server( void * ) ;
    #endif
-   #ifdef S4WIN32
+   #ifdef __WIN32
       __declspec(dllexport) long FAR PASCAL MainWndProc( HWND, UINT, UINT, LONG ) ;
    #else
-      #ifndef S4UNIX
+      #ifndef __unix__
          long FAR PASCAL _export MainWndProc( HWND, UINT, UINT, LONG ) ;
       #endif
    #endif
@@ -1585,7 +1585,7 @@ INDEX4 *I4open( DATA4 *, const char *, char, int, char, char, char, char, char, 
    #define c4getReadOnly( c4 )       ( (c4)->currentClient == 0 ? (c4)->readOnlyDefault : (c4)->currentClient->readOnly )
    #define c4setReadOnly( c4, val )  ( (c4)->currentClient == 0 ? ((c4)->readOnlyDefault = (val)) : ((c4)->currentClient->readOnly = (val)) )
 
-   #ifndef S4UNIX
+   #ifndef __unix__
       #ifdef __cplusplus
          extern "C" {
       #endif
@@ -1987,7 +1987,7 @@ int dfile4readOld( DATA4FILE *, long ) ;
 S4EXPORT long S4FUNCTION dfile4recCount( DATA4FILE S4PTR *, const long ) ;  /* exported for single-user version (d4recCount replacement) */
 //#define dfile4recordPosition( d4, rec ) ( (unsigned long)(d4)->headerLen + (unsigned long)(d4)->recWidth * ( (rec) - 1 ) )
 #ifndef S4CLIENT
-   #ifdef S4WIN32
+   #ifdef __WIN32
       #ifdef S4FILE_EXTENDED
          #define dfile4recordPosition( d4, recNo ) ( file4longCoerce((DWORDLONG)((d4)->recWidth) * (DWORDLONG)(recNo-1) + (DWORDLONG)((d4)->headerLen) ))
       #else
@@ -2162,7 +2162,7 @@ S4EXPORT void S4FUNCTION d4versionCheck( DATA4 *data ) ;  // used for ole-db in 
 */
 #endif
 
-#if defined( S4WIN32 ) || !defined( S4STAND_ALONE )
+#if defined( __WIN32 ) || !defined( S4STAND_ALONE )
    S4EXPORT long S4FUNCTION d4versionNumber( DATA4 *data ) ;
    #ifdef S4STAND_ALONE
       void dfile4versionIncrement( DATA4FILE *dataFile ) ;
@@ -2385,7 +2385,7 @@ S4EXPORT int S4FUNCTION mem4reset( void ) ;
    INDEX4 *mem4index( void ) ;
 #endif
 #ifdef S4SEMAPHORE
-   #ifdef S4WIN32
+   #ifdef __WIN32
       /* AS 11/19/98 - Borland C++ gives compiler error because EnterCriticalSection returns void... */
       /*   #define mem4start(c4) ( ( memoryInitialized == 0 ) ? -1 : EnterCriticalSection( &critical4memory ) ) */
       /*   #define mem4stop(c4)  ( ( memoryInitialized == 0 ) ?  0 : LeaveCriticalSection( &critical4memory ) ) */
@@ -2727,7 +2727,7 @@ S4EXPORT DATA4 * S4FUNCTION d4compress( DATA4 S4PTR *data, const char S4PTR *com
 // #define u4sleep( duration ) (Sleep(( (duration) == 0 ) ? 10 : ( duration )))
 // if c4 is not put in, just assume don't need to delay
 // AS Apr 13/07 - fix for non-win32
-#ifdef S4WIN32
+#ifdef __WIN32
    #define u4sleep( c4 ) (((c4) == 0 ) ? Sleep( 0 ) : ( ((c4)->highPriority == 1 ) ? Sleep( 10 ) : Sleep( 0 ) ))
 #else
    #define u4sleep( c4 ) Sleep( 0 )
@@ -2970,7 +2970,7 @@ S4EXPORT int S4CALL u4keycmp( S4CMP_PARM, S4CMP_PARM, size_t, size_t, size_t, CO
 #endif
 
 // AS Sep 8/04 - changed for debugging support
-#ifdef S4WIN32
+#ifdef __WIN32
    // AS Apr 11/05 - enabled general access to thse functions...
    void critical4sectionEnter( CRITICAL4SECTION * ) ;
    void critical4sectionLeave( CRITICAL4SECTION * ) ;
@@ -3020,7 +3020,7 @@ S4EXPORT int S4CALL u4keycmp( S4CMP_PARM, S4CMP_PARM, size_t, size_t, size_t, CO
    // new function conversions for OLE-DB
    void t4strToTime( COLLATE4 *, char *, const char *, const int, int * ) ;
    /* LY 99/5/6 */
-   #if defined( S4WIN32 ) || defined( S4MACINTOSH )
+   #if defined( __WIN32 ) || defined( S4MACINTOSH )
       void t4strToLongLong( COLLATE4 *, char *, const char *, const int, int * ) ;
       void t4dblToLongLong( char *result, const double input ) ;
    #endif
@@ -3204,9 +3204,13 @@ int u4createCopyrightFromStamp( char *, int ) ;
 
 
 // AS Aug 13/02 - Support for indicating porting issues for new features
-#ifdef S4WIN32
-   // As porting issues are addressed, the assert5port() calls themselves are removed
+// As porting issues are addressed, the assert5port() calls themselves are removed
+
+#ifdef __WIN32
    #define assert5port( val )
+#else
+   #include <assert.h>
+//   #define assert5port( c ) assert( c ) // JACS
 #endif
 
 

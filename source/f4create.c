@@ -16,10 +16,6 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
-
 #ifdef S4TEMP
    #include "t4test.h"
 #endif
@@ -31,7 +27,7 @@
    #endif
 #endif
 
-#ifdef S4UNIX
+#ifdef __unix__
    #include <sys/wait.h>  /* CS 2000/02/04 */
    /* LY July 7/03 : for fchmod() */
    #include <sys/stat.h>
@@ -231,7 +227,7 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
    }
 #endif
 
-#ifdef S4UNIX
+#ifdef __unix__
 int S4FUNCTION file4exists( const char *fileName )
 {
    /* existHandle will be >= 0 if the file exists and is allowed access
@@ -517,7 +513,7 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
    return 0 ;
 }
 #endif
-#endif /* S4UNIX */
+#endif /* __unix__ */
 
 #ifdef S4PALM
    static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
@@ -567,7 +563,7 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
 #endif /* S4PALM */
 
 
-#ifdef S4WIN32
+#ifdef __WIN32
    int S4FUNCTION file4exists( const char *fileName )
    {
       /* existHandle will be >= 0 if the file exists and is allowed access
@@ -658,7 +654,7 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
    }
 
 
-   // S4WIN32
+   // __WIN32
    static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
    {
       int existHandle ;
@@ -831,7 +827,7 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
 
       return 0 ;
    }
-#endif /* S4WIN32 */
+#endif /* __WIN32 */
 
 
 
@@ -893,7 +889,7 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
 
 /* now for all other instances */
 #ifdef S4WINTEL
-#ifndef S4WIN32
+#ifndef __WIN32
 #ifndef S4WIN16
 static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
 {
@@ -948,7 +944,7 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
    return 0 ;
 }
 #endif /* S4WINTEL */
-#endif /* S4WIN32 */
+#endif /* __WIN32 */
 #endif /* S4WIN16 */
 
 // AS Nov 3/05 - need to export...used by C++ module (File4 class)

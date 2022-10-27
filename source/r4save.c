@@ -316,7 +316,7 @@ int S4FUNCTION report4save_object( FILE4SEQ_WRITE *seq, OBJ4 *obj )
          lstrcpy( bname, obj->area->report->report_name ) ;
          wsprintf( bname + lstrlen(bname), TEXT(".b%2d"), obj->area->report->bitmaps++ ) ;
          #ifdef S4WINDOWS
-         #ifndef S4WIN32
+         #ifndef __WIN32
          if ( (bmp4WriteDIB( bname, (HANDLE)obj->data )) != (BOOL)NULL )
             save4string( seq, bname ) ;
          else
@@ -504,7 +504,7 @@ int S4FUNCTION report4save_style( FILE4SEQ_WRITE *seq, STYLE4 *style )
    if ( save4short( seq, &sval ) < 0 )
       return -1 ;
 
-   #ifdef S4WIN32
+   #ifdef __WIN32
       if ( save4long( seq, (long *)&(style->lfont.lfHeight) ) < 0 ||
       save4long( seq, (long *)&(style->lfont.lfWidth) ) < 0 ||
       save4long( seq, (long *)&(style->lfont.lfEscapement) ) < 0 ||
@@ -1507,7 +1507,7 @@ PSTYLE4 S4FUNCTION report4retrieve_style( FILE4SEQ_READ *seq, REPORT4 *report, i
    short point_size ;
    R4LOGFONT lfont ;
    int rc ;
-   #ifdef S4WIN32
+   #ifdef __WIN32
       short ilfHeight, ilfWidth, ilfEscapement, ilfOrientation, ilfWeight ;
    #endif
 
@@ -1521,7 +1521,7 @@ PSTYLE4 S4FUNCTION report4retrieve_style( FILE4SEQ_READ *seq, REPORT4 *report, i
    ret4short( seq, &point_size ) < sizeof(point_size) )
       return NULL ;
 
-   #ifndef S4WIN32
+   #ifndef __WIN32
       if ( ret4short( seq, (short *)&(lfont.lfHeight) ) < sizeof(lfont.lfHeight) ||
       ret4short( seq, (short *)&(lfont.lfWidth) ) < sizeof(lfont.lfWidth) ||
       ret4short( seq, (short *)&(lfont.lfEscapement) ) < sizeof(lfont.lfEscapement) ||

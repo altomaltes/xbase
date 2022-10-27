@@ -16,9 +16,6 @@
 /* forced rebuild mod */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif  /* __TURBOC__ */
 
 #ifdef __BORLANDC__
    #if __BORLANDC__ < 0x500 && !defined(S4STAND_ALONE) && !defined(S4EXE_BUILD)
@@ -115,7 +112,7 @@ S4LONG S4FUNCTION x4reverseLong( const void *val )
 
       return *(LONGLONG *)out ;
    }
-#endif  // S4WIN32
+#endif  // __WIN32
 
 double S4FUNCTION x4reverseDouble( const void *val )
 {

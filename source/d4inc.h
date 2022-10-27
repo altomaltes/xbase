@@ -28,7 +28,7 @@
       #include <TxtGlue.h>
       #include <WinGlue.h>
    #else
-      #if defined(S4WIN16) || defined(S4WIN32) || defined(S4WINCE) || defined(S4WIN64)
+      #if defined(S4WIN16) || defined(__WIN32) || defined(S4WINCE) || defined(S4WIN64)
          #include <windows.h>
       #endif
 
@@ -69,7 +69,7 @@
 
    #endif
 
-   #if defined( S4UNIX ) || defined( S4MACINTOSH ) || defined( S4PALM )
+   #if defined( __unix__ ) || defined( S4MACINTOSH ) || defined( S4PALM )
       #include "p4port.h"
    #else
       #include <stdarg.h>
@@ -86,7 +86,7 @@
       #endif
    #endif
 
-   #ifdef S4UNIX
+   #ifdef __unix__
       #include <dirent.h>
    #endif
 
@@ -100,7 +100,7 @@
       #include "single4.hpp"
    #endif
    #ifdef OLEDB5BUILD
-      #ifdef S4WIN32
+      #ifdef __WIN32
          /* need err5 for m4mem2.h in some instances if ole-db... */
          #include "oledb.h"
          #include "oledberr.h"
@@ -171,8 +171,8 @@
       #include "w4.h"
    #endif
 
-   // LY Sep 10/04 : changed from S4LINUX to S4UNIX
-   #ifdef S4UNIX /* LY 2002/02/20 : for semaphore support */
+   // LY Sep 10/04 : changed from S4LINUX to __unix__
+   #ifdef __unix__ /* LY 2002/02/20 : for semaphore support */
       #include <pthread.h>
    #endif
 

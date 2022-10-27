@@ -15,11 +15,6 @@
 /* d4skip.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifdef S4SERVER
    long d4skipRecno( DATA4 *data, long n )

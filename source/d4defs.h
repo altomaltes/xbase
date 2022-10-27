@@ -18,11 +18,11 @@
 #define D4DEFS_INC
 
 #ifdef S4WINCE
-   #define S4WIN32
+   #define __WIN32
 #endif
 
 #ifdef S4WIN64
-   #define S4WIN32
+   #define __WIN32
 #endif
 
 #ifdef S4SERVER
@@ -130,7 +130,7 @@
    #ifndef __cplusplus
       #error must build OLEDB as C++ (compiler build says compile is C, not C++)
    #endif
-   #ifdef S4WIN32
+   #ifdef __WIN32
       #include <windows.h>
    #endif
    #define S4OLEDB_OR_NOT_SERVER
@@ -147,7 +147,7 @@
    #define S4EXE_BUILD
 #endif
 
-#ifdef S4WIN32
+#ifdef __WIN32
    #ifdef __BORLANDC__
       #if __BORLANDC__ < 0x500
          #ifndef S4OFF_THREAD
@@ -200,25 +200,25 @@
    #define S4INLINE
 #endif
 
-#if !defined( S4UNIX ) && !defined( S4MACINTOSH ) && !defined( S4OS2 ) && !defined( S4PALM ) && !defined( _MSC_VER )
+#if !defined( __unix__ ) && !defined( S4MACINTOSH ) && !defined( S4OS2 ) && !defined( S4PALM ) && !defined( _MSC_VER )
    #define P4ARGS_USED
 #endif
 
 #if defined(_MSC_VER)
-   #if defined(_WIN32) && !defined(S4WIN32)
-      #error Must compile with S4WIN32 defined
+   #if defined(_WIN32) && !defined(__WIN32)
+      #error Must compile with __WIN32 defined
    #endif
-   #if !defined(_WIN32) && defined(S4WIN32)
-      #error Cannot compile with S4WIN32 defined
+   #if !defined(_WIN32) && defined(__WIN32)
+      #error Cannot compile with __WIN32 defined
    #endif
 #endif
 
 #if defined(__TURBOC__)
-   #if defined(__WIN32__) && !defined(S4WIN32)
-      #error Must compile with S4WIN32 defined
+   #if defined(__WIN32__) && !defined(__WIN32)
+      #error Must compile with __WIN32 defined
    #endif
-   #if !defined(__WIN32__) && defined(S4WIN32)
-      #error Cannot compile with S4WIN32 defined
+   #if !defined(__WIN32__) && defined(__WIN32)
+      #error Cannot compile with __WIN32 defined
    #endif
 #endif
 
@@ -391,11 +391,11 @@
    #endif
 #endif
 
-#if !defined(S4WIN16) && !defined(S4WIN32) && !defined(S4OS2) && !defined(S4UNIX) && !defined(S4MACINTOSH) && !defined(S4PASCAL_WIN) && !defined(S4DOS) && !defined(S4PALM)
-   #error NO OPERATING SYSTEM SELECTED (S4WIN16/S4WIN32/S4DOS/S4UNIX/...)
+#if !defined(S4WIN16) && !defined(__WIN32) && !defined(S4OS2) && !defined(__unix__) && !defined(S4MACINTOSH) && !defined(S4PASCAL_WIN) && !defined(S4DOS) && !defined(S4PALM)
+   #error NO OPERATING SYSTEM SELECTED (S4WIN16/__WIN32/S4DOS/__unix__/...)
 #endif
 
-#if !defined(S4UNIX) && !defined(S4MACINTOSH) && !defined(S4PALM)
+#if !defined(__unix__) && !defined(S4MACINTOSH) && !defined(S4PALM)
   #define S4WINTEL   /*This will include DOS and OS2 also */
 #endif
 
@@ -403,7 +403,7 @@
    #define S4WINDOWS
 #endif
 
-#ifdef S4WIN32
+#ifdef __WIN32
    #if !defined( S4STAND_ALONE ) && !defined( S4OFF_THREAD ) && !defined( S4COMM_THREAD ) && !defined( S4OFF_COMMUNICATIONS )
       #define S4COMM_THREAD
    #endif
@@ -459,7 +459,7 @@
    #endif
 #endif
 
-#if !defined( S4PROFILE ) && defined( S4SERVER ) && defined( S4WIN32 ) && !defined( S4COMTHREADS ) && !defined( S4OFF_THREAD )
+#if !defined( S4PROFILE ) && defined( S4SERVER ) && defined( __WIN32 ) && !defined( S4COMTHREADS ) && !defined( S4OFF_THREAD )
    #define S4COMTHREADS
 #endif
 
@@ -474,7 +474,7 @@
    #define S4CONSOLE
 #endif
 
-#if defined( S4UNIX ) && !defined( S4CONSOLE )
+#if defined( __unix__ ) && !defined( S4CONSOLE )
    #define S4CONSOLE
 #endif
 
@@ -482,7 +482,7 @@
    #ifndef S4OFF_TRAN
       #define S4STAND_ALONE_TRANS
    #endif
-   #ifdef S4UNIX
+   #ifdef __unix__
       #define S4OFF_COMMUNICATIONS
    #endif
    #ifdef S4OS2
@@ -503,12 +503,12 @@
    #error Both S4DOS and S4WIN16 switches set - only one is allowed.
 #endif
 
-#if defined(S4DOS) && defined(S4WIN32)
-   #error Both S4DOS and S4WIN32 switches set - only one is allowed.
+#if defined(S4DOS) && defined(__WIN32)
+   #error Both S4DOS and __WIN32 switches set - only one is allowed.
 #endif
 
-#if defined(S4WIN16) && defined(S4WIN32)
-   #error Both S4WIN16 and S4WIN32 switches set - only one is allowed.
+#if defined(S4WIN16) && defined(__WIN32)
+   #error Both S4WIN16 and __WIN32 switches set - only one is allowed.
 #endif
 
 #if defined( S4WINDOWS ) && defined( S4CONSOLE )
@@ -559,7 +559,7 @@
 #endif
 
 /*   OS2 2.0 SUPPORT */
-#ifndef S4UNIX    /* LY 99/11/29 : avoid if using AIX */
+#ifndef __unix__    /* LY 99/11/29 : avoid if using AIX */
    #ifdef __OS2__       /* Watcom 386, Borland C++ for OS/2 */
       #define S4OS2
    #endif
@@ -606,7 +606,7 @@
    typedef int HANDLE ;
 #endif
 
-#ifdef S4UNIX
+#ifdef __unix__
    typedef int HANDLE ;
    #define S4DIR   '/'
    #define S4DIRW L'/'
@@ -735,9 +735,9 @@
    #define S4DLL
 #endif
 
-#if !defined(S4DOS) && !defined(S4WIN16) && !defined(S4WIN32) && !defined(S4MACINTOSH)
-   /* LY 2001/07/27 : changed S4LINUX to S4UNIX since SOLARIS' wchar_t is 4 bytes */
-   #if (!defined(_WCHAR_T) && !defined(_WCHAR_T_DEFINED)) || defined(S4UNIX)  /* CS 1999/10/07 */
+#if !defined(S4DOS) && !defined(S4WIN16) && !defined(__WIN32) && !defined(S4MACINTOSH)
+   /* LY 2001/07/27 : changed S4LINUX to __unix__ since SOLARIS' wchar_t is 4 bytes */
+   #if (!defined(_WCHAR_T) && !defined(_WCHAR_T_DEFINED)) || defined(__unix__)  /* CS 1999/10/07 */
       #define S4NO_WCSLEN
    #endif
 #else
@@ -755,11 +755,11 @@
    #endif
 #endif
 
-#ifdef S4WIN32
+#ifdef __WIN32
    typedef WCHAR WSTR5 ;
 #else
-   /* LY 2001/07/27 : changed !S4LINUX to !S4UNIX since SOLARIS' wchar_t is 4 bytes */
-   #if (defined(_WCHAR_T) || defined(_WCHAR_T_DEFINED)) && !defined(S4UNIX)
+   /* LY 2001/07/27 : changed !S4LINUX to !__unix__ since SOLARIS' wchar_t is 4 bytes */
+   #if (defined(_WCHAR_T) || defined(_WCHAR_T_DEFINED)) && !defined(__unix__)
       typedef wchar_t WSTR5 ;
    #else
       typedef unsigned short WSTR5 ;
@@ -777,16 +777,16 @@
 #endif
 
 /* LY 2001/07/18 : changed from S4LINUX for 64-bit Solaris */
-#if !defined(S4NO_LONGLONG) && ( defined(S4UNIX) || defined( S4MACINTOSH ) )
-   typedef long long __int64 ;
-   typedef long long LONGLONG ;
+#if !defined(S4NO_LONGLONG) && ( defined(__unix__) || defined( S4MACINTOSH ) )
+   typedef          long long __int64 ;
+   typedef          long long LONGLONG ;
    typedef unsigned long long ULONGLONG ;
-   #ifdef S4MACINTOSH   // LY Nov 8/04 : changed from S4UNIX to S4MACINTOSH
+   #ifdef S4MACINTOSH   // LY Nov 8/04 : changed from __unix__ to S4MACINTOSH
       #define S4SEMAPHORE /* LY 2002/02/20 */
    #endif
 #endif
 
-#ifdef S4UNIX
+#ifdef __unix__
    #define S4ERRNO           /* use global variable, 'errno' */
    #define S4NO_DUP          /* use if dup() not found/not required */
 /* #define S4LSEEK        */ /* use if lseek() cannot seek past EOF */
@@ -812,14 +812,14 @@
    //    #error - Multithreading not supported under Unix. Set S4OFF_THREAD.
    // #endif
    // #ifndef S4OFF_THREAD
-   //    #define S4UNIX_THREADS
+   //    #define __unix___THREADS
    // #endif
 
    // LY Sep 10/04 : moved from preceding #ifdef block
    #define S4SEMAPHORE /* LY 2002/02/20 */
 #endif
 
-#ifndef S4WIN32
+#ifndef __WIN32
    #ifndef  S4OFF_THREAD
       #define S4OFF_THREAD  // CS 2001/02/16
    #endif
@@ -887,7 +887,7 @@
    #define S4DO_BYTEORDER
 #endif
 
-#ifdef S4WIN32
+#ifdef __WIN32
    #define S4NO_FILELENGTH
    #ifndef INVALID_HANDLE_VALUE
       #define INVALID_HANDLE_VALUE (HANDLE)-1    /* for Windows NT CreateFile */
@@ -932,7 +932,7 @@
 #endif
 
 #ifdef __DLL__
-   #ifdef S4WIN32
+   #ifdef __WIN32
       // CS 2002/10/28 Remove auto define S4DLL
       #ifdef S4CBPP
          #ifdef _MSC_VER
@@ -961,7 +961,7 @@
    #error - Both S4STATIC and S4DLL switches set - only one is allowed.
 #endif
 
-#ifdef S4WIN32
+#ifdef __WIN32
    #ifdef S4DLL
       #ifdef _MSC_VER
          #define S4FUNCTION __stdcall
@@ -999,7 +999,7 @@
 #endif
 
 #ifdef S4DLL
-   #ifdef S4WIN32
+   #ifdef __WIN32
       #define S4CALL _cdecl
    #else
       #ifdef S4OS2
@@ -1031,7 +1031,7 @@
    #define FALSE 0
 #endif
 
-#if !defined( S4WIN32 ) && defined( S4DLL ) && !defined( S4OS2 )
+#if !defined( __WIN32 ) && defined( S4DLL ) && !defined( S4OS2 )
    #define S4PTR far
 #endif
 
@@ -1598,11 +1598,11 @@
       #error IPX/SPX communication protocol not supported
    #endif
 
-   #if defined( S4UNIX ) && defined( S4WINSOCK )
+   #if defined( __unix__ ) && defined( S4WINSOCK )
       #error Windows Sockets not supported under UNIX
    #endif
 
-   #if !defined( S4UNIX ) && defined( S4BERKSOCK )
+   #if !defined( __unix__ ) && defined( S4BERKSOCK )
       #error Berkeley Sockets only supported under UNIX
    #endif
 
@@ -1632,7 +1632,7 @@
 
    #ifndef S4STAND_ALONE
       // AS May 5/11 - used if S4OFF_THREAD is defined in client
-      #if defined( S4WIN32 ) && defined( S4CLIENT )
+      #if defined( __WIN32 ) && defined( S4CLIENT )
          // AS Jan 8/02 - The timeout interval to use on the reconnection only -- still waits the amount of ACCEPT_TIME
          // below (or as set by c4->acceptTimeOut), but does so in CON4LOW_ACCEPT_INTERVAL time chunks.
          #define CON4LOW_ACCEPT_INTERVAL 2
@@ -2366,7 +2366,7 @@
 #endif
 
 // BR 2001/04/11 No gui for unix
-#ifdef S4UNIX
+#ifdef __unix__
    #define S4OFF_SERVER_GUI
 #endif
 
@@ -2383,7 +2383,7 @@
 #endif
 
 // AS Oct 24/03 - Support for file_extended with MDX
-#ifdef S4WIN32
+#ifdef __WIN32
    #ifdef S4FILE_EXTENDED
       // LY Mar 28/05 : allow S4FILE_EXTENDED for Clipper, so large-enabled file
       // optimization works correctly (large file support not tested)
@@ -2420,7 +2420,7 @@
    #endif
 #else   /* we only support extended length files with WIN 32 and 64-bit UNIX machines*/
    #ifndef S464BIT
-      #ifdef S4UNIX
+      #ifdef __unix__
          #ifndef S4CLIPPER
             /* LY 2001/07/18 : removed !S4LINUX */
             #ifndef S4NO_LINUX_LFS  /* LY 2001/09/13 */
@@ -2461,7 +2461,7 @@
 
 #ifndef S4OFF_COMMUNICATIONS
    #define WS4MAX_PENDING_CONNECTS 10
-   #ifndef S4UNIX
+   #ifndef __unix__
       #define S4NO_INET_ATON      /* A unix address conversion function */
    #endif
 #endif
@@ -2687,8 +2687,8 @@
 
 // o/s info, so client can determine server o/s (win32 vs unix)
 #define OS4UNKNOWN 0x00
-#define OS4WIN32   0x01
-#define OS4UNIX    0x02
+#define O__WIN32   0x01
+#define O__unix__    0x02
 
 // used for tracking progress of slow items (reindex, pack, etc).  Currently on reindex covered
 #define ACTION4NONE              0
@@ -2835,9 +2835,9 @@
 #endif
 
 // AS Feb 17/04 - compression should always be available now, evein in stand/alone
-// #if !defined( S4STAND_ALONE ) && defined( S4WIN32 ) && !defined( S4COMPRESS )
+// #if !defined( S4STAND_ALONE ) && defined( __WIN32 ) && !defined( S4COMPRESS )
 // AS Dec 6/06 - allow to turn compression off in stand-alone
-#if defined( S4WIN32 ) && !defined( S4WIN64 ) && !defined( S4COMPRESS ) && !defined( S4OFF_COMPRESS )
+#if defined( __WIN32 ) && !defined( S4WIN64 ) && !defined( S4COMPRESS ) && !defined( S4OFF_COMPRESS )
    // always use compressed messages if possible
    #define S4COMPRESS
 #endif
@@ -2863,7 +2863,7 @@
 //#endif
 
 
-#if defined( S4WIN32 ) && (defined( S4ENCRYPT_HOOK ) || defined( S4ENCRYPT_COM ) ) && !defined( S4DLL_BUILD_ENCRYPT )
+#if defined( __WIN32 ) && (defined( S4ENCRYPT_HOOK ) || defined( S4ENCRYPT_COM ) ) && !defined( S4DLL_BUILD_ENCRYPT )
    #ifndef ENCRYPT4NO_DLL
       // in this instance we use dynamic loading of encryption if available
       #define S4ENCRYPT_DLL
@@ -2919,6 +2919,9 @@
 #ifdef S4STAND_ALONE
    #define SHARE4TAG_REMOVE
 #endif
+
+
+
 
 // AS Aug 28/02 - was in wrong place (not at end of file)
 #endif /* D4DEFS_INC */

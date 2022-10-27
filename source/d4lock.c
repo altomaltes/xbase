@@ -15,11 +15,6 @@
 /* d4lock.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifdef S4CLIENT
    int d4localLockSet( DATA4 *data, const long rec )
@@ -161,7 +156,7 @@
 #endif
 int S4FUNCTION d4lock( DATA4 *data, const long rec )
 {
-   return d4lockInternal( data, rec, 1 ) ;
+   return d4lockInternal( data, rec, 1, lock4any ) ;
 }
 
 
@@ -1115,8 +1110,11 @@ int S4FUNCTION d4lockFileInternal( DATA4 *data, Bool5 doUnlock, Lock4type lockTy
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
+
 /* returns r4locked if someone else locally has locked, 1 if success, 0 if not locked */
-int S4FUNCTION d4lockTest( DATA4 *data, const long recNo, Lock4type lockType )
+int S4FUNCTION d4lockTest( DATA4 *data
+                         , const long recNo
+                         , Lock4type lockType )
 {
    #ifndef S4SINGLE
       int rc ;

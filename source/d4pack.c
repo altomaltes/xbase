@@ -15,20 +15,15 @@
 /* d4pack.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifndef S4OFF_WRITE
 
 // AS Jun 30/03 - support d4packWithProgress
-#if defined( TIME4STATUS ) && !defined( S4OFF_WRITE ) && defined( S4WIN32 )
+#if defined( TIME4STATUS ) && !defined( S4OFF_WRITE ) && defined( __WIN32 )
    #include <process.h>
 #endif
 
-#ifdef S4WIN32
+#ifdef __WIN32
    // AS Feb 9/06 - added clipper support for packwithstatus
    #if defined( TIME4STATUS )
       static void d4packStatusInit( REINDEX4STATUS *reindexStatus, DATA4 *data )
@@ -238,7 +233,7 @@
 
       return r4success ;
    }
-#endif  // S4WIN32
+#endif  // __WIN32
 
 
 
@@ -383,7 +378,7 @@ int S4FUNCTION d4pack( DATA4 *d4 )
          return rc ;
 
       #ifndef S4SINGLE
-         rc = d4lockFileInternal( d4, 1 ) ;
+         rc = d4lockFileInternal( d4, 1, lock4any ) ;
          if ( rc )
             return rc ;
       #endif
@@ -441,7 +436,7 @@ int S4FUNCTION d4pack( DATA4 *d4 )
       d4->fileChanged = 1 ;
       // AS Aug 15/01 - Code for 'version number' handling so users can know if the file has changed.
       /* LY 2001/08/21 : added ifdef to avoid compile error on non-WIN32 */
-      #if defined(S4WIN32) || !defined(S4STAND_ALONE)
+      #if defined(__WIN32) || !defined(S4STAND_ALONE)
          dfile4versionIncrement( d4 ) ;
       #endif
 

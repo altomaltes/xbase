@@ -15,11 +15,6 @@
 /* f4memo.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 extern unsigned short f4memoNullChar ;
 
@@ -952,7 +947,7 @@ int S4FUNCTION f4memoWritePart( FIELD4 *field, char *dataToWrite, unsigned int d
       // AS 06/09/00 was not compiling in S4OFF_MULTI
       int rc ;
       #ifndef S4OFF_MULTI
-         rc = d4lockInternal( data, d4recNo( data ), 1 ) ;
+         rc = d4lockInternal( data, d4recNo( data ), 1, lock4any ) ;
          if ( rc )
             return rc ;
 
