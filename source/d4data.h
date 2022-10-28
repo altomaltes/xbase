@@ -283,10 +283,6 @@ struct DATA4FILESt ;
    struct REINDEX4STATUSSt ;
 #endif
 
-#if !defined(S4OFF_COMMUNICATIONS) && defined(S4CLIENT)
-   struct CONNECTION4St ;
-#endif
-
 #ifdef S4MAC_TCP  //CJ Jul 17/01-define for Macintosh client connection C4CONLOW strucuture type.
    class Connection4macClient ;
 #endif
@@ -323,30 +319,26 @@ typedef struct l4linkSt
 
 
 typedef struct s4singleSt
-{
-   struct s4singleSt *nextLink ;
+{ struct s4singleSt *nextLink ;
 } SINGLE4 ;
 
 
 
 typedef struct s4singleDistantSt
-{
-   struct s4singleDistantSt *nextLink ;
+{ struct s4singleDistantSt *nextLink ;
 } SINGLE4DISTANT ;
 
 
 
 typedef struct
-{
-   LINK4 link ;
+{ LINK4 link ;
    double  data ;  /* Make sure it is on a boundry good for at least a double  */
 } Y4CHUNK ;
 
 
 
 typedef struct MEM4st
-{
-   LINK4 link ;
+{ LINK4 link ;
 
    LIST4 chunks ;      /* Chunks of pieces */
    LIST4 pieces ;      /* A list of available memory pieces */
@@ -357,6 +349,7 @@ typedef struct MEM4st
    int nRepeat ;    /* The number of times entry returned for 'new' */
                     /* If nRepeat is '-1', it is a temporary entry. */
    int nUsed ;      /* The number of entries used */
+
    #ifdef S4DOS    /* no memory sharing under DOS, so can use a CODE4 for limited memory */
       #ifdef S4CBPP
          CODE4 S4PTR    *codeBase ;
@@ -1517,51 +1510,6 @@ enum TRAN4FILE_STATUS
 
 
 
-   #ifdef S4WINSOCK
-      typedef struct CONNECT4LOWSt
-      {
-         #ifndef CODE4UNAVAILABLE
-            SOCKET sockw ;
-            SOCKET sockr ;
-            // struct sockaddr addressw ;  // set when needed to the address of the sockw socket
-            C4ADDRESS addressw ;
-            // AS 02/06/01 - method to disable dual sockets...
-            // short useDualSocket ;
-            #ifdef S4COMPRESS
-               short compressLevel ;   // the compression level to use
-            #endif
-            short minLength ;       // minimum length before compression is considered
-            #if defined( S4PREPROCESS_COM )
-               #if defined( S4ENCRYPT_DLL ) || defined( S4DLL_BUILD_ENCRYPT )
-                  void *preprocess ;
-                  void *preprocessInit ;
-                  short blockSize ;
-               #else
-                  PREPROCESS4 *preprocess ;
-               #endif
-            #endif
-            #ifdef S4SERVER
-               // AS Sept 30/02 - do internal tracking of the connection status as it gets connected
-               // status array entreis are set to '1' as follows [0]:allocated [1]:accepted [2]:received 4 identifying bytes
-               // [3]:2nd connection in server4clientAccept(), [4]:(1)found 1st connection in server4clientAccept()(2)did't find
-               // [5]:set up sockw in accept, [6]:  // created new javaptr in accept
-               // [7]:(1)found 1st connection in server4clientConnectNew()(2)did't find
-               char serverConnectStatus[10] ;
-               char serverConnectStatusSaved[10] ;   // for when we combine sockets, this is the one that was deleted
-               // AS Dec 8/03 - Need to track if the connection is a java connection at the low level (to determine if length and compress/encrypt bytes are being sent)
-               Bool5 javaClient ;
-            #endif
-            #ifdef S4CBPP  /* LY 2003/05/22 : last param of connect4lowAccept() either class or struct, but CONNECT4LOW.c4 declared only as struct */
-               CODE4 *c4 ;      // required for dll encryption - AS Mar 12/03 - make generally available
-            #else
-               struct CODE4St *c4 ;      // required for dll encryption - AS Mar 12/03 - make generally available
-            #endif
-         #endif
-      } CONNECT4LOW ;
-   #endif
-
-
-
    #ifdef S4BERKSOCK
       typedef struct
       {
@@ -1821,38 +1769,6 @@ enum TRAN4FILE_STATUS
 
 
 
-   typedef struct CONNECTION4St
-   {
-      LINK4 link ;
-
-      CONNECT4 *connect ;
-
-      int connected ;
-      unsigned short dataLen ;
-
-      short connectionFailure ;    /* true if a communications failure occurs */
-
-      #ifdef S4CBPP
-         CODE4 S4PTR *cb ;
-      #else
-         struct CODE4St *cb ;
-      #endif
-
-      PACKET4 packet ;
-
-      char *buffer ;
-      long bufferLen ;
-      long curBufferLen ;
-
-      #ifdef E4ANALYZE
-         short initUndone ;
-      #endif
-
-      char serverName[128] ;
-      char port[16];
-      char userName[LEN4ACCOUNT_ID + 1];
-      char password[LEN4PASSWORD + 1];
-   } CONNECTION4 ;
 #endif /* S4STAND_ALONE */
 
 
@@ -2569,10 +2485,6 @@ typedef struct CODE4St
             LIST4MUTEX connectBufferListMutex ;  /* list of CONNECT4BUFFERs */
          #endif
 
-         #ifdef S4COMM_THREAD
-            INTER4 *inter ;
-            unsigned long interThreadHandle ;
-         #endif
       #endif
       char skipCom ;  /* used for debugging purposes and the ats system */
       /*CJ- made change to facilate security issues for distribution of CodeBase DLLs */
@@ -3241,23 +3153,6 @@ typedef struct DATA4FILESt
       int doDate ;    /* does the date need to be updated on unlock/close? */
    #endif
 
-   #ifdef S4CLIENT
-      // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-      // struct DATA4St S4PTR *fileLock ;
-      // struct DATA4St S4PTR *appendLock ;
-      // struct DATA4St S4PTR *lockTest ;
-      long fileLockServerId ;
-      long fileLockLockId ;
-      long appendLockServerId ;
-      long appendLockLockId ;
-      long lockTestServerId ;
-      long lockTestLockId ;
-      char accessName[LEN4PATH+1] ;
-      struct CONNECTION4St S4PTR *connection ;
-      long serverId ;
-      int accessMode ;
-      Bool5 codePageRead ;   // true if the codepage has been read from the server
-   #else
       char S4PTR *record ;
       FILE4    file ;
       char hasMdxMemo ;        /* Has an MDX and/or a memo file attached to it */
@@ -3291,10 +3186,10 @@ typedef struct DATA4FILESt
          unsigned long recordLockReadCount ;
          LIST4 data4list ;
       #endif
+
       #ifdef S4FOX
          short compatibility ;   /* 2.5/2.6 compatible option */ // CS 2001/04/20 change to short
       #endif
-   #endif  /* S4CLIENT */
 
    int    codePage ;
 
@@ -3336,20 +3231,10 @@ typedef struct DATA4FILESt
       Bool5 longFieldNamesSupported ;
    #endif
    #ifdef __cplusplus
-      #ifdef S4CLIENT
-         Single4 lockedRecords ;
-      #endif
       #ifndef S4OFF_MULTI
          Single4 fileReadLocks ;   // uses Lock4's for convenience
       #endif
    #endif
-   #ifdef S4CLIENT
-      // AS Oct 12/01 - client needs to track the readonly flag on a DATA4FILE level in addition to the DATA4
-      // level.  (If the file initialy opened with full privileges, new DATA4's can re-open on client with
-      // more restrictive - i.e. readOnly, but if first open is read-only all rest are maxed out at read-only
-      // this is the same as stand-alone).
-      int readOnly ;
-   #else
       /* AS Aug 15/01 - ability to retrieve a version number associated with the data file, which increases when
          the data file changes */
       long versionNumberOld ;    // the last version number that was returned to the user
@@ -3357,7 +3242,7 @@ typedef struct DATA4FILESt
       #ifdef __WIN32
          FILETIME timeStamp ;         // the latest time stamp checked for the file
       #endif
-   #endif
+
    #ifdef S4PREPROCESS_FILE
       // AS 05/24/02 for block preprocessing need to be able to recover this value to write on block boundaries on header
       char savedVersionNumber ;
@@ -3384,61 +3269,6 @@ typedef struct DATA4FILESt
       COMPRESS4HANDLER *compressInfo ;
    #endif
 } DATA4FILE ;
-
-
-#ifdef S4CLIENT
-   /* AS Apr 10/02 - New function for batch writing client/server */
-   typedef struct
-   {
-      char *contents ;        // the contents of the memo field
-      long contentsLen ;      // the length of the contents
-      unsigned long contentsAllocLen ; // amount of space currently allocated for 'contents'
-   } MEMO4BATCH_ENTRY ;
-
-
-
-   /* AS Apr 10/02 - New function for batch writing client/server */
-   typedef struct
-   {
-      // there is 1 memo batch for each record in the write buffer
-      // int memoFieldCount ;
-      MEMO4BATCH_ENTRY *memos ;    // an array of entries (1 for each memo field in the record)
-   } MEMO4BATCH ;
-
-
-
-   /* AS Apr 10/02 - New function for batch writing client/server */
-   typedef struct
-   {
-      long writeRecsToBuf ;       // maximum number to buffer
-      long curWriteBufCount ;     // current count of records in the buffer
-      char *writeDelayBuf ;       // the delayed-write buffer - holds the rec # and record buffer
-      MEMO4BATCH *memos ;         // pointer to an array of memo entries (1 for each record)
-      MEMO4BATCH_ENTRY *memoBatchEntry ;   // single allocation for all memos
-   } DATA4BATCH_WRITE ;
-
-
-
-   typedef struct
-   {
-      long readRecsToBuf ;        // maximum number to buffer
-      long readRecsToBufNext ;    // # of read recs to buffer on the next fetch (can happen with d4skipCache() where the # to buffer can change)
-      char *readAdvanceBuf ;      // stores recno / record pairs (the rc is not stored, is always 0 except for last record which is stored in readBufRcSave)
-      long readBufNum ;           // number records currently in buffer (may differ from max size)
-      int readBufPos ;            // current position in buf
-      long readBufRecNoOn ;       // current rec # fetch (to see if bufPos accurately reflects current position)
-      short readBufDirection ;    // -1 if backwards, 1 if forwards
-      // short readBufRcSave ;    // rc to return after going past bufEndRecno
-      // int advanceReadBufRecs ; // size of buf in records
-      char *recordExtra ;         // an extra record buffer used for copying
-      MEMO4BATCH *memos ;         // pointer to an array of memo entries (1 for each record)
-      MEMO4BATCH_ENTRY *memoBatchEntry ;   // single allocation for all memos
-      Bool5 doMemos ;             // true if advance read bufferring memo fields as well
-      long currentDbl ;           // AS Jul 17/09 for doubling the number to cache
-      long modusStart ;
-      long nCacheIn ;
-   } DATA4BATCH_READ ;
-#endif
 
 
 
@@ -3490,14 +3320,7 @@ typedef struct DATA4St
       #endif
    #endif
 
-   #ifdef S4CLIENT
-      int aliasSet ;
-   #endif
-
    #ifndef S4OFF_TRAN
-      #ifndef S4CLIENT
-         int logVal ;
-      #endif
       char transChanged ;
    #endif
 
@@ -3537,28 +3360,9 @@ typedef struct DATA4St
    #if !defined(S4OFF_MULTI) && !defined(S4CLIENT) && defined(__cplusplus)
       Single4 lockedRecords ; /* list of LOCK4LINK's in client version, Lock4's in stand-alone/server */
    #endif
-   #if defined(S4FOX) || defined( S4CLIENT )
-      /* AS 05/24/00 for efficiency, track null info better... */
-      FIELD4 *nullFlags ;
-   #endif
-   #if defined( S4FOX ) || defined( S4CLIENT )
-      FIELD4 *autoIncrementField ;
-      // AS Mar 11/03 - support for new feature r4autoTimestamp
-      FIELD4 *autoTimestampField ;
-   #endif
    // AS 02/01/01 - Mark in data4 whether was logged so know if need to log the close message
    #ifndef S4OFF_TRAN
       Bool5 openWasLogged ;
-   #endif
-   #ifdef S4CLIENT
-      /* AS Apr 10/02 - New function for advance-reading client/server */
-      DATA4BATCH_READ batchRead ;
-      DATA4BATCH_WRITE batchWrite ;
-      Bool5 includeMemos ;   // if true, memos are transferred on non-batch reading (d4go/d4seek/d4positionSet/etc.)
-      // AS Aug 30/02 - for batch reading, we track the seek key to see if it is the same (in which case can skip)
-      char savedSeekNextBatchKey[I4MAX_KEY_SIZE] ;
-      short savedSeekNextBatchKeyLen ;
-      long readBatchMode ;  // used in conjunction with d4readBufferConfigure to control batching
    #endif
    #ifdef S4PREPROCESS_FILE
       // AS May 29/02 - dfile4recWidth returns in incorrect value in the instance where block preprocessing
@@ -3567,10 +3371,6 @@ typedef struct DATA4St
    #endif
    // AS Jun 2/03 - If a tag is based on a memo entry and only the memo entry has
    // changed, the record will match.  In that case we want to continue.
-   #ifndef S4CLIENT
-      short hasMemoExpr ;  // one of r4uninitializedMemoTagExpression(0), r4noMemoTagExpression, or r4memoTagExpression
-      Bool5 useOldMemo ;   // set to true to use old memo when generating keys
-   #endif
 } DATA4 ;
 
 
@@ -3948,37 +3748,6 @@ typedef struct e4exprSt
 
 
 
-// AS 07/27/99 -- this has been superseded by more simple collations for foxPro
-// typedef struct T4VFPSt
-// {
-//    #ifdef S4FOX   /* info on codepage and collating sequence */
-//       #ifndef S4CLIENT
-//          int              codePage ;    /* codepage of database file */
-//          int              sortType ;    /* collating seq of tag in index file */
-//          translatedChars  *tablePtr ;   /* points to translation table */
-//          compressedChars  *compPtr;     /* points to compressed char table */
-//          unsigned char    *cpPtr ;      /* points to codepage table */
-//       #endif
-//    #endif
-// } T4VFP ;
-
-
-#ifdef S4CLIENT
-   // AS Feb 12/09 - support for cacheing a larger number of keys
-   typedef struct KEY4CACHESt
-   {
-      int allocSize ;     // number keys allocated for the cache
-      int cacheSize ;     // number of keys to cache (may differ from the allocSize if the # of rows to cache changes)
-      int currentSize ;   // number keys currently in the cache
-      int pos ;           // current position within the cache  // if -1 then the cache is cleared.  Alternately cache is cleared if cachedKeys is null, even if this value is not -1
-      long *recNos ;
-      char *keys ;
-      // AS Jul 14/09 new feature for enhanced functionality
-      long modusOriginal ;  // the original requested modus
-      long modusCurrent ;   // the current modus value (in the case of doubling the cache size)
-      int numRowsIn ;  // original specified numRowsIn value
-   } KEY4CACHE ;
-#endif
 
 
 typedef struct TAG4FILESt
@@ -3999,27 +3768,6 @@ typedef struct TAG4FILESt
       int space2 ;
    #endif
 
-   #ifdef S4CLIENT
-      char S4PTR *exprPtr ;
-      char S4PTR *filterPtr ;
-      short int errUniqueHold ;
-      short int keyLen ;
-      short int keyType ;
-      // AS Oct 25/05 - keep track of additional information for the tag...low level tag functions
-      Bool5 tagDataValid ;   // set to true if we perform an operation that makes the low-level tag info correct.
-                              // reset to false when the tag data is made incorrect (via seek/skip/position with a selected tag)
-      DATA4 *refData ;  // gets set when d4tag is called
-      // AS Feb 9/09 - Keep the key stored locally
-      char S4PTR *currentKey ;
-      unsigned long currentKeyLen ;
-      unsigned int currentKeyAllocLen ;
-      long recNo ;
-
-      // AS Feb 12/09 - support for cacheing a larger number of keys
-      KEY4CACHE *cache ;  // if null the cache is not valid (is cleared) / not being used
-      Bool5 t4readBuffer ;  // true/false is t4readbuffer activated?
-
-   #else
       EXPR4   S4PTR  *expr ;
       EXPR4   S4PTR  *filter ;
       S4CMP_FUNCTION *cmp ;
@@ -4081,7 +3829,7 @@ typedef struct TAG4FILESt
          // track an available block to avoid index bloat...
          B4NODE availBlock ;
       #endif
-   #endif
+
    // AS Sep 15/04 - support removedKeys between TAG4 structures (at least in stand-alone)
    #ifdef SHARE4TAG_REMOVE
       #ifndef S4CLIENT
@@ -4138,18 +3886,6 @@ typedef struct TAG4St
       CODE4 S4PTR *codeBase ;
       DATA4FILE S4PTR *dataFile ;
 
-      #ifdef S4CLIENT
-         char accessName[LEN4PATH+1] ;
-         /* AS June 5/01 - see c4com.h CONNECTION4OPEN_INDEX_INFO_OUT structure for info on changes */
-         char fullIndexName[LEN4PATH+1] ;   // to ensure client can't have 2 instances of same index
-         int autoOpened ;
-         long clientId, serverId ;
-         #ifdef E4VBASIC
-            short int debugInt ;         /* used to check structure integrity (set to 0x5281) */
-         #else
-            short int space1 ;
-         #endif
-      #else
          FILE4  file ;
          MEM4 S4PTR *blockMemory ;
          long fileLocked ;
@@ -4178,7 +3914,7 @@ typedef struct TAG4St
             // AS Jan 9/03 - not supported for clipper
             Bool5 nonUpdateable ;  // AS Dec 31/02 - Added support to create non-production non-updating indexes
          #endif
-      #endif
+
       int isValid ;
    } INDEX4FILE ;
 #endif
@@ -4202,9 +3938,6 @@ typedef struct INDEX4St
    #else
       long space4;
    #endif
-   #ifdef S4CLIENT
-      char alias[LEN4PATH+1] ;
-   #else
       char accessName[LEN4PATH+1] ;
       #ifdef S4CLIPPER
          FILE4 file ;
@@ -4217,7 +3950,6 @@ typedef struct INDEX4St
          char S4PTR *space2 ;
          long space3 ;
       #endif
-   #endif
 } INDEX4 ;
 
 
@@ -4336,22 +4068,6 @@ typedef struct
 
 
 
-   #ifdef S4CLIENT
-      /* S4CLIENT, not S4OFF_MULTI */
-      typedef struct
-      {
-      /* public: */
-         SINGLE4 link ;
-         // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-         long lockId ;
-         long serverId ;
-         //         DATA4 *data ;
-         long   recNo ;
-         #ifdef S4TESTING
-            enum Lock4type lockType ;
-         #endif
-      } LOCK4LINK ;
-   #endif  /* S4CLIENT */
 #endif  /* S4OFF_MULTI */
 
 

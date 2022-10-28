@@ -128,47 +128,12 @@ int S4FUNCTION u4allocAgainDefault( CODE4 *c4, char **ptrPtr, unsigned *wasOldLe
 void *S4FUNCTION u4allocFreeDefault( CODE4 *c4, long n )
 {
    void *ptr ;
-   #if !defined( S4OFF_COMMUNICATIONS ) && defined( S4SERVER )
-      SERVER4CLIENT *client ;
-   #endif
-
    #if defined( S4SEMAPHORE ) && defined( E4MISC )
       /* the debug u4alloc uses global tracking pointers, so semaphore */
       mem4start( c4 ) ;
    #endif
 
    ptr = (void *)u4allocDefault( n ) ;
-
-   #ifndef S4OFF_COMMUNICATIONS
-      /*    go through all of the SERVER4CLIENTs, and if they are not in an*/
-      /*         active state (i.e. no worker thread working on them), then*/
-      /*         free up their SERVER4CLIENT.CONNECT.buffer and set len to 0*/
-      /*         then retry allocation (left in)*/
-      if ( ptr == NULL )
-      {
-         #ifdef S4SERVER
-            server4clientListReserve( c4->server ) ;
-            client = server4clientGetFirst( c4->server ) ;
-            while( client )
-            {
-               if ( client->connect.workState == CONNECT4IDLE )
-               {
-                  connection4clear(&client->connection) ;
-                  // AS July 25/02 - If the buffer is null, don't free it - was gpf'ing here
-                  if ( client->connection.bufferLen != 0 && client->connection.buffer != 0 )
-                  {
-                     client->connection.bufferLen = 0 ;
-                     client->connection.buffer = ((char *)(client->connection.buffer)) - 4 ;  /* CS 2000/02/14 */
-                     u4free(client->connection.buffer) ;
-                  }
-               }
-               client = server4clientGetNext( c4->server, client ) ;
-            }
-            server4clientListRelease( c4->server ) ;
-            ptr = (void *)u4allocDefault( n ) ;
-         #endif
-      }
-   #endif
 
    #ifndef S4OFF_OPTIMIZE
       if ( ptr == 0 && c4 )

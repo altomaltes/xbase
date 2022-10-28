@@ -455,50 +455,6 @@ int S4FUNCTION f4memoResetExport( FIELD4 *field )
          return mfield->len ;
       }
 
-      #ifdef S4CLIENT
-         data = field->data ;
-         connection = data->dataFile->connection ;
-         if ( connection == 0 )
-            return error4( c4, e4connection, E90525 ) ;
-
-         connection4assign( connection, CON4MEMO, data4clientId( data ), data4serverId( data ) ) ;
-         connection4addData( connection, NULL, sizeof( CONNECTION4MEMO_INFO_IN ), (void **)&info ) ;
-         info->recNo = htonl5(d4recNo( data )) ;
-         // AS Oct 27/03 - long field names support
-         info->fieldNo = htons5((short)d4fieldNumber( data, field->longName )) ;
-         connection4sendMessage( connection ) ;
-         rc = connection4receiveMessage( connection ) ;
-         if ( rc < 0 )
-            return error4stack( c4, rc, E90525 ) ;
-         rc = connection4status( connection ) ;
-         if ( rc < 0 )
-            return connection4error( connection, c4, rc, E90525 ) ;
-
-         if ( rc == r4entry )  /* no record, therefore no memo entry */
-         {
-            if ( mfield->lenMax == 0 )
-               mfield->contents = (char *)(&f4memoNullChar) ;
-            else
-            {
-               mfield->contents[0] = 0 ;  // CS 1999/09/14 make last 2 bytes NULL (Unicode NULL)
-               mfield->contents[1] = 0 ;
-            }
-            field->memo->status = 0 ;
-            mfield->len = 0 ;
-            return 0 ;
-         }
-
-         if ( connection4len( connection ) < sizeof( CONNECTION4MEMO_INFO_OUT ) )
-            return e4packetLen ;
-
-         out = (CONNECTION4MEMO_INFO_OUT *)connection4data( connection ) ;
-         out->memoLen = ntohl5( out->memoLen ) ;
-
-         if ( connection4len( connection ) != (long)sizeof( CONNECTION4MEMO_INFO_OUT ) + (long)out->memoLen )
-            return e4packetLen ;
-
-         return f4memoReadSet( field, out->memoLen, ((char *)out) + sizeof( CONNECTION4MEMO_INFO_OUT ) ) ;
-      #else
          #ifndef S4OFF_MULTI
             if ( c4getReadLock( c4 ) )
             {
@@ -513,7 +469,6 @@ int S4FUNCTION f4memoResetExport( FIELD4 *field )
             return error4stack( c4, rc, E90525 ) ;
 
          return 0 ;
-      #endif
    }
 
 

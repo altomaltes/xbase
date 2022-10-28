@@ -1039,60 +1039,6 @@ int S4FUNCTION d4lockFileInternal( DATA4 *data, Bool5 doUnlock, Lock4type lockTy
    #endif
 }
 
-#if !defined(S4SINGLE) && defined(S4CLIENT) && defined(E4LOCK)
-   /* this function does a compare of a lock with the server.  client and server
-      should always return the same result (input value) */
-   static int request4lockTest( DATA4 *data, short int lockType, long rec, int clientVal )
-   {
-      CONNECTION4 *connection ;
-      CONNECTION4LOCK_INFO_IN *info ;
-      int rc ;
-      long recNum ;
-
-      #ifdef E4PARM_LOW
-         if ( DATA == 0 || ( lockType != lock4read && lockType != lock4write && lockType != lock4any ) )
-         {
-            return error4( 0, e4parm, E92722 ) ;
-         }
-      #endif
-
-      if ( error4code( data->codeBase )
-         return -1 ;
-
-      connection = data->dataFile->connection ;
-      if ( connection == 0 )
-         rc = e4connection ;
-      else
-      {
-         // AS Apr 15/03 - support for new lockId for shared clone locking
-         connection4assign( connection, CON4LOCK, data4lockId( data ), data4serverId( data ) ) ;
-         connection4addData( connection, NULL, sizeof( CONNECTION4LOCK_INFO_IN ), &info ) ;
-         // AS Nov 30/01 lockType is long not short
-         // info->type = htons5( lockType ) ;
-         info->type = htonl5( lockType ) ;
-         info->test = htons5( 1 ) ;
-         info->lockType = lock4write ;
-         if ( lockType == LOCK4RECORD )
-         {
-            recNum = htonl5(rec) ;
-            connection4addData( connection, &recNum, sizeof( recNum ), NULL ) ;
-         }
-         connection4send( connection ) ;
-         rc = connection4receive( connection ) ;
-         if ( rc == 0 )
-         {
-            rc = connection4status( connection ) ;
-            if ( rc < 0 )
-               return connection4error( connection, data->codeBase, rc, E92722 ) ;
-         }
-      }
-      if ( rc != clientVal )
-         return error4( data->codeBase, e4info, E92722 ) ;
-
-      return rc ;
-   }
-#endif
-
 #ifdef S4LOCK_HASH
    /* returns '1' if we have locked, 'r4locked' if someone else has locked */
    #define data4hashLockTest( d4, recNo, lockType ) ((d4)->dataFile->lockHash->find( (d4), (recNo), (lockType) ) )

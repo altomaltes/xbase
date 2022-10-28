@@ -909,14 +909,14 @@ static ERROR4INFO_ARRAY error4array9[] =
    { 91004L, "code4connect" },
    { 91005L, "code4userConnect" },
    { 91006L, "code4timeout" },
-   { 91007L, "code4timeoutSet" },
-   { 91008L, "code4lock" },
-   { 91009L, "code4lockNetworkId" },
-   { 91010L, "code4lockUserId" },
-   { 91011L, "code4lockFileName" },
-   { 91012L, "code4lockItem" },
-   { 91013L, "code4logCreate" },
-   { 91014L, "code4logFileName" },
+///   { 91007L, "code4 timeoutSet" },
+   { 91008L, "code4lock" }
+,{ 91009L, "code4lockNetworkId" }
+,{ 91010L, "code4lockUserId" }
+,{ 91011L, "code4lockFileName" }
+,{ 91012L, "code4lockItem" }
+,{ 91013L, "code4logCreate" }
+,{ 91014L, "code4logFileName" },
    { 91015L, "code4logOpen" },
    { 91016L, "code4logOpenOff" },
    { 91017L, "code4passwordSet" },
@@ -1255,15 +1255,15 @@ static ERROR4INFO_ARRAY error4array9[] =
    { 96914L, "connect4bufferAuxConnection" },
    { 96915L, "connect4bufferAuxConnectionGet" },
    { 96916L, "connect4bufferAuxConnectionSpecific" },
-   { 96917L, "connect4bufferConnect" },
-   { 96918L, "address4getLocalNetID" },
-   { 96919L, "connect4bufferDisconnect" },
-   { 96920L, "connect4bufferGetWriteBuffer" },
-   { 96921L, "connect4bufferInit" },
-   { 96922L, "connect4bufferInitUndo" },
-   { 96923L, "connect4bufferInitRead" },
-   { 96924L, "connect4bufferReadRetrieve" },
-   { 96925L, "connect4threadInit" },
+///   { 96917L, "connect4 bufferConnect" },
+   { 96918L, "address4getLocalNetID" }
+,{ 96919L, "connect4bufferDisconnect" }
+,{ 96920L, "connect4bufferGetWriteBuffer" }
+,{ 96921L, "connect4bufferInit" }
+,{ 96922L, "connect4bufferInitUndo" }
+,{ 96923L, "connect4bufferInitRead" }
+,{ 96924L, "connect4bufferReadRetrieve" }
+,{ 96925L, "connect4threadInit" },
    { 96926L, "list4mutexAdd" },
    { 96927L, "list4mutexInit" },
    { 96928L, "list4mutexRelease" },

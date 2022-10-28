@@ -22,18 +22,12 @@
 // #ifdef S4SERVER
 // #endif
 
-#ifdef S4CLIENT
-   static int relation4readBufferAlloc( RELATION4 *relation, short doMemos ) ;
-   static int relation4skipFetchMultiple( RELATION4 *relation, long numskip, short startPos, long startOffset ) ;
-   static int relate4freeServer( RELATE4 *relate ) ;
-#else
    static int relate4currentIsChild( RELATE4 * ) ;
    static int relate4parent( RELATE4 *, RELATE4 * ) ;
    static int relate4nextRelationList( RELATION4 *, int ) ;
    static int relate4prevRecordInScan( RELATE4 * ) ;
    static int relate4prevRelationList( RELATION4 *, int ) ;
    static int relate4topInit( RELATE4 * ) ;
-#endif
 
 #ifdef S4SERVER
 static int relate4initRelate( RELATE4 *, RELATION4 *, DATA4 *, CODE4 *, int, char * ) ;
@@ -804,92 +798,6 @@ int S4FUNCTION relate4bottom( RELATE4 *relate )
       relate4skipEnable( relate, 1 ) ;
    }
 
-   #ifdef S4CLIENT
-      if ( relate->dataTag != relate->data->tagSelected )
-         relate4changed( relate ) ;
-
-      if ( relation->isInitialized == 0 )
-      {
-         // AS Sept 3/02 - Failing to select tag if relate4bottom() is called instead of relate4top()
-         relate->dataTag = relate->data->tagSelected ;
-         rc = relate4clientInit( relate ) ;
-         if ( rc != 0 )
-            return rc ;
-      }
-      #ifdef S4CB51
-         #ifndef S4OFF_MULTI
-            if ( c4getReadLock( c4 ) )
-            {
-               rc = relate4lock( relate ) ;
-               if ( rc != 0 )
-                  return rc ;
-            }
-         #endif
-      #endif
-      #ifdef E4ANALYZE
-         if ( relate->data == 0 )
-            return error4( c4, e4parm, E94401 ) ;
-         if ( relate->data->dataFile == 0 )
-            return error4( c4, e4parm, E94401 ) ;
-      #endif
-      connection = relate->data->dataFile->connection ;
-      #ifdef E4ANALYZE
-         if ( connection == 0 )
-            return error4( c4, e4parm, E94401 ) ;
-      #endif
-
-      rc = relate4flush( relate ) ;
-      if ( rc )
-         return rc ;
-
-      // AS Apr 12/02 block reading of records for relate skip...
-      assert5port( "client/server support for batch reading of related records" ) ;
-      if ( relation->readRecsToBuf > 0 )
-      {
-         relation4readBufferReset( relation, 0 ) ;
-         rc =  relation4skipFetchMultiple( relation, 0, 2, 0 ) ;  // '2' means bottom
-         if ( rc < 0 || rc == r4terminate )
-         {
-            // AS Aug 6/02 - Ensure that server frees up info as well...
-            relate4freeServer( relate ) ;
-            relation->isInitialized = 0 ;
-            if ( rc < 0 )
-               return connection4error( connection, c4, rc, E94401 ) ;
-         }
-      }
-      else
-      {
-         connection4assign( connection, CON4RELATE_BOTTOM, 0, 0 ) ;
-         connection4addData( connection, 0, sizeof( CONNECTION4RELATE_BOTTOM_INFO_IN ), (void **)&info ) ;
-         info->relationId = htonl5( relation->relationId ) ;
-         // AS May 21/02 - code to support auto-transfer of memo fields
-         assert5port( "added optional transfer of memo fields with client/server communications" ) ;
-         info->includeMemos = relation->includeMemos ;
-         connection4sendMessage( connection ) ;
-         rc = connection4receiveMessage( connection ) ;
-         if ( rc < 0 )
-            return error4stack( c4, rc, E94401 ) ;
-         rc = connection4status( connection ) ;
-         if ( rc < 0 )
-         {
-            // AS Aug 6/02 - Ensure that server frees up info as well...
-            relate4freeServer( relate ) ;
-            relation->isInitialized = 0 ;
-            if ( rc < 0 )
-               return connection4error( connection, c4, rc, E94401 ) ;
-         }
-         rc2 = relation4unpack( relation, connection ) ;
-         if ( rc2 < 0 )
-            return error4stack( c4, rc, E94401 ) ;
-         if ( rc == r4terminate )
-         {
-            // AS Aug 6/02 - Ensure that server frees up info as well... - after the unpack
-            relate4freeServer( relate ) ;
-            relation->isInitialized = 0 ;
-         }
-      }
-      return rc ;
-   #else
       #ifndef S4OFF_MULTI
          oldReadLock = c4getReadLock( c4 ) ;
          c4setReadLock( c4, 0 ) ;
@@ -1011,7 +919,6 @@ int S4FUNCTION relate4bottom( RELATE4 *relate )
          c4setReadLock( c4, oldReadLock ) ;
       #endif
       return rc ;
-   #endif
 }
 
 
@@ -1112,14 +1019,6 @@ int S4FUNCTION relate4changed( RELATE4 *relate )
       relate->scanValue = 0 ;
    #endif
    relation = relate->relation ;
-
-   #ifdef S4CLIENT
-      if ( relation->isInitialized != 0 )
-         relation->needsFreeing = 1 ;
-      relation4readBufferReset( relation, 1 ) ;
-      // AS Aug 6/02 - Ensure that server frees up info as well...
-      relate4freeServer( relate ) ;
-   #endif
 
    relation->isInitialized = 0 ;
    // AS Jul 01/02 - relate4count() support, must recalculate count if relate4changed called...
@@ -1396,165 +1295,6 @@ static int relate4dbfInRelation( RELATE4 *relate, const DATA4 *dbf )
 
 
 
-#ifdef S4CLIENT
-   /* S4CLIENT */
-   int S4FUNCTION relate4doAll( RELATE4 *relate )
-   {
-      CONNECTION4RELATE_DO_INFO_IN *info ;
-      CONNECTION4 *connection ;
-      int rc, rc2 ;
-      CODE4 *c4 ;
-      RELATION4 *relation ;
-
-      #ifdef E4PARM_HIGH
-         if ( relate == 0 )
-            return error4( 0, e4parm_null, E94404 ) ;
-      #endif
-      #ifdef E4VBASIC
-         if ( c4parm_check( relate, 5, E94404 ) )
-            return -1 ;
-      #endif
-
-      c4 = relate->codeBase ;
-      relation = relate->relation ;
-
-      #ifdef E4PARM_HIGH
-         if ( relate->master != 0 )
-            return error4( c4, e4parm, E84402 ) ;
-      #endif
-
-      if ( relation->isInitialized == 0 )  /* need to initialize on server first */
-      {
-         rc = relate4clientInit( relate ) ;
-         if ( rc != 0 )
-            return rc ;
-      }
-
-      connection = relate->data->dataFile->connection ;
-      #ifdef E4ANALYZE
-         if ( connection == 0 )
-            return error4( c4, e4struct, E94404 ) ;
-      #endif
-
-      rc = relate4flush( relate ) ;
-      if ( rc )
-         return rc ;
-
-      connection4assign( connection, CON4RELATE_DO, 0, 0 ) ;
-      connection4addData( connection, 0, sizeof( CONNECTION4RELATE_DO_INFO_IN ), (void **)&info ) ;
-      info->relationId = htonl5(relation->relationId) ;
-      info->relateId = htons5(relate->id) ;
-      info->masterStartPos = htonl5(d4recNo( relate->data )) ;
-      // AS May 21/02 - code to support auto-transfer of memo fields
-      assert5port( "added optional transfer of memo fields with client/server communications" ) ;
-      info->includeMemos = relation->includeMemos ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-         return error4stack( c4, rc, E94404 ) ;
-      rc = connection4status( connection ) ;
-      if ( rc < 0 )
-      {
-         // AS Aug 6/02 - Ensure that server frees up info as well...
-         relate4freeServer( relate ) ;
-         relation->isInitialized = 0 ;
-         if ( rc < 0 )
-            return connection4error( connection, c4, rc, E94404 ) ;
-      }
-      rc2 = relation4unpack( relation, relate->data->dataFile->connection ) ;
-      if ( rc2 < 0 )
-         return error4stack( c4, rc, E94404 ) ;
-      if (  rc == r4terminate )
-      {
-         // AS Aug 6/02 - Ensure that server frees up info as well...
-         relate4freeServer( relate ) ;
-         relation->isInitialized = 0 ;
-      }
-      return rc ;
-   }
-
-
-
-   /* S4CLIENT */
-   int S4FUNCTION relate4doOne( RELATE4 *relate )
-   {
-      CONNECTION4RELATE_DO_ONE_INFO_IN *info ;
-      CONNECTION4RELATE_DO_ONE_INFO_OUT *out ;
-      CONNECTION4 *connection ;
-      int rc, saveRc ;
-      CODE4 *c4 ;
-
-      #ifdef E4PARM_HIGH
-         if ( relate == 0 )
-            return error4( 0, e4parm_null, E94405 ) ;
-         if ( relate->master == 0 )
-            return error4( relate->codeBase, e4parm, E84405 ) ;
-      #endif
-      #ifdef E4VBASIC
-         if ( c4parm_check( relate, 5, E94405 ) )
-            return -1 ;
-      #endif
-
-      c4 = relate->codeBase ;
-
-      if ( relate->relation->isInitialized == 0 )  /* need to initialize on server first */
-      {
-         rc = relate4clientInit( &relate->relation->relate ) ;
-         if ( rc != 0 )
-            return rc ;
-      }
-
-      connection = relate->data->dataFile->connection ;
-      #ifdef E4ANALYZE
-         if ( connection == 0 )
-            return error4( 0, e4struct, E94405 ) ;
-      #endif
-
-      rc = relate4flush( relate ) ;
-      if ( rc )
-         return rc ;
-
-      connection4assign( connection, CON4RELATE_DO_ONE, 0, 0 ) ;
-      connection4addData( connection, 0, sizeof( CONNECTION4RELATE_DO_ONE_INFO_IN ), (void **)&info ) ;
-      info->relationId = htonl5(relate->relation->relationId) ;
-      info->relateId = htons5(relate->id) ;
-      info->masterStartPos = htonl5(d4recNo( relate->master->data )) ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-         return rc ;
-      rc = connection4status( connection ) ;
-      if ( rc < 0 )
-         return connection4error( connection, c4, rc, E94405 ) ;
-
-      saveRc = rc ;
-      if ( saveRc != r4terminate )
-      {
-         if ( saveRc == r4eof )   /* end of file */
-         {
-            saveRc = 0 ;
-            rc = d4goEof( relate->data ) ;
-            if ( rc < 0 )
-               return error4stack( c4, rc, E94405 ) ;
-         }
-         else
-         {
-            if ( connection4len( connection ) != sizeof( CONNECTION4RELATE_DO_ONE_INFO_OUT ) )
-               return error4stack( c4, e4packetLen, E94405 ) ;
-
-            out = (CONNECTION4RELATE_DO_ONE_INFO_OUT *)connection4data( connection ) ;
-
-            rc = d4go( relate->data, ntohl5(out->recNo) ) ;
-            if ( rc < 0 )
-               return error4stack( c4, rc, E94405 ) ;
-         }
-      }
-      return saveRc ;
-   }
-
-
-
-#else
    /* !S4CLIENT */
    // AS Jun 28/02 - for internal purposes with relate4skipMaster, allow relate4filterRecord return
    static int relate4doAllLow( RELATE4 *relate, Bool5 allowFilter )
@@ -1702,8 +1442,6 @@ static int relate4dbfInRelation( RELATE4 *relate, const DATA4 *dbf )
       }
       return rc ;
    }
-#endif
-
 
 
 int S4FUNCTION relate4eof( RELATE4 *relate )
@@ -1826,40 +1564,6 @@ int S4FUNCTION relate4freeRelate( RELATE4 *relate, const int closeFiles )
 
 
 
-#ifdef S4CLIENT
-   // AS Aug 6/02 - Need functionality to uninitialize relate on server without actually freeing everything
-   // on the client side, to avoid memory leakage on server...
-   static int relate4freeServer( RELATE4 *relate )
-   {
-      assert5port( "client/server function added to free data on server in a more organized fashion" ) ;
-      CONNECTION4RELATE_FREE_INFO_IN *info ;
-      CONNECTION4 *connection ;
-      RELATION4 *relation = relate->relation ;
-      relate = &relation->relate ;
-      // AS Mar 4/04 - if client closes table before calling relate4free (or before code4initUndo calls it), may get a gpf here.
-      if ( relation->relationId != 0 && relate->data != 0 && relate->data->dataFile != 0 )   /* if not freed on the server */
-      {
-         connection = relate->data->dataFile->connection ;
-         #ifdef E4ANALYZE
-            if ( connection == 0 )
-               return error4( relate->codeBase, e4struct, E94408 ) ;
-         #endif
-         connection4assign( connection, CON4RELATE_FREE, 0, 0 ) ;
-         connection4addData( connection, 0, sizeof( CONNECTION4RELATE_FREE_INFO_IN ), (void **)&info ) ;
-         info->relationId = htonl5( relation->relationId ) ;
-         connection4sendMessage( connection ) ;
-         relation->relationId = 0 ;
-         int rc = connection4receiveMessage( connection ) ;
-         if ( rc < 0 )
-            return rc ;
-         rc = connection4status( connection ) ;
-         if ( rc != 0 )
-            return connection4error( connection, relate->codeBase, rc, E94408 ) ;
-      }
-
-      return 0 ;
-   }
-#endif
 
 
 
@@ -1894,27 +1598,10 @@ int S4FUNCTION relate4free( RELATE4 *relate, const int closeFiles )
    RELATION4 *relation = relate->relation ;
    relate = &relation->relate ;
 
-   #ifdef S4CLIENT
-      assert5( relation->readAdvanceBuf == 0 ) ;    // relate4changed should have freed it...
-   #endif
-
    #ifndef S4SERVER
       // AS Apr 30/02 - Allow for auto-freeing of relations on code4initUndo
       // AS Jan 3/03 - Moved this up in function to ensure no endless loop in code4initUndo.
       l4remove( &c4->relations, relation ) ;
-   #endif
-
-   #ifdef S4CLIENT
-      #ifdef E4ANALYZE
-         if ( relate->data == 0 )
-            return error4( c4, e4struct, E94408 ) ;
-         if ( relate->data->dataFile == 0 )
-            return error4( c4, e4struct, E94408 ) ;
-      #endif
-
-      rc = relate4freeServer( relate ) ;
-      if ( rc < 0 )
-         return rc ;
    #endif
 
    int closeMaster = closeFiles ;
@@ -1950,14 +1637,14 @@ int S4FUNCTION relate4free( RELATE4 *relate, const int closeFiles )
 
    relate4sortFree( relation, 1 ) ;
    u4free( relation->exprSource ) ;
-   #ifndef S4CLIENT
+  
       if ( relation->sortedKeyBufferLen != 0 )
       {
          u4free( relation->sortedKeyBuffer2 ) ;
          relation->sortedKeyBuffer2 = 0 ;
          relation->sortedKeyBufferLen = 0 ;
       }
-   #endif
+   
 
    mem4free( c4->relationMemory, relation ) ;
 
@@ -2062,12 +1749,10 @@ int S4FUNCTION relate4free( RELATE4 *relate, const int closeFiles )
    if ( relation == 0 )
       return 0 ;
 
-   #ifndef S4CLIENT
       relation->log.relation = relation ;
       relation->log.codeBase = c4 ;
       relation->sort.file.hand = INVALID4HANDLE ;
       relation->sortedFile.hand = INVALID4HANDLE ;
-   #endif
 
    #ifdef S4SERVER
       rc = relate4initRelate( &relation->relate, relation, master, c4, 1, masterAliasName ) ;
@@ -4286,205 +3971,6 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
 
 
 
-#ifdef S4CLIENT
-   static int relation4skipFetchSingle( RELATION4 *relation, long numskip )
-   {
-      assert5port( "new client/server function to fetch relation records in batches" ) ;
-      // normal skip/fetch where block reading is not occurring.
-      CONNECTION4RELATE_SKIP_INFO_IN *info ;
-      int saveRc ;
-
-      CODE4 *c4 = relation->relate.codeBase ;
-
-      CONNECTION4 *connection = relation->relate.data->dataFile->connection ;
-      #ifdef E4ANALYZE
-         if ( connection == 0 )
-            return error4( c4, e4struct, E94418 ) ;
-      #endif
-      connection4assign( connection, CON4RELATE_SKIP, 0, 0 ) ;
-      connection4addData( connection, 0, sizeof( CONNECTION4RELATE_SKIP_INFO_IN ), (void **)&info ) ;
-      info->relationId = htonl5( relation->relationId ) ;
-      info->numSkips = htonl5( numskip ) ;
-      // AS May 21/02 - code to support auto-transfer of memo fields
-      assert5port( "added optional transfer of memo fields with client/server communications" ) ;
-      info->includeMemos = relation->includeMemos ;
-      connection4sendMessage( connection ) ;
-      saveRc = connection4receiveMessage( connection ) ;
-      if ( saveRc < 0 )
-         return error4( c4, saveRc, E94418 ) ;
-      saveRc = connection4status( connection ) ;
-      if ( saveRc < 0 )
-      {
-         // AS Aug 6/02 - Ensure that server frees up info as well...
-         relate4freeServer( &relation->relate ) ;
-         relation->isInitialized = 0 ;
-         if ( saveRc < 0 )
-            return connection4error( connection, c4, saveRc, E94418 ) ;
-      }
-
-      int rc = relation4unpack( relation, connection ) ;
-      if ( rc < 0 )
-         return error4( c4, rc, E94418 ) ;
-      if ( saveRc == r4terminate )
-      {
-         // AS Aug 6/02 - Ensure that server frees up info as well... - ensure relate4unpack is called first
-         relate4freeServer( &relation->relate ) ;
-         relation->isInitialized = 0 ;
-      }
-      return saveRc ;
-   }
-
-
-
-   static int relation4skipFetchFromBuffer( RELATION4 *relation, long pos )
-   {
-      assert5port( "new client/server function to fetch relation records in batches" ) ;
-      // fetches the current relation record from the buffer
-      // pos is the position into the buffer to retrive from (range 0 to numRecs-1)
-      // also updates the current position in the buffer to the input pos
-      relation->readBufPos = pos ;
-
-      char *fromPos = relation->readAdvanceBuf + (relation->readRecLen * pos ) ;
-
-      int rc = (int)(*((long *)fromPos) ) ;
-      fromPos += sizeof( long ) ;
-
-      #ifndef S4OFF_MEMO
-         int memoOn = 0 ;  // counter for all the memos in the extended relation record (may cross multiple records if there are slaves)
-      #endif
-
-      for( RELATE4 *relateOn = &relation->relate ;; )
-      {
-         DATA4 *data = relateOn->data ;
-         #ifndef S4OFF_MEMO
-            if ( data->dataFile->nFieldsMemo > 0 )
-            {
-               for ( int i = 0; i < data->dataFile->nFieldsMemo; i++ )
-               {
-                  f4memoReset( data->fieldsMemo[i].field ) ;
-                  if ( relation->doMemos )
-                  {
-                     MEMO4BATCH_ENTRY *entry = &relation->memos[pos].memos[memoOn] ;
-                     FIELD4 *field = data->fieldsMemo[i].field ;
-                     f4memoReadSet( field, entry->contentsLen, entry->contents ) ;
-                     field->memo->status = 0 ;
-                  }
-                  memoOn++ ;
-               }
-            }
-         #endif
-
-         data->bofFlag = *((short *)fromPos) ;
-         fromPos += sizeof( short ) ;
-         data->eofFlag = *((short *)fromPos) ;
-         fromPos += sizeof( short ) ;
-         data->recNum = *((long *)fromPos) ;
-         fromPos += sizeof( long ) ;
-         long recWidth = dfile4recWidth( data->dataFile ) ;
-         memcpy( data->record, fromPos, recWidth ) ;
-         fromPos += recWidth ;
-
-         if ( relate4next( &relateOn ) == 2 )
-            break ;
-      }
-
-      if ( rc != 0 )  // reset the buffer
-         relation4readBufferReset( relation, 0 ) ;
-
-      return rc ;
-   }
-
-
-
-   static int relation4skipFetchMultiple( RELATION4 *relation, long numskip, short startPos, long startOffset )
-   {
-      assert5port( "new client/server function to fetch relation records in batches" ) ;
-      // AS Apr 12/02 block reading of records for relate skip...
-      // startPos == 0 if skipping, 1 if relate4top, 2 if relate4bottom
-      // startOffset indicates if the server side must do some extra skipping first.  This happens, for example,
-      // if we started skipping forwards (say 10 recs) (server is on record 10) but then start skipping backwards
-      // now we need the server side to skip in the given direction by this new startOffset before continuing
-      // to fetch recods.
-      CODE4 *c4 = relation->relate.codeBase ;
-      CONNECT4 *connect = c4getClientConnect( c4 ) ;
-
-      #ifdef E4ANALYZE
-         if ( connect == 0 )
-            return error4( c4, e4struct, E94418 ) ;
-      #endif
-
-      // AS Aug 1/02 - It is possible if the relation has changed that we need to
-      // allocate memory at this point for the bufferring...
-      if ( relation->readAdvanceBuf == 0 )
-      {
-         int rc = relation4readBufferAlloc( relation, relation->doMemos ) ;
-         if ( rc != 0 )
-            return rc ;
-      }
-
-      if ( startPos == 1 ) // means relate4top  - indicate we are skipping forward
-         numskip = 1 ;
-      if ( startPos == 2 ) // means relate4top - indicate we skipping backward
-         numskip = -1 ;
-
-      connect4sendShort( connect, MSG5RELATE_SKIP_MULTI ) ;
-      connect4sendLong( connect, relation->relationId ) ;
-      connect4sendShort( connect, c4->readLock ) ;
-      connect4sendShort( connect, code4unlockAuto( c4 ) ) ;
-      connect4sendShort( connect, startPos ) ;
-      connect4sendLong( connect, numskip ) ;
-      connect4sendLong( connect, relation->readRecsToBuf ) ;
-      connect4sendShort( connect, relation->doMemos ) ;
-      connect4sendLong( connect, startOffset ) ;
-      connect4sendFlush( connect ) ;
-
-      int saveRc = connect4receiveShort( connect ) ;
-
-      if ( numskip > 0 )
-         relation->readBufDirection = 1 ;
-      else
-         relation->readBufDirection = -1 ;
-
-      if ( saveRc >= 0 )
-      {
-         int rc = saveRc ;
-
-         assert5( relation->readBufNum == 0 ) ;
-         char *buf = relation->readAdvanceBuf ;
-
-         for( ;; )
-         {
-            *((long *)buf) = (long)rc ;
-            relation4unpackMultiple( relation, buf + sizeof( long ) ) ;
-            relation->readBufNum++ ;
-            buf += relation->readRecLen ;
-
-            if ( rc != 0 || relation->readBufNum == relation->readRecsToBuf )  // means we are done
-               break ;
-
-            rc = connect4receiveShort( connect ) ;
-
-            if ( rc < 0 )
-               break ;
-         }
-      }
-
-      if ( saveRc >= 0 )   // fill in with the bufferred data
-         relation4skipFetchFromBuffer( relation, 0 ) ;
-
-      if ( saveRc < 0 || saveRc == r4terminate )  // in this case no records are sent back
-      {
-         // AS Aug 6/02 - Ensure that server frees up info as well...
-         relate4freeServer( &relation->relate ) ;
-         relation->isInitialized = 0 ;
-         if ( saveRc < 0 )
-            return error4( c4, saveRc, E94418 ) ;
-      }
-
-      return saveRc ;
-   }
-#endif
-
 
 // AS Apr 18/05 - new callback functionality - currently only for windows 32 bit...
 // #ifdef S4SERVER
@@ -4550,11 +4036,6 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
          code4enterExclusiveVerifyFirst( suspend->client->server->c4, suspend->client, 1 ) ;
          // AS Apr 19/04 - for odbc, the connection is not set up, and thus doesn't need to be set
          assert5( suspend->relCnt > 0 ) ;
-         #ifndef S4OFF_COMMUNICATIONS
-            // Now ensure our connection is still valid (if not return -1)
-            if ( suspend->client->connect.connectBuffer.connectionFailed == 1 )
-               return -1 ;
-         #endif
          return 0 ;
       #else
          assert5( suspend->relate->callback != 0 ) ;
@@ -5761,222 +5242,6 @@ int S4FUNCTION relate4sortSetTag( RELATE4 *relate, TAG4 *tag )
 
 
 
-#ifdef S4CLIENT
-   static int relate4add( CONNECTION4 *connection, RELATE4 *relate, unsigned int *relatePos, unsigned short *flexPos, char *relateData )
-   {
-      int len, savePos ;
-      RELATE4 *slaveOn ;
-      CONNECTION4RELATE *info ;
-      TAG4 *tag ;
-
-      /* add this relate's info */
-      savePos = *relatePos ;
-      info = (CONNECTION4RELATE *)( relateData + *relatePos ) ;
-      info->matchLen = htons5(relate->matchLen) ;
-      info->relationType = htons5(relate->relationType) ;
-      info->errorAction = htons5(relate->errorAction) ;
-      assert5( relate->slaves.nLink < USHRT_MAX ) ;  // ensure no overflow on assigning to unsigned short below
-      info->numSlaves = htons5((unsigned short)relate->slaves.nLink) ;
-      info->clientId = htonl5(data4clientId( relate->data )) ;
-
-      tag = relate->dataTag ;
-      if ( tag == 0 )
-         info->dataTagName.offset = 0 ;
-      else
-      {
-         len = strlen( tag->tagFile->alias ) + 1 ;
-         info->dataTagName.offset = htons5(*flexPos) ;
-         connection4addData( connection, tag->tagFile->alias, len, 0 ) ;
-         *flexPos += len ;
-      }
-
-      if ( relate->masterExpr == 0 )
-         info->masterExpr.offset = 0 ;
-      else
-      {
-         len = strlen( relate->masterExpr->source ) + 1 ;
-         info->masterExpr.offset = htons5(*flexPos) ;
-         connection4addData( connection, relate->masterExpr->source, len, 0 ) ;
-         *flexPos += len ;
-      }
-
-      if ( relate->data == 0 )
-         info->dataAccessName.offset = 0 ;
-      else
-      {
-         len = strlen( dfile4name( relate->data->dataFile ) ) + 1 ;
-         info->dataAccessName.offset = htons5(*flexPos) ;
-         connection4addData( connection, dfile4name( relate->data->dataFile ), len, 0 ) ;
-         *flexPos += len ;
-      }
-
-      if ( relate->data == 0 )
-         info->dataAliasName.offset = 0 ;
-      else
-      {
-         if ( relate->data->aliasSet == 0 )
-            info->dataAliasName.offset = 0 ;
-         else
-         {
-            len = strlen( d4alias( relate->data ) ) + 1 ;
-            info->dataAliasName.offset = htons5(*flexPos) ;
-            connection4addData( connection, d4alias( relate->data ), len, 0 ) ;
-            *flexPos += len ;
-         }
-      }
-
-      *relatePos += sizeof( CONNECTION4RELATE ) ;
-
-      /* and do it's slaves:  */
-      for ( slaveOn = 0 ;; )
-      {
-         slaveOn = (RELATE4 *)l4next( &relate->slaves, slaveOn ) ;
-         if ( slaveOn == 0 )
-            break ;
-         relate4add( connection, slaveOn, relatePos, flexPos, relateData ) ;
-      }
-
-      return 0 ;
-   }
-
-
-
-   int relate4clientInit( RELATE4 *master )
-   {
-      CONNECTION4RELATE_INIT_INFO_IN *info ;
-      CONNECTION4RELATE_INIT_INFO_OUT *out ;
-      int rc, i ;
-      unsigned short relateCount ;
-      RELATE4 *relateOn ;
-      CONNECTION4 *connection ;
-      unsigned int relatePos, sortLen ;
-      unsigned short flexPos, flexOffset, exprLen, relateOffset ;
-      char *relateData ;
-      CODE4 *c4 ;
-
-      #ifdef E4PARM_LOW
-         if ( master == 0 )
-            return error4( 0, e4parm_null, E94421 ) ;
-      #endif
-
-      RELATION4 *relation = master->relation ;
-
-      c4 = master->codeBase ;
-      connection = master->data->dataFile->connection ;
-      relateCount = 1 ;
-
-      for( relateOn = master ;; relateCount++ )
-      {
-         if ( relate4next( &relateOn ) == 2 )
-            break ;
-         if ( relateOn->data != 0 )
-         {
-            if ( connection == 0 )
-               connection = relateOn->data->dataFile->connection ;
-            else
-               if ( connection != relateOn->data->dataFile->connection )   /* multi-servers not supported on relations */
-                  return error4( c4, e4notSupported, E84414 ) ;
-         }
-      }
-
-      #ifdef E4ANALYZE
-         if ( connection == 0 )
-            return error4( c4, e4struct, E94421 ) ;
-      #endif
-      if ( relateCount == 0 || connection == 0 )
-         return error4( c4, e4relate, E84415 ) ;
-
-      connection4assign( connection, CON4RELATE_INIT, 0, 0 ) ;
-
-      connection4addData( connection, 0, sizeof( CONNECTION4RELATE_INIT_INFO_IN ), (void **)&info ) ;
-      if ( relation->needsFreeing == 1 )
-         info->relationId = htonl5(relation->relationId) ;
-      else
-         info->relationId = 0 ;
-      relateOffset = sizeof( CONNECTION4RELATE_INIT_INFO_IN ) ;
-      info->relateOffset = htons5(relateOffset) ;
-      flexOffset = relateOffset + relateCount * sizeof( CONNECTION4RELATE ) ;
-      info->flexOffset = htons5(flexOffset ) ;
-      // AS May 1/02 - added support for leaving the relation status unchanged, to allow positioning within relat4edoAll
-      info->retainRelation = htons5( relation->retainRelation ) ;
-      info->relation.skipBackwards = htons5(relation->skipBackwards) ;
-      info->bitmapDisable = htons5(relation->bitmapDisable) ;
-      info->masterClientId = htonl5(master->data->clientId) ;
-      if ( relation->exprSource == 0 )
-      {
-         info->relation.exprSource.offset = 0 ;
-         exprLen = 0 ;
-      }
-      else
-      {
-         exprLen = strlen( relation->exprSource ) + 1 ;
-         info->relation.exprSource.offset = info->flexOffset ;
-      }
-      if ( relation->sortSource == 0 )
-      {
-         info->relation.sortSource.offset = 0 ;
-         sortLen = 0 ;
-      }
-      else
-      {
-         sortLen = (unsigned int)strlen( relation->sortSource ) + 1 ;
-         info->relation.sortSource.offset = htons5((unsigned short)(flexOffset + exprLen)) ;
-      }
-
-      connection4addData( connection, 0, relateCount * sizeof( CONNECTION4RELATE ), (void **)&relateData ) ;
-      if ( exprLen != 0 )
-         connection4addData( connection, relation->exprSource, exprLen, 0 ) ;
-      if ( sortLen != 0 )
-         connection4addData( connection, relation->sortSource, sortLen, 0 ) ;
-
-      relatePos = 0 ;
-      flexPos = flexOffset + exprLen + sortLen ;
-      rc = relate4add( connection, master, &relatePos, &flexPos, relateData ) ;
-      if ( rc < 0 )
-      {
-         /* u4free( relateData ) ; */
-         return error4stack( c4, rc, E94421 ) ;
-      }
-
-      connection4sendMessage( connection ) ;
-      /* u4free( relateData ) ;*/
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-         return error4stack( c4, rc, E94421 ) ;
-      rc = connection4status( connection ) ;
-      if ( rc < 0 )
-         return connection4error( connection, c4, rc, E84401 ) ;
-      if ( rc != 0 )
-         return rc ;
-      if ( connection4len( connection ) != (long)sizeof( CONNECTION4RELATE_INIT_INFO_OUT ) + relateCount * (long)sizeof( relateOn->id ) )
-         return error4stack( c4, e4packetLen, E94421 ) ;
-      out = (CONNECTION4RELATE_INIT_INFO_OUT *)connection4data( connection ) ;
-      relation->relationId = ntohl5(out->relationId) ;
-
-      #ifdef E4ANALYZE
-         if ( sizeof( relateOn->id ) != sizeof( unsigned short int ) )
-            return error4( c4, e4struct, E94421 ) ;
-      #endif
-
-      out++ ;   /* go to the end of out for the variable length data */
-
-      for( relateOn = master, i = 0 ;; i++ )
-      {
-         if ( relateOn == 0 )
-            break ;
-         relateOn->id = ntohs5(*((unsigned short int *)(((char *)out) + i * sizeof( relateOn->id ) ) )) ;
-         rc = relate4next( &relateOn ) ;
-         if ( rc == 2 )
-            break ;
-      }
-
-      relation->isInitialized = 1 ;
-
-      return 0 ;
-   }
-#endif
-
-
 
 #ifndef S4CLIENT
    static int relate4topInit( RELATE4 *relate )
@@ -6081,17 +5346,11 @@ int S4FUNCTION relate4top( RELATE4 *relate )
    int rc ;
    CODE4 *c4 ;
    DATA4 *d4 ;
-   #ifdef S4CLIENT
-      CONNECTION4RELATE_TOP_INFO_IN *info ;
-      CONNECTION4 *connection ;
-      int saveRc ;
-   #else
       long rec ;
       int rc2 ;
       #ifndef S4OFF_MULTI
          char oldReadLock ;
       #endif
-   #endif
 
    #ifdef E4VBASIC
       if ( c4parm_check( relate, 5, E94422 ) )
@@ -6129,91 +5388,6 @@ int S4FUNCTION relate4top( RELATE4 *relate )
 
    rc = 0 ;
 
-   #ifdef S4CLIENT
-      #ifdef E4ANALYZE
-         if ( d4 == 0 )
-            return error4( c4, e4struct, E94422 ) ;
-         if ( d4->dataFile == 0 )
-            return error4( c4, e4struct, E94422 ) ;
-      #endif
-      // AS Jun 12/02 - bug here - if tag has changed, call relate4changed() instead of init
-      // directly since otherwise certain uninitialization was not being performed
-      if ( relate->dataTag != d4->tagSelected )
-         relate4changed( relate ) ;
-
-      if ( relation->isInitialized == 0 )
-      {
-         relate->dataTag = d4->tagSelected ;
-         rc = relate4clientInit( relate ) ;
-         if ( rc != 0 )
-            return rc ;
-      }
-      #ifdef S4CB51
-         #ifndef S4OFF_MULTI
-            if ( c4getReadLock( c4 ) )
-            {
-               rc = relate4lock( relate ) ;
-               if ( rc != 0 )
-                  return rc ;
-            }
-         #endif
-      #endif
-      connection = d4->dataFile->connection ;
-      #ifdef E4ANALYZE
-         if ( connection == 0 )
-            return error4( c4, e4struct, E94422 ) ;
-      #endif
-
-      rc = relate4flush( relate ) ;
-      if ( rc )
-         return rc ;
-
-      // AS Apr 12/02 block reading of records for relate skip...
-      assert5port( "new client/server functionality to fetch relation records in batches" ) ;
-      if ( relation->readRecsToBuf > 0 )
-      {
-         relation4readBufferReset( relation, 0 ) ;
-         return relation4skipFetchMultiple( relation, 0, 1, 0 ) ;  // '1' means top
-      }
-      else
-      {
-         connection4assign( connection, CON4RELATE_TOP, 0, 0 ) ;
-         connection4addData( connection, 0, sizeof( CONNECTION4RELATE_TOP_INFO_IN ), (void **)&info ) ;
-         info->relationId = htonl5(relation->relationId) ;
-         // AS 06/15/00 - added general collating relation tag support in...
-         info->useGeneralTagsInRelate = htons5( c4->useGeneralTagsInRelate ) ;
-         // AS May 21/02 - code to support auto-transfer of memo fields
-         assert5port( "added optional transfer of memo fields with client/server communications" ) ;
-         info->includeMemos = relation->includeMemos ;
-         connection4sendMessage( connection ) ;
-         saveRc = connection4receiveMessage( connection ) ;
-         if ( saveRc < 0 )
-            return error4stack( c4, saveRc, E94422 ) ;
-         saveRc = connection4status( connection ) ;
-
-         if ( saveRc < 0 )
-         {
-            // AS Aug 6/02 - Ensure that server frees up info as well...
-            relate4freeServer( relate ) ;
-            relation->isInitialized = 0 ;
-            if ( saveRc < 0 )
-               return connection4error( connection, c4, saveRc, E94422 ) ;
-         }
-
-         rc = relation4unpack( relation, connection ) ;
-         if ( rc != 0 )
-            return rc ;
-         if ( saveRc == r4terminate )
-         {
-            // don't call freeServer until after the unpack since freeServer sends a new message to the server
-            // AS Aug 6/02 - Ensure that server frees up info as well...
-            relate4freeServer( relate ) ;
-            relation->isInitialized = 0 ;
-         }
-
-         return saveRc ;
-      }
-   #else
       #ifndef S4OFF_MULTI
          oldReadLock = c4getReadLock( c4 ) ;
          c4setReadLock( c4, 0 ) ;
@@ -6562,7 +5736,6 @@ int S4FUNCTION relate4retain( RELATE4 *relate, int flag )
       }
       // data->readBufRcSave = 0 ;
    }
-#endif
 
 
 /* AS Apr 11/02 - New function for advance-reading client/server */

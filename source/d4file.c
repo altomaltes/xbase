@@ -61,15 +61,8 @@
 #endif
 long S4FUNCTION dfile4recCount( DATA4FILE *data, const long serverId )
 {
-   /* set serverId to -2 to get the actual count if possible for example, b4leafInit needs to know how many may potentially exist */
-   #ifdef S4CLIENT
-      int rc ;
-      CONNECTION4 *connection ;
-      CONNECTION4RECCOUNT_INFO_OUT *info ;
-   #else
       unsigned len ;
       FILE4LONG pos ;
-   #endif
    S4LONG tmpCount ;
 
    #ifdef E4PARM_HIGH
@@ -81,33 +74,6 @@ long S4FUNCTION dfile4recCount( DATA4FILE *data, const long serverId )
    if ( error4code( data->c4 ) < 0 )
       return e4codeBase ;
 
-   #ifdef S4CLIENT
-      /* client checks current count in d4recCount */
-      connection = data->connection ;
-      if ( connection == 0 )
-         return e4connection ;
-
-      connection4assign( connection, CON4RECCOUNT, 0, data->serverId ) ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-         return rc ;
-      rc = connection4status( connection ) ;
-      if ( rc != 0 )
-         return connection4error( connection, data->c4, rc, E91102 ) ;
-
-      if ( connection4len( connection ) != sizeof( CONNECTION4RECCOUNT_INFO_OUT ) )
-         return error4( data->c4, e4packetLen, E91102 ) ;
-      info = (CONNECTION4RECCOUNT_INFO_OUT *)connection4data( connection ) ;
-      tmpCount = ntohl5(info->recCount) ;
-      if ( tmpCount < 0 )
-         return -1L ;
-      data->minCount = tmpCount ;
-      #ifndef S4SINGLE
-         if ( info->appendLocked )
-      #endif  /* S4SINGLE */
-            data->numRecs = tmpCount ;
-   #else
       if ( data->numRecs >= 0L )  /* we have an accurate count - append bytes locked */
       {
          #ifndef S4SINGLE
@@ -167,7 +133,6 @@ long S4FUNCTION dfile4recCount( DATA4FILE *data, const long serverId )
          transactions are taking place and the append bytes are locked, and
          data handles of other datafiles are performing the access */
       dfile4setMinCount( data, tmpCount ) ;    /* used for multi-user ensured sequencing */
-   #endif
 
    return tmpCount ;
 }

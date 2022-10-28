@@ -252,27 +252,6 @@ static MONTH monthOfYear[] =
          c4strcpy( c4->currentClient->trans.dateFormat, sizeof( c4->c4trans.trans.dateFormat ), str ) ;
       #else
          c4strcpy( c4->c4trans.trans.dateFormat, sizeof( c4->c4trans.trans.dateFormat ), str ) ;  // AS Dec 13/05 vs 5.0 fixes
-         #ifdef S4CLIENT
-            if ( c4->defaultServer.connected )
-            {
-               connection = &c4->defaultServer ;
-               #ifdef E4ANALYZE
-                  if ( connection == 0 )
-                     return error4( c4, e4struct, E96302 ) ;
-               #endif
-               connection4assign( connection, CON4DATE_FORMAT, 0L, 0L ) ;
-               connection4addData( connection, NULL, sizeof(CONNECTION4DATE_FORMAT_SET_INFO_IN), (void **)&infoIn ) ;
-               memcpy( infoIn->dateFormat, &c4->c4trans.trans.dateFormat, sizeof( c4->c4trans.trans.dateFormat ) ) ;
-               connection4sendMessage( connection ) ;
-               rc = connection4receiveMessage( connection ) ;
-               if ( rc < 0 )
-                  return error4stack( c4, rc, E96302 ) ;
-               rc = connection4status( connection ) ;
-               if ( rc < 0 )
-                  connection4error( connection, c4, rc, E96302 ) ;
-               return rc ;
-            }
-         #endif
       #endif
 
       return 0 ;
@@ -785,7 +764,7 @@ void date4timeNowFull( void *timeData )
    // returns full date and time, including time to the millisecond level.
    // output is in r4dateTime / r4dateTimeMilli format ((2 longs), first long is date, 2nd is time )
    #ifndef S4MACINTOSH  // LY Jul 16/04
-      assert5port( "added autoTimestampField support" ) ;
+      assert( "added autoTimestampField support" ) ;
    #endif
    // AS Mar 11/03 - support for new feature r4autoTimestamp
    #if defined(S4WINCE) || defined(__WIN32)

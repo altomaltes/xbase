@@ -2975,31 +2975,6 @@
 
 
 #if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && defined( S4CLIENT )
-   /* !S4OFF_TRAN, !S4OFF_WRITE, S4CLIENT */
-   int S4FUNCTION code4tranCommitPhaseTwo( CODE4 *c4, int doUnlock )
-   {
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-            return error4( 0, e4parm_null, E93828 ) ;
-      #endif
-
-      if ( c4->c4trans.trans.currentTranStatus != r4partial )
-         return error4( c4, e4transStatus, E83812 ) ;
-
-      CONNECTION4 *connection = &c4->defaultServer ;
-      connection4assign( connection, CON4COMMIT_PHASE_TWO, 0, 0 ) ;
-      connection4sendMessage( connection ) ;
-      int rc = connection4receiveMessage( connection ) ;
-      if ( rc >= 0 )
-         rc = connection4status( connection ) ;
-
-      return rc ;
-   }
-#endif /* !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && defined( S4CLIENT ) */
-
-
-
-#if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && defined( S4CLIENT )
    #ifdef S4MULTI_SERVER
       /* !S4OFF_TRAN, !S4OFF_WRITE, S4CLIENT */
       int S4FUNCTION code4tranCommitPhaseOne( CODE4 *c4, CommitPhaseType phaseType )

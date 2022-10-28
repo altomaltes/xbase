@@ -366,11 +366,6 @@ int S4FUNCTION d4eof( DATA4 *data )
 
 const char *S4FUNCTION d4fileName( DATA4 *data )
 {
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      int rc ;
-   #endif
-
    #ifdef E4PARM_HIGH
       if ( data == 0 )
       {
@@ -384,33 +379,7 @@ const char *S4FUNCTION d4fileName( DATA4 *data )
          return 0 ;
    #endif
 
-   #ifdef S4CLIENT
-      if ( error4code( data->codeBase ) < 0 )
-         return 0 ;
-
-      connection = data->dataFile->connection ;
-      connection4assign( connection, CON4DATA_FNAME, data4clientId( data ), data4serverId( data ) ) ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-      {
-         #ifdef E4STACK
-            error4stack( data->codeBase, rc, E95501 ) ;
-         #endif
-         return 0 ;
-      }
-
-      rc = connection4status( connection ) ;
-      if ( rc < 0 )
-      {
-         connection4error( connection, data->codeBase, rc, E95501 ) ;
-         return 0 ;
-      }
-
-      return connection4data( connection ) ;
-   #else
-      return data->dataFile->file.name ;
-   #endif
+  return data->dataFile->file.name ;
 }
 
 
@@ -936,27 +905,6 @@ int d4verify( DATA4 *d4, const int subs )
          if ( error4code( data->codeBase ) < 0 )
             return e4codeBase ;
 
-         #ifdef S4CLIENT
-            if ( data->dataFile->codePageRead != 1 )
-            {
-               CONNECTION4 *connection = data->dataFile->connection ;
-               connection4assign( connection, CON4DATA_CODEPAGE, data4clientId( data ), data4serverId( data ) ) ;
-               connection4sendMessage( connection ) ;
-               int rc = connection4receiveMessage( connection ) ;
-               if ( rc < 0 )
-                  return rc ;
-
-               rc = connection4status( connection ) ;
-               if ( rc < 0 )
-               {
-                  connection4error( connection, data->codeBase, rc, E95501 ) ;
-                  return rc ;
-               }
-
-               data->dataFile->codePage = rc ;
-               data->dataFile->codePageRead = 1 ;
-            }
-         #endif
 
          return data->dataFile->codePage ;
       #endif
@@ -1003,33 +951,6 @@ int d4verify( DATA4 *d4, const int subs )
          it easy to track if the file has changed
       */
 
-      #ifdef S4CLIENT
-         CONNECTION4VERSION_INFO_OUT *info ;
-         CONNECTION4 *connection ;
-         int rc ;
-         CODE4 *c4 = data->codeBase ;
-
-         connection = data->dataFile->connection ;
-         if ( connection == 0 )
-            return e4connection ;
-
-         connection4assign( connection, CON4VERSION, 0, data->dataFile->serverId ) ;
-         connection4sendMessage( connection ) ;
-         rc = connection4receiveMessage( connection ) ;
-         if ( rc < 0 )
-            return rc ;
-         rc = connection4status( connection ) ;
-         if ( rc != 0 )
-            return connection4error( connection, c4, rc, E91102 ) ;
-
-         if ( connection4len( connection ) != sizeof( CONNECTION4VERSION_INFO_OUT ) )
-            return error4( c4, e4packetLen, E91102 ) ;
-         info = (CONNECTION4VERSION_INFO_OUT *)connection4data( connection ) ;
-         long versionNum = ntohl5(info->versionNumber) ;
-         if ( versionNum < 0 )
-            return -1L ;
-         return versionNum ;
-      #else
          // once the version number is requested, ensure that we always update it on disk so other users can
          // check if has changed (in particular this applies for the server)
          DATA4FILE *dataFile = data->dataFile ;
@@ -1078,7 +999,6 @@ int d4verify( DATA4 *d4, const int subs )
          }
 
          return dataFile->versionNumber ;
-      #endif
    }
 #endif /* #if defined( __WIN32 ) || !defined( S4STAND_ALONE ) */
 

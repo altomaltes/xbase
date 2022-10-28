@@ -116,12 +116,6 @@
       #else
          int rc, saveUnlockAuto ;
       #endif
-      #ifdef S4SERVER
-         #ifndef S4OFF_COMMUNICATIONS
-            unsigned short int mType ;
-            long ID ;
-         #endif /* S4OFF_COMMUNICATIONS */
-      #endif
 
       c4 = data->codeBase ;
 
@@ -147,48 +141,6 @@
             #endif
          }
 
-      #ifdef S4CLIENT
-         if ( doReqdUpdate == 0 )
-            if ( d4hasLocks( data, lockId, data4serverId( data ) ) == 0 )  /* first make sure there are locks to undo */
-               return 0 ;
-
-         rc =  d4update( data ) ;  /* returns -1 if error4code( codeBase ) < 0 */
-         if ( rc < 0 )
-            return rc ;
-
-         if ( d4hasLocks( data, lockId, data4serverId( data ) ) == 0 )  /* first make sure there are locks to undo */
-            return 0 ;
-
-         // Apr 19/02 - flush out any bufferred records...
-         assert5port( "Batch write - write the records" ) ;
-         rc = d4writeBufferDo( data ) ;
-         if ( rc != 0 )
-            return rc ;
-
-         /* in case of rollback and exclusive files, make sure count set to -1 */
-         data->dataFile->numRecs = -1 ;
-
-         connection = data->dataFile->connection ;
-         if ( connection == 0 )
-            return error4stack( c4, e4connection, E92801 ) ;
-         connection4assign( connection, CON4UNLOCK, lockId, data4serverId( data ) ) ;
-
-         connection4sendMessage( connection ) ;
-         rc = connection4receiveMessage( connection ) ;
-         if ( rc < 0 )
-            return error4stack( c4, rc, E92801 ) ;
-
-         rc = connection4status( connection ) ;
-         if ( rc < 0 )
-            return connection4error( connection, c4, rc, E92801 ) ;
-
-         /* AS 01/09/97, since now have STREAM4UNLOCK_DATA handles, don't need this code */
-         /* cb51 compat, remove lock */
-         /* if ( code4trans( c4 )->unlockAuto == 2 ) */
-         /*   d4unlockClientData( data ) ; */
-
-         return rc ;
-      #else
          // AS July 16/02 - d4hasLocks() only returns true if there are data file locks, not index locks.
          // for example, calling d4reindex() only locks the index.
          Bool5 dbfHasLocks = 1 ;
@@ -236,36 +188,7 @@
          // for example, calling d4reindex() only locks the index.
          if ( dbfHasLocks == 1 )
          {
-            #ifdef S4SERVER
-               d4unlockData( data, lockId ) ;
-               #ifndef S4OFF_COMMUNICATIONS
-                  #ifdef S4JAVA
-                     if ( c4->currentClient->javaClient == 0 )
-                  #endif
-                     if ( code4unlockAuto( c4 ) == LOCK4DATA )
-                        if ( c4->currentClient->isStream == 0 )
-                        {
-                           /* send a STREAM4UNLOCK_DATA message to the client to tell it to unlock stuff */
-                           mType = htons5(STREAM4UNLOCK_DATA) ;
-                           connection4send( &c4->currentClient->connection, &mType, sizeof( mType ) ) ;
-                           /* also send the lockId and serverId */
-                           ID = htonl5( data4lockId( data ) ) ;
-                           connection4send( &c4->currentClient->connection, &ID, sizeof( ID ) ) ;
-                           ID = htonl5( data->serverId ) ;
-                           connection4send( &c4->currentClient->connection, &ID, sizeof( ID ) ) ;
-                        }
-                        else if ( c4->currentClient->sendUnlock == 1 )
-                        {
-                           // AS Apr 24/02 - for new batch skip, support an unlock send-back
-                           CONNECT4 *connect = &c4->currentClient->connect ;
-                           connect4sendShort( connect, STREAM4UNLOCK_DATA ) ;
-                           connect4sendLong( connect, data4lockId( data ) ) ;
-                           connect4sendLong( connect, data->serverId ) ;
-                        }
-               #endif /* S4OFF_COMMUNICATIONS */
-            #else
                d4unlockData( data ) ;
-            #endif
          }
 
          #if !defined( S4CLIPPER ) && !defined( S4OFF_MEMO )
@@ -281,7 +204,6 @@
          if ( error4code( c4 ) < 0 )
             return -1 ;
          return rc ;
-      #endif
    }
 #endif /* S4OFF_MULTI */
 
@@ -351,51 +273,6 @@
 // AS Apr 15/03 - support for new lockId for shared clone locking and in client/server
 int S4FUNCTION d4unlockAppendInternal( DATA4 *data, long lockId )
 {
-   /* only unlocks the append byte */
-   #ifdef S4CLIENT
-      int rc =  d4update( data ) ;  /* returns -1 if error4code( codeBase ) < 0 */
-      if ( rc < 0 )
-         return rc ;
-
-      // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-      if ( data->dataFile->appendLockLockId == 0 && data->dataFile->appendLockServerId == 0 )  /* first make sure the append bytes are locked */
-         return 0 ;
-
-      // Apr 19/02 - flush out any bufferred records...
-      assert5port( "Batch write - write the records" ) ;
-      rc = d4writeBufferDo( data ) ;
-      if ( rc != 0 )
-         return rc ;
-
-      /* in case of rollback and exclusive files, make sure count set to -1 */
-      data->dataFile->numRecs = -1 ;
-
-      CONNECTION4 *connection = data->dataFile->connection ;
-      if ( connection == 0 )
-         return error4stack( c4, e4connection, E92801 ) ;
-      connection4assign( connection, CON4UNLOCK_APPEND, lockId, data4serverId( data ) ) ;
-
-      rc = connection4sendMessage( connection ) ;
-      if ( rc < 0 )
-         return rc ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-         return rc ;
-
-      rc = connection4status( connection ) ;
-      if ( rc < 0 )
-         return connection4error( connection, data->codeBase, rc, E92801 ) ;
-
-      if ( rc == 0 )
-      {
-         // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-         // data->dataFile->appendLock = 0 ;
-         data->dataFile->appendLockLockId = 0 ;
-         data->dataFile->appendLockServerId = 0 ;
-      }
-
-      return rc ;
-   #else
       #ifndef S4OFF_MULTI
          #ifdef E4PARM_HIGH
             if ( data == 0 )
@@ -416,17 +293,14 @@ int S4FUNCTION d4unlockAppendInternal( DATA4 *data, long lockId )
       #else
          return 0 ;
       #endif
-   #endif
 }
 
 
-#ifndef S4SERVER
    // AS Apr 15/03 - support for new lockId for shared clone locking
    int S4FUNCTION d4unlockAppend( DATA4 *data )
    {
       return d4unlockAppendInternal( data, data4lockId( data ) ) ;
    }
-#endif
 
 
 
@@ -676,11 +550,6 @@ int S4FUNCTION d4unlockAppendInternal( DATA4 *data, long lockId )
       #ifdef S4CLIENT
          int oldLock ;
       #endif
-      #ifdef S4SERVER
-         #ifndef S4OFF_COMMUNICATIONS
-            unsigned short int mType ;
-         #endif /* S4OFF_COMMUNICATIONS */
-      #endif
 
       c4 = 0 ;
 
@@ -724,24 +593,6 @@ int S4FUNCTION d4unlockAppendInternal( DATA4 *data, long lockId )
 
       if ( c4 != 0 )
       {
-         #ifdef S4SERVER
-            #ifndef S4OFF_COMMUNICATIONS
-               #ifdef S4JAVA
-                  if ( c4->currentClient->javaClient == 0 )
-               #endif
-                  if ( c4->currentClient->connection.connect != 0 && c4->currentClient->isStream == 0)
-                  {
-                     /* send a STREAM4UNLOCK_ALL message to the client to tell it to unlock stuff */
-                     mType = htons5(STREAM4UNLOCK_ALL) ;
-                     connection4send( &c4->currentClient->connection, &mType, sizeof( mType ) ) ;
-                  }
-                  else if ( c4->currentClient->sendUnlock == 1 )
-                  {
-                     CONNECT4 *connect = &c4->currentClient->connect ;
-                     connect4sendShort( connect, STREAM4UNLOCK_ALL ) ;
-                  }
-            #endif /* S4OFF_COMMUNICATIONS */
-         #endif
 
          if ( error4code( c4 ) < 0 )
             return error4code( c4 ) ;

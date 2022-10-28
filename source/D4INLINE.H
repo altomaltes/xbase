@@ -156,14 +156,17 @@
    #ifdef __cplusplus
       extern "C" {
    #endif
+
    #ifndef S4SINGLE
       int code4unlockAutoSave( CODE4 *c) ;
    #endif
+
    #ifndef S4OFF_WRITE
       #ifndef S4OFF_TRAN
          int code4transEnabled( CODE4 * ) ;
       #endif
    #endif
+
    TRAN4 *code4trans( CODE4 * ) ;
 
    /* C4TRANS.C */

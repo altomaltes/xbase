@@ -68,7 +68,6 @@
       #define S4OFF_TRAN
    #endif
 
-   #define S4OFF_COMMUNICATIONS
    #ifndef S4OFF_TRAN
       // AS Apr 28/03 - made trans-shared a run-time switch
       // #ifndef S4TRANS_FILE_SHARED
@@ -404,9 +403,6 @@
 #endif
 
 #ifdef __WIN32
-   #if !defined( S4STAND_ALONE ) && !defined( S4OFF_THREAD ) && !defined( S4COMM_THREAD ) && !defined( S4OFF_COMMUNICATIONS )
-      #define S4COMM_THREAD
-   #endif
    #if !defined( S4CONSOLE ) && !defined( S4WINDOWS )
       #define S4WINDOWS
    #endif
@@ -482,16 +478,7 @@
    #ifndef S4OFF_TRAN
       #define S4STAND_ALONE_TRANS
    #endif
-   #ifdef __unix__
-      #define S4OFF_COMMUNICATIONS
-   #endif
-   #ifdef S4OS2
-      #define S4OFF_COMMUNICATIONS
-   #endif
    /* #ifndef S4UTILS */ /* switch not needed anymore unless CodeUtil connects to the server */
-      #ifndef S4OFF_COMMUNICATIONS
-         #define S4OFF_COMMUNICATIONS
-      #endif
    /* #endif */
 #endif
 
@@ -2283,15 +2270,11 @@
    #ifdef S4PASCAL_DOS
       #error - CodeBase Server incorrectly built with S4PASCAL_DOS
    #endif
+
    #ifdef S4PASCAL_WIN
       #error - CodeBase Server incorrectly built with S4PASCAL_WIN
    #endif
-   #ifdef S4OFF_COMMUNICATIONS
-      /* allow for testing purposes to compile without communications, also for odbc servicing dll */
-      #if !defined( S4TESTING ) && !defined( S4ODBC_BUILD )
-         #error - CodeBase Server incorrectly built with S4OFF_COMMUNICATIONS
-      #endif
-   #endif
+
    #ifdef S4NT_DOS
       #error - CodeBase Server incorrectly built with S4NT_DOS
    #endif
@@ -2457,13 +2440,6 @@
    /* Need enough room for both a large starting offset and room to grow, use middle value */
    /* this value is the hi-byte offset used for locking when using large files */
    #define S4LARGE_FILE_OFFSET 0x3FFFFFFF
-#endif
-
-#ifndef S4OFF_COMMUNICATIONS
-   #define WS4MAX_PENDING_CONNECTS 10
-   #ifndef __unix__
-      #define S4NO_INET_ATON      /* A unix address conversion function */
-   #endif
 #endif
 
 #ifdef S4SPEED_TEST

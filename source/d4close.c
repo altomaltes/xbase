@@ -207,104 +207,16 @@ int dfile4close( DATA4FILE *data )
       }
    #endif
 
-   #ifndef S4STAND_ALONE
-      CODE4 *c4 = data->c4 ;
-      assert5( c4 != 0 ) ;
-   #endif
+  CODE4 *c4 = data->c4 ;
+  assert5( c4 != 0 ) ;
 
-   #ifdef S4CLIENT
-      int saveRc = error4set( c4, 0 ) ;
-      int finalRc = 0 ;
-   #endif
 
    if ( data->userCount > 0 )  // may be at 0 if datafile is invalid...
       data->userCount-- ;
    assert5( data->userCount >= 0 ) ;
    if ( data->userCount == 0 )
    {
-      #ifdef S4CLIENT
-         if ( data->info != 0 )
-         {
-            u4free( data->info ) ;
-            data->info = 0 ;
-         }
-
-         connection = data->connection ;
-         if ( connection == 0 )
-            finalRc = e4connection ;
-         else
-         {
-            connection4assign( connection, CON4CLOSE, 0, data->serverId ) ;
-            connection4sendMessage( connection ) ;
-            finalRc = connection4receiveMessage( connection ) ;
-            if ( finalRc >= 0 )
-               finalRc = connection4status( connection ) ;
-         }
-         #ifndef S4OFF_INDEX
-            for ( ;; )
-            {
-               i4 = (INDEX4FILE *)l4first( &data->indexes ) ;
-               if ( i4 == 0 )
-                  break ;
-               index4close( i4 ) ;
-            }
-         #endif
-
-         l4remove( &c4->dataFileList, data ) ;
-         #ifdef S4LOCK_HASH
-            delete data->lockHash ;
-         #endif
-         mem4free( c4->data4fileMemory, data ) ;
-         if ( saveRc != 0 )
-         {
-            error4set( c4, saveRc ) ;
-            return saveRc ;
-         }
-         else
-         {
-            error4set( c4, finalRc ) ;
-            return finalRc ;
-         }
-      #else
-         #ifdef S4SERVER
-            // AS Oct 24/02 - also closelow if remove is set to true, so the file is removed (otherwise was left in place)
-            // AS Sep 2/03 - for testing purposes, close the testing files even if keepOpen is set to true
-            #ifdef S4TESTING
-               int oldKeepOpen = c4->server->keepOpen ;
-               const char *name = data->file.name ;
-               // AS May 28/04 - or the ANDREW.T
-               if ( c4->server->keepOpen == 1 && ( name != 0 && (strnicmp( name, "h:\\codebase.t", 13 ) == 0 || strnicmp( name, "h:\\andrew.t", 11 ) == 0 ) ) )
-                  c4->server->keepOpen = 0 ;
-            #endif
-
-            if ( c4getDoRemove( c4 ) == 1 || c4->server->keepOpen == 0 || data->valid != 1 )    /* not a valid datafile (failure in dfile4open) so close */
-            {
-               int rc = dfile4closeLow( data ) ;
-               #ifdef S4TESTING
-                  c4->server->keepOpen = oldKeepOpen ;
-               #endif
-               return rc ;
-            }
-
-            #ifdef S4TESTING
-               c4->server->keepOpen = oldKeepOpen ;
-            #endif
-
-            if ( file4getTemporary( &data->file ) && c4->server->keepOpen != 2 )  /* cannot leave temp files open or they will never close */
-            {
-               return dfile4closeLow( data ) ;
-            }
-
-            // AS May 16/03 - To fix a server-side closing issue - after create but before open it was possible that
-            // the server would close the file, and if it was temporary it was being deleted.
-            if ( c4->server->keepOpen == 2 )  /* cannot leave temp files open or they will never close */
-               data->userCount = -1 ;
-            data->singleClient = 0 ;
-            time( &data->nullTime ) ;
-         #else
-            return dfile4closeLow( data ) ;
-         #endif
-      #endif  /* S4CLIENT */
+            return dfile4closeLow( data ) ;  // ççç
    }
 
    return 0 ;

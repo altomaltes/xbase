@@ -12,14 +12,10 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-#include "d4all.h"
+#include "../../../source/d4all.h"
 
 
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000 ;  /* for all Borland compilers*/
-#endif
-
-void main( )
+int main( )
 {
    CODE4 codeBase ;
 	DATA4 *newDataFile ;
@@ -47,5 +43,6 @@ void main( )
 
    code4close( &codeBase ) ;
    code4initUndo( &codeBase) ;
+
+  return( 0 );
 }
-

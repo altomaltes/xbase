@@ -21,58 +21,6 @@
    #include <time.h>
 #endif
 
-#ifdef S4CLIENT
-int S4FUNCTION d4check( DATA4 *d4 )
-{
-   #ifdef S4OFF_INDEX
-      return 0 ;
-   #else
-      CONNECTION4 *connection ;
-      int rc ;
-      CONNECTION4CHECK_INFO_OUT *out ;
-
-      #ifdef E4PARM_HIGH
-         if ( d4 == 0 )
-            return error4( 0, e4parm_null, E95702 ) ;
-      #endif
-
-      #ifndef S4OFF_MULTI
-         rc = d4lockFile( d4 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-         if ( rc )
-            return rc ;
-      #endif
-
-      // Apr 25/02 - ensure batched writes get flushed first
-      code4writeBufferFlush( d4->codeBase ) ;
-      if ( error4code( d4->codeBase ) < 0 )  // check if write buffer flush returned an error
-         return error4code( d4->codeBase ) ;
-
-      connection = d4->dataFile->connection ;
-      if ( connection == 0 )
-         return e4connection ;
-      connection4assign( connection, CON4CHECK, data4clientId( d4 ), data4serverId( d4 ) ) ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-         return rc ;
-      rc = connection4status( connection ) ;
-      if ( rc != 0 )
-         return connection4error( connection, d4->codeBase, rc, E95702 ) ;
-
-      if ( connection4len( connection ) != sizeof( CONNECTION4CHECK_INFO_OUT ) )
-         return error4( d4->codeBase, e4packetLen, E95702 ) ;
-      out = (CONNECTION4CHECK_INFO_OUT *)connection4data( connection ) ;
-      if ( out->lockedDatafile == 1 )
-      {
-         // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-         d4->dataFile->fileLockServerId = data4serverId( d4 ) ;
-         d4->dataFile->fileLockLockId = data4lockId( d4 ) ;
-      }
-      return 0 ;
-   #endif  /* S4OFF_INDEX */
-}
-#else
-
 #ifndef S4OFF_INDEX
 
 typedef struct
@@ -1115,5 +1063,4 @@ int S4FUNCTION d4check( DATA4 *d4 )
    #endif  /* S4OFF_INDEX */
 }
 
-#endif /* S4CLIENT */
 
