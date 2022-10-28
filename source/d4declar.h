@@ -776,21 +776,17 @@ S4EXPORT short S4FUNCTION d4logStatusCB( DATA4 * ) ;
 #ifdef S4OFF_TRAN
    #define d4logStatus( d4 ) ( 0 )
 #else
-   #ifdef S4CLIENT
-      #define d4logStatus( d4 ) ( 0 )
-   #else
       #define d4logStatus( d4 ) ( (d4)->logVal == 0 ? 0 : 1 )
-   #endif
 #endif
 S4EXPORT LIST4 S4PTR * S4FUNCTION d4indexList( DATA4 S4PTR * ) ;
 
 /* DATE4 */
 #define date4assign( a, b ) ( date4assignLow( (a), (b), 0 ) )
-S4EXPORT int S4FUNCTION date4assignLow( char S4PTR *, const long, int ) ;
-S4EXPORT S4CONST char *S4FUNCTION date4cdow( const char S4PTR * ) ;
+S4EXPORT int S4FUNCTION date4assignLow(              char S4PTR *, const long, int ) ;
+S4EXPORT S4CONST char *S4FUNCTION date4cdow(   const char S4PTR * ) ;
 S4EXPORT S4CONST char *S4FUNCTION date4cmonth( const char S4PTR * ) ;
-S4EXPORT int S4FUNCTION date4dow( const char S4PTR * ) ;
-S4EXPORT void S4FUNCTION date4format( const char S4PTR *, char S4PTR *, char S4PTR * ) ;/* 'dt' may be 'result'*/
+S4EXPORT          int  S4FUNCTION date4dow(    const char S4PTR * ) ;
+S4EXPORT         void  S4FUNCTION date4format( const char S4PTR *, char S4PTR *, char S4PTR * ) ;/* 'dt' may be 'result'*/
 S4EXPORT double S4FUNCTION date4formatMdx( const char S4PTR * ) ;
 S4EXPORT int S4FUNCTION date4formatMdx2( const char S4PTR * , double S4PTR * ) ;
 S4EXPORT void S4FUNCTION date4init( char S4PTR *, const char S4PTR *, char S4PTR * ) ;
