@@ -59,7 +59,6 @@ DATA4 *S4FUNCTION d4createTemp( CODE4 *c4, const FIELD4INFO *fieldData, const TA
    return data ;
 }
 
-#ifndef S4CLIENT
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -100,7 +99,7 @@ static void d4createClose( CODE4 *c4, DATA4 *d4, int doDelete )
       code4tranStatusSet( c4, oldStatus ) ;
    #endif
 }
-#endif
+
 DATA4 *S4FUNCTION d4createLow( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, const TAG4INFO *tagInfo )
 {
     #ifdef S4CLIENT
@@ -526,7 +525,6 @@ DATA4 *S4FUNCTION d4create( CODE4 *c4, const char *name, const FIELD4INFO *field
 
 }
 
-#ifndef S4CLIENT
 #ifndef S4OFF_MEMO
    #ifndef CREATE4MEMO_EXT
       #ifdef S4MFOX
@@ -535,7 +533,6 @@ DATA4 *S4FUNCTION d4create( CODE4 *c4, const char *name, const FIELD4INFO *field
          #define CREATE4MEMO_EXT "mdx"
       #endif
    #endif
-#endif
 
 int dfile4create( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, const TAG4INFO *tagInfo, DATA4 **temp )
 {

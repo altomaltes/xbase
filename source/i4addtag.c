@@ -7,7 +7,6 @@
    #endif
 #endif
 
-#ifndef S4CLIENT
 #ifndef S4OFF_INDEX
 
 #ifndef S4OFF_WRITE
@@ -818,4 +817,3 @@ int t4addCalc( TAG4 *t4, long rec )
 
 #endif  /* S4OFF_WRITE */
 #endif  /* S4OFF_INDEX */
-#endif  /* not S4CLIENT */

@@ -56,11 +56,7 @@ int S4FUNCTION r4index_lookup_foo( DATA4 *data, char *index_name,
          return 0 ;
       #endif
 
-   #ifndef S4CLIENT
       ttype = report4index_type();
-   #else
-      ttype = code4indexFormat( data->codeBase ) ;
-   #endif
    u4namePiece( index_lookup, 257, index_name, 1, 0 ) ;
    #ifndef S4CASE_SEN
       c4upper( index_lookup ) ;
@@ -79,15 +75,11 @@ int S4FUNCTION r4index_lookup_foo( DATA4 *data, char *index_name,
       index_on = (INDEX4 *)l4first( &data->indexes );
       while( index_on )
       {
-         #ifndef S4CLIENT
             #ifdef N4OTHER
                u4namePiece( current, 257, index_on->file.name, 1, 0 ) ;
             #else
                u4namePiece( current, 257, index_on->indexFile->file.name, 1, 0 ) ;
             #endif
-         #else
-            u4namePiece( current, 257, i4fileName( index_on ), 1, 0 ) ;
-         #endif
          #ifndef S4CASE_SEN
             c4upper( current ) ;
          #endif
@@ -104,15 +96,11 @@ int S4FUNCTION r4index_lookup_foo( DATA4 *data, char *index_name,
       index_on = (INDEX4 *)l4first( &data->indexes );
       while( index_on )
       {
-         #ifndef S4CLIENT
             #ifdef N4OTHER
                u4namePiece( current, 257, index_on->file.name, 0, 0 ) ;
             #else
                u4namePiece( current, 257, index_on->indexFile->file.name, 0, 0 ) ;
             #endif
-         #else
-            u4namePiece( current, 257, i4fileName( index_on ), 0, 0 ) ;
-         #endif
          #ifndef S4CASE_SEN
             c4upper( current ) ;
          #endif
@@ -197,11 +185,7 @@ DATA4 *r4open_data_foo( char *file_name, char *alias, RELATE4 *relate, CODE4 *co
    relate_on = relate;
    while( relate_on )
    {
-      #ifndef S4CLIENT
          strcpy( fnbuf, relate_on->data->dataFile->file.name );
-      #else
-         strcpy( fnbuf, d4fileName( relate_on->data ) ) ;
-      #endif
       #ifndef S4CASE_SEN
          c4upper( fnbuf );
       #endif

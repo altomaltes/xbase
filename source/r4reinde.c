@@ -23,7 +23,6 @@
 #ifndef S4OFF_WRITE
 #ifndef S4INDEX_OFF
 
-#ifndef S4CLIENT
 #ifndef S4OFF_TRAN
 void i4deleteRemoveKeys( INDEX4 *index )
 {
@@ -47,7 +46,6 @@ void i4deleteRemoveKeys( INDEX4 *index )
    }
 }
 #endif /* S4OFF_TRAN */
-#endif /* S4CLIENT */
 
 #ifndef N4OTHER
 #ifdef S4CLIENT

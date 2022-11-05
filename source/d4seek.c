@@ -8,7 +8,6 @@
 #endif
 
 #ifndef S4INDEX_OFF
-#ifndef S4CLIENT
 
 #ifdef S4FOX
 /* because of possibilities of null, key may need to have a character
@@ -179,7 +178,6 @@ static int d4seekCheck( DATA4 *data, TAG4FILE *tag, const int rc, const char *bu
       }
    #endif
 }
-#endif /* S4CLIENT */
 
 #ifdef S4CLIENT
 static int d4seekServer( DATA4 *data, const void *searchData, const short len, const int fromCurrentPos, const short seekType )
@@ -312,13 +310,11 @@ int S4FUNCTION d4seekNextN( DATA4 *data, const char *str, const short l )
          int oldErrGo ;
       #endif
    #endif
-   #ifndef S4CLIENT
       int len, rc2, saveGo ;
       TAG4 *tag ;
       TAG4FILE *tfile ;
       char buf[I4MAX_KEY_SIZE] ;
       unsigned char *dbfKey ;
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( data, 2, E92905 ) )
@@ -528,13 +524,11 @@ int S4FUNCTION d4seekNextN( DATA4 *data, const char *str, const short l )
 
 int S4FUNCTION d4seekN( DATA4 *data, const char *str, const short l )
 {
-   #ifndef S4CLIENT
       TAG4 *tag ;
       TAG4FILE *tfile ;
       int rc, len ;
       CODE4 *c4 ;
       char buf[I4MAX_KEY_SIZE] ;
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( data, 2, E92903 ) )
@@ -679,7 +673,6 @@ int S4FUNCTION d4seekN( DATA4 *data, const char *str, const short l )
 
 int S4FUNCTION d4seekDouble( DATA4 *data, const double dkey )
 {
-   #ifndef S4CLIENT
       TAG4 *tag ;
       TAG4FILE *tfile ;
       CODE4 *c4 ;
@@ -688,9 +681,6 @@ int S4FUNCTION d4seekDouble( DATA4 *data, const double dkey )
       #ifdef S4CLIPPER
          int len ;
       #endif
-   #else
-      double temp ;
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( data, 2, E92903 ) )
@@ -814,7 +804,6 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
          int oldErrGo ;
       #endif
    #endif
-   #ifndef S4CLIENT
       int rc2, saveGo ;
       TAG4 *tag ;
       TAG4FILE *tfile ;
@@ -823,9 +812,6 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
       #ifdef S4CLIPPER
          int len ;
       #endif
-   #else
-      double temp ;
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( data, 2, E92909 ) )

@@ -21,7 +21,6 @@
 
 
 
-#ifndef S4CLIENT
 #ifndef S4INDEX_OFF
 
 /* This function creates a branch out of the input constant, and combines it with the input map */
@@ -798,5 +797,4 @@ void const4deleteNe( LIST4 *list, CONST4 *con )
 }
 
 #endif   /* S4INDEX_OFF */
-#endif   /* S4CLIENT */
 

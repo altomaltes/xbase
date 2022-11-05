@@ -57,9 +57,7 @@ static void tran4lowCloseDelayed( TRAN4 *trans )
    }
 }
 
-#ifndef S4CLIENT
 static DATA4 *tran4dataFull( TRAN4 *, const long, const long ) ;
-#endif
 
 #ifdef E4ANALYZE
 static int code4transVerify( CODE4TRANS *, int ) ;
@@ -68,7 +66,7 @@ static int code4transVerify( CODE4TRANS *, int ) ;
 #ifndef S4SERVER
 static void code4invalidate( CODE4 * ) ;
 #endif
-#ifndef S4CLIENT
+
 #ifdef E4ANALYZE
 static int tran4fileVerify( TRAN4FILE *t4, int subs )
 {
@@ -1517,7 +1515,7 @@ int S4FUNCTION tran4lowCommitPhaseTwo( TRAN4 *trans, long id, int doUnlock )
 
    return 0 ;
 }
-#endif  /* not S4CLIENT */
+
 
 #ifdef S4SERVER
 #ifndef S4INLINE
@@ -1578,7 +1576,6 @@ int S4FUNCTION code4tranRollback( CODE4 *c4 )
 #endif  /* S4INLINE */
 #endif  /* S4SERVER */
 
-#ifndef S4CLIENT
 int S4FUNCTION code4tranCommit( CODE4 *c4 )
 {
    #ifdef E4PARM_HIGH
@@ -1592,7 +1589,6 @@ int S4FUNCTION code4tranCommit( CODE4 *c4 )
 
    return code4tranCommitPhaseTwo( c4, 1 ) ;
 }
-#endif
 
 int S4FUNCTION code4tranCommitSingle( CODE4 *c4 )
 {
@@ -2161,14 +2157,10 @@ int code4transFileEnable( CODE4TRANS *c4trans, const char *logName, const int do
    #ifdef E4ANALYZE
       int rc ;
    #else
-      #ifndef S4CLIENT
          int rc ;
-      #endif
    #endif
 
-   #ifndef S4CLIENT
       CODE4 *c4 ;
-   #endif
 
    if ( c4trans->enabled == 1 )
       return 0 ;
@@ -2184,7 +2176,6 @@ int code4transFileEnable( CODE4TRANS *c4trans, const char *logName, const int do
          return rc ;
    #endif
 
-   #ifndef S4CLIENT
       rc = 0 ;
 
       c4 = c4trans->c4 ;
@@ -2247,12 +2238,8 @@ int code4transFileEnable( CODE4TRANS *c4trans, const char *logName, const int do
          c4->transFileName = 0 ;
       }
       return rc ;
-   #else
-      return 0 ;
-   #endif
 }
 
-#ifndef S4CLIENT
 int tran4addUser( TRAN4 *trans, const long clientId, const char *charId, const unsigned short int lenIn )
 {
    int rc ;
@@ -2335,7 +2322,6 @@ int tran4addUser( TRAN4 *trans, const long clientId, const char *charId, const u
 
    return 0 ;
 }
-#endif /* S4CLIENT */
 
 #endif /* S4OFF_WRITE */
 #endif  /* S4OFF_TRAN */
@@ -2363,7 +2349,6 @@ void S4FUNCTION tran4freeLocks( CODE4 *c4, SINGLE4DISTANT *toFree )
    }
 }
 
-#ifndef S4CLIENT
 static void tran4unlock( SINGLE4DISTANT *toAdd, SINGLE4DISTANT *toUnlock )
 {
    LOCK4 *lock ;
@@ -2378,7 +2363,7 @@ static void tran4unlock( SINGLE4DISTANT *toAdd, SINGLE4DISTANT *toUnlock )
       lock4unlock( lock ) ;
    }
 }
-#endif
+
 #endif /* SOFF_MULTI */
 
 #ifndef S4SERVER
@@ -2611,11 +2596,9 @@ static int code4transVerify( CODE4TRANS *c4trans, int subs )
 
    #ifndef S4OFF_TRAN
       #ifndef S4OFF_WRITE
-         #ifndef S4CLIENT
             if ( c4trans->enabled == 1 )
                if ( c4trans->transFile == 0 )
                   return error4( c4trans->c4, e4struct, E93832 ) ;
-         #endif
       #endif
    #endif
 
@@ -2694,7 +2677,6 @@ int code4tranInitLow( TRAN4 *t4, CODE4TRANS *c4trans )
 int S4FUNCTION code4transInitUndo( CODE4TRANS *c4trans )
 {
    #ifndef S4OFF_WRITE
-      #ifndef S4CLIENT
          CODE4 *c4 ;
          #ifndef S4OFF_TRAN
             int rc, oldError ;
@@ -2708,7 +2690,6 @@ int S4FUNCTION code4transInitUndo( CODE4TRANS *c4trans )
                #endif
             #endif
          #endif
-      #endif
    #endif
 
    #ifdef E4PARM_LOW
@@ -2798,12 +2779,10 @@ int code4transInit( CODE4TRANS *c4trans, CODE4 *c4 )
    #endif
 
    #ifndef S4OFF_TRAN
-      #ifndef S4CLIENT
          #ifdef E4ANALYZE
             if ( c4trans->enabled != 0 )
                return error4( 0, e4struct, E93836 ) ;
          #endif
-      #endif
    #endif
 
    memset( c4trans, 0, sizeof( c4trans ) ) ;
@@ -2828,7 +2807,6 @@ int code4transInit( CODE4TRANS *c4trans, CODE4 *c4 )
 }
 #endif
 
-#ifndef S4CLIENT
 #ifdef S4SERVER
 /*
 int d4tagUniqueSync( DATA4 *data )
@@ -2983,10 +2961,8 @@ int tran4lock( TRAN4 *trans )
       }
    }
 }
-#endif  /* S4OFF_MULTI */
 #endif  /* S4SERVER */
 
-#ifndef S4CLIENT
 static DATA4 *tran4dataFull( TRAN4 *trans, const long serverId, const long clientId )
 {
    DATA4 *data ;
@@ -3003,7 +2979,6 @@ static DATA4 *tran4dataFull( TRAN4 *trans, const long serverId, const long clien
 
    return data ;
 }
-#endif
 
 #ifdef S4SERVER
 /* to get a DATA4 based on id instead of TRAN4 */
@@ -3033,7 +3008,6 @@ DATA4 *code4idData( CODE4 *c4, const long serverId, const long clientId )
 }
 #endif
 
-#ifndef S4CLIENT
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -3112,7 +3086,6 @@ int tran4active( CODE4 *c4, DATA4 *data )
       return 0 ;
    #endif  /* S4OFF_TRAN */
 }
-#endif
 
 void S4FUNCTION code4lockClear( CODE4 *c4 )
 {

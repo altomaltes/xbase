@@ -27,7 +27,6 @@
 #ifndef S4OFF_WRITE
 
 #ifndef S4OFF_MULTI
-#ifndef S4CLIENT
 int S4FUNCTION d4lockAppendRecord( DATA4 *data )
 {
    int rc, oldUnlock ;
@@ -105,7 +104,6 @@ int S4FUNCTION d4lockAppendRecord( DATA4 *data )
 
    return rc ;
 }
-#endif /* S4CLIENT */
 
 #ifdef S4SERVER
 int dfile4lockAppendRecord( DATA4FILE *data, const long clientId, const long serverId )
@@ -156,7 +154,6 @@ int dfile4lockAppendRecord( DATA4FILE *data, const long clientId, const long ser
 #endif
 #endif  /* S4OFF_MULTI */
 
-#ifndef S4CLIENT
 static int dfile4appendData( DATA4FILE *data, const void *record, S4LONG *recNum )
 {
    long count ;
@@ -203,9 +200,6 @@ static int dfile4appendData( DATA4FILE *data, const void *record, S4LONG *recNum
 }
 
 static int d4doAppend( DATA4 *data )
-#else
-int S4FUNCTION d4append( DATA4 *data )
-#endif  /* S4CLIENT */
 {
    int rc ;
    CODE4 *c4 ;
@@ -516,7 +510,6 @@ int S4FUNCTION d4append( DATA4 *data )
    #endif  /* S4CLIENT */
 }
 
-#ifndef S4CLIENT
 int S4FUNCTION d4append( DATA4 *data )
 {
    #ifndef S4OFF_TRAN
@@ -719,7 +712,6 @@ int S4FUNCTION d4append( DATA4 *data )
 
    return rc ;
 }
-#endif
 
 int S4FUNCTION d4appendBlank( DATA4 *data )
 {
@@ -822,12 +814,10 @@ int S4FUNCTION d4appendStart( DATA4 *data, int useMemoEntries )
             {
                if ( data->recNum > 0 && !d4eof( data ) && !d4bof( data ) )
                {
-                  #ifndef S4CLIENT
                      #ifdef E4ANALYZE
                         if ( !file4openTest( &data->dataFile->memoFile.file ) )
                            return error4( c4, e4data, E81101 ) ;
                      #endif
-                  #endif
 
                   /* Read in the current memo entries of the current record */
                   #ifndef S4OFF_MULTI
@@ -874,7 +864,6 @@ int S4FUNCTION d4appendStart( DATA4 *data, int useMemoEntries )
       data->recNum = 0 ;
 
       #ifndef S4OFF_MULTI
-         #ifndef S4CLIENT
             #ifdef S4SERVER
                rc = dfile4unlockData( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
             #else
@@ -884,13 +873,11 @@ int S4FUNCTION d4appendStart( DATA4 *data, int useMemoEntries )
             if ( rc )
                return rc ;
          #endif
-      #endif
    #endif  /* S4SERVER */
 
    return 0 ;
 }
 
-#ifndef S4CLIENT
 #ifndef S4OFF_TRAN
 int S4FUNCTION d4unappend( DATA4 *data )
 {
@@ -1097,5 +1084,4 @@ int dfile4unappendData( DATA4FILE *data, const long clientId, const long serverI
 }
 
 #endif  /* S4OFF_TRAN */
-#endif  /* S4CLIENT */
 #endif  /* S4OFF_WRITE */

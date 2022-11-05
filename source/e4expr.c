@@ -10,7 +10,6 @@ char  *expr4constants ;
 E4INFO *expr4infoPtr ;
 EXPR4 *expr4ptr ;
 
-#ifndef S4CLIENT
 /* sets the data4 context for the expression */
 int S4FUNCTION expr4context( EXPR4 *expr, DATA4 *data )
 {
@@ -35,7 +34,6 @@ int S4FUNCTION expr4context( EXPR4 *expr, DATA4 *data )
    data->dataFile->record = d4record( data ) ;
    return 0 ;
 }
-#endif /* S4CLIENT */
 
 #ifdef __WIN32
    #ifdef S4SEMAPHORE
@@ -59,11 +57,9 @@ int expr4start( EXPR4 *expr )
       #endif
    #endif
    expr4buf = expr->codeBase->exprWorkBuf ;  /* initialize the working buffer pointer */
-   #ifndef S4CLIENT
       if ( expr->tagPtr )  /* is a tag, so verift context validity */
          if ( expr->dataFile->record == 0 )
             return expr4context( expr, expr->data ) ;
-   #endif
    return 0 ;
 }
 
@@ -261,7 +257,6 @@ int S4FUNCTION expr4execute( EXPR4 *expr, const int pos, void **resultPtrPtr )
    return error4code( expr->codeBase ) ;
 }
 
-#ifndef S4CLIENT
 int S4FUNCTION expr4key( EXPR4 *e4expr, char **ptrPtr, TAG4FILE *t4file )
 {
    int resultLen ;
@@ -565,7 +560,6 @@ int expr4keyConvert( EXPR4 *e4expr, char **ptrPtr, const int rLen, const int exp
    *ptrPtr = cb->storedKey ;
    return resultLen ;
 }
-#endif
 
 /* returns true if a currency field resides in the expression
    tag file type is currency if there is any currency field value within
@@ -599,18 +593,15 @@ int S4FUNCTION expr4nullLow( const EXPR4 *e4expr, const int forAdd )
 {
    FIELD4 *field ;
    int parms ;
-   #ifndef S4CLIENT
       #ifndef S4OFF_INDEX
          TAG4FILE *tag ;
       #endif
-   #endif
 
    #ifdef S4CLIENT
       if ( code4indexFormat( e4expr->codeBase ) != r4cdx )
          return 0 ;
    #endif
 
-   #ifndef S4CLIENT
       #ifndef S4OFF_INDEX
          #ifdef S4FOX
             /* checking the tag setting doesn't apply for client since would only
@@ -623,7 +614,6 @@ int S4FUNCTION expr4nullLow( const EXPR4 *e4expr, const int forAdd )
                      return 0 ;
             }
          #endif
-      #endif
    #endif
 
    for ( parms = 0 ; parms < e4expr->infoN ; parms++ )

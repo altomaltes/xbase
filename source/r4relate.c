@@ -20,13 +20,11 @@
 #include "d4all.h"
 
 
-#ifndef S4CLIENT
    static int relate4currentIsChild( RELATE4 * ) ;
    static int relate4parent( RELATE4 *, RELATE4 * ) ;
    static int relate4nextRelationList( RELATION4 *, int ) ;
    static int relate4prevRecordInScan( RELATE4 * ) ;
    static int relate4prevRelationList( RELATION4 *, int ) ;
-#endif
 
 #ifdef S4SERVER
 static int relate4initRelate( RELATE4 *, RELATION4 *, DATA4 *, CODE4 *, int, char * ) ;
@@ -60,8 +58,6 @@ static int relate4flush( RELATE4 *root )
    return 0 ;
 }
 #endif
-
-#ifndef S4CLIENT
 
 static int relate4topInit( RELATE4 * ) ;
 
@@ -385,7 +381,6 @@ static int relate4blankSet( RELATE4 *relate, const char direction )
          return rc ;
    }
 }
-#endif
 
 #ifdef S4CLIENT
 int relate4unpack( RELATION4 *relation, CONNECTION4 *connection )
@@ -654,7 +649,6 @@ int S4FUNCTION relate4bottom( RELATE4 *relate )
    #endif
 }
 
-#ifndef S4CLIENT
 static int relate4buildScanList( RELATE4 *master, RELATE4 *relate, RELATION4 *relation )
 {
    RELATE4 *relateOn ;
@@ -683,7 +677,6 @@ static int relate4buildScanList( RELATE4 *master, RELATE4 *relate, RELATION4 *re
       }
    return 0 ;
 }
-#endif
 
 static void relate4freeRelateList( RELATE4 *relate )
 {
@@ -712,9 +705,7 @@ int S4FUNCTION relate4changed( RELATE4 *relate )
 {
    RELATION4 *relation ;
    CODE4 *c4 ;
-   #ifndef S4CLIENT
       int j ;
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( relate == 0 )
@@ -725,10 +716,8 @@ int S4FUNCTION relate4changed( RELATE4 *relate )
    if ( error4code( c4 ) < 0 )
       return -1 ;
 
-   #ifndef S4CLIENT
       u4free( relate->scanValue ) ;
       relate->scanValue = 0 ;
-   #endif
    relation = relate->relation ;
 
    #ifdef S4CLIENT
@@ -741,7 +730,6 @@ int S4FUNCTION relate4changed( RELATE4 *relate )
 
    relate4freeRelateList( &(relation->relate) ) ;
 
-   #ifndef S4CLIENT
       u4free( relation->relate.set.flags ) ;
       memset( (void *)&relation->relate.set, 0, sizeof( F4FLAG ) ) ;
 
@@ -769,7 +757,6 @@ int S4FUNCTION relate4changed( RELATE4 *relate )
          relation->log.bufPos = 0 ;
       }
       relation->inSort = 0 ;
-   #endif
 
    return 0 ;
 }
@@ -851,7 +838,6 @@ RELATE4 *S4FUNCTION relate4createSlave( RELATE4 *master, DATA4 *slaveData, const
          slave->masterExpr->vfpInfo = &slaveTag->tagFile->vfpInfo ;
    #endif
 
-   #ifndef S4CLIENT
       #ifndef S4OFF_INDEX
          if ( slaveTag != 0 )
             if ( tfile4type( slaveTag->tagFile ) != expr4type( slave->masterExpr ) )
@@ -867,7 +853,6 @@ RELATE4 *S4FUNCTION relate4createSlave( RELATE4 *master, DATA4 *slaveData, const
                   return 0 ;
                }
       #endif
-   #endif
 
    slave->dataTag = slaveTag ;
    slave->master = master ;
@@ -1176,11 +1161,9 @@ int S4FUNCTION relate4eof( RELATE4 *relate )
       }
    #endif
 
-   #ifndef S4CLIENT
       if ( relate->relation->inSort == relate4sortDone )
          return relate->relation->sortEofFlag ;
       else
-   #endif
       return d4eof( relate->relation->relate.data ) ;
 }
 
@@ -1243,10 +1226,8 @@ int S4FUNCTION relate4freeRelate( RELATE4 *relate, const int closeFiles )
    expr4free( relate->masterExpr ) ;
    u4free( relate->scanValue ) ;
    relate->scanValue = 0 ;
-   #ifndef S4CLIENT
       u4free( relate->set.flags ) ;
       relate->set.flags = 0 ;
-   #endif
 
    l4remove( &relate->master->slaves, relate ) ;
    mem4free( c4->relateMemory, relate ) ;
@@ -1432,12 +1413,10 @@ RELATE4 *S4FUNCTION relate4init( DATA4 *master )
    if ( relation == 0 )
       return 0 ;
 
-   #ifndef S4CLIENT
       relation->log.relation = relation ;
       relation->log.codeBase = c4 ;
       relation->sort.file.hand = INVALID4HANDLE ;
       relation->sortedFile.hand = INVALID4HANDLE ;
-   #endif
 
    #ifdef S4SERVER
       rc = relate4initRelate( &relation->relate, relation, master, c4, 1, masterAliasName ) ;
@@ -1970,9 +1949,7 @@ int S4FUNCTION relate4matchLen( RELATE4 *relate, const int matchLenIn )
       return e4codeBase ;
 
    matchLen = matchLenIn ;
-   #ifndef S4CLIENT
       expr4context( relate->masterExpr, relate->master->data ) ;
-   #endif
    len = expr4keyLen( relate->masterExpr ) ;
 
    #ifdef S4CLIPPER
@@ -1990,7 +1967,6 @@ int S4FUNCTION relate4matchLen( RELATE4 *relate, const int matchLenIn )
       }
    #endif
 
-   #ifndef S4CLIENT
       #ifndef S4OFF_INDEX
          #ifndef S4CLIPPER
             #ifdef E4MISC
@@ -2000,12 +1976,10 @@ int S4FUNCTION relate4matchLen( RELATE4 *relate, const int matchLenIn )
             #endif
          #endif
       #endif
-   #endif
 
    if ( matchLen > len )
       matchLen = len ;
 
-   #ifndef S4CLIENT
       #ifndef S4OFF_INDEX
          if ( relate->dataTag )
          {
@@ -2015,7 +1989,6 @@ int S4FUNCTION relate4matchLen( RELATE4 *relate, const int matchLenIn )
                matchLen = len ;
          }
       #endif
-   #endif
 
    relate->matchLen = matchLen ;
    relate4changed( relate ) ;
@@ -2077,7 +2050,6 @@ int S4FUNCTION relate4next( RELATE4 **ptrPtr )
    }
 }
 
-#ifndef S4CLIENT
 static int relate4nextRecordInScan( RELATE4 *relate )
 {
    long nextRec ;
@@ -2742,7 +2714,6 @@ static int relate4prevScanRecord( RELATION4 *relation )
       }
    }
 }
-#endif
 
 int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
 {
@@ -2774,7 +2745,6 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
    return 0 ;
 }
 
-#ifndef S4CLIENT
 int relate4readIn( RELATE4 *relate )
 {
    int rc ;
@@ -2917,7 +2887,6 @@ static void relate4setNotRead( RELATE4 *relate )
       }
    }
 }
-#endif
 
 int S4FUNCTION relate4skip( RELATE4 *relate, const long numSkip )
 {
@@ -3158,7 +3127,6 @@ static void relate4sortFree( RELATION4 *relation, const int deleteSort )
    if ( relation == 0 )
       return ;
 
-   #ifndef S4CLIENT
       sort4free( &relation->sort ) ;
       u4free( relation->otherData ) ;
       relation->otherData = 0 ;
@@ -3166,7 +3134,7 @@ static void relate4sortFree( RELATION4 *relation, const int deleteSort )
          file4close( &relation->sortedFile ) ;
       r4dataListFree( &relation->sortDataList ) ;
       relation->inSort = 0 ;
-   #endif
+
    if ( deleteSort )
    {
       u4free( relation->sortSource ) ;
@@ -3174,7 +3142,6 @@ static void relate4sortFree( RELATION4 *relation, const int deleteSort )
    }
 }
 
-#ifndef S4CLIENT
 static int relate4sort( RELATE4 *relate )
 {
    EXPR4 *sortExpr ;
@@ -3463,7 +3430,6 @@ static int relate4sortPrevRecord( RELATION4 *relation )
       relation->sortRecOn-- ;
    return rc ;
 }
-#endif
 
 int S4FUNCTION relate4sortSet( RELATE4 *relate, const char *expr )
 {
@@ -3709,7 +3675,6 @@ int relate4clientInit( RELATE4 *master )
 }
 #endif
 
-#ifndef S4CLIENT
 static int relate4topInit( RELATE4 *relate )
 {
    RELATION4 *relation ;
@@ -3793,7 +3758,6 @@ static int relate4topInit( RELATE4 *relate )
 
    return 0 ;
 }
-#endif
 
 int S4FUNCTION relate4top( RELATE4 *relate )
 {

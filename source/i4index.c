@@ -185,11 +185,9 @@ int S4FUNCTION i4close( INDEX4 *i4 )
       if ( i4->codeBase == 0 )
          return error4( 0, e4parm, E91701 ) ;
       #ifndef S4CLIPPER
-         #ifndef S4CLIENT
             /* users are not allowed to close production index files */
             if ( index4isProduction( i4->indexFile ) )
                return error4( i4->codeBase, e4close, E81721 ) ;
-         #endif
       #endif
    #endif
 
@@ -449,7 +447,6 @@ const char *S4FUNCTION i4fileName( INDEX4 *i4 )
 
 #ifndef S4CLIPPER
 
-#ifndef S4CLIENT
 int S4FUNCTION i4closeLow( INDEX4 *i4 )
 {
    int rc, finalRc ;
@@ -793,7 +790,7 @@ int index4update( INDEX4FILE *i4 )
    return 0 ;
 }
 #endif  /* S4OFF_WRITE */
-#endif  /* S4CLIENT */
+
 
 INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
 {
@@ -996,13 +993,11 @@ INDEX4FILE *index4open( DATA4 *d4, const char *fileName, INDEX4 *index )
          error4( 0, e4parm_null, E91707 ) ;
          return 0 ;
       }
-      #ifndef S4CLIENT
          if ( index == 0 )
          {
             error4( 0, e4parm_null, E91707 ) ;
             return 0 ;
          }
-      #endif
    #endif
 
    c4 = d4->codeBase ;
@@ -1162,13 +1157,11 @@ INDEX4FILE *index4open( DATA4 *d4, const char *fileName, INDEX4 *index )
          error4( 0, e4parm_null, E91707 ) ;
          return 0 ;
       }
-      #ifndef S4CLIENT
          if ( index == 0 )
          {
             error4( 0, e4parm_null, E91707 ) ;
             return 0 ;
          }
-      #endif
    #endif
 
    c4 = d4->codeBase ;
@@ -1587,7 +1580,6 @@ TAG4 *S4FUNCTION i4tag( INDEX4 *i4, const char *tagName )
    return 0 ;
 }
 
-#ifndef S4CLIENT
 #ifndef S4OFF_WRITE
 int index4shrink( INDEX4FILE *i4, long blockNo )
 {
@@ -1965,10 +1957,8 @@ int index4versionCheck( INDEX4FILE *i4, const int updateVersion )
       return 1 ;
    #endif
 }
-#endif /* S4CLIENT */
 #endif /* S4CLIPPER */
 
-#ifndef S4CLIENT
 /* need a special version check */
 int S4FUNCTION tfile4versionCheckFree( TAG4FILE *t4 )
 {
@@ -1995,7 +1985,6 @@ int S4FUNCTION tfile4versionCheckFree( TAG4FILE *t4 )
       }
    #endif
 }
-#endif
 
 
 #ifdef S4CLIPPER
@@ -2139,9 +2128,7 @@ INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
    FILE4SEQ_READ seqread ;
    char buffer[1024], tNames[258], firstByte ;
    int pos, iPos, saveLen, tempLen ;
-   #ifndef S4CLIENT
       FILE4LONG tPos ;
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( d4, 2, E91706 ) )
@@ -2480,7 +2467,6 @@ TAG4 *S4FUNCTION i4tag( INDEX4 *i4, const char *tagName )
 #endif   /*  ifdef S4CLIPPER  */
 
 #ifndef S4CLIPPER
-#ifndef S4CLIENT
 int index4isProduction( INDEX4FILE *i4 )
 {
    #ifdef S4FOX
@@ -2548,7 +2534,6 @@ int index4isProduction( INDEX4FILE *i4 )
       return 0 ;
    #endif
 }
-#endif /* S4CLIENT */
 #endif /* S4CLIPPER */
 #endif /* S4INDEX_OFF */
 

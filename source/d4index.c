@@ -13,10 +13,8 @@ int S4FUNCTION d4freeBlocks( DATA4 *data )
    #ifdef S4INDEX_OFF
       return 0 ;
    #else
-      #ifndef S4CLIENT
          int rc ;
          TAG4 *tagOn ;
-      #endif
 
       #ifdef E4PARM_HIGH
          if ( data == 0 )
@@ -51,9 +49,7 @@ INDEX4 *S4FUNCTION d4index( DATA4 *data, const char *indexName )
    #else
       char *current ;
       char indexLookup[258], ext[4] ;
-      #ifndef S4CLIENT
          char indexLookup2[258] ;
-      #endif
       INDEX4 *indexOn ;
       unsigned int i, extIndex ;
       int doAlias, hasExt, hasPath ;

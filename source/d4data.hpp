@@ -301,9 +301,7 @@ public:
    #ifdef S4CLIPPER
        int close()                { return t4close( tag ) ; }
    #endif
-   #ifndef S4CLIENT
       int descending() ;
-   #endif
 
    const char S4PTR* expr()       { return t4expr( tag ) ; }
    const char S4PTR* filter()     { return t4filter( tag ) ; }
@@ -1100,7 +1098,6 @@ S4INLINE2 int Relate4set::init( Data4 data )
    return rc ;
 }
 
-#ifndef S4CLIENT
 S4INLINE2 int Tag4::descending()
 {
    int rc;
@@ -1114,7 +1111,6 @@ S4INLINE2 int Tag4::descending()
    rc = tfile4isDescending( tag->tagFile ) ;
    return rc ;
 }
-#endif
 
 #ifndef S4OFF_REPORT
    REPORT4 * S4FUNCTION  report4retrieve( Code4 &, char *, int, char * ) ;

@@ -7,7 +7,6 @@
    #endif  /* __TUROBC__ */
 #endif  /* S4UNIX */
 
-#ifndef S4CLIENT
 /* fromDisk set to 1 if ensure that a disk read is done, instead of a buffer read */
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -49,7 +48,6 @@ int dfile4read( DATA4FILE *data, long recNum, char *ptr, int fromDisk )
       return 0 ;
    #endif
 }
-#endif  /* !S4CLIENT */
 
 /* set serverId to -2 to get the actual count if possible for example,
    b4leafInit needs to know how many may potentially exist */
@@ -78,7 +76,6 @@ long S4FUNCTION dfile4recCount( DATA4FILE *data, const long serverId )
       return e4codeBase ;
 
    /* client checks current count in d4recCount */
-   #ifndef S4CLIENT
       if ( data->numRecs >= 0L )
       {
          #ifndef S4SINGLE
@@ -90,7 +87,6 @@ long S4FUNCTION dfile4recCount( DATA4FILE *data, const long serverId )
          #endif
                return data->numRecs ;
       }
-   #endif
 
    #ifdef S4CLIENT
       connection = data->connection ;
@@ -178,7 +174,6 @@ S4CONST char *dfile4name( S4CONST DATA4FILE *data )
    #endif
 }
 
-#ifndef S4CLIENT
 FILE4LONG dfile4recordPosition( DATA4FILE *d4, long rec )
 {
    FILE4LONG val ;
@@ -247,4 +242,3 @@ int dfile4updateHeader( DATA4FILE *data, int doTimeStamp, int doCount )
    return 0 ;
 }
 #endif  /* !S4OFF_WRITE */
-#endif  /* !S4CLIENT */

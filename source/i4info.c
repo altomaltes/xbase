@@ -283,7 +283,6 @@ unsigned short int S4FUNCTION tfile4isDescending( TAG4FILE *tag )
    #endif
 }
 
-#ifndef S4CLIENT
 TAG4INFO *S4FUNCTION i4tagInfo( INDEX4 *i4 )
 {
    TAG4INFO *tagInfo ;
@@ -329,5 +328,4 @@ TAG4INFO *S4FUNCTION i4tagInfo( INDEX4 *i4 )
    }
 }
 
-#endif  /* S4CLIENT */
 #endif  /* S4OFF_INDEX */

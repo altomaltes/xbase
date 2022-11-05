@@ -15,12 +15,10 @@ INDEX4 *S4FUNCTION i4create( DATA4 *d4, const char *fileName, const TAG4INFO *ta
    INDEX4 *index ;
 
    #ifndef S4OFF_OPTIMIZE
-      #ifndef S4CLIENT
          CODE4 *c4 ;
          #ifdef S4LOW_MEMORY
             int hasOpt ;
          #endif
-      #endif
    #endif
 
    #ifdef S4VBASIC
@@ -37,7 +35,6 @@ INDEX4 *S4FUNCTION i4create( DATA4 *d4, const char *fileName, const TAG4INFO *ta
    #endif
 
    #ifndef S4OFF_OPTIMIZE
-      #ifndef S4CLIENT
          c4 = d4->codeBase ;
          #ifdef S4LOW_MEMORY
             if ( c4->hasOpt )
@@ -47,13 +44,11 @@ INDEX4 *S4FUNCTION i4create( DATA4 *d4, const char *fileName, const TAG4INFO *ta
             }
             else
                hasOpt = 0 ;
-         #endif
       #endif
    #endif
 
    index = i4createLow( d4, fileName, tagData ) ;
 
-   #ifndef S4CLIENT
       #ifndef S4OFF_OPTIMIZE
          #ifndef S4CLIPPER
             if ( index != 0 )
@@ -64,7 +59,6 @@ INDEX4 *S4FUNCTION i4create( DATA4 *d4, const char *fileName, const TAG4INFO *ta
                code4optRestart( c4 ) ;
          #endif
       #endif
-   #endif
 
    return index ;
 }

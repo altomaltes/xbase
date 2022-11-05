@@ -19,7 +19,6 @@
 
 #include "d4all.h"
 
-#ifndef S4CLIENT
 void relate4freeBitmaps( RELATE4 *relate )
 {
    RELATE4 *relateOn ;
@@ -40,7 +39,6 @@ void relate4freeBitmaps( RELATE4 *relate )
    u4free( relate->set.flags ) ;
    memset( (void *)&relate->set, 0, sizeof ( F4FLAG ) ) ;
 }
-#endif
 
 /* frees up any extra memory that is not neccessarily required for CodeBase */
 /* returns 0 if successfully freed info, else 0 */
@@ -61,7 +59,6 @@ static int sort4freeExtra( RELATE4 *relate, CODE4 *codeBase )
       }
    #endif
 
-   #ifndef S4CLIENT
       if ( relate != 0 )
          if ( relate->relation->bitmapsFreed == 0 )
          {
@@ -69,7 +66,6 @@ static int sort4freeExtra( RELATE4 *relate, CODE4 *codeBase )
             relate->relation->bitmapsFreed = 1 ;
             return 0 ;
          }
-   #endif
 
    return 1 ;
 }

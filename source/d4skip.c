@@ -281,7 +281,6 @@ int S4FUNCTION d4tagSync( DATA4 *data, TAG4 * const tag )
 }
 
 #ifndef S4OFF_INDEX
-#ifndef S4CLIENT
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -471,7 +470,6 @@ int d4tagSyncDo( DATA4 *data, TAG4 * const tag, int direction )
    else
       return saveRc ;
 }
-#endif  /* S4CLIENT */
 #endif  /* S4OFF_INDEX */
 
 int S4FUNCTION d4skip( DATA4 *data, const long nSkip )

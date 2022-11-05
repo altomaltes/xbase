@@ -270,7 +270,6 @@ int S4FUNCTION d4unlock( DATA4 *data )
 #endif
 
 /*#ifdef S4STAND_ALONE*/
-#ifndef S4CLIENT
 
 /* only unlocks the append byte */
 #ifdef P4ARGS_USED
@@ -423,7 +422,6 @@ int d4unlockRecords( DATA4 *data )
       return 0 ;
    #endif
 }
-#endif /* S4CLIENT */
 /*#endif  */ /* S4STAND_ALONE */
 
 #ifndef S4SINGLE

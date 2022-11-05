@@ -4,7 +4,6 @@
 
 /* B4BLOCK.C */
 #ifndef S4INDEX_OFF
-#ifndef S4CLIENT
 
 #ifdef S4MDX
    #define b4goEof( b4 )         ( (b4)->keyOn = (b4)->nKeys )
@@ -37,7 +36,6 @@
    #endif /* S4NDX */
 #endif /* N4OTHER */
 
-#endif  /* S4CLIENT */
 #endif  /* S4INDEX_OFF */
 
 #ifdef S4CLIENT
@@ -155,10 +153,8 @@ long S4FUNCTION data4serverId( DATA4 * ) ;
 TRAN4 *code4trans( CODE4 * ) ;
 
 /* C4TRANS.C */
-#ifndef S4CLIENT
 #ifndef S4OFF_TRAN
 unsigned short int tran4entryLen( LOG4HEADER * ) ;
-#endif
 #endif
 
 S4EXPORT int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) ;
@@ -213,9 +209,7 @@ S4EXPORT int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) 
    #define d4lock_all( a )        ( d4lockAll( a ) )
    #define d4lock_append( a )        ( d4lockAppend( a ) )
    #define d4lock_file( a )          ( d4lockFile( a ) )
-   #ifndef S4CLIENT
       #define d4lock_index( a )      ( d4lockIndex( a ) )
-   #endif
    #define d4lock_test( a, b )       ( d4lockTest( a, b ) )
    #define d4lock_test_append( a )   ( d4lockTestAppend( a ) )
    #define d4lock_test_file( a )     ( d4lockTestFile( a ) )
@@ -261,9 +255,7 @@ S4EXPORT int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) 
    #define expr4calc_modify( a, b )          ( expr4calcModify( a, b ) )
    #define expr4calc_name_change( a, b, c )  ( expr4calcNameChange( a, b, c ) )
    #define expr4calc_reset( a )              ( code4calcReset( a ) )
-   #ifndef S4CLIENT
       #define expr4key_convert( a, b, c, d ) (( expr4keyConvert( a, b, c, d ) )
-   #endif
    #define expr4key_len( a )                 (  expr4keyLen( a ) )
 
    #define f4assign_char( a, b )      ( f4assignChar( a, b ) )
@@ -298,9 +290,7 @@ S4EXPORT int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) 
    #define file4seq_write_init( a, b, c, d, e ) ( file4seqWriteInit( a, b, c, d, e ) )
    #define file4seq_write_repeat( a, b, c )     ( file4seqWriteRepeat( a, b, c ) )
 
-   #ifndef S4CLIENT
       #define i4add_tag( a, b )    ( i4tagAdd( a, b ) )
-   #endif
    #define i4tag_info( a )         ( i4tagInfo( a ) )
    #define l4add_after( a, b, c )  ( l4addAfter( a, b, c ) )
    #define l4add_before( a, b, c ) ( l4addBefore( a, b, c ) )
@@ -321,19 +311,19 @@ S4EXPORT int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) 
    #define sort4get_init( a )      ( sort4getInit( a ) )
 
    #define t4unique_set( a, b )   ( t4uniqueSet( a, b ) )
-   #ifndef S4CLIENT  /* what to do if S4CLIENT defined */
-   #define t4add( a, b, c )       ( tfile4add( (a)->tagFile, b, c ) )
-   #define t4add_calc( a, b )     ( t4addCalc( a, b ) )
-   #define t4block( a )           ( tfile4block( (a)->tagFile ) )
-   #define t4bottom( a )          ( tfile4bottom( (a)->tagFile ) )
-   #define t4down( a )            ( tfile4down( (a)->tagFile ) )
-   #define t4dump( a, b, c )      ( tfile4dump( (a)->tagFile, b, c ) )
-   #define t4eof( a )             ( tfile4eof( (a)->tagFile ) )
-   #ifdef N4OTHER
-   #define t4flush( a )           ( tfile4flush( (a)->tagFile ) )
-   #endif
-   #define t4free_all( a )        ( tfile4freeAll( (a)->tagFile ) )
-   #define t4go( a, b, c )        ( tfile4go( (a)->tagFile, b, c, 0 ) )
+
+     #define t4add( a, b, c )       ( tfile4add( (a)->tagFile, b, c ) )
+     #define t4add_calc( a, b )     ( t4addCalc( a, b ) )
+     #define t4block( a )           ( tfile4block( (a)->tagFile ) )
+     #define t4bottom( a )          ( tfile4bottom( (a)->tagFile ) )
+     #define t4down( a )            ( tfile4down( (a)->tagFile ) )
+     #define t4dump( a, b, c )      ( tfile4dump( (a)->tagFile, b, c ) )
+     #define t4eof( a )             ( tfile4eof( (a)->tagFile ) )
+     #ifdef N4OTHER
+     #define t4flush( a )           ( tfile4flush( (a)->tagFile ) )
+     #endif
+     #define t4free_all( a )        ( tfile4freeAll( (a)->tagFile ) )
+     #define t4go( a, b, c )        ( tfile4go( (a)->tagFile, b, c, 0 ) )
    #define t4is_descending( a )   ( tfile4isDescending( (a)->tagFile ) )
    #define t4key( a )             ( tfile4key( (a)->tagFile ) )
    #define t4position( a )        ( tfile4position( (a)->tagFile ) )
@@ -349,7 +339,6 @@ S4EXPORT int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) 
    #define t4top( a )             ( tfile4top( (a)->tagFile ) )
    #define t4up( a )              ( tfile4up( (a)->tagFile ) )
    #define t4up_to_root( a )      ( tfile4upToRoot( (a)->tagFile ) )
-   #endif /* not S4CLIENT*/
 
    #define u4alloc_again( a, b, c, d )   ( u4allocAgain( a, b, c, d ) )
    #define u4alloc_er( a, b )            ( u4allocEr( a, b ) )

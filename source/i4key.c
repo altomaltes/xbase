@@ -7,7 +7,6 @@
    #endif
 #endif
 
-#ifndef S4CLIENT
 
 #ifndef S4INDEX_OFF
 
@@ -68,4 +67,3 @@ char * tfile4key_v( TAG4FILE *t4 )
 
 #endif  /* S4VB_DOS */
 
-#endif  /* S4CLIENT */

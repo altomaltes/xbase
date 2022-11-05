@@ -363,7 +363,6 @@ int f4memoRead( FIELD4 *field )
    #endif
 }
 
-#ifndef S4CLIENT
 int f4memoReadLow( FIELD4 *field )
 {
    F4MEMO *mfield ;
@@ -422,7 +421,6 @@ int f4memoReadLow( FIELD4 *field )
 
    return rc ;
 }
-#endif
 
 int f4memoReset( FIELD4 *field )
 {
@@ -524,7 +522,6 @@ S4CONST char *S4FUNCTION f4memoStr( FIELD4 *field )
       return f4memoPtr( field ) ;
    #endif
 }
-#ifndef S4CLIENT
 #ifndef S4OFF_WRITE
 #ifndef S4OFF_MEMO
 int f4memoUpdate( FIELD4 *field )
@@ -584,7 +581,6 @@ int f4memoWrite( FIELD4 *field )
 }
 #endif  /* S4OFF_MEMO */
 #endif  /* S4OFF_WRITE */
-#endif  /* S4CLIENT */
 
 
 #ifdef S4VBASIC

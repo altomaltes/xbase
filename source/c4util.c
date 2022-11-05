@@ -27,39 +27,8 @@
 
 DATA4 *S4FUNCTION code4directory( CODE4 *c4, char *directory )
 {
-   #ifndef S4CLIENT
       error4( c4, e4notSupported, 0 ) ;
       return 0 ;
-   #else
-      short rc ;
-      char *name ;
-      DATA4 *data ;
-      int oldAccessMode ;
-      CONNECT4 *connect = &c4->clientConnect ;
-
-      connect4sendShort( connect, STREAM4DIRECTORY ) ;
-      connect4sendString( connect, directory ) ;
-      connect4sendFlush( connect ) ;
-
-      rc = connect4receiveShort( connect ) ;
-      if ( rc < 0 )
-      {
-         error4( c4, rc, E96701 ) ;
-         return NULL ;
-      }
-      name = connect4receiveString( connect ) ;
-
-      oldAccessMode = c4->accessMode ;
-      c4->accessMode = OPEN4DENY_RW ;
-      c4->openForCreate = 1 ;
-      data = d4open( c4, name ) ;
-      c4->openForCreate = 0 ;
-      c4->accessMode = oldAccessMode ;
-
-      u4free( name ) ;
-
-      return data ;
-   #endif
 }
 
 #ifdef S4CLIENT

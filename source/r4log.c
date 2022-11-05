@@ -20,8 +20,6 @@
 #include "d4all.h"
 
 
-#ifndef S4CLIENT
-
 static int dataList4isIn( DATA4LIST *, const RELATE4 * ) ;
 static int log4swapEntries( L4LOGICAL *, const int, const int ) ;
 
@@ -596,5 +594,3 @@ int log4true( L4LOGICAL *log )
       return -1 ;
    return 1 ;
 }
-
-#endif /* S4CLIENT */

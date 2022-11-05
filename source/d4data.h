@@ -662,11 +662,7 @@ typedef struct S4CLASS CODE4TRANSSt
    #ifndef S4OFF_TRAN
       int enabled ;
       #ifndef S4OFF_WRITE
-         #ifndef S4CLIENT
             struct TRAN4FILESt *transFile ;
-         #else
-            struct TRAN4FILESt *space1 ;
-         #endif
       #else
          struct TRAN4FILESt *space1 ;
       #endif
@@ -1266,9 +1262,7 @@ typedef struct CODE4St
    #endif
 
    #ifndef S4OFF_CATALOG
-      #ifndef S4CLIENT
          CATALOG4 S4PTR *catalog ;
-      #endif
    #endif
 
    #ifndef S4OFF_TRAN
@@ -1673,11 +1667,7 @@ typedef struct DATA4FILESt
    CODE4 S4PTR *c4 ;
    char S4PTR *info ;
 
-   #ifndef S4CLIENT
       char S4PTR *record ;
-   #else
-      char S4PTR *space1 ;
-   #endif
 
    #ifndef S4OFF_WRITE
       int doDate ;    /* does the date need to be updated on unlock/close? */
@@ -1686,15 +1676,9 @@ typedef struct DATA4FILESt
    /**** the next set of lines must remain in order as they are a file view ****/
    /* Database Header Information */
    char version ;
-   #ifndef S4CLIENT
       char     yy ;             /* Last Update */
       char     mm ;
       char     dd ;
-   #else
-      char space3 ;
-      char space4 ;
-      char space5 ;
-   #endif
    S4LONG   numRecs ;
    unsigned short headerLen ; /* Header Length, Indicates start of data */
    /**** the previous set of lines must remain in order as they are a file view ****/
@@ -1722,7 +1706,6 @@ typedef struct DATA4FILESt
       long serverId ;
       int accessMode ;
    #endif
-   #ifndef S4CLIENT
       FILE4    file ;
       char hasMdxMemo ;        /* Has an MDX and/or a memo file attached to it */
 
@@ -1748,7 +1731,6 @@ typedef struct DATA4FILESt
          long tempServerLock ;    /* for lock registering */
          long tempClientLock ;    /* for lock registering */
       #endif
-   #endif  /* S4CLIENT */
 
    #ifndef S4OFF_OPTIMIZE
       int hiPrio ;   /* used to determine which priority lru list to put block data on and advance group-reads */
@@ -1818,9 +1800,7 @@ typedef struct DATA4St
    #endif
 
    #ifndef S4OFF_TRAN
-      #ifndef S4CLIENT
          int logVal ;
-      #endif
       char transChanged ;
    #endif
 
@@ -1894,8 +1874,6 @@ typedef struct e4exprSt
       int keyDec, keyLen ;   /* used for CLIPPER version */
    #endif
 } EXPR4 ;
-
-#ifndef S4CLIENT
 
 #ifdef S4CLIPPER
    typedef struct
@@ -2108,7 +2086,6 @@ typedef struct T4VFPSt
    unsigned char    *cpPtr ;      /* points to codepage table */
 } T4VFP ;
 #endif /* S4FOX */
-#endif /* S4CLIENT */
 
 typedef struct TAG4FILESt
 {
@@ -2201,12 +2178,10 @@ typedef struct TAG4St
    #ifndef S4OFF_TRAN
       int isValid ;
    #endif
-   #ifndef S4CLIENT
       #ifndef S4OFF_TRAN
          LIST4 removedKeys ;     /* list of temporarily removed keys for r4unique and e4unique cases */
       #endif
       int added, removed ;             /* was an entry added, removed */
-   #endif
 } TAG4 ;
 
 typedef struct
@@ -2300,7 +2275,6 @@ typedef struct INDEX4St
 } INDEX4 ;
 
 #ifndef S4OFF_TRAN
-#ifndef S4CLIENT
 typedef struct
 {
    LINK4 link ;
@@ -2308,9 +2282,6 @@ typedef struct
    unsigned char key[1] ;   /* of variable length, but marked as '1' for a place holder */
 } TAG4KEY_REMOVED ;
 #endif
-#endif
-
-#ifndef S4CLIENT
 
 /* Memo File Structures */
 typedef struct
@@ -2357,7 +2328,6 @@ typedef struct
    #endif
 } MEMO4BLOCK ;
 #endif  /*  ifndef S4MNDX  */
-#endif  /*  ifndef S4CLIENT  */
 
 typedef struct
 {

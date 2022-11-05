@@ -1511,7 +1511,6 @@ int S4FUNCTION report4dataDo( PREPORT4 report )
 
 #endif /* S4WINDOWS */
 
-#ifndef S4CLIENT
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -1529,7 +1528,6 @@ int S4FUNCTION t4close( TAG4 *t4 )
    return error4( 0, e4notSupported, E91637 ) ;
 }
 #endif
-#endif /* S4CLIENT */
 
 #ifndef S4CB51
 #ifdef P4ARGS_USED
@@ -1565,12 +1563,10 @@ int S4FUNCTION relate4unlock( RELATE4 *relate )
 }
 #endif /* S4CB51 */
 
-#ifndef S4CLIENT
 int S4FUNCTION code4serverRestart( CODE4 S4PTR *c4 )
 {
    return error4( c4, e4notSupported, E91110 ) ;
 }
-#endif
 
 #ifdef S4OFF_WRITE_MEMO
 #ifdef P4ARGS_USED
@@ -1582,7 +1578,6 @@ int S4FUNCTION f4memoSetLen( FIELD4 *field, const unsigned len )
 }
 #endif /* S4OFF_WRITE_MEMO */
 
-#ifndef S4CLIENT
 #ifdef S4OFF_N4OTHER_INDEX
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -1593,7 +1588,6 @@ TAG4 *S4FUNCTION t4openLow( DATA4 *d4, INDEX4 *i4ndx, const char *fileName, cons
 
    return 0 ;
 }
-#endif /* S4OFF_N4OTHER_INDEX_WRITE */
 #endif /* S4STAND_ALONE */
 
 #ifdef S4OFF_STAND_WRITE_TRAN

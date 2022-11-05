@@ -60,7 +60,6 @@ static DATA4 *d4openInit( CODE4 *c4 )
    #endif
    #endif
 
-   #ifndef S4CLIENT
       #ifdef E4ANALYZE
          #ifndef S4STAND_ALONE
             if ( c4->currentClient == 0 || c4->accessMutexCount == 0 )
@@ -75,7 +74,6 @@ static DATA4 *d4openInit( CODE4 *c4 )
             }
          #endif
       #endif
-   #endif
 
    if ( c4->dataMemory == 0 )
    {
@@ -128,7 +126,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
    #ifdef S4CLIENT_OR_FOX
       int nullCount ;
    #endif
-   #ifndef S4CLIENT
+
       #ifdef S4CLIPPER
          #ifndef S4OFF_INDEX
             char nameBuf[258] ;
@@ -169,11 +167,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
             #endif
          #endif
       #endif
-   #else
-      #ifndef S4OFF_INDEX
-         char nameBuf[258] ;
-      #endif
-   #endif
+
    #ifndef S4OFF_MEMO
       int i_memo ;
    #endif
@@ -423,7 +417,6 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
    #endif
    #ifndef S4OFF_WRITE
       #ifndef S4OFF_TRAN
-         #ifndef S4CLIENT
             if ( code4transEnabled( c4 ) )
             {
                trans = code4trans( c4 ) ;
@@ -487,7 +480,6 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
                else
                   return -1 ;
             }
-         #endif /* S4CLIENT */
       #endif /* S4OFF_TRAN */
    #endif /* S4OFF_WRITE */
 
@@ -500,7 +492,6 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
       }
    #endif
 
-   #ifndef S4CLIENT
       /* 07/30/96 AS --> previously just check c4 setting.  should instead
          check file read only as well (but still allow read-only override
          for server handling */
@@ -508,13 +499,10 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
          d4->readOnly = 1 ;
       else
          d4->readOnly = c4getReadOnly( c4 ) ;
-   #endif
 
    #ifndef S4OFF_TRAN
-      #ifndef S4CLIENT
          if ( code4transEnabled( d4->codeBase ) == 1 )
             d4->logVal = c4->log ;
-      #endif
    #endif
 
    return 0 ;
@@ -921,7 +909,6 @@ static int dfile4checkAccess( DATA4FILE *d4, int accessRequested, int readOnly )
 
 static DATA4FILE *data4reopen( DATA4FILE *d4, char **info )
 {
-   #ifndef S4CLIENT
       #ifndef S4OFF_MULTI
          int rc ;
          #ifndef S4OFF_INDEX
@@ -937,7 +924,7 @@ static DATA4FILE *data4reopen( DATA4FILE *d4, char **info )
             #endif
          #endif
       #endif
-   #endif
+
    #ifndef S4SERVER
       #ifndef S4OFF_TRAN
          DATA4 *data4 ;
@@ -950,7 +937,6 @@ static DATA4FILE *data4reopen( DATA4FILE *d4, char **info )
       return 0 ;
 
    c4 = d4->c4 ;
-   #ifndef S4CLIENT
       if ( d4->userCount == 0 )
       {
          #ifndef S4OFF_MULTI
@@ -1003,7 +989,6 @@ static DATA4FILE *data4reopen( DATA4FILE *d4, char **info )
       }
       else
       {
-   #endif /* S4CLIENT */
       #ifndef S4SERVER
          if ( c4->singleOpen != OPEN4DENY_NONE )   /* only one instance allowed... */
          {
@@ -1059,13 +1044,11 @@ static DATA4FILE *data4reopen( DATA4FILE *d4, char **info )
       #endif
       /* verify that the desired access level is available in terms of the actual physical open */
       #ifndef S4OFF_MULTI
-         #ifndef S4CLIENT
             /* AS 08/21/97 Also disallow open if file is open in read-only level
                at low-level, but we want it to be open as read-write */
             if ( d4->file.isReadOnly == 1 )
                if ( c4getReadOnly( c4 ) != 1 )
                   error4describe( c4, e4instance, E84307, dfile4name( d4 ), 0, 0 ) ;
-         #endif
          switch( c4->accessMode )
          {
             case OPEN4DENY_NONE:
@@ -1109,9 +1092,7 @@ static DATA4FILE *data4reopen( DATA4FILE *d4, char **info )
                return 0 ;
             }
       #endif
-   #ifndef S4CLIENT
       }
-   #endif
 
    if ( d4 != 0 )
    {
@@ -1333,7 +1314,6 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
    d4->c4 = c4 ;
    d4->userCount = 1 ;
 
-   #ifndef S4CLIENT
       #ifndef S4OFF_MEMO
          d4->memoFile.file.hand = INVALID4HANDLE ;
       #endif
@@ -1360,7 +1340,6 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
          dfile4close( d4 ) ;
          return 0 ;
       }
-   #endif
 
    l4add( &c4->dataFileList, &d4->link ) ;
 
@@ -1442,7 +1421,6 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
       if ( c4->largeFileOffset == 0 )
       {
          /* fullHeader.recordLen is not necessarily accurate with large files */
-         #ifndef S4CLIENT
             /* if the file is opened deny write/exclusively, and this was the
                first open, then verify that the record count matches the file
                length (i.e. to avoid data file corruption) */
@@ -1458,7 +1436,6 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
                   return 0 ;
                }
             }
-         #endif
 
          tLen = file4lenLow( &d4->file ) ;
          file4longSubtract( &tLen, fullHeader.headerLen ) ;

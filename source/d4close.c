@@ -29,7 +29,6 @@
    extern char f4memoNullChar ;
 #endif  /* not S4MEMO_OFF */
 
-#ifndef S4CLIENT
 /* closes the given datafile if it's user count is zero */
 int dfile4closeLow( DATA4FILE *data )
 {
@@ -154,7 +153,6 @@ int code4dataFileCloseAll( CODE4 *c4 )
 
    return 0 ;
 }
-#endif
 
 int dfile4close( DATA4FILE *data )
 {
@@ -298,14 +296,12 @@ int S4FUNCTION d4close( DATA4 *data )
 {
    int rc, saveRc, saveRc2 ;
    CODE4 *c4 ;
-   #ifndef S4CLIENT
       #ifndef S4OFF_WRITE
          #ifndef S4OFF_TRAN
             long connectionId ;
             TRAN4 *trans = 0 ;
          #endif
       #endif
-   #endif
    #ifndef S4INDEX_OFF
       INDEX4 *indexNext, *indexOn ;
    #endif
@@ -356,7 +352,6 @@ int S4FUNCTION d4close( DATA4 *data )
 
       #ifndef S4OFF_TRAN
          #ifndef S4OFF_WRITE
-            #ifndef S4CLIENT
                #ifdef S4SERVER
                   if ( c4->currentClient != 0 )
                #endif
@@ -381,7 +376,6 @@ int S4FUNCTION d4close( DATA4 *data )
                }
                else
                   trans = 0 ;
-            #endif
          #endif /* S4OFF_WRITE */
       #endif /* S4OFF_TRAN */
 

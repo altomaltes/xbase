@@ -301,11 +301,9 @@ static int e4massage( E4PARSE *p4 )
                   break ;
                case E4DEL:
                   length[numParms] = sizeof(char) ;
-                  #ifndef S4CLIENT
                   if ( p4->expr.tagPtr )  /* data4 independent, so point to datafile */
                      info->p1 = (char *)&p4->expr.dataFile->record ;
                   else  /* data4 dependent, so just point to record */
-                  #endif
                      info->p1 = (char *)&p4->expr.data->record ;
                   break ;
                case E4CALC_FUNCTION:
@@ -425,11 +423,9 @@ static int e4massage( E4PARSE *p4 )
             if ( info->functionI != E4FIELD_LOG )
             {
                if ( info->functionI == E4DELETED )
-                  #ifndef S4CLIENT
                      if ( p4->expr.tagPtr )  /* data4 independent, so point to datafile */
                         info->p1 = (char *)&p4->expr.dataFile->record ;
                      else  /* data4 dependent, so just point to record */
-                  #endif
                      info->p1 = (char *)&p4->expr.data->record ;
                else
                {
@@ -1516,11 +1512,9 @@ int expr4parseValue( E4PARSE *p4 )
          info->fieldPtr = fieldPtr ;
          if ( fieldPtr->data == (DATA4 *)p4->expr.data )  /* data is local */
             info->localData = 1 ;
-         #ifndef S4CLIENT
             if ( p4->expr.tagPtr )
                info->p1 = (char *)&basePtr->dataFile->record ;
             else
-         #endif
          info->p1 = (char *)&basePtr->record ;
          info->i1 = fieldPtr->offset ;
 

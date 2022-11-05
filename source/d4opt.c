@@ -51,7 +51,6 @@ void code4memStartMaxSet( CODE4 *c4, const int percent )
 }
 #endif
 
-#ifndef S4CLIENT
 #ifdef S4CB51
 int S4FUNCTION code4freeBlocks( CODE4 *c4 )
 #else
@@ -61,9 +60,7 @@ static int code4freeBlocks( CODE4 *c4 )
    #ifdef S4SERVER
       SERVER4CLIENT *client ;
    #endif
-   #ifndef S4CLIENT
       DATA4 *data ;
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( c4 == 0 )
@@ -102,7 +99,6 @@ static int code4freeBlocks( CODE4 *c4 )
 
    return 0 ;
 }
-#endif
 
 #ifdef S4STAND_ALONE
 #ifndef S4OFF_OPTIMIZE
@@ -189,10 +185,8 @@ int S4FUNCTION code4optStart( CODE4 *c4 )
       #endif
 
       rc = code4optRestart( c4 ) ;
-      #ifndef S4CLIENT
          if ( rc == 0 )
             code4freeBlocks( c4 ) ;
-      #endif
 
       return rc ;
    #else
@@ -468,7 +462,6 @@ int S4FUNCTION d4optimize( DATA4 *d4, const int optFlag )
 }
 #endif /* S4SERVER */
 
-#ifndef S4CLIENT
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -531,7 +524,6 @@ int dfile4optimize( DATA4FILE *d4, const int optFlag )
       return 0 ;
    #endif
 }
-#endif
 
 int S4FUNCTION d4optimizeWrite( DATA4 *d4, const int optFlag )
 {
@@ -551,7 +543,6 @@ int S4FUNCTION d4optimizeWrite( DATA4 *d4, const int optFlag )
    #endif
 }
 
-#ifndef S4CLIENT
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -614,7 +605,6 @@ int dfile4optimizeWrite( DATA4FILE *d4, const int optFlag )
    #endif
    return 0 ;
 }
-#endif
 
 #ifndef S4OFF_OPTIMIZE
 static void opt4freeAlloc( OPT4 *opt )

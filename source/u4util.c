@@ -178,9 +178,7 @@ void S4FUNCTION u4delayHundredth( const unsigned int numHundredths )
          struct timeb oldTime, newTime ;
       #endif
       #ifdef S4WIN16
-         #ifndef S4CLIENT
             MSG msg;
-         #endif
       #endif
       #ifdef S4UNIX
          #ifdef S4NO_USLEEP
@@ -222,7 +220,6 @@ void S4FUNCTION u4delayHundredth( const unsigned int numHundredths )
       for ( ;; )
       {
          /* Give some other application a chance to run. */
-         #ifndef S4CLIENT
             if ( PeekMessage( &msg, (HWND)NULL, (UINT)0, (UINT)0, PM_REMOVE ) )
             {
                /* can't allow re-entrancy, so if not a paint message, just
@@ -235,7 +232,6 @@ void S4FUNCTION u4delayHundredth( const unsigned int numHundredths )
                   DispatchMessage((LPMSG)&msg) ;
                }
             }
-         #endif /* S4CLIENT */
 
          /* allow device drivers to run... */
          _asm mov ax, 0x1689
@@ -475,9 +471,7 @@ int ats4readInfo( char *filename, void *info, const unsigned int len )
    FILE4LONG fpos ;
 
    code4init( &cb ) ;
-   #ifndef S4CLIENT
       code4logOpenOff( &cb ) ;
-   #endif
 
    cb.errOff = 1 ;
    cb.errOpen = 0 ;   /* avoid endless loop due to error calling this function... */
@@ -767,9 +761,7 @@ void u4writeOut( char *out, int newLine, long lenIn )
             /* reopen the log if it has been previously closed:   */
             code4init(&cb) ;
             /* the code4init() call should have opened or created s4test  */
-            #ifndef S4CLIENT
                code4logOpenOff( &cb ) ;
-            #endif
             if( s4test.hand == INVALID4HANDLE )
             {
                code4close(&cb) ;

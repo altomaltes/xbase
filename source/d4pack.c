@@ -96,16 +96,13 @@ int S4FUNCTION d4pack( DATA4 *d4 )
    #endif  /* S4CLIENT */
 }
 
-#ifndef S4CLIENT
 int d4packData( DATA4 *d4 )
 {
    int rc ;
-   #ifndef S4CLIENT
       #ifndef S4OFF_TRAN
          TRAN4 *trans ;
          long connectionId ;
       #endif
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
@@ -126,7 +123,6 @@ int d4packData( DATA4 *d4 )
          return rc ;
    #endif
 
-   #ifndef S4CLIENT
       #ifndef S4OFF_TRAN
          if ( code4transEnabled( d4->codeBase ) )
          {
@@ -141,7 +137,6 @@ int d4packData( DATA4 *d4 )
                tran4lowAppend( trans, "\0", 1 ) ;
          }
       #endif
-   #endif
 
    rc = dfile4packData( d4->dataFile ) ;
 
@@ -228,6 +223,5 @@ int dfile4packData( DATA4FILE *d4 )
    file4longAdd( &len, 1 ) ;
    return file4lenSetLow( &d4->file, len ) ;
 }
-#endif
 
 #endif  /* S4OFF_WRITE */

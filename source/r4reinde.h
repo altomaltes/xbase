@@ -1,6 +1,5 @@
 /* r4reindex.h   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
-#ifndef S4CLIENT
 typedef struct
 {
    /* must be before nKeys  */
@@ -102,4 +101,3 @@ TAG4FILE *r4reindexFindITag( R4REINDEX *, const int ) ;
    }
 #endif
 
-#endif

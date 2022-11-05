@@ -162,14 +162,12 @@ int dfile4lock( DATA4FILE *data, const long clientId, const long serverId, const
    #endif
 }
 
-#ifndef S4CLIENT
 #ifndef S4CLIPPER
 #ifndef S4MEMO_OFF
 int dfile4lockMemo( DATA4FILE *data )
 {
    return memo4fileLock( &data->memoFile ) ;
 }
-#endif
 #endif
 #endif
 
@@ -681,7 +679,6 @@ int dfile4lockTest( DATA4FILE *data, const long clientId, const long serverId, c
    #endif /* S4CLIENT */
 }
 
-#ifndef S4CLIENT
 /* not S4CLIENT */
 int dfile4lockTestIndex( DATA4FILE *data, const long serverId )
 {
@@ -733,7 +730,6 @@ int dfile4lockTestIndex( DATA4FILE *data, const long serverId )
    #endif
    return 1 ;
 }
-#endif  /* S4CLIENT */
 
 #endif /* S4SINGLE */
 

@@ -25,11 +25,9 @@
 #define S4STAND_ALONE
 
 /* Index File compatibility options */
-#ifndef S4CLIENT
 /* #define S4CLIPPER */
 #define S4FOX
 /* #define S4MDX     */
-#endif
 
 /* Output selection (alternatives to default) */
 /* #define S4CONSOLE */

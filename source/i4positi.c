@@ -7,7 +7,6 @@
    #endif
 #endif
 
-#ifndef S4CLIENT
 #ifndef S4INDEX_OFF
 
 /* 'pos' is an percentage, positioning is approximate. */
@@ -302,4 +301,3 @@ int tfile4positionSet( TAG4FILE *t4, const double posIn )
 
 #endif  /* N4OTHER */
 #endif  /* S4INDEX_OFF */
-#endif  /* S4CLIENT */

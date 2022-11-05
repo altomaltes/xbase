@@ -889,11 +889,7 @@ const char S4PTR* S4FUNCTION d4fileNameVB( DATA4 *d4 )
       if ( c4parm_check( d4, 2, E40139 ) ) return 0 ;
    #endif
 
-   #ifndef S4CLIENT
       return d4->dataFile->file.name ;
-   #else
-      return d4fileName( d4 ) ;
-   #endif
 
 }
 

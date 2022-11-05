@@ -247,9 +247,7 @@
 #endif
 
 #ifdef S4FOX
-   #ifndef S4CLIENT_OR_FOX
       #define S4CLIENT_OR_FOX
-   #endif
 #endif
 
 #ifdef S4CLIENT
@@ -2105,14 +2103,12 @@
    #ifdef E4LOCK
       #undef E4LOCK
    #endif
-   #ifndef S4CLIENT
       #ifdef S4OFF_OPTIMIZE
          #error should not compile with both S4OFF_OPTIMIZE and S4SPEED_TEST
       #endif
       #ifndef S4OFF_TRAN
          #error should not compile without S4OFF_TRAN and S4SPEED_TEST
       #endif
-   #endif
    #ifdef S4OFF_THREAD
       #error should not compile with both S4OFF_THREAD and S4SPEED_TEST
    #endif

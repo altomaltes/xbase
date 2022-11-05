@@ -19,7 +19,6 @@
 
 #include "d4all.h"
 
-#ifndef S4CLIENT
 #ifndef S4MEMO_OFF
 
 #ifndef S4OFF_MULTI
@@ -739,4 +738,3 @@ int memo4fileWrite( MEMO4FILE *f4memo, long *memoIdPtr, const char *ptr, const u
 #endif /* S4OFF_WRITE */
 #endif /* S4MEMO_OFF */
 
-#endif /* S4CLIENT */

@@ -41,7 +41,6 @@ int dfile4verify( DATA4FILE *d4, int subs )
 }
 
 #ifndef S4SINGLE
-#ifndef S4CLIENT
 int lock4verify( LOCK4 *lock, const int subs )
 {
    int rc ;
@@ -60,12 +59,10 @@ int lock4verify( LOCK4 *lock, const int subs )
 
    return 0 ;
 }
-#endif  /* S4CLIENT */
 #endif  /* S4SINGLE */
 #endif  /* E4ANALYZE */
 
 #ifndef S4SINGLE
-#ifndef S4CLIENT
 int lock4lock( LOCK4 *lock )
 {
    int rc ;
@@ -140,5 +137,4 @@ int lock4unlock( LOCK4 *lock )
 
    return rc ;
 }
-#endif  /* S4CLIENT */
 #endif  /* S4SINGLE */

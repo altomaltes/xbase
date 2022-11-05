@@ -108,15 +108,12 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
    #endif
 }
 
-#ifndef S4CLIENT
 int d4zapData( DATA4 *data, const long startRec, const long endRec )
 {
    int rc ;
    #ifndef S4OFF_TRAN
-      #ifndef S4CLIENT
          TRAN4 *trans ;
          long connectionId ;
-      #endif
    #endif
 
    #ifdef E4PARM_HIGH
@@ -141,7 +138,6 @@ int d4zapData( DATA4 *data, const long startRec, const long endRec )
       return rc ;
 
    #ifndef S4OFF_TRAN
-      #ifndef S4CLIENT
          if ( code4transEnabled( data->codeBase ) )
          {
             trans = code4trans( data->codeBase ) ;
@@ -164,7 +160,6 @@ int d4zapData( DATA4 *data, const long startRec, const long endRec )
             if ( rc < 0 )
                return rc ;
          }
-      #endif  /* S4CLIENT */
    #endif  /* S4OFF_TRAN */
 
    rc = dfile4zapData( data->dataFile, startRec, endRec ) ;
@@ -267,5 +262,4 @@ int dfile4zapData( DATA4FILE *d4, long startRec, long endRec )
    file4longAdd( &len, 1 ) ;
    return file4lenSetLow( &d4->file, len ) ;
 }
-#endif
 #endif  /* S4OFF_WRITE */

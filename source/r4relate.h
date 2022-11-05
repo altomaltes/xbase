@@ -68,7 +68,6 @@ typedef struct RELATE4St
    LIST4 slaves ;
    LIST4 relateList ;  /* A list of scan Relate pointers; */
 
-   #ifndef S4CLIENT
       int scanValueLen ;
       int isRead ;
       F4FLAG  set ;  /* Specify records for bitmap optimizable sub-expression. */
@@ -76,7 +75,6 @@ typedef struct RELATE4St
          DATA4 S4PTR *dataOld ; /* the DATA4 that originally derived the relation */
          int freeData ;         /* did the relate create the data structure */
       #endif
-   #endif
 
    #ifdef S4SERVER
       long dataId ;    /* used for client identification purposes (locking) */
@@ -116,7 +114,6 @@ typedef struct RELATION4St
    char sortEofFlag ;
    BOOL4 bitmapDisable ;     /* used for testing purposes to test disabled bitmaps */
 
-   #ifndef S4CLIENT
       char inSort ;       /* are we skipping for sorting purposes? */
       LIST4 sortDataList ;  /* data list for the sort */
       L4LOGICAL log ;
@@ -125,7 +122,6 @@ typedef struct RELATION4St
       FILE4 sortedFile ;
       int  sortOtherLen ;
       long sortRecTo, sortRecOn, sortFilePos, sortRecCount ;
-   #endif
    int isInitialized ;
    char skipBackwards ;   /* is backwards skipping enabled? */
 

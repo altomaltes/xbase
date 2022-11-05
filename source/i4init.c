@@ -36,7 +36,6 @@ void t4dblToCur( char *result, const double d )
    c4atoCurrency( (CURRENCY4 *)result, currencyBuffer, 20 ) ;
 }
 
-#ifndef S4CLIENT
 #ifndef S4CLIPPER
 
 #ifdef S4FOX
@@ -710,4 +709,3 @@ int tfile4initSeekConv( TAG4FILE *t4, int keyType )
 }
 #endif   /* S4OFF_INDEX */
 #endif   /* S4CLIPPER */
-#endif   /* S4CLIENT */

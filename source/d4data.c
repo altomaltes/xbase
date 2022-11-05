@@ -349,7 +349,6 @@ short int S4FUNCTION d4numFields( DATA4 *data )
    return data->dataFile->nFields ;
 }
 
-#ifndef S4CLIENT
 /*  currently this function is not used...
 int d4read( DATA4 *data, const long recNum, char *ptr )
 {
@@ -393,7 +392,6 @@ int d4readOld( DATA4 *data, const long recNum )
 
    return 0 ;
 }
-#endif
 
 #ifndef S4SERVER
 #ifndef S4OFF_WRITE
@@ -570,7 +568,6 @@ int d4verify( DATA4 *d4, const int subs )
    if ( d4->link.n == 0 || d4->link.p == 0 )
       return error4( d4->codeBase, e4struct, E93317 ) ;
 
-   #ifndef S4CLIENT
       if ( d4->dataFile == 0 )
          return error4( d4->codeBase, e4struct, E93317 ) ;
 
@@ -578,7 +575,6 @@ int d4verify( DATA4 *d4, const int subs )
          if ( subs == 1 )
             return dfile4verify( d4->dataFile, 0 ) ;
       #endif
-   #endif
 
    return 0 ;
 }

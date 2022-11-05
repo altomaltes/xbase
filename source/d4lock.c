@@ -103,7 +103,6 @@ int S4FUNCTION d4lock_group( DATA4 *data, const long *recs, const int n_recs )
       if( d4lockTestFile( data ) )
          return 0 ;
 
-      #ifndef S4CLIENT
          switch( code4unlockAuto( c4 ) )
          {
             case LOCK4ALL :
@@ -116,7 +115,6 @@ int S4FUNCTION d4lock_group( DATA4 *data, const long *recs, const int n_recs )
          }
          if( rc < 0 )
             return error4stack( c4, rc, E92724 ) ;
-      #endif
 
       for ( i = 0 ; i < n_recs ; i++ )
       {
@@ -548,9 +546,7 @@ int S4FUNCTION d4lockFile( DATA4 *data )
       return 0 ;
    #else
       CODE4 *c4 ;
-      #ifndef S4CLIENT
          int rc ;
-      #endif
 
       #ifdef S4VBASIC
          if ( c4parm_check( data, 2, E92709 ) )
@@ -681,10 +677,8 @@ int S4FUNCTION d4lockTestAppendLow( DATA4 *data )
             return error4( 0, e4parm, E92704 ) ;
       #endif
 
-      #ifndef S4CLIENT
          if ( data->accessMode == OPEN4DENY_RW )
             return 1 ;
-      #endif
 
       rc = dfile4lockTestAppend( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
 
@@ -712,10 +706,8 @@ int S4FUNCTION d4lockTestFileLow( DATA4 *data )
             return error4( 0, e4parm_null, E92705 ) ;
       #endif
 
-      #ifndef S4CLIENT
          if ( data->accessMode != OPEN4DENY_NONE )
             return 1 ;
-      #endif
 
       rc = dfile4lockTestFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
 

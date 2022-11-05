@@ -43,9 +43,7 @@ int S4FUNCTION d4flush( DATA4 *data )
    #ifdef S4OFF_WRITE
       return 0 ;
    #else
-      #ifndef S4CLIENT
          int rc, saveRc ;
-      #endif
 
       #ifdef E4PARM_HIGH
          if ( data == 0 )
@@ -73,9 +71,7 @@ int d4flushData( DATA4 *data )
    #ifdef S4OFF_WRITE
       return 0 ;
    #else
-      #ifndef S4CLIENT
          int rc, saveRc ;
-      #endif
 
       #ifdef E4PARM_HIGH
          if ( data == 0 )
@@ -95,7 +91,6 @@ int d4flushData( DATA4 *data )
 }
 #endif /* S4SERVER */
 
-#ifndef S4CLIENT
 int dfile4flush( DATA4FILE *data )
 {
    int rc, saveRc ;
@@ -189,7 +184,6 @@ int dfile4flushData( DATA4FILE *data )
       return rc ;
    #endif
 }
-#endif  /* S4CLIENT */
 
 #ifndef S4SERVER
 #ifdef P4ARGS_USED
@@ -233,7 +227,6 @@ int S4FUNCTION code4flush( CODE4 *c4 )
 
 #ifndef S4OFF_WRITE
 
-#ifndef S4CLIENT
 #ifndef S4INDEX_OFF
 int dfile4updateIndexes( DATA4FILE *data )
 {
@@ -274,7 +267,6 @@ int dfile4updateIndexes( DATA4FILE *data )
    return rc ;
 }
 #endif
-#endif
 
 int d4update( DATA4 *data )
 {
@@ -293,7 +285,6 @@ int d4update( DATA4 *data )
 
    rc = d4updateRecord( data, 0 ) ;
 
-   #ifndef S4CLIENT
       if ( rc == 0 )
          if ( data->dataFile->fileChanged )   /* if the header is outdated */
             #ifndef S4SINGLE
@@ -304,7 +295,6 @@ int d4update( DATA4 *data )
          if ( rc == 0 )
             dfile4updateIndexes( data->dataFile ) ;
       #endif
-   #endif
 
    return rc ;
 }

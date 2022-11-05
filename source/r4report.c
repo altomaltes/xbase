@@ -14,7 +14,6 @@ void    S4FUNCTION code4calcReset( CODE4 S4PTR * ) ;
 
 int S4FUNCTION report4index_type()
 {
-   #ifndef S4CLIENT
       #ifdef S4MDX
          return r4mdx;
       #endif
@@ -30,23 +29,16 @@ int S4FUNCTION report4index_type()
       #ifdef S4FOX
          return r4cdx;
       #endif
-   #else
-      return -1 ;
-   #endif
 }
 
 int S4FUNCTION report4off_write()
 {
 
-   #ifndef S4CLIENT
       #ifdef S4OFF_WRITE
          return 1;
       #else
          return 0;
       #endif
-   #else
-      return 0 ;
-   #endif
 
 }
 
@@ -1375,7 +1367,6 @@ int S4FUNCTION report4dataDo( PREPORT4 report )
    report->rcount = 0;
    report->dfile_buf = NULL;
 
-   #ifndef S4CLIENT
    /* allocate as large a buffer as you can*/
    while( report->dfile_buf == NULL )
    {
@@ -1391,13 +1382,10 @@ int S4FUNCTION report4dataDo( PREPORT4 report )
    #else
       return 0;
    #endif
-   #endif /* S4CLIENT */
 
    /* set up the new datafile for fast writing*/
-   #ifndef S4CLIENT
       file4seqWriteInitLow( &report->dfile_seq, &dfile->dataFile->file, dfile4recordPosition(dfile->dataFile, 1L),
                            report->dfile_buf, (unsigned)bsize );
-   #endif
    d4appendStart( dfile, 0 );
    if( f4info )
    {
@@ -1432,23 +1420,19 @@ int S4FUNCTION report4dataDo( PREPORT4 report )
    report->for_dbf = 0;
 
    /* flush the buffer to the new data file*/
-   #ifndef S4CLIENT
       file4seqWriteFlush( &report->dfile_seq );
       #ifndef S4OFF_MULTI
          report->data_file->dataFile->file.lowAccessMode = 1;
       #endif
       report->data_file->dataFile->numRecs = report->rcount;
       dfile4updateHeader( report->data_file->dataFile, 1, 1 );
-   #endif
    d4close( report->data_file );
 
-   #ifndef S4CLIENT
       if( report->dfile_buf )
       {
          u4free( report->dfile_buf );
          report->dfile_buf = NULL;
       }
-   #endif
 
    group = (PGROUP4) l4first( &report->groups );
    while( group )

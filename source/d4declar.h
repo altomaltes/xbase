@@ -544,10 +544,8 @@ S4EXPORT void S4FUNCTION mem4release( MEM4 S4PTR * ) ;
          #define t4expr( t4 )   ( (t4)->tagFile->expr->source )
       #endif
    #endif
-   #ifndef S4CLIENT
       #define t4filter( t4 ) ( ( (t4)->tagFile->filter == 0 ? 0 : (t4)->tagFile->filter->source ) )
       S4EXPORT unsigned short int S4FUNCTION tfile4isDescending( TAG4FILE * ) ;  /* for SQL */
-   #endif /* S4CLIENT */
 #endif /* S4COMP_OFF_INDEX */
 
 /* UTIL4 */
@@ -737,7 +735,6 @@ int client4indexSetup( CODE4 *, DATA4 *, DATA4FILE *, unsigned int, const char *
 
 long time4long( const char *, int ) ;
 
-#ifndef S4CLIENT
    #ifndef S4OFF_INDEX
       /* B4BLOCK */
       B4BLOCK *b4alloc( TAG4FILE *, const long ) ;
@@ -812,7 +809,6 @@ long time4long( const char *, int ) ;
          int tfile4shrink( TAG4FILE *, long ) ;
       #endif /* S4CLIPPER */
    #endif /* S4OFF_INDEX */
-#endif /* S4CLIENT */
 
 S4EXPORT int S4FUNCTION c4clip( char *, int ) ;
 S4EXPORT char *S4FUNCTION c4descend( char *, const char *, int ) ; /* exported for OLEDB */
@@ -1114,13 +1110,11 @@ int file4changeSize( FILE4 *, FILE4LONG ) ;
       #endif  /* S4CLIPPER */
    #endif /* S4CLIENT */
 #endif /* S4OFF_INDEX */
-#ifndef S4CLIENT
    #ifndef S4OFF_MULTI
       int lock4verify( LOCK4 *, const int ) ;
       int lock4lock( LOCK4 * ) ;
       int lock4unlock( LOCK4 * ) ;
    #endif /* S4OFF_MULTI */
-#endif /* S4CLIENT */
 
 S4EXPORT int S4FUNCTION l4check( LIST4 * ) ;
 int l4seek( const LIST4 *, const void * ) ;
@@ -1158,12 +1152,11 @@ int mem4reset( void ) ;
 #endif
 
 #ifndef S4OFF_MEMO
-   #ifndef S4CLIENT
-      int memo4fileCheck( MEMO4FILE * ) ;
-      int memo4fileCreate( MEMO4FILE *, CODE4 *, DATA4FILE *, const char * );
-      int memo4fileOpen( MEMO4FILE *, DATA4FILE *, char * ) ;
-      int memo4fileReadPart( MEMO4FILE *, long , char * *, unsigned int *, unsigned long, const unsigned int, long * ) ;
-      int memo4fileWrite( MEMO4FILE *, long *, const char *, const unsigned int ) ;
+      int memo4fileCheck(     MEMO4FILE * ) ;
+      int memo4fileCreate(    MEMO4FILE *, CODE4 *, DATA4FILE *, const char * );
+      int memo4fileOpen(      MEMO4FILE *, DATA4FILE *, char * ) ;
+      int memo4fileReadPart(  MEMO4FILE *, long , char * *, unsigned int *, unsigned long, const unsigned int, long * ) ;
+      int memo4fileWrite(     MEMO4FILE *, long *, const char *, const unsigned int ) ;
       int memo4fileWritePart( MEMO4FILE *, long *, const char *, const long, const long, const unsigned int, const long ) ;
       #ifdef S4MFOX
          int memo4fileDump( MEMO4FILE *, const long, const char *, const unsigned int, const long, const long ) ;
@@ -1179,7 +1172,6 @@ int mem4reset( void ) ;
             #endif
          #endif /* S4MNDX  */
       #endif /* S4MFOX  */
-   #endif /* S4CLIENT */
 
    int memo4fileLock( MEMO4FILE * ) ;
    int memo4fileUnlock( MEMO4FILE * ) ;
@@ -1193,7 +1185,6 @@ int mem4reset( void ) ;
       S4EXPORT int S4FUNCTION t4uniqueSetLow( TAG4 *, const short, const char ) ;
    #endif
 
-   #ifndef S4CLIENT
       /* #ifdef S4HAS_DESCENDING */  /* removed from switch to facilatate index independant code */
       S4EXPORT void S4FUNCTION tfile4descending( TAG4FILE *, const unsigned short int ) ;
       /* #endif */
@@ -1256,7 +1247,6 @@ int mem4reset( void ) ;
          #endif
          B4BLOCK *tfile4split( TAG4FILE *, B4BLOCK * ) ;
       #endif
-   #endif /* S4CLIENT */
 #endif /* S4OFF_INDEX */
 
 #ifdef S4TESTING
@@ -1406,9 +1396,7 @@ void t4dblToCurFox( char *, const double ) ;
 void t4dblToCur( char *, const double ) ;
 
 #ifdef S4FOX
-   #ifndef S4CLIENT
       int S4CALL u4keycmp( S4CMP_PARM, S4CMP_PARM, size_t, size_t, size_t, T4VFP * ) ;
-   #endif
 
    /* collating sequence tables */
    #ifdef S4GENERAL

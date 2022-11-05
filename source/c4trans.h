@@ -92,7 +92,6 @@ S4EXPORT int S4FUNCTION code4tranCommitSingle( CODE4 S4PTR * ) ;
       #endif
    #endif
 
-   #ifndef S4CLIENT
       #ifndef S4OFF_TRAN
          /* #define TRAN4CREATE    1  Not supported*/
          #define TRAN4OPEN             1
@@ -129,13 +128,11 @@ S4EXPORT int S4FUNCTION code4tranCommitSingle( CODE4 S4PTR * ) ;
             #define TRAN4MAX_USERS      1000
          #endif
       #endif  /* S4OFF_TRAN */
-   #endif  /* not S4CLIENT */
 
    #ifdef __cplusplus
       extern "C" {
    #endif
    #ifndef S4OFF_TRAN
-      #ifndef S4CLIENT
          int  tran4fileCreate( TRAN4FILE *, const char * ) ;
          int  tran4active( CODE4 *, DATA4 * ) ;
          int  tran4addUser( TRAN4 *, const long, const char *, const unsigned short int ) ;
@@ -160,11 +157,9 @@ S4EXPORT int S4FUNCTION code4tranCommitSingle( CODE4 S4PTR * ) ;
             S4EXPORT int  S4FUNCTION tran4type( TRAN4 S4PTR * ) ;
          #endif
          S4EXPORT void * S4FUNCTION tran4getData( TRAN4 S4PTR *, const long pos  ) ;
-      #endif  /* not S4CLIENT */
    #endif  /* S4OFF_TRAN */
 
    #ifndef S4OFF_TRAN
-      #ifndef S4CLIENT
          S4EXPORT int S4FUNCTION tran4lowAppend( TRAN4 S4PTR *, void S4PTR *, int ) ;
          S4EXPORT int S4FUNCTION tran4lowCommitPhaseOne( TRAN4 S4PTR *, long ) ;
          S4EXPORT int S4FUNCTION tran4lowCommitPhaseTwo( TRAN4 S4PTR *, long, int ) ;
@@ -172,14 +167,12 @@ S4EXPORT int S4FUNCTION code4tranCommitSingle( CODE4 S4PTR * ) ;
          S4EXPORT int S4FUNCTION tran4lowStart( TRAN4 S4PTR *, long, int ) ;
          int tran4lowUnappend( TRAN4 * ) ;
          int tran4lowUnwrite( TRAN4 * ) ;
-      #endif  /* S4CLIENT */
    #endif  /* S4OFF_TRAN */
    #ifdef __cplusplus
       }
    #endif
 #endif /* S4OFF_WRITE */
 
-#ifndef S4CLIENT
    int tran4closeAll( struct TRAN4St * ) ;
    #ifndef S4SINGLE
       #ifdef S4SERVER
@@ -188,7 +181,7 @@ S4EXPORT int S4FUNCTION code4tranCommitSingle( CODE4 S4PTR * ) ;
       S4EXPORT int  S4FUNCTION code4tranLockTransactions( CODE4TRANS S4PTR *, long ) ;
       S4EXPORT int  S4FUNCTION code4tranUnlockTransactions( CODE4TRANS S4PTR *, long ) ;
    #endif  /* S4SINGLE */
-#endif  /* S4CLIENT */
+
 DATA4 *tran4data( struct TRAN4St *, const long, const long ) ;
 DATA4 *tran4dataName( struct TRAN4St *, const char *, const long, const int ) ;
 

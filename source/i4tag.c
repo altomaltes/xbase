@@ -16,7 +16,6 @@
 
 #ifndef S4OFF_INDEX
 
-#ifndef S4CLIENT
 int tfile4unique( TAG4FILE *tag, const short int errUnique )
 {
    #ifdef S4FOX
@@ -27,7 +26,6 @@ int tfile4unique( TAG4FILE *tag, const short int errUnique )
          return errUnique ;
    return 0 ;
 }
-#endif /* S4CLIENT */
 
 short int S4FUNCTION t4unique( const TAG4 *tag )
 {

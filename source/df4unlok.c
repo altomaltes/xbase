@@ -8,7 +8,6 @@
 #endif
 
 #ifndef S4OFF_MULTI
-#ifndef S4CLIENT
 
 #ifndef S4CLIPPER
 #ifndef S4MEMO_OFF
@@ -28,14 +27,11 @@ int dfile4memoUnlock( DATA4FILE *data )
       return 0 ;
 }
 #endif
-#endif
 
 int dfile4unlockAppend( DATA4FILE *data, const long clientId, const long serverId )
 {
    #ifndef S4OFF_MULTI
-      #ifndef S4CLIENT
          int rc ;
-      #endif
 
       #ifdef E4PARM_LOW
          if ( data == 0 || serverId == 0 )
@@ -60,7 +56,6 @@ int dfile4unlockAppend( DATA4FILE *data, const long clientId, const long serverI
             }
          #endif
 
-         #ifndef S4CLIENT
             if ( data->c4->largeFileOffset == 0 )
             {
                #ifdef S4FOX
@@ -76,7 +71,6 @@ int dfile4unlockAppend( DATA4FILE *data, const long clientId, const long serverI
                rc = file4unlockInternal( &data->file, 0, data->c4->largeFileOffset, 1L, 0 ) ;
             if ( rc < 0 )
                return error4stack( data->c4, (short)rc, E91102 ) ;
-         #endif
          data->appendServerLock = 0 ;
          data->appendClientLock = 0 ;
          data->numRecs = -1 ;
@@ -214,7 +208,6 @@ int S4FUNCTION dfile4unlockIndex( DATA4FILE *data, const long serverId )
 }
 #endif
 
-#ifndef S4CLIENT
 static int dfile4unlockRecordDo( DATA4FILE *data, long rec )
 {
    FILE4LONG position ;
@@ -257,11 +250,9 @@ static int dfile4unlockRecordDo( DATA4FILE *data, long rec )
          return -1 ;
    return 0 ;
 }
-#endif
 
 int S4FUNCTION dfile4unlockRecord( DATA4FILE *data, const long clientId, const long serverId, const long rec )
 {
-   #ifndef S4CLIENT
       LOCK4 *lock ;
       SINGLE4DISTANT singleDistant ;
       single4distantInitIterate( &singleDistant, &data->lockedRecords ) ;
@@ -281,7 +272,6 @@ int S4FUNCTION dfile4unlockRecord( DATA4FILE *data, const long clientId, const l
          }
          single4distantNext( &singleDistant ) ;
       }
-   #endif
 
    return 0 ;
 }
@@ -310,10 +300,8 @@ int dfile4unlockRecords( DATA4FILE *data, const long clientId, const long server
 
          if ( lock->id.serverId == serverId && ( clientId == 0 || lock->id.clientId == clientId ) )
          {
-            #ifndef S4CLIENT
                if ( dfile4unlockRecordDo( data, lock->id.recNum ) < 0 )
                   return -1 ;
-            #endif
             single4distantPop( &singleDistant ) ;
             mem4free( data->c4->lockMemory, lock ) ;
          }

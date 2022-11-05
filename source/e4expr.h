@@ -251,9 +251,7 @@ extern const E4FUNCTIONS v4functions[EXPR4NUM_FUNCTIONS] ;
 #ifdef __cplusplus
    extern "C" {
 #endif
-#ifndef S4CLIENT
    S4EXPORT int S4FUNCTION expr4context( EXPR4 *, DATA4 * ) ;
-#endif
 
 /* EXTERNAL FUNCTIONS : */
 
@@ -289,10 +287,8 @@ int S4FUNCTION e4lookup( const unsigned char S4PTR *, const int, const int, cons
 /* INTERNAL FUNCTIONS : */
 int expr4start( EXPR4 * ) ;
 S4EXPORT int S4FUNCTION expr4keyLen( EXPR4 S4PTR * ) ;
-#ifndef S4CLIENT
    S4EXPORT int S4FUNCTION expr4key( EXPR4 S4PTR *, char S4PTR * S4PTR *, TAG4FILE * ) ;
    int expr4keyConvert( EXPR4 *, char **, const int, const int, TAG4FILE * ) ;
-#endif
 S4EXPORT int S4FUNCTION expr4nullLow( const EXPR4 S4PTR *, const int ) ;
 #define expr4null( e4 ) ( expr4nullLow( (e4), 1 ) )
 

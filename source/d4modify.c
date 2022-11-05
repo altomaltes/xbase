@@ -6,8 +6,6 @@
    #pragma hdrstop
 #endif  /* __TUROBC__ */
 
-#ifndef S4CLIENT
-
 static int createReplacementFile( CODE4 *c4, FILE4 *newFile, const char *oldPathName )
 {
    char buf[258] ;
@@ -816,5 +814,3 @@ DATA4 *S4FUNCTION d4fieldsRemove( DATA4 **d4, int nFields, char *names[] )
    #endif
    return newData ;
 }
-
-#endif /* S4CLIENT */

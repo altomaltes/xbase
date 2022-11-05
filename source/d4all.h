@@ -11,11 +11,9 @@
    #define S4STAND_ALONE
 
 /* Index File compatibility options */
-#ifndef S4CLIENT
 /* #define S4CLIPPER */
    #define S4FOX
 /* #define S4MDX     */
-#endif
 
 #ifdef S4FOX
    /* FoxPro collating sequence support (select none, some or all) */
@@ -74,7 +72,6 @@
 /* #define E4MAC_ALERT 4444 */
 
 /* Library Reducing Switches */
-#ifndef S4CLIENT
 /* #define S4OFF_INDEX    */
 /* #define S4OFF_MEMO     */
 /* #define S4OFF_MULTI    */
@@ -83,7 +80,6 @@
 /* #define S4OFF_THREAD   */
 /* #define S4OFF_TRAN     */
 /* #define S4OFF_WRITE    */
-#endif
 
 /* Spoken Language Switches */
 /* #define S4ANSI         */

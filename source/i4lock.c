@@ -8,7 +8,6 @@
 #endif
 
 #ifndef S4INDEX_OFF
-#ifndef S4CLIENT
 
 #ifdef S4CLIPPER
    #include <time.h>
@@ -475,5 +474,4 @@ int i4unlock( INDEX4 *i4 )
 
 #endif  /* S4CLIPPER */
 
-#endif  /* S4CLIENT */
 #endif  /* S4INDEX_OFF */

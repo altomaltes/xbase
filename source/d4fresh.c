@@ -23,7 +23,6 @@ int S4FUNCTION d4refresh( DATA4 *data )
    #endif
 }
 
-#ifndef S4CLIENT
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -75,7 +74,6 @@ int dfile4refresh( DATA4FILE *data )
    #endif
    return 0 ;
 }
-#endif
 
 #ifndef S4SERVER
 

@@ -140,13 +140,11 @@ TRAN4 *code4trans( CODE4 *c4 )
 }
 #endif
 
-#ifndef S4CLIENT
 #ifndef S4OFF_TRAN
 unsigned short int tran4entryLen( LOG4HEADER *header )
 {
    return sizeof( LOG4HEADER ) + header->dataLen + sizeof( TRAN4ENTRY_LEN ) ;
 }
-#endif
 #endif
 
 int tran4dataListSet( TRAN4 *t4, LIST4 *list )

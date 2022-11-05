@@ -70,7 +70,6 @@ int S4FUNCTION d4memoCompress( DATA4 *data )
 #endif /* S4CLIENT */
 #endif /* S4OFF_MEMO */
 
-#ifndef S4CLIENT
 
 #ifndef S4OFF_MEMO
 #ifdef S4MFOX
@@ -458,4 +457,3 @@ int d4validateMemoIds( DATA4 *data )
 }
 #endif  /* S4OFF_MULTI */
 #endif  /* S4OFF_MEMO */
-#endif  /* S4CLIENT */

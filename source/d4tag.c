@@ -52,7 +52,6 @@ TAG4 *S4FUNCTION d4tag( DATA4 *d4, const char* const tagName )
    return 0 ;
 }
 
-#ifndef S4CLIENT
 /* for N4OTHER should compare full name, adding extension if required */
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -63,10 +62,8 @@ TAG4FILE *dfile4tag( DATA4FILE *d4, const char * const tagName )
       char tagLookup[LEN4TAG_ALIAS+1] ;
       TAG4FILE *tagOn ;
       #ifdef N4OTHER
-         #ifndef S4CLIENT
             char tagLookup2[258], ext1[3], ext2[3] ;
             int l1, l2 ;
-         #endif
       #endif
 
       #ifdef E4PARM_LOW
@@ -78,11 +75,9 @@ TAG4FILE *dfile4tag( DATA4FILE *d4, const char * const tagName )
       #endif
 
       #ifdef N4OTHER
-         #ifndef S4CLIENT
             u4nameCurrent( tagLookup2, sizeof( tagLookup2 ), tagName ) ;
             u4nameExt( tagLookup2, sizeof( tagLookup2 ), code4indexExtension( d4->c4 ), 0 ) ;
             c4upper( tagLookup2 ) ;
-         #endif
       #endif
 
       u4namePiece( tagLookup, sizeof( tagLookup ), tagName, 0, 0 ) ;
@@ -96,17 +91,13 @@ TAG4FILE *dfile4tag( DATA4FILE *d4, const char * const tagName )
          if ( tagOn == 0 )
             break ;
          #ifdef N4OTHER
-            #ifndef S4CLIENT
                if ( strcmp( tagOn->file.name, tagLookup2 ) == 0 )
                   return tagOn ;
-            #endif
             if ( strcmp( tagOn->alias, tagLookup ) == 0 )  /* also need to verify extension*/
             {
-               #ifndef S4CLIENT
                   l1 = u4nameRetExt( ext1, sizeof( ext1 ), tagOn->file.name ) ;
                   l2 = u4nameRetExt( ext2, sizeof( ext1 ), tagName ) ;
                   if ( ( l2 == 0 ) || ( ( l1 == l2 ) && ( memcmp( ext1, ext2, l1 ) == 0 ) ) )
-               #endif
                   return tagOn ;
             }
          #else
@@ -120,7 +111,6 @@ TAG4FILE *dfile4tag( DATA4FILE *d4, const char * const tagName )
    #endif
    return 0 ;
 }
-#endif
 
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -159,7 +149,6 @@ TAG4 *S4FUNCTION d4tagDefault( DATA4 *d4 )
    return 0 ;
 }
 
-#ifndef S4CLIENT
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -186,7 +175,6 @@ TAG4FILE *dfile4tagDefault( DATA4FILE *d4 )
       return 0 ;
    #endif
 }
-#endif
 
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -244,7 +232,6 @@ TAG4 *S4FUNCTION d4tagNext( DATA4 *d4, TAG4 * tag )
    #endif
 }
 
-#ifndef S4CLIENT
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -289,7 +276,6 @@ TAG4FILE *dfile4tagNext( DATA4FILE *d4, TAG4FILE *tagOn )
       #endif /* N4OTHER */
    #endif
 }
-#endif
 
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -423,7 +409,6 @@ void S4FUNCTION d4tagSelect( DATA4 *d4, TAG4 *t4 )
    return ;
 }
 
-#ifndef S4CLIENT
 int dfile4tagSelect( DATA4FILE *d4, TAG4FILE *t4 )
 {
    #ifdef E4PARM_LOW
@@ -456,7 +441,6 @@ int dfile4tagSelect( DATA4FILE *d4, TAG4FILE *t4 )
 
    return 0 ;
 }
-#endif
 
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -478,7 +462,6 @@ TAG4 *S4FUNCTION d4tagSelected( DATA4 *d4 )
    #endif
 }
 
-#ifndef S4CLIENT
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -514,7 +497,6 @@ TAG4FILE *dfile4tagSelected( DATA4FILE *d4 )
       return (TAG4FILE *)0 ;
    #endif
 }
-#endif
 
 #ifdef S4VB_DOS
 

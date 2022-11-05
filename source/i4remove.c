@@ -7,7 +7,6 @@
    #endif
 #endif
 
-#ifndef S4CLIENT
 #ifndef S4OFF_WRITE
 #ifndef S4OFF_INDEX
 
@@ -1325,4 +1324,3 @@ int tfile4removeCurrent( TAG4FILE *t4 )
 
 #endif  /* S4OFF_INDEX */
 #endif  /* S4OFF_WRITE */
-#endif

@@ -10,7 +10,6 @@
 #ifndef S4OFF_INDEX
 #ifndef S4OFF_WRITE
 
-#ifndef S4CLIENT
 int S4FUNCTION t4uniqueModify( TAG4 *tag, int newUnique )
 {
    TAG4FILE *tagFile ;
@@ -59,7 +58,6 @@ int S4FUNCTION t4uniqueModify( TAG4 *tag, int newUnique )
       return file4writeInternal( &tagFile->file, pos, &tagFile->header.unique, sizeof(tagFile->header.unique)) ;
    #endif
 }
-#endif /* S4CLIENT */
 
 #ifndef S4CLIPPER
 #ifdef S4CLIENT
@@ -1115,7 +1113,6 @@ int S4FUNCTION i4tagAdd( INDEX4 *i4, const TAG4INFO *tagData )
 #endif /* S4CLIENT */
 #endif /* S4CLIPPER */
 
-#ifndef S4CLIENT
 /* remove all tags/indexes from data file */
 #ifdef S4CLIPPER
 int i4indexRemove( INDEX4 *index )
@@ -1289,6 +1286,5 @@ int S4FUNCTION i4tagRemove( TAG4 *tag )
    return 0 ;
 }
 #endif /* S4CLIPPER */
-#endif /* S4CLIENT */
 #endif /* S4OFF_WRITE */
 #endif /* S4OFF_INDEX */

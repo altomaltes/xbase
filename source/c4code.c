@@ -633,15 +633,11 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
       #endif
    #endif
 
-   #ifndef S4CLIENT
       c4->doIndexVerify = 1 ;
-   #endif
 
    #ifndef S4OFF_TRAN
       #ifndef S4OFF_WRITE
-         #ifndef S4CLIENT
             c4->log = LOG4ON ;
-         #endif
          #ifdef S4STAND_ALONE
             c4->logOpen = 1 ;
          #endif
@@ -1056,9 +1052,7 @@ static int code4initUndo2( CODE4 *c4, int doClose )
       CloseHandle( c4->accessMutex ) ;
    #else
       #ifndef S4OFF_TRAN
-         #ifndef S4CLIENT
             if ( code4transEnabled( c4 ) )
-         #endif
          if ( code4tranStatus( c4 ) == r4active )
             code4tranRollback( c4 ) ;
       #endif
@@ -1495,9 +1489,7 @@ DATA4 *tran4dataName( TRAN4 *trans, const char *name, const long clientId, const
    #ifdef E4MISC
       DATA4 *dataResult ;
    #endif
-   #ifndef S4CLIENT
       char name1[258] ;
-   #endif
 
    #ifdef E4ANALYZE
       if ( tran4verify( trans, 1 ) < 0 )
@@ -1509,14 +1501,12 @@ DATA4 *tran4dataName( TRAN4 *trans, const char *name, const long clientId, const
       dataResult = 0 ;
    #endif
 
-   #ifndef S4CLIENT
       u4nameCurrent( name1, sizeof( name1 ), name ) ;
       #ifdef S4CASE_SEN
          u4nameExt( name1, sizeof( name1 ), ".dbf", 0 ) ;
       #else
          u4nameExt( name1, sizeof( name1 ), ".DBF", 0 ) ;
       #endif
-   #endif
 
    for (;; )
    {
@@ -1540,7 +1530,6 @@ DATA4 *tran4dataName( TRAN4 *trans, const char *name, const long clientId, const
             return dataOn ;
          #endif
       }
-      #ifndef S4CLIENT
          #ifdef E4MISC
             else
          #endif
@@ -1563,7 +1552,6 @@ DATA4 *tran4dataName( TRAN4 *trans, const char *name, const long clientId, const
                   return dataOn ;
                #endif
             }
-      #endif
    }
    #ifdef E4MISC
       return dataResult ;
