@@ -1,18 +1,4 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* r4reindex.h   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* r4reindex.h   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #ifndef S4CLIENT
 typedef struct
@@ -52,10 +38,10 @@ typedef struct  /* R4REINDEX  For 'i4reindex' */
       #ifdef S4CLIPPER
          B4KEY_DATA *stranded ;
          int keysHalf ;
-         unsigned long lastblockInc ;        /* How much to increment 'lastblock' by */
-         unsigned long nBlocksUsed ;
+         int lastblockInc ;        /* How much to increment 'lastblock' by */
+         int nBlocksUsed ;
       #else
-         unsigned long lastblockInc ;        /* How much to increment 'lastblock' by */
+         int lastblockInc ;        /* How much to increment 'lastblock' by */
          unsigned blocklen ;
       #endif
    #endif
@@ -63,7 +49,7 @@ typedef struct  /* R4REINDEX  For 'i4reindex' */
    unsigned int grouplen ;             /* Entire key length */
    int valuelen ;             /* Length of sorted portion of key */
    int keysmax ;
-   B4NODE lastblock ;            /* The block last written to */
+   S4LONG lastblock ;            /* The block last written to */
    S4LONG keyCount ;
 
    SORT4 sort ;
@@ -101,10 +87,7 @@ void r4reindexFree( R4REINDEX * ) ;
    int r4reindexInit( R4REINDEX *, INDEX4 *, INDEX4FILE * ) ;
 #endif
 int r4reindexBlocksAlloc( R4REINDEX * ) ;
-
-#ifndef S4CLIPPER
-   TAG4FILE *index4fileFindITag( INDEX4FILE *, const int ) ;
-#endif
+TAG4FILE *r4reindexFindITag( R4REINDEX *, const int ) ;
 
 /* Write key functions */
 #ifdef S4FOX

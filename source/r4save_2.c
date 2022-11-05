@@ -1,26 +1,12 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* r4save_2.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
-
-#include "d4all.h"
-
-#ifndef S4OFF_REPORT
+/* r4save_2.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #ifdef S4CR2  /* required for building crep2.exe*/
    #define S4CONV_REP
 #endif
+
+#include "d4all.h"
+
+#ifndef S4OFF_REPORT
 
 extern int file_version;
 extern LIST4 name_list;
@@ -80,7 +66,7 @@ int S4FUNCTION r4index_lookup_foo( DATA4 *data, char *index_name,
       c4upper( index_lookup ) ;
    #endif
 
-   if( r4ntx == ttype )
+   if( r4ntx == ttype || r4ndx == ttype )
    {
       if( d4tag( data, index_lookup ) )
          return 1;
@@ -185,13 +171,11 @@ int S4FUNCTION r4index_lookup( DATA4 *data, char *index_name )
  *  HISTORY:
  *
  */
-// AS Dec 13/05 - improvements for function deprecation
-#define FNBUF_LEN 256
-static DATA4 *r4open_data_foo( char *file_name, char *alias, RELATE4 *relate, CODE4 *codeBase, char *fnbuf )
+DATA4 *r4open_data_foo( char *file_name, char *alias, RELATE4 *relate, CODE4 *codeBase, char *fnbuf )
 {
    DATA4   *old, *nnew;
    RELATE4 *relate_on;
-   char    abuf[LEN4DATA_ALIAS + 1];
+   char    abuf[11];
 
    if( !file_name || !alias )
       return NULL;
@@ -213,17 +197,15 @@ static DATA4 *r4open_data_foo( char *file_name, char *alias, RELATE4 *relate, CO
    relate_on = relate;
    while( relate_on )
    {
-      // AS Dec 13/05 - under Windows strcpy is becoming deprecated...
       #ifndef S4CLIENT
-         c4strcpy( fnbuf, FNBUF_LEN, relate_on->data->dataFile->file.name );
+         strcpy( fnbuf, relate_on->data->dataFile->file.name );
       #else
-         c4strcpy( fnbuf, FNBUF_LEN, d4fileName( relate_on->data ) ) ;
+         strcpy( fnbuf, d4fileName( relate_on->data ) ) ;
       #endif
       #ifndef S4CASE_SEN
          c4upper( fnbuf );
       #endif
-      // AS Dec 13/05 - improvements for function deprecation
-      c4strcpy( abuf, sizeof( abuf ), d4alias( relate_on->data ) );
+      strcpy( abuf, d4alias( relate_on->data ) );
       #ifndef S4CASE_SEN
          c4upper( abuf );
       #endif
@@ -244,8 +226,7 @@ static DATA4 *r4open_data_foo( char *file_name, char *alias, RELATE4 *relate, CO
 
    /* save the existing files alias, reset it to xxxxxxx open the new file,
       set the new files alias, then restore the old files alias  */
-   // AS Dec 13/05 - under Windows strcpy is becoming deprecated...
-   c4strcpy( abuf, sizeof( abuf ), d4alias(old) );
+   strcpy( abuf, d4alias(old) );
    d4aliasSet( old, "XXXXXXXXXX" );
    nnew = d4open( codeBase, file_name );
    if( nnew )
@@ -253,6 +234,7 @@ static DATA4 *r4open_data_foo( char *file_name, char *alias, RELATE4 *relate, CO
    d4aliasSet( old, abuf );
 
    return nnew;
+
 }
 
 /* wrapper for above function */
@@ -261,8 +243,7 @@ DATA4 *r4open_data( char *file_name, char *alias, RELATE4 *relate, CODE4 *codeBa
    DATA4 *retvalue;
    char *fnbuf;
 
-   // AS Dec 13/05 - improvements for function deprecation
-   fnbuf = (char *)u4allocFree( codeBase, FNBUF_LEN );
+   fnbuf = (char *)u4allocFree( codeBase, 256 );
    if( !fnbuf )
       return NULL;
 
@@ -365,16 +346,14 @@ void report4nchange( CODE4 *c4, char **psrc, int can_alloc, int s_size )
       old_name_len = strlen(nchange->old_name);
 
       /* create a buffer to duplicate the expression source */
-      int origLen = strlen(src) + 1 ;
-      orig = (char *)u4allocFree( c4, origLen );
+      orig = (char *)u4allocFree( c4, strlen(src) + 1 );
       if( !orig )
          return;
 
       /* copy the expression source */
       src_pos = 0;
-      // AS Dec 13/05 - improvements for function deprecation
-      c4strcpy( orig, origLen, src );
-      orig_len = strlen( orig );
+      strcpy( orig, src );
+      orig_len = strlen(orig);
 
       /* run through the copy of the expression source */
       for( pos = 0; orig[pos]; pos++ )
@@ -482,13 +461,10 @@ void report4nchange( CODE4 *c4, char **psrc, int can_alloc, int s_size )
  *  HISTORY:
  *
  */
-// AS Dec 13/05 - improvements for function deprecation
-#define TEMP4NAME_BUF_LEN 512
-#define STR4BUF_LEN 256
-static RELATE4 *S4FUNCTION relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int open_files, char *spath,
-                           char *dname_buf, char *iname_buf, char *tname_buf,
-                           char *str_buf, char *masterExpr_buf,
-                           char *slave_expr_buf, char *tempname_buf, int file_type )
+RELATE4 * S4FUNCTION   relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int open_files, char *spath,
+                          char *dname_buf, char *iname_buf, char *tname_buf,
+                          char *str_buf, char *masterExpr_buf,
+                          char *slave_expr_buf, char *tempname_buf, int file_type )
 {
    RELATE4 *relate = NULL, *master = NULL;
    DATA4   *data;
@@ -498,12 +474,7 @@ static RELATE4 *S4FUNCTION relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int o
    CODE4   *c4;
    INAME4  *iname, *nname;
    EXPR4   *expr;
-   char alias_buf[LEN4DATA_ALIAS + 1], *cptr, *tmp_buf;
-/* removed because aliases should be allowed in client/server
-#ifdef S4CLIENT
-   char temp_buf[11];
-#endif
-*/
+   char alias_buf[11], *cptr, *tmp_buf;
    short matchLen, relationType, sortType, errorAction, nLinks, code;
    int i, err_code, err_flag, repeat_flag, errorCode = 0, iindex, tname_err;
    int indexType ;
@@ -518,9 +489,6 @@ static RELATE4 *S4FUNCTION relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int o
    memset( &name_list, 0, sizeof(name_list) );
 
    c4 = seq->file->codeBase;
-   c4->errOpen = 0 ;   /* JH 11/01/99 - added so that Load Relation does not */
-                       /* report an error if the database file is not in the */
-                       /* same location as the relation (REL) one.           */
 
    /* reset the index name list */
    memset( &indexes, 0, sizeof(indexes) );
@@ -548,13 +516,6 @@ static RELATE4 *S4FUNCTION relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int o
             goto CLEANUP;
          }
       }
-      /* removed because aliases should be allowed in client/server
-         #ifdef S4CLIENT
-            u4namePiece( temp_buf, sizeof( temp_buf ), dname_buf, 0, 0 ) ;
-            if( strcmp( alias_buf, temp_buf ) )
-               strcpy( alias_buf, temp_buf ) ;
-         #endif
-      */
 
       /* retrieve the internal flags of the RELATE4 */
       ret4short( seq, &matchLen );
@@ -562,7 +523,8 @@ static RELATE4 *S4FUNCTION relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int o
       ret4short( seq, &sortType );
       ret4short( seq, &errorAction );
 
-      /* retrieve the names of the index files and place them in the index list */
+      /* retrieve the names of the index files and place them in the index list
+       */
       ret4short( seq, &nLinks );
       for( i = 0; i < nLinks; i++ )
       {
@@ -572,17 +534,13 @@ static RELATE4 *S4FUNCTION relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int o
             errorCode = 1;
             goto CLEANUP;
          }
-         /* LY 2001/08/31 : changed both lines from using +1, since u4nameExt() is used to add extension */
-         iname->name_length = strlen(iname_buf) + 5;
-         iname->index_name = (char *)u4allocFree( c4, iname->name_length );
-         if ( iname->index_name == 0 )
-         // AS Dec 13/05 - improvements for function deprecation
-         {
-            u4free( iname ) ;
-            errorCode = 1;
-            goto CLEANUP;
-         }
-         c4strcpy( iname->index_name, iname->name_length, iname_buf );
+         iname->index_name = (char *)u4allocFree( c4, strlen(iname_buf) + 1 );
+         iname->name_length = strlen(iname_buf) + 1;
+         #ifdef S4WINDOWS
+            lstrcpy( iname->index_name, iname_buf );
+         #else
+            strcpy( iname->index_name, iname_buf );
+         #endif
          l4add( &indexes, iname );
       }
 
@@ -633,11 +591,10 @@ static RELATE4 *S4FUNCTION relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int o
                if( spath && spath[0] != '\0' )
                {
                   u4namePiece( str_buf, 256, dname_buf, 0, 1 );
-                  // AS Dec 13/05 - improvements for function deprecation
-                  c4strcpy( tempname_buf, TEMP4NAME_BUF_LEN, spath );
+                  strcpy( tempname_buf, spath );
                   if( *(tempname_buf+(strlen(tempname_buf)-1) ) != '\\' )
-                     c4strcat( tempname_buf, TEMP4NAME_BUF_LEN, "\\" );
-                  c4strcat( tempname_buf, TEMP4NAME_BUF_LEN, str_buf );
+                     strcat( tempname_buf, "\\" );
+                  strcat( tempname_buf, str_buf );
                   /* open the data file */
                   data = r4open_data( tempname_buf, alias_buf, master, c4 );
                }
@@ -656,22 +613,19 @@ static RELATE4 *S4FUNCTION relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int o
                   nchange = (PN4CHANGE)u4allocFree( c4, sizeof(N4CHANGE) );
                   if( nchange )
                   {
-                     u4namePiece( str_buf, STR4BUF_LEN, dname_buf, 0, 0 );
+                     u4namePiece( str_buf, 256, dname_buf, 0, 0 );
                      nchange->old_name = (char *)u4allocFree( c4, strlen(str_buf)+1 );
                      if( nchange->old_name )
                      {
-                        // AS Dec 13/05 - improvements for function deprecation
-                        c4strcpy( nchange->old_name, STR4BUF_LEN, str_buf );
+                        strcpy( nchange->old_name, str_buf );
                         rc = AlternateDataFile( dname_buf, 256 );
                         if( rc == 0 )
                         {
-                           u4namePiece( str_buf, STR4BUF_LEN, dname_buf, 0, 0 );
-                           // AS Dec 13/05 - improvements for function deprecation
-                           int strLen = strlen(str_buf) + 1 ;
-                           nchange->new_name = (char *)u4allocFree( c4, strLen );
+                           u4namePiece( str_buf, 256, dname_buf, 0, 0 );
+                           nchange->new_name = (char *)u4allocFree(c4,strlen(str_buf)+1 );
                            if( nchange->new_name )
                            {
-                              c4strcpy( nchange->new_name, strLen, str_buf );
+                              strcpy( nchange->new_name, str_buf );
                               l4add( &name_list, nchange );
                               repeat_flag  = 1;
                            }
@@ -694,12 +648,12 @@ static RELATE4 *S4FUNCTION relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int o
                   else
                      err_flag = 1;
                   #else
-                     /* if not in the executable report an error */
-                     if( spath && spath[0] != '\0' )
-                        error4describe( c4, e4report, 0L, E4_REP_DFILE, tempname_buf, (char *)0 );
-                     else
-                        error4describe( c4, e4report, 0L, E4_REP_DFILE, dname_buf, (char *)0 );
-                     err_flag = 1;
+                  /* if not in the executable report an error */
+                  if( spath && spath[0] != '\0' )
+                     error4describe( c4, e4report, 0L, E4_REP_DFILE, tempname_buf, (char *)0 );
+                  else
+                     error4describe( c4, e4report, 0L, E4_REP_DFILE, dname_buf, (char *)0 );
+                  err_flag = 1;
                   #endif
                }
                error4set( c4, 0 );
@@ -752,15 +706,17 @@ static RELATE4 *S4FUNCTION relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int o
                   #endif
                   switch( indexType )
                   {
-                     /* LY 2001/08/31 : changed 2nd param to u4namExt from strlen(iname->index_name */
                      case r4cdx :
-                        u4nameExt( iname->index_name, iname->name_length, "cdx", 1 );
+                        u4nameExt( iname->index_name, strlen(iname->index_name)+1, "cdx", 1 );
                         break ;
                      case r4mdx :
-                        u4nameExt( iname->index_name, iname->name_length, "mdx", 1 );
+                        u4nameExt( iname->index_name, strlen(iname->index_name)+1, "mdx", 1 );
                         break ;
                      case r4ntx :
-                        u4nameExt( iname->index_name, iname->name_length, "ntx", 1 );
+                        u4nameExt( iname->index_name, strlen(iname->index_name)+1, "ntx", 1 );
+                        break ;
+                     case r4ndx :
+                        u4nameExt( iname->index_name, strlen(iname->index_name)+1, "ndx", 1 );
                         break ;
                   }
                   #endif
@@ -769,11 +725,9 @@ static RELATE4 *S4FUNCTION relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int o
                   if( spath && spath[0] != '\0' )
                   {
                      u4namePiece( str_buf, 256, iname->index_name, 0, 1 );
-                     // AS Dec 13/05 - improvements for function deprecation
-                     c4strcpy( tempname_buf, TEMP4NAME_BUF_LEN, spath );
-                     if( *(tempname_buf+(strlen(tempname_buf)-1) ) != '\\' )
-                        c4strcat( tempname_buf, TEMP4NAME_BUF_LEN, "\\" );
-                     c4strcat( tempname_buf, TEMP4NAME_BUF_LEN, str_buf );
+                     strcpy( tempname_buf, spath );
+                     strcat( tempname_buf, "\\" );
+                     strcat( tempname_buf, str_buf );
                      index = i4open( data, tempname_buf );
                   }
                   else
@@ -930,13 +884,7 @@ static RELATE4 *S4FUNCTION relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int o
 
             if( !relate )
                goto CLEANUP;
-
-            /* #ifdef S4CR2 */
-               if(relate->matchLen < matchLen)
-                  matchLen = relate->matchLen;
-            /* #endif */
-
-            /* relate->matchLen = matchLen; */
+            relate->matchLen = matchLen;
             relate->sortType = sortType;
             relate->relationType = relationType;
             relate->errorAction = errorAction;
@@ -1215,10 +1163,10 @@ RELATE4 * S4FUNCTION   relate4retrieve_relate( FILE4SEQ_READ *seq, int open_file
    dname_buf = (char *)u4allocFree( seq->file->codeBase, 256 );
    iname_buf = (char *)u4allocFree( seq->file->codeBase, 256 );
    tname_buf = (char *)u4allocFree( seq->file->codeBase, 256 );
-   str_buf = (char *)u4allocFree( seq->file->codeBase, STR4BUF_LEN );
+   str_buf = (char *)u4allocFree( seq->file->codeBase, 256 );
    masterExpr_buf = (char *)u4allocFree( seq->file->codeBase, 1024 );
    slave_expr_buf = (char *)u4allocFree( seq->file->codeBase, 1024 );
-   tempname_buf = (char *)u4allocFree( seq->file->codeBase, TEMP4NAME_BUF_LEN );
+   tempname_buf = (char *)u4allocFree( seq->file->codeBase, 512 );
    if( !dname_buf || !iname_buf || !tname_buf || !str_buf ||
        !masterExpr_buf || !slave_expr_buf || !tempname_buf )
       goto R4LEAVE;
@@ -1287,10 +1235,8 @@ int S4FUNCTION obj4dataFieldSet( POBJ4 obj, char *fname, char ftype, int flength
 /* see the CodeReporter manual */
 int S4FUNCTION report4dataFileSet( PREPORT4 report, char *fname )
 {
-   #ifdef E4PARM_HIGH
-           if( report == 0 )
-                   return error4( 0, e4parm_null, E95702 ) ;
-   #endif
+   if( !report )
+      return -1;
 
    if( report->dfile_name )
       u4free( report->dfile_name );
@@ -1310,10 +1256,8 @@ int S4FUNCTION report4dataFileSet( PREPORT4 report, char *fname )
 /* see the CodeReporter manual */
 int S4FUNCTION report4dataGroup( PREPORT4 report, PGROUP4 group )
 {
-   #ifdef E4PARM_HIGH
-           if( report == 0 )
-                   return error4( 0, e4parm_null, E95702 ) ;
-   #endif
+   if( !report )
+      return -1;
 
    report->output_group = group;
    return 0;

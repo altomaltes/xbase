@@ -12,7 +12,10 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/* s4quick.c (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved.
+/* revisited by altomaltes@gmail.com
+ */
+
+/* s4quick.c (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved.
 
    Iterative Quick Sort Algorithm
 
@@ -30,6 +33,7 @@
 */
 
 #include "d4all.h"
+
 
 static int sort( void **pointers, int nPointers, int sortLen, S4CMP_FUNCTION *cmp )
 {
@@ -71,8 +75,8 @@ static int sort( void **pointers, int nPointers, int sortLen, S4CMP_FUNCTION *cm
          rc = (*cmp)( pointers[middle], pointers[l], (unsigned int)sortLen ) ;
          if ( rc == 0 )
          {
-            c4memcpy( (void *)&l1, ((char *)pointers[middle])+sortLen, sizeof(S4LONG) ) ;
-            c4memcpy( (void *)&l2, ((char *)pointers[l])+sortLen, sizeof(S4LONG) ) ;
+            memcpy( (void *)&l1, ((char *)pointers[middle])+sortLen, sizeof(S4LONG) ) ;
+            memcpy( (void *)&l2, ((char *)pointers[l])+sortLen, sizeof(S4LONG) ) ;
             rc = (l1 > l2) ? 1 : 0 ;
          }
          if ( rc > 0 )
@@ -87,8 +91,8 @@ static int sort( void **pointers, int nPointers, int sortLen, S4CMP_FUNCTION *cm
          rc = (*cmp)( pointers[middle], pointers[f], (unsigned int)sortLen ) ;
          if ( rc == 0 )
          {
-            c4memcpy( (void *)&l1, ((char *)pointers[middle])+sortLen, sizeof(S4LONG) ) ;
-            c4memcpy( (void *)&l2, ((char *)pointers[f])+sortLen, sizeof(S4LONG) ) ;
+            memcpy( (void *)&l1, ((char *)pointers[middle])+sortLen, sizeof(S4LONG) ) ;
+            memcpy( (void *)&l2, ((char *)pointers[f])+sortLen, sizeof(S4LONG) ) ;
             rc = (l1 > l2) ? 1 : 0 ;
          }
          if ( rc > 0 )
@@ -104,8 +108,8 @@ static int sort( void **pointers, int nPointers, int sortLen, S4CMP_FUNCTION *cm
             rc = (*cmp)( pointers[f], pointers[l], (unsigned int)sortLen ) ;
             if ( rc == 0 )
             {
-               c4memcpy( (void *)&l1, ((char *)pointers[f])+sortLen, sizeof(S4LONG) ) ;
-               c4memcpy( (void *)&l2, ((char *)pointers[l])+sortLen, sizeof(S4LONG) ) ;
+               memcpy( (void *)&l1, ((char *)pointers[f])+sortLen, sizeof(S4LONG) ) ;
+               memcpy( (void *)&l2, ((char *)pointers[l])+sortLen, sizeof(S4LONG) ) ;
                rc = (l1 > l2) ? 1 : 0 ;
             }
             if ( rc > 0 )
@@ -133,8 +137,8 @@ static int sort( void **pointers, int nPointers, int sortLen, S4CMP_FUNCTION *cm
                rc = (*cmp)( pointers[i], pointers[f], (unsigned int)sortLen ) ;
                if ( rc == 0 )
                {
-                  c4memcpy( (void *)&l1, ((char *)pointers[i])+sortLen, sizeof(S4LONG) ) ;
-                  c4memcpy( (void *)&l2, ((char *)pointers[f])+sortLen, sizeof(S4LONG) ) ;
+                  memcpy( (void *)&l1, ((char *)pointers[i])+sortLen, sizeof(S4LONG) ) ;
+                  memcpy( (void *)&l2, ((char *)pointers[f])+sortLen, sizeof(S4LONG) ) ;
                   rc = (l1 < l2) ? -1 : 0 ;
                }
             }
@@ -147,8 +151,8 @@ static int sort( void **pointers, int nPointers, int sortLen, S4CMP_FUNCTION *cm
                rc = (*cmp)( pointers[j], pointers[f], (unsigned int)sortLen ) ;
                if ( rc == 0 )
                {
-                  c4memcpy( (void *)&l1, ((char *)pointers[j])+sortLen, sizeof(S4LONG) ) ;
-                  c4memcpy( (void *)&l2, ((char *)pointers[f])+sortLen, sizeof(S4LONG) ) ;
+                  memcpy( (void *)&l1, ((char *)pointers[j])+sortLen, sizeof(S4LONG) ) ;
+                  memcpy( (void *)&l2, ((char *)pointers[f])+sortLen, sizeof(S4LONG) ) ;
                   rc = (l1 > l2) ? 1 : 0 ;
                }
             }
@@ -200,8 +204,8 @@ static int sort( void **pointers, int nPointers, int sortLen, S4CMP_FUNCTION *cm
             rc = (*cmp)( pointers[k], pointers[j], (unsigned int)sortLen ) ;
             if ( rc == 0 )
             {
-               c4memcpy( (void *)&l1, ((char *)pointers[k])+sortLen, sizeof(S4LONG) ) ;
-               c4memcpy( (void *)&l2, ((char *)pointers[j])+sortLen, sizeof(S4LONG) ) ;
+               memcpy( (void *)&l1, ((char *)pointers[k])+sortLen, sizeof(S4LONG) ) ;
+               memcpy( (void *)&l2, ((char *)pointers[j])+sortLen, sizeof(S4LONG) ) ;
                rc = (l1 > l2) ? 1 : 0 ;
             }
             if ( rc <= 0 )

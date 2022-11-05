@@ -12,14 +12,17 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/* f4opt.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* revisited by altomaltes@gmail.com
+ */
+
+/* f4opt.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 /* file-level optimizations */
 
 #include "d4all.h"
 
 #ifndef S4OPTIMIZE_OFF
 #ifdef E4ANALYZE_ALL
-#ifndef __unix__
+#ifndef S4UNIX
    #include <sys\stat.h>
    #include <share.h>
 #endif
@@ -109,9 +112,7 @@ int file4partLenSet( FILE4 *file, unsigned long newLen )
    return rc ;
 }
 
-
-
-int file4writePart( const void *buf, FILE4 *file, unsigned long pos, unsigned len )
+int file4writePart( const void *buf, FILE4 *file, long pos, unsigned len )
 {
    #ifdef S4WINTEL
       HANDLE h1 = INVALID4HANDLE;
@@ -119,8 +120,7 @@ int file4writePart( const void *buf, FILE4 *file, unsigned long pos, unsigned le
       int h1 = INVALID4HANDLE;
    #endif
    unsigned rc = -1;
-   long bufWriteLen ;
-   unsigned long fileLen, rc1 ;
+   long rc1, fileLen, bufWriteLen ;
    char emptyBuf[512] ;
 
    if ( file->inUse == 1 )
@@ -151,7 +151,7 @@ int file4writePart( const void *buf, FILE4 *file, unsigned long pos, unsigned le
             if ( rc1 != (DWORD)-1 )
                rc1 = fileLen ;
          #else
-            rc1 = (long)lseek( h1, (off_t)fileLen, 0 ) ;
+            rc1 = (long)lseek( h1, fileLen, 0 ) ;
          #endif
          if ( rc1 != fileLen )
             break ;
@@ -160,7 +160,7 @@ int file4writePart( const void *buf, FILE4 *file, unsigned long pos, unsigned le
          #else
             rc1 = (long)write( h1, emptyBuf, (int)bufWriteLen ) ;
          #endif
-         if ( rc1 != (unsigned long)len )
+         if ( rc1 != (long)len )
             break;
          fileLen = file4longGetLo( u4filelength( h1 ) ) ;
       }
@@ -169,7 +169,7 @@ int file4writePart( const void *buf, FILE4 *file, unsigned long pos, unsigned le
          if ( rc1 != (DWORD)-1 )
             rc1 = pos ;
       #else
-         rc1 = (long)lseek( h1, (off_t)pos, 0 ) ;
+         rc1 = (long)lseek( h1, pos, 0 ) ;
       #endif
       if ( rc1 != pos )
          break ;
@@ -179,7 +179,7 @@ int file4writePart( const void *buf, FILE4 *file, unsigned long pos, unsigned le
       #else
          rc1 = (long)write( h1, buf, len ) ;
       #endif
-      if ( rc1 != (unsigned long)len )
+      if ( rc1 != (long)len )
          break;
 
       rc = 0 ;
@@ -199,16 +199,16 @@ int file4writePart( const void *buf, FILE4 *file, unsigned long pos, unsigned le
    return rc ;
 }
 
-int file4cmpPart( CODE4 *c4, void *bufIn, FILE4 *file, unsigned long pos, unsigned len )
+int file4cmpPart( CODE4 *c4, void *bufIn, FILE4 *file, long pos, unsigned len )
 {
    #ifdef S4WINTEL
       HANDLE h1 = INVALID4HANDLE ;
    #else
       int h1 = INVALID4HANDLE ;
    #endif
-   unsigned long rc = -1, rc1 ;
+   int rc = -1 ;
    char buf1[512] ;
-   long lenHold ;
+   long lenHold, rc1 ;
    char *buf = (char *)bufIn ;
 
    if ( file->inUse == 1 )
@@ -236,7 +236,7 @@ int file4cmpPart( CODE4 *c4, void *bufIn, FILE4 *file, unsigned long pos, unsign
             if ( rc1 != (DWORD)-1 )
                rc1 = pos ;
          #else
-            rc1 = (long)lseek( h1, (off_t)pos, 0 ) ;
+            rc1 = lseek( h1, pos, 0 ) ;
          #endif
          if ( rc1 != pos )
             break ;
@@ -246,7 +246,7 @@ int file4cmpPart( CODE4 *c4, void *bufIn, FILE4 *file, unsigned long pos, unsign
          #else
             rc1 = (unsigned)read( h1, buf1, sizeof( buf1 ) > len ? len : sizeof( buf1 ) ) ;
          #endif
-         if ( rc1 != (unsigned long)sizeof( buf1 ) && rc1 != (unsigned long)len )
+         if ( rc1 != (long)sizeof( buf1 ) && rc1 != (long)len )
             break ;
 
          if ( c4memcmp( buf + ( lenHold - len ), buf1, (unsigned)rc1 ) != 0 )
@@ -315,7 +315,7 @@ int file4cmp( FILE4 *f1 )
             if ( rct != (DWORD)-1 )
                rct = p1 ;
          #else
-            rct = (long)lseek( h1, (off_t)p1, 0 ) ;
+            rct = lseek( h1, p1, 0 ) ;
          #endif
          if ( rct != p1 )
             break ;
@@ -360,8 +360,6 @@ int file4cmp( FILE4 *f1 )
    return rc ;
 }
 
-
-
 int file4copyx( CODE4 *c4, FILE4 *f1, char *f2 )
 {
    #ifdef S4WINTEL
@@ -404,12 +402,12 @@ int file4copyx( CODE4 *c4, FILE4 *f1, char *f2 )
                rct = p1 ;
             ReadFile( h1, buf, sizeof( buf ), (unsigned long *)&urc, NULL ) ;
             rc1 = urc ;
-            WriteFile( h2, buf, rc1, (unsigned long *)&rc2, NULL ) ;
+            WriteFile( h2, buf, rc1, (unsigned long *)&rc1, NULL ) ;
          #else
-            rct = (long)lseek( h1, (off_t)p1, 0 ) ;
+            rct = lseek( h1, p1, 0 ) ;
             if ( rct != p1 )
                break ;
-            rct = (long)lseek( h2, (off_t)p1, 0 ) ;
+            rct = lseek( h2, p1, 0 ) ;
             if ( rct != p1 )
                break ;
             rc1 = (unsigned)read( h1, buf, sizeof( buf ) ) ;
@@ -442,10 +440,6 @@ int file4copyx( CODE4 *c4, FILE4 *f1, char *f2 )
 #endif
 #endif
 
-#ifdef E4ANALYZE
-   static long g_counter = 0 ;
-#endif
-
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -472,11 +466,10 @@ int S4FUNCTION file4optimizeLow( FILE4 *file, const int optFlagIn, const int fil
             return error4( 0, e4parm, E90616 ) ;
       #endif
 
-      // AS Apr 13/04 - support for large file optimization
-      // #ifdef S4FILE_EXTENDED
-      //    if ( file->isLong != 0 )  /* if is long, don't optimize */
-      //       return 0 ;
-      // #endif
+      #ifdef S4FILE_EXTENDED
+         if ( file->isLong != 0 )  /* if is long, don't optimize */
+            return 0 ;
+      #endif
 
       optFlag = optFlagIn ;
       rc = 0 ;
@@ -489,30 +482,19 @@ int S4FUNCTION file4optimizeLow( FILE4 *file, const int optFlagIn, const int fil
       #ifdef S4OFF_MULTI
          optFlag = 1 ;
       #else
-         // AS 06/21/00 - this was incorrect - according to docs, should not read-optimize if read-only is set, only
-         // if the physical read-only file attribute is set.  In that case, the lowAccessMode is marked as exclusive,
-         // so the readOnly part here is unnecessary...
-         // optFlag = ( file->lowAccessMode != OPEN4DENY_NONE || file->isReadOnly ) ? 1 : 0 ;
-         optFlag = ( file->lowAccessMode != OPEN4DENY_NONE ) ? 1 : 0 ;
+         optFlag = ( file->lowAccessMode != OPEN4DENY_NONE || file->isReadOnly ) ? 1 : 0 ;
       #endif
 
       if ( optFlag == 1 )
       {
-         // AS May 24/02 - created file4openLow for internal use to indicate file types
-         // AS Mar 4/03 - error here if file was optimized twice.  if file is optimized it will be
-         // on the list
-         // if ( file->doBuffer != 0 && (file->link.n == 0) )  /* already optimized */
-         if ( file->doBuffer != 0 && (file->link.n != 0) )  /* already optimized */
+         if ( file->doBuffer != 0 && file->type != OPT4NONE )  /* already optimized */
             return 0 ;
          if ( opt->numBuffers > 0 )
          {
             file4longAssignError( file->len ) ;
             file->hashInit = opt->hashTrail * opt->blockSize ;
             #ifdef E4ANALYZE
-               /* LY 2001/08/14 : un-nest file4lenLow in file4longError to
-                  avoid "non-lvalue in unary &" in Linux */
-               FILE4LONG tempFLen = file4lenLow( file ) ;
-               if ( file4longError( tempFLen ) < 0 || opt->blockSize == 0 )
+               if ( file4longError( file4lenLow( file ) ) < 0 || opt->blockSize == 0 )
                   return error4( file->codeBase, e4info, E90616 ) ;
             #endif
             opt->hashTrail = (opt->hashTrail + file4longGetLo( file4lenLow( file ) ) / opt->blockSize) % opt->numBlocks ;
@@ -521,17 +503,7 @@ int S4FUNCTION file4optimizeLow( FILE4 *file, const int optFlagIn, const int fil
          else
             file->hashInit = - 1 ;
 
-         #ifdef E4ANALYZE
-            g_counter++ ;
-            if ( g_counter == 10000 )  // just to avoid optimizing out.
-            {
-               file->type = 2 ;
-               g_counter = 0 ;
-            }
-         #endif
-
-         // AS May 24/02 - created file4openLow for internal use to indicate file types
-         if ( file->link.n == 0 )   /* not on list, so add */
+         if ( file->type == OPT4NONE )   /* add to list... */
             l4add( &opt->optFiles, file ) ;
          file->type = (char)fileType ;
          rc = file4optimizeWrite( file, file->codeBase->optimizeWrite ) ;
@@ -559,8 +531,7 @@ int S4FUNCTION file4optimizeLow( FILE4 *file, const int optFlagIn, const int fil
                   hand = sopen( file->dupName, O_CREAT | O_TRUNC | O_RDWR, SH_DENYWR, S_IREAD  | S_IWRITE ) ;
                #endif
 
-               // AS Apr 15/04 - at least for now don't duplicate large file names...
-               if ( hand == INVALID4HANDLE || file4longGetHi( file4lenLow( file ) ) > 0 )
+               if ( hand == INVALID4HANDLE )
                   file->hasDup = 0 ;
                else
                {
@@ -584,8 +555,7 @@ int S4FUNCTION file4optimizeLow( FILE4 *file, const int optFlagIn, const int fil
       }
       else  /* 0 */
       {
-         // AS May 24/02 - created file4openLow for internal use to indicate file types
-         if ( file->link.n == 0 )   /* not optimized */
+         if ( file->type == OPT4NONE )   /* not optimized */
             return 0 ;
 
          #ifdef E4ANALYZE_ALL
@@ -613,17 +583,10 @@ int S4FUNCTION file4optimizeLow( FILE4 *file, const int optFlagIn, const int fil
             if ( opt4fileFlush( file, 1 ) < 0 )
                return error4( file->codeBase, e4optFlush, E90616 ) ;
             l4remove( &opt->optFiles, file ) ;
-            // AS May 24/02 - created file4openLow for internal use to indicate file types
-//            file->type = OPT4NONE ;
+            file->type = OPT4NONE ;
             file->doBuffer = 0 ;
          }
       }
-
-      // AS 04/20/01 - Enable file optimization if we are here and are optimizing and it is not enabled yet
-      // AS Jul 2/03 - Don't enable if c4->hadOpt == 1, since that means we have called suspend (user called, so wait
-      // til he/she calls code4optStart() again)
-      if ( optFlag == 1 && file->codeBase->hasOpt == 0 && file->codeBase->hadOpt == 0 )
-         code4optStart( file->codeBase ) ;
 
       return rc ;
    #endif
@@ -633,8 +596,7 @@ int S4FUNCTION file4optimizeLow( FILE4 *file, const int optFlagIn, const int fil
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
-// AS Sep 16/04 - Don't support write-optimization of compressed write files...there are sequencing problems
-int S4FUNCTION file4optimizeWrite( FILE4 *file, int optFlag )
+int S4FUNCTION file4optimizeWrite( FILE4 *file, const int optFlag )
 {
    #ifdef S4OPTIMIZE_OFF
       return 0 ;
@@ -650,14 +612,6 @@ int S4FUNCTION file4optimizeWrite( FILE4 *file, int optFlag )
 
       if ( optFlag == file->writeBuffer )
          return rc ;
-
-      // LY Jan 19/05 : added switches to avoid compiler error
-      #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
-         // AS Sep 16/04 - Don't support write-optimization of compressed write files...there are sequencing problems
-         // which need to be solved first.
-         if ( file->compressInfo != 0 )
-            optFlag = 0 ;
-      #endif
 
       switch ( optFlag )
       {

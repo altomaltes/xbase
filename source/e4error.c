@@ -1,30 +1,16 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* e4error.c   (c)Copyright Sequiter Software Inc., 1988-2001. All rights reserved. */
+/* e4error.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
 
-#ifdef S4PALM
-   #include "e4palm.h"
-#endif
+#ifdef __TURBOC__
+   #pragma hdrstop
+#endif  /* __TUROBC__ */
 
 #ifdef S4WINTEL
-   #if !defined(S4WINDOWS) && !defined(S4WINCE)    /* LY 00/07/04 */
+   #ifndef S4WINDOWS
       #include <conio.h>
    #endif  /* not S4WINDOWS */
-#endif   /* S4WINTEL */
+#endif  /* S4WINTEL */
 
 #ifdef S4OS2PM
    #define  E4MSGBOXID 9513
@@ -38,7 +24,7 @@
 #ifdef S4OS2PM
    #ifndef E4ERROR_OFF
       #ifndef E4OFF_STRING
-    extern ERROR4INFO_ARRAY *error4array ;
+         extern ERROR4INFO_ARRAY *error4array ;
       #endif
    #endif
 #endif
@@ -52,21 +38,16 @@ int S4FUNCTION error4file( CODE4 *c4, S4CONST char *name, const int overwrite )
    c4->errorLog = (FILE4 *)u4allocEr( c4, sizeof( FILE4 ) ) ;
    if ( c4->errorLog == 0 )
       return e4memory ;
-   // LY 2003/07/31 #ifdef S4WIN64 /* LY 00/09/20 */
-   //    c4->errorLog->hand = NULL ;
-   // #else
-      c4->errorLog->hand = INVALID4HANDLE ;
-   // #endif
+   c4->errorLog->hand = INVALID4HANDLE ;
 
    oldSafety = c4->safety ;
    if ( overwrite == 0 )
    {
       oldOpenError = c4->errOpen ;
       c4->errOpen = 0 ;
-      // AS May 24/02 - created file4openInternal for internal use to indicate file types
-      rc = file4openInternal( c4->errorLog, c4, name, 1, OPT4NONE ) ;
+      rc = file4open( c4->errorLog, c4, name, 1 ) ;
       c4->errOpen = oldOpenError ;
-      if ( rc != r4noOpen && rc != r4noExist )  /* if open failed, try create */
+      if ( rc != r4noOpen )  /* if open failed, try create */
          return rc ;
       c4->safety = 1 ; /* file shouldn't exist */
    }
@@ -75,20 +56,12 @@ int S4FUNCTION error4file( CODE4 *c4, S4CONST char *name, const int overwrite )
 
    oldCreateError = c4getErrCreate( c4 ) ;
    c4setErrCreate( c4, 0 ) ;
-   // AS May 24/02 - created file4createInternal for internal use to indicate file types
-   rc = file4createInternal( c4->errorLog, c4, name, 1, OPT4NONE ) ;
+   rc = file4create( c4->errorLog, c4, name, 1 ) ;
    c4setErrCreate( c4, oldCreateError ) ;
    c4->safety = oldSafety ;
 
    return rc ;
 }
-
-
-void S4FUNCTION error4callback( CODE4 S4PTR *c4, ERROR_CALLBACK errorCallback )  // CS 2001/03/26 add
-{
-   c4->errorCallback = errorCallback ;
-}
-
 
 static void error4logAppendNewLine( FILE4 *errorLog )
 {
@@ -105,66 +78,48 @@ void error4logAppend( CODE4 *c4, int errCode1, long errCode2, const char *desc1,
    const char *ptr ;
    FILE4 *errorLog ;
    FILE4LONG pos ;
-   char buffer[9];
-   char dateStr[32];
 
    if ( c4->errorLog == 0 )
       return ;
 
-   // LY 2003/07/31 #ifdef S4WIN64 /* LY 00/09/20 */
-   //    if ( c4->errorLog->hand == NULL )
-   // #else
-      if ( c4->errorLog->hand == INVALID4HANDLE )
-   // #endif
+   if ( c4->errorLog->hand == INVALID4HANDLE )
       return ;
 
    /* in case one of the file writes fails, avoid endless error loop */
    errorLog = c4->errorLog ;
    c4->errorLog = 0 ;
 
-   date4today( buffer ) ;
-   date4format( buffer, dateStr, "CCYY/MM/DD  " ) ;
-   date4timeNow( buffer ) ;
-   c4strncat( dateStr, sizeof( dateStr ), buffer, 8 ) ;  // AS Dec 13/05 vs 5.0 fixes
+   memset( num, 0, sizeof( num ) ) ;
+   c4ltoa45( (long)errCode1, num, sizeof( num ) - 1 ) ;
 
    pos = file4lenLow( errorLog ) ;
-   file4writeInternal( errorLog, pos, dateStr, c4strlen( dateStr ) ) ;
+   file4writeInternal( errorLog, pos, num, strlen( num ) ) ;
+
    error4logAppendNewLine( errorLog ) ;
 
-   // AS Oct 5/04 if the errCodes are both 0, don't log it, just log the description - allows flexibility with general logging
-   if ( errCode1 != 0 || errCode2 != 0 )
+   ptr = e4text( errCode1 ) ;
+   if ( ptr != 0 )
    {
-      c4memset( num, 0, sizeof( num ) ) ;
-      c4ltoa45( (long)errCode1, num, sizeof( num ) - 1 ) ;
-
       pos = file4lenLow( errorLog ) ;
-      file4writeInternal( errorLog, pos, num, c4strlen( num ) ) ;
+      file4writeInternal( errorLog, pos, ptr, strlen( ptr ) ) ;
       error4logAppendNewLine( errorLog ) ;
+   }
 
-      ptr = e4text( errCode1 ) ;
+   memset( num, 0, sizeof( num ) ) ;
+   c4ltoa45( error4number2( errCode2 ), num, sizeof( num ) - 1 ) ;
+   pos = file4lenLow( errorLog ) ;
+   file4writeInternal( errorLog, pos, num, strlen( num ) ) ;
+   error4logAppendNewLine( errorLog ) ;
+
+   #ifndef E4OFF_STRING
+      ptr = error4text( c4, errCode2 ) ;
       if ( ptr != 0 )
       {
          pos = file4lenLow( errorLog ) ;
-         file4writeInternal( errorLog, pos, ptr, c4strlen( ptr ) ) ;
+         file4writeInternal( errorLog, pos, ptr, strlen( ptr ) ) ;
          error4logAppendNewLine( errorLog ) ;
       }
-
-      c4memset( num, 0, sizeof( num ) ) ;
-      c4ltoa45( error4number2( errCode2 ), num, sizeof( num ) - 1 ) ;
-      pos = file4lenLow( errorLog ) ;
-      file4writeInternal( errorLog, pos, num, c4strlen( num ) ) ;
-      error4logAppendNewLine( errorLog ) ;
-
-      #ifndef E4OFF_STRING
-         ptr = error4text( c4, errCode2 ) ;
-         if ( ptr != 0 )
-         {
-            pos = file4lenLow( errorLog ) ;
-            file4writeInternal( errorLog, pos, ptr, c4strlen( ptr ) ) ;
-            error4logAppendNewLine( errorLog ) ;
-         }
-      #endif
-   }
+   #endif
 
    #ifdef E4FILE_LINE
       if ( s4fileName != 0 )
@@ -179,99 +134,23 @@ void error4logAppend( CODE4 *c4, int errCode1, long errCode2, const char *desc1,
       }
    #endif
 
-   #ifdef S4SERVER
-      // AS Mar 3/10 ... try to get info about the client
-      char clientInfo[80] ;
-      if ( c4 == 0 )
-         strcpy( clientInfo, "CODE4 is null, no client info is available" ) ;
-      else
-      {
-         if ( c4->currentClient == 0 )
-            strcpy( clientInfo, "CurrentClient is not set, no client info is available" ) ;
-         else
-         {
-            // the tcp address will be set if it ever connected...
-            strcpy( clientInfo, "Client Info: ip address: " ) ;
-            tcp4addressToChar( clientInfo+strlen(clientInfo), c4->currentClient->clientTcpAddress ) ;
-         }
-      }
-      pos = file4lenLow( errorLog ) ;
-      file4writeInternal( errorLog, pos, clientInfo, strlen( clientInfo ) ) ;
-      error4logAppendNewLine( errorLog ) ;
-
-      // AS Mar 15/10 ... and info about memory allocation
-      sprintf( clientInfo, "Memory: total allocated: %ld, num allocations %ld", u4allocated(), u4numAllocated() ) ;
-      pos = file4lenLow( errorLog ) ;
-      file4writeInternal( errorLog, pos, clientInfo, strlen( clientInfo ) ) ;
-      error4logAppendNewLine( errorLog ) ;
-   #endif
-
-   #ifdef EXCEPTION4REINDEX
-      char exceptionString[] = "Exception error contained invalid paramater (probably memory corruption)" ;
-   #endif
-
    if ( desc1 != 0 )
    {
-      #ifdef EXCEPTION4REINDEX
-      // paramaters may be bad here, only use if ok...
-      try
-      {
-      #endif
-         slen = c4strlen( desc1 ) ;
-      #ifdef EXCEPTION4REINDEX
-      }
-      catch( ... )
-      {
-         // default to another error
-         desc1 = exceptionString ;
-         slen = strlen( desc1 ) ;
-      }
-      #endif
-
+      slen = strlen( desc1 ) ;
       pos = file4lenLow( errorLog ) ;
       file4writeInternal( errorLog, pos, desc1, slen ) ;
       error4logAppendNewLine( errorLog ) ;
    }
-
    if ( desc2 != 0 )
    {
-      #ifdef EXCEPTION4REINDEX
-         // paramaters may be bad here, only use if ok...
-         try
-         {
-         #endif
-          slen = c4strlen( desc2 ) ;
-         #ifdef EXCEPTION4REINDEX
-         }
-         catch( ... )
-         {
-          // default to another error
-          desc2 = exceptionString ;
-          slen = strlen( desc2 ) ;
-         }
-      #endif
+      slen = strlen( desc2 ) ;
       pos = file4lenLow( errorLog ) ;
       file4writeInternal( errorLog, pos, desc2, slen ) ;
       error4logAppendNewLine( errorLog ) ;
    }
-
    if ( desc3 != 0 )
    {
-      #ifdef EXCEPTION4REINDEX
-         // paramaters may be bad here, only use if ok...
-         try
-         {
-         #endif
-          slen = c4strlen( desc3 ) ;
-         #ifdef EXCEPTION4REINDEX
-         }
-         catch( ... )
-         {
-          // default to another error
-          desc3 = exceptionString ;
-          slen = strlen( desc3 ) ;
-         }
-      #endif
+      slen = strlen( desc3 ) ;
       pos = file4lenLow( errorLog ) ;
       file4writeInternal( errorLog, pos, desc3, slen ) ;
       error4logAppendNewLine( errorLog ) ;
@@ -282,97 +161,493 @@ void error4logAppend( CODE4 *c4, int errCode1, long errCode2, const char *desc1,
    c4->errorLog = errorLog ;
 }
 
-#if !defined(S4SERVER) && defined(S4CONSOLE) && defined(E4PAUSE)
-   static void error4pause( void )
-   {
-      #ifndef S4WINTEL
-         getchar() ;
-      #else
-         getch() ;
-      #endif
-   }
+#ifndef S4SERVER
+#ifdef S4CONSOLE
+#ifdef E4PAUSE
+static void error4pause( void )
+{
+   #ifndef S4WINTEL
+      getchar() ;
+   #else
+      getch() ;
+   #endif
+}
+#endif
+#endif
 #endif
 
 #ifdef S4WINDOWS
    #ifdef __TURBOC__
-      #if __TURBOC__ == 0x297   /* if Borland C++ 2.0 */
-    #ifdef __cplusplus
-       extern "C"{ void FAR PASCAL FatalAppExit(WORD,LPSTR) ; }
-    #else
-       void FAR PASCAL FatalAppExit(WORD,LPSTR) ;
-    #endif  /* __cplusplus */
+      #if __TURBOC__ == 0x297     /* if Borland C++ 2.0 */
+         #ifdef __cplusplus
+            extern "C"{ void FAR PASCAL FatalAppExit(WORD,LPSTR) ; }
+         #else
+            void FAR PASCAL FatalAppExit(WORD,LPSTR) ;
+         #endif  /* __cplusplus */
       #endif  /* __TUROBC__ == 0x297 */
    #endif  /* __TUROBC__ */
 
    #ifndef __SC__
    #ifdef __ZTC__
       #ifdef __cplusplus
-    extern "C"{ void FAR PASCAL FatalAppExit(unsigned short,LPSTR) ; }
+         extern "C"{ void FAR PASCAL FatalAppExit(unsigned short,LPSTR) ; }
       #else
-    void FAR PASCAL FatalAppExit(unsigned short,LPSTR) ;
+         void FAR PASCAL FatalAppExit(unsigned short,LPSTR) ;
       #endif  /* __cplusplus */
    #endif  /* __ZTC__ */
    #endif  /* __SC__ */
 
    #ifdef _MSC_VER
       #if _MSC_VER == 600
-    #ifdef __cplusplus
-       extern "C"{ void FAR PASCAL FatalAppExit(WORD,LPSTR) ; }
-    #else
-       void FAR PASCAL FatalAppExit(WORD,LPSTR) ;
-    #endif  /* __cplusplus */
+         #ifdef __cplusplus
+            extern "C"{ void FAR PASCAL FatalAppExit(WORD,LPSTR) ; }
+         #else
+            void FAR PASCAL FatalAppExit(WORD,LPSTR) ;
+         #endif  /* __cplusplus */
       #endif  /* _MSC_VER == 600 */
    #endif  /* _MSC_VER */
-#endif   /* S4WINDOWS */
+#endif  /* S4WINDOWS */
 
-extern S4CONST char *bad4data ;
+#ifndef E4ERROR_OFF
+S4CONST char *bad4data = "Invalid or Unknown Error Code" ;
 
-// moved from inline to code in server case to avoid possible exception error
-#if defined (S4SERVER) || !defined( S4INLINE )
-   int S4FUNCTION error4code( CODE4 *c4 )
-   {
-      #ifdef S4SERVER
-         if ( c4 == 0 )
-            return -1 ;
+#ifndef S4LANGUAGE
+ERROR4DATA e4errorData[] =
+{
+   /* General Disk Access Errors */
+   { e4close,          "Closing File" },
+   { e4create,         "Creating File" },
+   { e4len,            "Determining File Length" },
+   { e4lenSet,         "Setting File Length" },
+   { e4lock,           "Locking File" },
+   { e4open,           "Opening File" },
+   { e4permiss,        "Permission Error Opening File" },
+   { e4access,         "Access Error Opening File" },
+   { e4numFiles,       "File Handle Count Overflow Error Opening File" },
+   { e4fileFind,       "File Find Error Opening File" },
+   { e4instance,       "Duplicate Instance Found Error Opening File" },
+   { e4read,           "Reading File" },
+   { e4remove,         "Removing File" },
+   { e4rename,         "Renaming File" },
+   { e4seek,           "Seeking to File Position" },
+   { e4unlock,         "Unlocking File" },
+   { e4write,          "Writing to File" },
 
-         SERVER4CLIENT *curClient = c4->currentClient ;
-         if ( curClient == 0 || c4accessMutexCountZero( c4 ) )
-            return c4->errorCodeDefault ;
-         else
-            return curClient->errorCode ;
-      #else
-         #ifdef E4PARM_LOW
-            if ( c4 == 0 )
-               return error4( 0, e4parm_null, E96601 ) ;
-         #endif
-         return c4->errorCode ;
-      #endif
-   }
+   /* Database Specific Errors */
+   { e4data,          "File is not a Data File" },
+   { e4fieldName,     "Unrecognized Field Name" },
+   { e4fieldType,     "Unrecognized Field Type" },
+   { e4recordLen,     "Record Length is too Large" },
+   { e4append,        "Record Append Attempt Past End of File" },
+   { e4seek,          "Attempt to perform a d4seekDouble() on non-numeric tag" },
+
+   /* Index File Specific Errors */
+   { e4entry,          "Tag Entry Missing" },
+   { e4index,          "Not a Correct Index File" },
+   { e4tagName,        "Tag Name not Found" },
+   { e4unique,         "Unique Key Error" },
+   { e4tagInfo,        "Tag Information Invalid" },
+   { e4candidate,      "Candidate Key Error" },
+
+   /* Expression Evaluation Errors */
+   { e4commaExpected, "Comma or Bracket Expected" },
+   { e4complete,      "Expression not Complete" },
+   { e4dataName,      "Data File Name not Located" },
+   { e4lengthErr,     "IIF() Needs Parameters of Same Length" },
+   { e4notConstant,   "SUBSTR() and STR() need Constant Parameters" },
+   { e4numParms,      "Number of Parameters is Wrong" },
+   { e4overflow,      "Overflow while Evaluating Expression" },
+   { e4rightMissing,  "Right Bracket Missing" },
+   { e4typeSub,       "Sub-expression Type is Wrong" },
+   { e4unrecFunction, "Unrecognized Function" },
+   { e4unrecOperator, "Unrecognized Operator" },
+   { e4unrecValue,    "Unrecognized Value"} ,
+   { e4unterminated,  "Unterminated String"} ,
+   { e4tagExpr,       "Expression Invalid for Tag"} ,
+
+   /* Optimization Errors */
+   { e4opt,            "Optimization Error"} ,
+   { e4optSuspend,     "Optimization Removal Failure"} ,
+   { e4optFlush,      "Optimization File Flushing Failure"} ,
+
+   /* Relation Errors */
+   { e4lookupErr,      "Matching Slave Record Not Located"} ,
+   { e4relate,         "Relation Error"} ,
+   { e4relateRefer,    "Relation Referred to Does Not Exist or is Not Initialized"} ,
+
+   /* Report Errors */
+   { e4report,         "Report Error"} ,
+   { e4styleCreate,   "Error Creating Style"},
+   { e4styleSelect,   "Error Selecting Style"},
+   { e4styleIndex,    "Error Finding Style"},
+   { e4areaCreate,    "Error Creating Area"},
+   { e4groupCreate,   "Error Creating Group"},
+   { e4groupExpr,     "Error Setting Group Reset-Expression"},
+   { e4totalCreate,   "Error Creating Total"},
+   { e4objCreate,     "Error Creating Object"},
+   { e4repWin,        "Error In Windows Output"},
+   { e4repOut,        "Error In Report Output"},
+   { e4repSave,       "Error Saving Report"},
+   { e4repRet,        "Error Retrieving Report"},
+   { e4repData,       "Error In Sending Report to Data File"},
+
+   /* Critical Errors */
+   { e4info,           "Unexpected Information"} ,
+   { e4memory,         "Out of Memory"} ,
+   { e4parm,           "Unexpected Parameter"} ,
+   { e4parm_null,      "Null Input Parameter unexpected"} ,
+   { e4demo,           "Exceeded Maximum Record Number for Demonstration"} ,
+   { e4result,         "Unexpected Result"} ,
+   { e4verify,         "Structure Verification Failure"} ,
+   { e4struct,         "Data Structure Corrupt or not Initialized" },
+
+   /* Not Supported Errors */
+   { e4notIndex,       "Function unsupported: library compiled with S4OFF_INDEX" },
+   { e4notMemo,        "Function unsupported: library compiled with S4OFF_MEMO" },
+   { e4notRename,      "Function unsupported: library compiled with S4NO_RENAME" },
+   { e4notWrite,       "Function unsupported: library compiled with S4OFF_WRITE" },
+   { e4notClipper,     "Function unsupported: library not compiled with S4CLIPPER" },
+   { e4notLock,        "Function unsupported: library not compiled with S4LOCK_HOOK" },
+/*   { e4notHook,        "Function unsupported: library not compiled with E4HOOK" }, */
+   { e4notSupported,   "Function unsupported" },
+   { e4version,        "Application/Library version mismatch" },
+
+   /* MEMO errors */
+   { e4memoCorrupt,    "Memo File Corrupt" },
+   { e4memoCreate,     "Error Creating Memo File" },
+
+   /* transaction errors */
+   { e4transViolation, "Transaction Violation Error" },
+   { e4trans,          "Transaction Error" },
+   { e4rollback,       "Transaction Rollback Failure" },
+   { e4commit,         "Transaction Commit Failure" },
+   { e4transAppend,    "Error Appending Information to Log File" },
+   { e4transStatus,    "Transaction state confliction" },  /* eg. attempt to commit when no active transaction */
+
+   /* communications errors */
+   { e4corrupt,        "Communication Information Corrupt" },
+   { e4connection,     "Connection Failure" },
+   { e4socket,         "Socket Failure" },
+   { e4net,            "Network Failure" },
+   { e4loadlib,        "Failure Loading Communication DLL" },
+   { e4timeOut,        "Network Timed Out" },
+   { e4message,        "Communication Message Corrupt" },
+   { e4packetLen,      "Communication Packet Length Mismatch" },
+   { e4packet,         "Communication Packet Corrupt" },
+   { e4connect,        "system-level communication failure" },
+
+   /* miscellaneous errors */
+   { e4max,            "CodeBase Capabilities Exceeded (system maxed out)" },
+   { e4codeBase,       "CodeBase in an Unacknowledged Error State" },
+   { e4name,           "Name not Found error" },
+   { e4authorize,      "Authorization Error (access denied)" },
+   { e4invalidUserId,  "Invalid User ID Authorization Error (access denied)" },
+   { e4invalidPassword, "Invalid Password Authorization Error (access denied)" },
+   { e4invalidTcpAddress, "Invalid TCP Address access Authorization Error (access denied)" },
+   { e4connectDenied,  "Server is not accepting any new connections at this time - contact System Administrator for details" },
+   { e4invalidLicence, "LICENCE NOTICE: " },
+
+   /* all server-specific error >2100, not only e4server returned to client */
+   { e4server,         "Server Failure" },
+   { e4config,         "Server Configuration Failure" },
+/*   { e4cat,            "Catalog Failure" },  -- not used currently */
+
+   { 0, 0 },
+} ;
+
+#endif  /* not S4LANGUAGE */
+
+#ifdef S4LANGUAGE
+#ifdef S4GERMAN
+
+S4CONST char *bad4data = "Invalid or Unknown Error Code" ;
+
+ERROR4DATA e4errorData[] =
+{
+   /* Allgemeine Fehler beim Diskzugriff  (General Disk Access Errors) */
+   { e4create,         "Anlegen einer Datei" },
+   { e4open,           "™ffnen einer Datei" },
+   { e4read,           "Lesen einer Datei" },
+   { e4seek,           "Suchen einer Position in der Datei " },
+   { e4write,          "Schreiben einer Datei" },
+   { e4close,          "Schlieáen einer Datei" },
+   { e4remove,         "L”schen einer Datei" },
+   { e4lock,           "Locken einer Datei" },
+   { e4unlock,         "Freigeben einer Datei" },
+   { e4len,            "Festlegen der L„nge einer Datei" },
+   { e4lenSet,        "Einstellen der L„nge einer Datei" },
+   { e4rename,         "Umnennen einer Datei" },
+
+   /* Datenbank spezifische Fehler (Database Specific Errors) */
+   { e4data,           "Datei is keiner DatenBank" },
+   { e4recordLen,     "Datensatzl„nge zu groá" },
+   { e4fieldName,     "Unbekannter Feldname" },
+   { e4fieldType,     "Feldtyp" },
+
+   /* Indexdatei spezifische Fehler  (Index File Specific Errors) */
+   { e4index,          "Datei is keine Indexdatei" },
+   { e4entry,          "Indexdatei is veraltet" },
+   { e4unique,         "Schulsel ist schon einmal vorhanden" },
+   { e4tagName,       "Name des 'Tag'"},
+
+   /* Fehler bei der Bewertung von Ausdrcken   (Expressions Evaluation Errors) */
+   { e4commaExpected, "\",\" oder \")\" erwartet" },
+   { e4complete,       "Ausdruck ist nich vollst„ndig" },
+   { e4dataName,      "Keine offene Datenbank" },
+   { e4numParms,      "Ungltige Anzahl von Parametern im Ausdruck"},
+   { e4overflow,       "šberlauf bei der Auswertung eines Ausdrucks" },
+   { e4rightMissing,  "Rechte Klammer im Ausdruck fehlt" },
+   { e4unrecFunction, "Unbekannte Funktion im Ausdruck" },
+   { e4unrecOperator, "Unbekannter Operator im Ausdruck" },
+   { e4unrecValue,    "Unbekannter Wert im Ausdruck"} ,
+   { e4unterminated,   "Nicht abgeschlossene Zeichenkette im Ausdruck"} ,
+
+   /* Optimization Errors */
+   { e4opt,            "Optimization Error"} ,   /*!!!GERMAN*/
+   { e4optSuspend,     "Optimization Removal Failure"} ,      /*!!!GERMAN*/
+   { e4optFlush,      "Optimization File Flushing Failure"} , /*!!!GERMAN*/
+
+   /* Relation Errors */
+   { e4lookupErr,     "Matching Slave Record Not Located"} ,
+
+   /* Kritische Fehler  (Critical Errors) */
+   { e4memory,         "Kein Speicher mehr verfgbar"} ,
+   { e4info,           "Unerwartete Information" },
+   { e4parm,           "Unerwarteter Parameter"},
+   { e4parm_null,      "Null Input Parameter unexpected"} ,
+   { e4demo,           "Exceeded Maximum Record Number for Demonstration"} , /*!!!GERMAN*/
+   { e4result,         "Unerwartetes Ergebnis"},
+   { 0, 0 },
+} ;
+
+#endif  /* S4GERMAN  */
+
+#ifdef S4FRENCH
+
+ERROR4DATA e4errorData[] =
+{
+   /* General Disk Access Errors */
+   { e4create,         "En cr‚ant le fichier" },
+   { e4open,           "En engageant le fichier" },
+   { e4read,           "En lisant le fichier" },
+   { e4seek,           "En se pla‡ant dans le fichier" },
+   { e4write,          "En ‚crivant dans le fichier" },
+   { e4close,          "En lib‚rant le fichier" },
+   { e4remove,         "En effa‡ant le fichier" },
+   { e4lock,           "En bloquant le fichier" },
+   { e4unlock,         "En d‚bloquant le fichier" },
+   { e4len,            "En d‚terminant la longueur du fichier" },
+   { e4lenSet,        "Mise … jour de la longueur du fichier" },
+   { e4rename,         "D‚nomination du fichier" },
+
+   /* Database Specific Errors */
+   { e4data,           "Le fichier n'est pas une base de donn‚es:" },
+   { e4recordLen,     "La fiche est trop grande" },
+   { e4fieldName,     "Champ inconnu" },
+   { e4fieldType,     "Type de champ inconnu" },
+
+   /* Index File Specific Errors */
+   { e4index,          "Ce n'est pas un fichier d'indice" },
+   { e4entry,          "Le fichier d'indice n'est pas … jour" },
+   { e4unique,         "La clef n'est pas unique" },
+   { e4tagName,       "L'article d‚sign‚ par l'indice n'existe pas" },
+
+   /* Expression Evaluation Errors */
+   { e4commaExpected, "\",\" ou \")\" manquant dans l'expression" },
+   { e4complete,       "Expression incomplŠte" },
+   { e4dataName,      "La base r‚f‚r‚e dans l'expression n'est pas pr‚sente" },
+   { e4numParms,      "Nombre ill‚gal de critŠres dans l'expression"},
+   { e4overflow,       "L'expression donne un r‚sultat trop grand" },
+   { e4rightMissing,  "ParenthŠse manquante dans l'expression" },
+   { e4typeSub,       "Un paramŠtre est de la mauvaise sorte" },
+   { e4unrecFunction, "L'expression contient une fonction inconnue" },
+   { e4unrecOperator, "L'expression contient un op‚rateur inconnu" },
+   { e4unrecValue,    "L'expression contient une valeur inconnue"} ,
+   { e4unterminated,   "Apostrophe manquante dans l'expression"} ,
+
+   /* Optimization Errors */
+   { e4opt,            "Optimization Error"} ,
+   { e4optSuspend,     "Optimization Removal Failure"} ,
+   { e4optFlush,      "Optimization File Flushing Failure"} ,
+
+   /* Relation Errors */
+   { e4lookupErr,     "Matching Slave Record Not Located"} ,
+
+   /* Critical Errors */
+   { e4memory,         "Plus de m‚moire disponible" } ,
+   { e4info,           "Information inexpect‚e"} ,
+   { e4parm,           "ParamŠtre inexpect‚"} ,
+   { e4parm_null,      "Null Input Parameter unexpected"} ,
+   { e4demo,           "Au maximum d'articles dans la version de d‚monstration" } ,
+   { e4result,         "R‚sultat inexpect‚"} ,
+   { 0, 0 },
+} ;
+
+#endif  /* S4FRENCH */
+
+#ifdef S4SCANDINAVIAN
+
+ERROR4DATA e4errorData[] =
+{
+   /* General Disk Access Errors */
+   { e4create,         "Creating File" },
+   { e4open,           "Opening File" },
+   { e4read,           "Reading File" },
+   { e4seek,           "Seeking to File Position" },
+   { e4write,          "Writing to File" },
+   { e4close,          "Closing File" },
+   { e4remove,         "Removing File" },
+   { e4lock,           "Locking File" },
+   { e4unlock,         "Unlocking File" },
+   { e4len,            "Determining File Length" },
+   { e4lenSet,        "Setting File Length" },
+   { e4rename,         "Renaming File" },
+
+   /* Database Specific Errors */
+   { e4data,           "File is not a Data File" },
+   { e4recordLen,     "Record Length is too Large" },
+   { e4fieldName,     "Unrecognized Field Name" },
+   { e4fieldType,     "Unrecognized Field Type" },
+
+   /* Index File Specific Errors */
+   { e4index,          "Not a Correct Index File" },
+   { e4entry,          "Tag Entry Missing" },
+   { e4unique,         "Unique Key Error" },
+   { e4tagName,       "Tag Name not Found" },
+
+   /* Expression Evaluation Errors */
+   { e4commaExpected, "Comma or Bracket Expected" },
+   { e4complete,       "Expression not Complete" },
+   { e4dataName,      "Data File Name not Located" },
+   { e4lengthErr,     "IIF() Needs Parameters of Same Length" },
+   { e4notConstant,   "SUBSTR() and STR() need Constant Parameters" },
+   { e4numParms,      "Number of Parameters is Wrong" },
+   { e4overflow,       "Overflow while Evaluating Expression" },
+   { e4rightMissing,  "Right Bracket Missing" },
+   { e4typeSub,       "Sub-expression Type is Wrong" },
+   { e4unrecFunction, "Unrecognized Function" },
+   { e4unrecOperator, "Unrecognized Operator" },
+   { e4unrecValue,    "Unrecognized Value"} ,
+   { e4unterminated,   "Unterminated String"} ,
+
+   /* Optimization Errors */
+   { e4opt,            "Optimization Error"} ,
+   { e4optSuspend,     "Optimization Removal Failure"} ,
+   { e4optFlush,      "Optimization File Flushing Failure"} ,
+
+   /* Relation Errors */
+   { e4relate,         "Relation Error"} ,
+   { e4lookupErr,     "Matching Slave Record Not Located"} ,
+
+   /* Report Errors */
+   { e4report,         "Report Error"} ,
+
+   /* Critical Errors */
+   { e4memory,         "Out of Memory"} ,
+   { e4info,           "Unexpected Information"} ,
+   { e4parm,           "Unexpected Parameter"} ,
+   { e4parm_null,      "Null Input Parameter unexpected"} ,
+   { e4demo,           "Exceeded Maximum Record Number for Demonstration"} ,
+   { e4result,         "Unexpected Result"} ,
+   { 0, 0 },
+} ;
+#endif  /* S4SCANDINAVIAN */
+#ifdef S4SWEDISH
+ERROR4DATA e4errorData[] =
+{
+   /* General Disk Access Errors */
+   { e4create,         "Creating File" },
+   { e4open,           "Opening File" },
+   { e4read,           "Reading File" },
+   { e4seek,           "Seeking to File Position" },
+   { e4write,          "Writing to File" },
+   { e4close,          "Closing File" },
+   { e4remove,         "Removing File" },
+   { e4lock,           "Locking File" },
+   { e4unlock,         "Unlocking File" },
+   { e4len,            "Determining File Length" },
+   { e4lenSet,        "Setting File Length" },
+   { e4rename,         "Renaming File" },
+
+   /* Database Specific Errors */
+   { e4data,           "File is not a Data File" },
+   { e4recordLen,     "Record Length is too Large" },
+   { e4fieldName,     "Unrecognized Field Name" },
+   { e4fieldType,     "Unrecognized Field Type" },
+
+   /* Index File Specific Errors */
+   { e4index,          "Not a Correct Index File" },
+   { e4entry,          "Tag Entry Missing" },
+   { e4unique,         "Unique Key Error" },
+   { e4tagName,       "Tag Name not Found" },
+
+   /* Expression Evaluation Errors */
+   { e4commaExpected, "Comma or Bracket Expected" },
+   { e4complete,       "Expression not Complete" },
+   { e4dataName,      "Data File Name not Located" },
+   { e4lengthErr,     "IIF() Needs Parameters of Same Length" },
+   { e4notConstant,   "SUBSTR() and STR() need Constant Parameters" },
+   { e4numParms,      "Number of Parameters is Wrong" },
+   { e4overflow,       "Overflow while Evaluating Expression" },
+   { e4rightMissing,  "Right Bracket Missing" },
+   { e4typeSub,       "Sub-expression Type is Wrong" },
+   { e4unrecFunction, "Unrecognized Function" },
+   { e4unrecOperator, "Unrecognized Operator" },
+   { e4unrecValue,    "Unrecognized Value"} ,
+   { e4unterminated,   "Unterminated String"} ,
+
+   /* Optimization Errors */
+   { e4opt,            "Optimization Error"} ,
+   { e4optSuspend,     "Optimization Removal Failure"} ,
+   { e4optFlush,      "Optimization File Flushing Failure"} ,
+
+   /* Relation Errors */
+   { e4relate,         "Relation Error"} ,
+   { e4lookupErr,     "Matching Slave Record Not Located"} ,
+
+   /* Report Errors */
+   { e4report,         "Report Error"} ,
+
+   /* Critical Errors */
+   { e4memory,         "Out of Memory"} ,
+   { e4info,           "Unexpected Information"} ,
+   { e4parm,           "Unexpected Parameter"} ,
+   { e4parm_null,      "Null Input Parameter unexpected"} ,
+   { e4demo,           "Exceeded Maximum Record Number for Demonstration"} ,
+   { e4result,         "Unexpected Result"} ,
+   { 0, 0 },
+} ;
 #endif
+#endif  /* S4LANGUAGE */
+#else
+   S4CONST char *bad4data = "Invalid or Unknown Error Code" ;
+#endif  /* S4ERROR_OFF */
 
-#ifdef S4SERVER
-   long error4code2( CODE4 *c4 )
-   {
+#ifndef S4INLINE
+int S4FUNCTION error4code( CODE4 *c4 )
+{
+   #ifdef E4PARM_LOW
       if ( c4 == 0 )
-         return -1 ;
-
-      SERVER4CLIENT *curClient = c4->currentClient ;
-      if ( curClient == 0 || c4accessMutexCountZero( c4 ) )
-         return c4->errorCode2Default ;
-      else
-         return curClient->errorCode2 ;
-   }
+         return error4( 0, e4parm_null, E96602 ) ;
+   #endif
+   #ifdef S4SERVER
+      return c4->currentClient->errorCode ;
+   #else
+      return c4->errorCode ;
+   #endif
+}
 #endif
-
 
 int S4FUNCTION error4set( CODE4 *c4, const int newErrCode )
 {
+   int oldErrCode ;
+
    #ifdef E4PARM_LOW
       if ( c4 == 0 )
          return error4( 0, e4parm_null, E96601 ) ;
    #endif
 
-   int oldErrCode = error4code( c4 ) ;
+   oldErrCode = error4code( c4 ) ;
    #ifdef S4SERVER
       if ( c4->currentClient != 0 )
          c4->currentClient->errorCode = newErrCode ;
@@ -382,9 +657,9 @@ int S4FUNCTION error4set( CODE4 *c4, const int newErrCode )
    return oldErrCode ;
 }
 
-long S4FUNCTION error4set2( CODE4 *c4, const long newErrCode2 )
+int S4FUNCTION error4set2( CODE4 *c4, const long newErrCode2 )
 {
-   long oldErrCode2 ;
+   int oldErrCode2 ;
 
    #ifdef E4PARM_LOW
       if ( c4 == 0 )
@@ -401,14 +676,31 @@ long S4FUNCTION error4set2( CODE4 *c4, const long newErrCode2 )
    return oldErrCode2 ;
 }
 
+#ifdef S4CB51
+S4CONST char *S4FUNCTION e4text( const int errCode )
+#else
+S4CONST char *e4text( const int errCode )
+#endif
+{
+   #ifndef E4ERROR_OFF
+      int i ;
+
+      for ( i = 0 ; (int)e4errorData[i].errorNum != 0 ; i++ )
+         if ( e4errorData[i].errorNum == errCode )
+            return e4errorData[i].errorData ;
+   #endif
+
+   return bad4data ;   /* errCode not matched */
+}
 
 #ifdef S4OS2PM
-S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, const char *desc1, const char *desc2, const char *desc3 )
+
+void error4out( CODE4 *c4, int errCode1, long errCode2, const char *desc1, const char *desc2, const char *desc3 )
 {
    int pos = 0 , descNumber = 1 ;
    const char *ptr, *errPtr ;
-   HAB   e4hab ;
-   HMQ   e4hmq ;
+   HAB  e4hab ;
+   HMQ  e4hmq ;
    char errorStr[100] ;
    #ifndef E4ERROR_OFF
       #ifndef E4OFF_STRING
@@ -424,39 +716,21 @@ S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, cons
          if ( c4->errOff )
             return ;
 
-      #ifdef S4ODBC_BUILD
-         #ifdef E4ANALYZE
-            // if we get to the point of outputting an error, we have a serious flaw.  catch this...
-            iMsg = MessageBox( GetActiveWindow(), szBuf, "Assertion Error", MB_YESNOCANCEL | MB_DEFBUTTON2 | MB_ICONSTOP | MB_TASKMODAL ) ;
-            if (IDYES == iMsg)
-            {
-               /* force an exception to invoke the debugger */
-               int i = 0 ;
-               i = 1 / i ;   // manually through debugger change i to 1 to continue...
-            }
-            else if ( IDCANCEL == iMsg )
-            {
-               DebugBreak() ;
-            }
-         #endif
-      #endif
-
       if (errCode1 != 0)
       {
-         c4strcpy( errorStr, sizeof( errorStr ), E4_ERROR ) ; // AS Dec 13/05 vs 5.0 fixes
-         c4strcat( errorStr, sizeof( errorStr ), " #: " ) ;
-         pos = strlen( errorStr ) ;
-         c4ltoa45( (long)errCode1, (char *)errorStr + pos, 5 ) ;
-         pos += 5 ;
+         strcpy( errorStr, E4_ERROR ) ;
+         strcat( errorStr, " #: " ) ;
+         c4ltoa45( errCode1, (char *)errorStr+9, 5 ) ;
+         pos = 13 ;
 
          errorStr[pos++] = '\r' ;
          errorStr[pos++] = '\n' ;
 
-         c4strcpy( errorStr + pos, sizeof( errorStr ) - pos, E4_ERROR ) ;
-         c4strcat( errorStr + pos, sizeof( errorStr ) - pos, " #: " ) ;
-         pos = strlen( errorStr ) ;
-         c4ltoa45( error4number2( errCode2 ), (char *)errorStr + pos, 6 ) ;
-         pos += 6 ;
+         strcpy( errorStr + pos, E4_ERROR ) ;
+         strcat( errorStr + pos, " #: " ) ;
+         errorStr[strlen(errorStr)] = ' ' ;
+         c4ltoa45( error4number2( errCode2 ), (char *)errorStr + pos + 9, 6 ) ;
+         pos += 16 ;
 
          errorStr[pos++] = '\r' ;
          errorStr[pos++] = '\n' ;
@@ -464,7 +738,7 @@ S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, cons
          errPtr = e4text( errCode1 ) ;
          if ( errPtr != 0 )
          {
-            c4strcpy( errorStr + pos, sizeof( errorStr ) - pos, errPtr ) ;
+            strcpy( errorStr+pos, errPtr ) ;
             pos += strlen( errPtr ) ;
             errorStr[pos++] = '\r\n' ;
          }
@@ -474,7 +748,7 @@ S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, cons
          tPtr = error4text( c4, errCode2 ) ;
          if ( tPtr != 0 )
          {
-            c4strcpy( errorStr + pos, sizeof( errorStr ) - pos, tPtr ) ;
+            strcpy( errorStr + pos, tPtr ) ;
             pos += strlen( tPtr ) ;
             errorStr[pos++] = '\r' ;
             errorStr[pos++] = '\n' ;
@@ -484,10 +758,9 @@ S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, cons
       ptr = desc1 ;
       while ( (ptr != (char *) 0) && (descNumber <= 3 ) )
       {
-         // AS 03/23/00 this was incorrect, sometimes not stopping when should be
-         if ( strlen(ptr)+pos+3 >= sizeof(errorStr) )
+         if ( strlen(desc1)+pos+3 >= sizeof(errorStr) )
             break ;
-         c4strcpy( errorStr + pos, sizeof( errorStr ) - pos, ptr ) ;
+         strcpy( errorStr + pos, ptr ) ;
          pos += strlen(ptr) ;
          errorStr[pos++] = '\r' ;
          errorStr[pos++] = '\n' ;
@@ -501,7 +774,7 @@ S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, cons
          if ( code4fileName() != 0 )
             if ( strlen( code4fileName() )+pos+8 < sizeof(errorStr) )
             {
-               c4strcpy( errorStr + pos, sizeof( errorStr ) - pos, code4fileName() ) ;
+               strcpy( errorStr + pos, code4fileName() ) ;
                pos += strlen( code4fileName() ) ;
                errorStr[pos++] = ' ' ;
                c4ltoa45( code4lineNo(), (char *)errorStr+pos, 6 ) ;
@@ -514,7 +787,7 @@ S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, cons
       errorStr[pos] = 0 ;
 
       /* In case the application has done no PM Initialization, set up an
-    instance to allow for the error output to occur */
+         instance to allow for the error output to occur */
 
       e4hab = WinInitialize(0) ;
       if ( e4hab == NULLHANDLE )
@@ -534,218 +807,167 @@ S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, cons
       WinTerminate(e4hab) ;
    #endif  /* E4ERROR_OFF */
 }
-#endif   /* S4OS2PM */
 
-#if defined(S4WINDOWS)
-   S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, const char *desc1, const char *desc2, const char *desc3 )
-   {
-      #ifndef E4ERROR_OFF
-         char errorStr[257] ;
-         LPTSTR pErrStr;
-         const char *ptr, *errPtr ;
-         #ifdef UNICODE  // CS 2002/07/01
-            WCHAR errUStr[257] ;
-         #endif
-      #endif
-      int pos=0,  descNumber = 1 ;
-      #ifdef S4TESTING
-         #ifdef S4SERVER
-            WORD wType ;
-         #endif
-      #else
-         #if !defined(S4WINCE) && !defined(S4PALM) && !defined(E4ERROR_OFF)
-            WORD wType ;
-         #endif
-      #endif
-      #ifndef E4ERROR_OFF
-         #ifndef E4OFF_STRING
-            const char *tPtr ;
-         #endif
-      #endif
+#endif  /* S4OS2PM */
 
-      #ifndef E4ERROR_OFF
-         #ifdef UNICODE
-            pErrStr = errUStr;
-         #else
-            pErrStr = errorStr;
-         #endif
-      #endif
+#ifdef S4WINDOWS
 
+/* S4WINDOWS */
+void error4out( CODE4 *c4, int errCode1, long errCode2, const char *desc1, const char *desc2, const char *desc3 )
+{
+   #ifndef E4ERROR_OFF
+      char errorStr[257] ;
+      const char *ptr, *errPtr ;
+      #ifdef S4WINCE
+         unsigned short errUStr[257] ;
+      #endif
+   #endif
+   int pos=0,  descNumber = 1 ;
+   #ifdef S4TESTING
+      #ifdef S4SERVER
+         WORD wType ;
+      #endif
+   #else
+      #ifndef S4WINCE
+         WORD wType ;
+      #endif
+   #endif
+   #ifndef E4ERROR_OFF
+      #ifndef E4OFF_STRING
+         const char *tPtr ;
+      #endif
+   #endif
+
+   if ( c4 != 0 )
+      error4set( c4, errCode1 ) ;
+
+   #ifndef E4ERROR_OFF
       if ( c4 != 0 )
-         error4set( c4, errCode1 ) ;
+         if ( c4->errOff )
+            return ;
 
-      #ifndef E4ERROR_OFF
-         if ( c4 != 0 )
-            if ( c4->errOff )
-               return ;
+      if (errCode1 != 0)
+      {
+         memset( errorStr, ' ', sizeof( errorStr ) - 1 ) ;
 
-         if (errCode1 != 0)
+         strcpy( errorStr, E4_ERROR ) ;
+         strcat( errorStr, " #: " ) ;
+         c4ltoa45( (long)errCode1, (char *)errorStr+9, 5 ) ;
+         pos = 31 ;
+
+         errorStr[pos++] = '\r' ;
+         errorStr[pos++] = '\n' ;
+
+         strcpy( errorStr + pos, E4_ERROR ) ;
+         strcat( errorStr + pos, " #: " ) ;
+         errorStr[strlen(errorStr)] = ' ' ;
+         c4ltoa45( error4number2( errCode2 ), (char *)errorStr + pos + 9, 6 ) ;
+         pos += 16 ;
+
+         errorStr[pos++] = '\r' ;
+         errorStr[pos++] = '\n' ;
+
+         errPtr = e4text( errCode1 ) ;
+         if ( errPtr != 0 )
          {
-            c4memset( errorStr, ' ', sizeof( errorStr ) - 1 ) ;
-
-            c4strcpy( errorStr, sizeof( errorStr ), E4_ERROR ) ;  // AS Dec 13/05 vs 5.0 fixes
-            c4strcat( errorStr, sizeof( errorStr ), " #: " ) ;
-            pos = c4strlen( errorStr ) ;
-            c4ltoa45( (long)errCode1, (char *)errorStr + pos, 5 ) ;
-            pos += 5 ;
-
-            #ifndef S4PALM
-               errorStr[pos++] = '\r' ;
-            #endif
-            errorStr[pos++] = '\n' ;
-
-            c4strcpy( errorStr + pos, sizeof( errorStr ) - pos, E4_ERROR ) ;
-            c4strcat( errorStr + pos, sizeof( errorStr ) - pos, " #: " ) ;
-            pos = c4strlen( errorStr ) ;
-            c4ltoa45( error4number2( errCode2 ), (char *)errorStr + pos, 6 ) ;
-            pos += 6 ;
-
+            strcpy( errorStr + pos, errPtr ) ;
+            pos += strlen( errPtr ) ;
             errorStr[pos++] = '\r' ;
             errorStr[pos++] = '\n' ;
+         }
 
-            errPtr = e4text( errCode1 ) ;
-            if ( errPtr != 0 )
+      #ifndef E4OFF_STRING
+         tPtr = error4text( c4, errCode2 ) ;
+         if ( tPtr != 0 )
+         {
+            strcpy( errorStr + pos, tPtr ) ;
+            pos += strlen( tPtr ) ;
+            errorStr[pos++] = '\r' ;
+            errorStr[pos++] = '\n' ;
+         }
+      #endif
+
+      }
+
+      ptr = desc1 ;
+      while ( (ptr != (char *) 0) && (descNumber <= 3 ) )
+      {
+         if ( strlen( desc1 ) + pos + 3 >= sizeof( errorStr ) )
+            break ;
+         strcpy( errorStr+pos, ptr ) ;
+         pos += strlen(ptr) ;
+         errorStr[pos++] = '\r' ;
+         errorStr[pos++] = '\n' ;
+         if ( descNumber++ == 1 )
+            ptr = desc2 ;
+         else
+            ptr = desc3 ;
+      }
+
+      #ifdef E4FILE_LINE
+         if ( s4fileName != 0 )
+            if ( strlen(s4fileName)+pos+8 < sizeof(errorStr) )
             {
-               c4strcpy( errorStr + pos, sizeof( errorStr ) - pos, errPtr ) ;
-               pos += c4strlen( errPtr ) ;
-               #ifndef S4PALM
-                  errorStr[pos++] = '\r' ;
-               #endif
+               strcpy( errorStr + pos, s4fileName ) ;
+               pos += strlen( s4fileName ) ;
+               errorStr[pos++] = ' ' ;
+               c4ltoa45( s4lineNo, (char *)errorStr+pos, 6 ) ;
+               pos += 6 ;
+               errorStr[pos++] = '\r' ;
                errorStr[pos++] = '\n' ;
             }
+      #endif
 
-            #ifndef E4OFF_STRING
-               tPtr = error4text( c4, errCode2 ) ;
-               if ( tPtr != 0 )
-               {
-                  c4strcpy( errorStr + pos, sizeof( errorStr ) - pos, tPtr ) ;
-                  pos += c4strlen( tPtr ) ;
-                  #ifndef S4PALM
-                     errorStr[pos++] = '\r' ;
-                  #endif
-                  errorStr[pos++] = '\n' ;
-               }
-            #endif
-         }
+      errorStr[pos] = 0 ;
 
-         ptr = desc1 ;
-         while ( (ptr != (char *) 0) && (descNumber <= 3 ) )
-         {
-            // AS 03/23/00 this was incorrect, sometimes not stopping when should be
-            if ( c4strlen( ptr ) + pos + 3 >= sizeof( errorStr ) )
-               break ;
-            c4strcpy( errorStr + pos, sizeof( errorStr ) - pos, ptr ) ;
-            pos += c4strlen(ptr) ;
-            errorStr[pos++] = '\r' ;
-            errorStr[pos++] = '\n' ;
-            if ( descNumber++ == 1 )
-               ptr = desc2 ;
-            else
-               ptr = desc3 ;
-         }
+      #ifdef S4TESTING
+         u4writeErr( errorStr, 1 ) ;
+      #endif
 
-         #ifdef E4FILE_LINE
-            if ( s4fileName != 0 )
-               if ( strlen(s4fileName)+pos+8 < sizeof(errorStr) )
-               {
-                  c4strcpy( errorStr + pos, sizeof( errorStr ) - pos, s4fileName ) ;
-                  pos += strlen( s4fileName ) ;
-                  errorStr[pos++] = ' ' ;
-                  c4ltoa45( s4lineNo, (char *)errorStr+pos, 6 ) ;
-                  pos += 6 ;
-                  errorStr[pos++] = '\r' ;
-                  errorStr[pos++] = '\n' ;
-               }
+      #ifndef S4WINCE
+         OemToAnsi( errorStr, errorStr ) ;
+      #endif
+
+      #ifdef S4TESTING
+         #ifdef S4SERVER
+            wType = MB_OK | MB_ICONSTOP ;
+            if ( errCode1 == e4memory )
+               wType |= MB_SYSTEMMODAL ;
+            /* server should not error, so ok to leave in */
+            if ( MessageBox( 0, errorStr, E4_ERROR_COD, wType ) == 0 )
+               FatalAppExit( 0, E4_MEMORY_ERR ) ;
          #endif
-
-         errorStr[pos] = 0 ;
-
-         #ifdef S4TESTING
-            u4writeErr( errorStr, 1 ) ;
-         #endif
-
-         #if !defined(S4WINCE) && !defined(S4PALM)
-            OemToAnsi( errorStr, errorStr ) ;
-         #endif
-
-         #ifdef E4DEBUG_STOP
-            DebugBreak() ;
-         #endif
-
-         #ifdef S4TESTING
-            #ifdef S4SERVER
-               wType = MB_OK | MB_ICONSTOP ;
-               if ( errCode1 == e4memory )
-                  wType |= MB_SYSTEMMODAL ;
-               /* server should not error, so ok to leave in */
-               // do not do a message box if no c4 or if a service
-               if ( c4 != 0 )
-                  if ( c4->runAsService == 0 )
-                  {
-                     if ( MessageBox( 0, pErrStr, E4_ERROR_COD, wType ) == 0 )
-                        FatalAppExit( 0, E4_MEMORY_ERR ) ;
-                  }
-            #endif
+      #else
+         #ifndef S4WINCE
+            wType = MB_OK | MB_ICONSTOP ;
+            if ( errCode1 == e4memory )
+               wType |= MB_SYSTEMMODAL ;
+            if ( MessageBox( 0, errorStr, E4_ERROR_COD, wType ) == 0 )
+               FatalAppExit( 0, E4_MEMORY_ERR ) ;
          #else
-            #if defined(S4WINCE)
-               // do not do a message box if no c4 or if a service
-               // AS Feb 14/06 - for windows ce, do a box otherwise we cannot get the output...
-               // if ( c4 != 0 )
-               {
-                  #ifdef S4SERVER
-                     if ( c4->runAsService == 0 )
-                  #endif
-                  {
-                     c4atou(errorStr, errUStr, 257) ;
-                     pErrStr = errUStr;
-                     MessageBox( 0, pErrStr, E4_ERROR_COD, MB_OK | MB_ICONSTOP ) ;
-                  }
-               }
-            #else
-               #ifdef S4SERVER
-                  // do not do a message box if a service
-                  if ( c4 != 0 )  // check c4 only if server
-                     if ( c4->runAsService == 0 )
-               #endif
-               {
-                  wType = MB_OK | MB_ICONSTOP ;
-                  if ( errCode1 == e4memory )
-                     wType |= MB_SYSTEMMODAL ;
-                  HWND hWnd = 0;
-                  #ifndef S4CODE_SCREENS  /* LY 2004/02/25 */
-                     if ( c4 )
-                        hWnd = c4->hWnd ;
-                  #endif
-                  #ifdef UNICODE
-                     c4atou(errorStr, errUStr, 257) ;
-                     pErrStr = errUStr;
-                  #endif
-
-                  int mbResult;
-                  mbResult = MessageBox( hWnd, pErrStr, E4_ERROR_COD, wType );
-                  if ( mbResult == 0 )
-                  {
-                     if (GetLastError() == ERROR_INVALID_WINDOW_HANDLE)
-                     {
-                        // CS 2002/07/01 MessageBox only failed because the window handle was invalid.
-                        // Try again with a NULL window hande.
-                        mbResult = MessageBox( NULL, pErrStr, E4_ERROR_COD, wType );
-                     }
-                  }
-                  if ( mbResult == 0 )
-                     FatalAppExit( 0, TEXT(E4_MEMORY_ERR) ) ;
-               }
-            #endif
+            c4atou(errorStr, errUStr, 257) ;
+            MessageBox( 0, (const unsigned short *)errUStr, E4_ERROR_COD, MB_OK | MB_ICONSTOP ) ;
          #endif
       #endif
-   }
-#endif   /* S4WINDOWS  */
+   #endif
+}
+
+#endif  /* S4WINDOWS  */
+
+#ifdef S4VB_DOS
+
+/* S4VB_DOS */
+void error4out( CODE4 *c4, int errCode1, long errCode2, const char *desc1, const char *desc2, const char *desc3 )
+{
+
+}
+#endif /* S4VB_DOS */
 
 
 #ifndef S4CONSOLE
 #ifdef S4MACINTOSH
 /* S4MACINTOSH */
-S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, const char *desc1, const char *desc2, const char *desc3 )
+void error4out( CODE4 *c4, int errCode1, long errCode2, const char *desc1, const char *desc2, const char *desc3 )
 {
    #ifdef S4TESTING
       char errorStr[257] ;
@@ -754,7 +976,7 @@ S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, cons
    #endif
    #ifndef E4ERROR_OFF
       #ifndef E4OFF_STRING
-    char const *tPtr ;
+         char const *tPtr ;
       #endif
    #endif
    char const * ptr ;
@@ -769,8 +991,8 @@ S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, cons
 
    #ifndef E4ERROR_OFF
       if ( c4 != 0 )
-    if ( c4->errOff )
-       return ;
+         if ( c4->errOff )
+            return ;
 
       if (errCode1 != 0)
       {
@@ -783,199 +1005,197 @@ S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, cons
             if ( tPtr != 0 )
                sprintf( (char *)&macStr+strlen((char *)macStr), "%s",error4text( c4, errCode2 ) ) ;
          #endif
-         S4CTOPSTR( (char *)&macStr );  /* convert C string to Pascal string */
+         CtoPstr( (char *)&macStr );  /* convert C string to Pascal string */
       }
 
       if (desc1 != (char*)0 )
       {
          strcpy((char *)&macStra, desc1 );
-         S4CTOPSTR((char *)&macStra) ;
+         CtoPstr((char *)&macStra) ;
       }
-
       #ifndef E4FILE_LINE
          if (desc2 != (char*)0 )
          {
             strcpy((char *)&macStrb, desc2 );
-            S4CTOPSTR((char *)&macStrb) ;
+            CtoPstr((char *)&macStrb) ;
          }
 
          if (desc3 != (char*)0 )
          {
             strcpy((char *)&macStrc, desc3 );
-            S4CTOPSTR((char *)&macStrc) ;
+            CtoPstr((char *)&macStrc) ;
          }
-      #else /*since we can only support 4 lines total, we'll have to combine two*/
+      #else     /*since we can only support 4 lines total, we'll have to combine two*/
          if (desc2 != (char*)0 )
          {
             strcpy((char *)&macStrb, desc2 );
             if (desc3 != (char*)0 )
             {
-               strcat((char *)&macStrb,"\r");
-               strcat((char *)&macStrb,"desc3");
+                strcat((char *)&macStrb,"\r");
+                strcat((char *)&macStrb,"desc3");
             }
-            S4CTOPSTR((char *)&macStrb) ;
+            CtoPstr((char *)&macStrb) ;
          }
          else if (desc3 != (char*)0 )
          {
             strcpy((char *)&macStrb,"desc3");
-            S4CTOPSTR((char *)&macStrb) ;
+            CtoPstr((char *)&macStrb) ;
          }
 
          if ( s4fileName != 0 )
          {
             sprintf( (char *)&macStrc, "File: %s Line:%d\r\r\r", s4fileName, s4lineNo ) ;
-            S4CTOPSTR( (char *)&macStrc );  /* convert C string to Pascal string */
+            CtoPstr( (char *)&macStrc );  /* convert C string to Pascal string */
          }
       #endif
       ParamText(macStr, macStra, macStrb, macStrc ) ;
       itemHit = StopAlert( E4MAC_ALERT, 0 ) ;
       ParamText(0,0,0,0);
+
+
    #endif  /* E4ERROR_OFF */
 }
 #endif
 #endif
 
-#ifdef S4PALM
-   S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, const char *desc1, const char *desc2, const char *desc3 )
-   {
-   }
-#endif
 
 #ifdef S4CONSOLE
-   S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, const char *desc1, const char *desc2, const char *desc3 )
-   {
-      #ifdef S4TESTING
-         char errorStr[257] ;
-         const char *errPtr ;
-         int pos=0 ;
-      #endif
-      #ifndef E4ERROR_OFF
-         #ifndef E4OFF_STRING
-            char const *tPtr ;
-         #endif
-      #endif
-      char const * ptr ;
-      int descNumber = 1 ;
 
+/* S4CONSOLE */
+void error4out( CODE4 *c4, int errCode1, long errCode2, const char *desc1, const char *desc2, const char *desc3 )
+{
+   #ifdef S4TESTING
+      char errorStr[257] ;
+      const char *errPtr ;
+      int pos=0 ;
+   #endif
+   #ifndef E4ERROR_OFF
+      #ifndef E4OFF_STRING
+         char const *tPtr ;
+      #endif
+   #endif
+   char const * ptr ;
+   int descNumber = 1 ;
+
+   if ( c4 != 0 )
+      error4set( c4, errCode1 ) ;
+
+   #ifndef E4ERROR_OFF
       if ( c4 != 0 )
-         error4set( c4, errCode1 ) ;
+         if ( c4->errOff )
+            return ;
 
-      #ifndef E4ERROR_OFF
-         if ( c4 != 0 )
-            if ( c4->errOff )
-               return ;
+   #ifdef S4TESTING
+      if (errCode1 != 0)
+      {
+         memset( errorStr, ' ', sizeof( errorStr ) - 1 ) ;
 
-         #ifdef S4TESTING
-            if (errCode1 != 0)
+         strcpy( errorStr, E4_ERROR ) ;
+         strcat( errorStr, " #: " ) ;
+         c4ltoa45( (long)errCode1, (char *)errorStr+9, 5 ) ;
+         pos = 31 ;
+
+         errorStr[pos++] = '\r' ;
+         errorStr[pos++] = '\n' ;
+
+         strcpy( errorStr + pos, E4_ERROR ) ;
+         strcat( errorStr + pos, " #: " ) ;
+         errorStr[strlen(errorStr)] = ' ' ;
+         c4ltoa45( error4number2( errCode2 ), (char *)errorStr + pos + 9, 6 ) ;
+         pos += 16 ;
+
+         errorStr[pos++] = '\r' ;
+         errorStr[pos++] = '\n' ;
+
+         errPtr = e4text( errCode1 ) ;
+         if ( errPtr != 0 )
+         {
+            strcpy( errorStr + pos, errPtr ) ;
+            pos += strlen( errPtr ) ;
+            errorStr[pos++] = '\r' ;
+            errorStr[pos++] = '\n' ;
+         }
+
+      #ifndef E4OFF_STRING
+         tPtr = error4text( c4, errCode2 ) ;
+         if ( tPtr != 0 )
+         {
+            strcpy( errorStr + pos, tPtr ) ;
+            pos += strlen( tPtr ) ;
+            errorStr[pos++] = '\r' ;
+            errorStr[pos++] = '\n' ;
+         }
+      #endif
+
+      }
+
+      ptr = desc1 ;
+      while ( (ptr != (char *) 0) && (descNumber <= 3 ) )
+      {
+         if ( strlen( desc1 ) + pos + 3 >= sizeof( errorStr ) )
+            break ;
+         strcpy( errorStr+pos, ptr ) ;
+         pos += strlen(ptr) ;
+         errorStr[pos++] = '\r' ;
+         errorStr[pos++] = '\n' ;
+         if ( descNumber++ == 1 )
+            ptr = desc2 ;
+         else
+            ptr = desc3 ;
+      }
+
+      #ifdef E4FILE_LINE
+         if ( s4fileName != 0 )
+            if ( strlen(s4fileName)+pos+8 < sizeof(errorStr) )
             {
-               memset( errorStr, ' ', sizeof( errorStr ) - 1 ) ;
-
-               strcpy( errorStr, E4_ERROR ) ;
-               strcat( errorStr, " #: " ) ;
-               pos = strlen( errorStr ) ;
-               c4ltoa45( (long)errCode1, (char *)errorStr + pos, 5 ) ;
-               pos += 5 ;
-
-               errorStr[pos++] = '\r' ;
-               errorStr[pos++] = '\n' ;
-
-               strcpy( errorStr + pos, E4_ERROR ) ;
-               strcat( errorStr + pos, " #: " ) ;
-               pos = strlen( errorStr ) ;
-               c4ltoa45( error4number2( errCode2 ), (char *)errorStr + pos, 6 ) ;
+               strcpy( errorStr + pos, s4fileName ) ;
+               pos += strlen( s4fileName ) ;
+               errorStr[pos++] = ' ' ;
+               c4ltoa45( s4lineNo, (char *)errorStr+pos, 6 ) ;
                pos += 6 ;
-
                errorStr[pos++] = '\r' ;
                errorStr[pos++] = '\n' ;
-
-               errPtr = e4text( errCode1 ) ;
-               if ( errPtr != 0 )
-               {
-                  strcpy( errorStr + pos, errPtr ) ;
-                  pos += strlen( errPtr ) ;
-                  errorStr[pos++] = '\r' ;
-                  errorStr[pos++] = '\n' ;
-               }
-
-               #ifndef E4OFF_STRING
-                  tPtr = error4text( c4, errCode2 ) ;
-                  if ( tPtr != 0 )
-                  {
-                     strcpy( errorStr + pos, tPtr ) ;
-                     pos += strlen( tPtr ) ;
-                     errorStr[pos++] = '\r' ;
-                     errorStr[pos++] = '\n' ;
-                  }
-               #endif
             }
+      #endif
 
-            ptr = desc1 ;
-            while ( (ptr != (char *) 0) && (descNumber <= 3 ) )
-            {
-               // AS 03/23/00 this was incorrect, sometimes not stopping when should be
-               if ( strlen( ptr ) + pos + 3 >= sizeof( errorStr ) )
-                  break ;
-               strcpy( errorStr+pos, ptr ) ;
-               pos += strlen(ptr) ;
-               errorStr[pos++] = '\r' ;
-               errorStr[pos++] = '\n' ;
-               if ( descNumber++ == 1 )
-                  ptr = desc2 ;
-               else
-                  ptr = desc3 ;
-            }
+      errorStr[pos] = 0 ;
 
-            #ifdef E4FILE_LINE
-               if ( s4fileName != 0 )
-                  if ( strlen(s4fileName)+pos+8 < sizeof(errorStr) )
-                  {
-                     strcpy( errorStr + pos, s4fileName ) ;
-                     pos += strlen( s4fileName ) ;
-                     errorStr[pos++] = ' ' ;
-                     c4ltoa45( s4lineNo, (char *)errorStr+pos, 6 ) ;
-                     pos += 6 ;
-                     errorStr[pos++] = '\r' ;
-                     errorStr[pos++] = '\n' ;
-                  }
-            #endif
+      u4writeErr( errorStr, 1 ) ;
+   #else
+      if (errCode1 != 0)
+      {
+         fprintf( stderr, E4_ERROR_NUM ) ;
+         fprintf( stderr, "  %d, %ld \r\n", errCode1, error4number2( errCode2 ) ) ;
+         ptr = e4text( errCode1 ) ;
+         if ( ptr != 0 )
+            fprintf( stderr, "%s\r\n",e4text( errCode1 ) ) ;
+         #ifndef E4OFF_STRING
+            tPtr = error4text( c4, errCode2 ) ;
+            if ( tPtr != 0 )
+               fprintf( stderr, "%s\r\n",error4text( c4, errCode2 ) ) ;
+         #endif
+      }
 
-            errorStr[pos] = 0 ;
+      ptr = desc1 ;
+      while ( (ptr != (char *) 0) && (descNumber <= 3 ) )
+      {
+         fprintf( stderr, "\r\r\n" ) ;
+         fprintf( stderr, ptr ) ;
+         if ( descNumber++ == 1 )
+            ptr = desc2 ;
+         else
+            ptr = desc3 ;
+      }
 
-            u4writeErr( errorStr, 1 ) ;
-         #else
-            if (errCode1 != 0)
-            {
-               fprintf( stderr, E4_ERROR_NUM ) ;
-               fprintf( stderr, "  %d, %ld \r\n", errCode1, error4number2( errCode2 ) ) ;
-               ptr = e4text( errCode1 ) ;
-               if ( ptr != 0 )
-                  fprintf( stderr, "%s\r\n",e4text( errCode1 ) ) ;
-               #ifndef E4OFF_STRING
-                  tPtr = error4text( c4, errCode2 ) ;
-                  if ( tPtr != 0 )
-                     fprintf( stderr, "%s\r\n",error4text( c4, errCode2 ) ) ;
-               #endif
-            }
+      fprintf( stderr, "\r\r\n" ) ;
+      #ifdef E4FILE_LINE
+         if ( s4fileName != 0 )
+            fprintf( stderr, "File: %s Line:%d\r\r\n", s4fileName, s4lineNo ) ;
+      #endif
+   #endif  /* S4TESTING */
 
-            ptr = desc1 ;
-            while ( (ptr != (char *) 0) && (descNumber <= 3 ) )
-            {
-               fprintf( stderr, "\r\r\n" ) ;
-               fprintf( stderr, ptr ) ;
-               if ( descNumber++ == 1 )
-                  ptr = desc2 ;
-               else
-                  ptr = desc3 ;
-            }
-
-            fprintf( stderr, "\r\r\n" ) ;
-            #ifdef E4FILE_LINE
-               if ( s4fileName != 0 )
-                  fprintf( stderr, "File: %s Line:%d\r\r\n", s4fileName, s4lineNo ) ;
-            #endif
-         #endif  /* S4TESTING */
-      #endif  /* E4ERROR_OFF */
-   }
+   #endif  /* E4ERROR_OFF */
+}
 #endif
 
 #ifdef E4FILE_LINE
@@ -983,7 +1203,7 @@ S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, cons
    const char *s4fileName = 0 ;
    int s4lineNo = 0 ;
 
-   int   S4FUNCTION code4lineNo( void )
+   int  S4FUNCTION code4lineNo( void )
    {
       return s4lineNo ;
    }
@@ -1011,57 +1231,11 @@ S4EXPORT void S4FUNCTION error4out( CODE4 *c4, int errCode1, long errCode2, cons
 /*}*/
 #endif
 
-static void error4storeDescription(CODE4 *c4, const char *s1, const char *s2, const char *s3)
-{
-   // CS 2002/04/24
-   // Store the description strings, separated by a new line, to
-   // c4->lastErrorDescription. Any or all description pointers can be null.
-   // If all pointers are null, c4->lastErrorDescription is set to null.
-
-   // free the existing string, if it has been previously allocated
-   if (c4->lastErrorDescription)
-      u4free(c4->lastErrorDescription) ;
-   c4->lastErrorDescription = 0 ;
-
-   // if additional description was provided
-   if ( s1 || s2 || s3 )
-   {
-      int descriptionLength = 0 ;
-      if ( s1 )
-         descriptionLength += strlen( s1 ) ;
-      if ( s2 )
-         descriptionLength += strlen( s2 ) ;
-      if ( s3 )
-         descriptionLength += strlen( s3 ) ;
-
-      descriptionLength += 6 ;
-      c4->lastErrorDescription = (char *)u4allocFree( c4, descriptionLength ) ;
-
-      if (s1)
-         c4strcpy( c4->lastErrorDescription, descriptionLength , s1 ) ;  // AS Dec 13/05 vs 5.0 fixes
-
-      if (s2)
-      {
-         if ( strlen( c4->lastErrorDescription ) > 0 )
-            c4strcat( c4->lastErrorDescription, descriptionLength, "\r\n" ) ;
-         c4strcat( c4->lastErrorDescription, descriptionLength, s2 ) ;
-      }
-
-      if (s3)
-      {
-         if ( strlen( c4->lastErrorDescription) > 0 )
-            c4strcat( c4->lastErrorDescription, descriptionLength, "\r\n" ) ;
-         c4strcat( c4->lastErrorDescription, descriptionLength, s3 ) ;
-      }
-   }
-}
-
-
 #ifdef E4STACK
-   int S4FUNCTION error4stackDefault( CODE4 *c4, const int errCode1, const long errCode2 )
-   {
-      return error4describeExecute( c4, errCode1, errCode2, 0, 0, 0 ) ;
-   }
+int S4FUNCTION error4stackDefault( CODE4 *c4, const int errCode1, const long errCode2 )
+{
+   return error4describeExecute( c4, errCode1, errCode2, 0, 0, 0 ) ;
+}
 #endif
 
 int S4FUNCTION error4default( CODE4 *c4, const int errCode1, const long errCode2 )
@@ -1076,11 +1250,6 @@ int S4FUNCTION error4describeDefault( CODE4 *c4, const int errCode1, const long 
 
 int S4FUNCTION error4describeExecute( CODE4 *c4, const int errCode1, const long errCode2, const char *s1, const char *s2, const char *s3 )
 {
-   #ifndef S4SERVER
-      if ( c4 != 0 )
-         error4storeDescription(c4, s1, s2, s3);
-   #endif
-
    #ifdef E4HOOK
       #ifndef S4SERVER
          if ( c4 != 0 )
@@ -1093,49 +1262,25 @@ int S4FUNCTION error4describeExecute( CODE4 *c4, const int errCode1, const long 
       error4hook( c4, errCode1, errCode2, s1, s2, s3 ) ;
       return errCode1 ;
    #else
-      int doCallback = 0;
-
       /* display error local to operating system */
       if ( c4 != 0 )
-      {
          if ( c4->errorLog != 0 )
-         {
-            if ( c4->errorLog->hand != INVALID4HANDLE )  // CS 2000/03/26
+            if ( c4->errorLog->hand != INVALID4HANDLE )
                error4logAppend( c4, errCode1, errCode2, s1, s2, s3 ) ;
-         }
-
-         if (c4->errorCallback)  // CS 2002/04/24
-            doCallback = 1;
-      }
-
-      // CS 2002/04/23 move up - set error codes before callback
-      if ( c4 )
+      error4out( c4, errCode1, errCode2, s1, s2, s3 ) ;
+      if ( c4 != 0 )
       {
+         #ifndef E4ERROR_OFF
+            #ifdef S4CONSOLE
+               #ifdef E4PAUSE
+                  if ( c4->errOff == 0 )
+                     error4pause() ;
+               #endif
+            #endif
+         #endif
          error4set( c4, errCode1 ) ;
          error4set2( c4, errCode2 ) ;
       }
-
-      if (doCallback)
-      {
-         // CS 2009/10/20 Don't translate number 2. If the application wants a display number, it can call error4number2().
-         c4->errorCallback(c4, errCode1, errCode2, s1, s2, s3);
-      } // if doCallBack
-      else
-      {
-         error4out( c4, errCode1, errCode2, s1, s2, s3 ) ;
-
-         #if !defined( E4ERROR_OFF ) && defined( S4CONSOLE ) && defined( E4PAUSE )
-            if (c4)
-            {
-               if (c4->errOff == 0)
-               {
-                  error4pause() ;
-               }
-            }
-            else
-               error4pause() ;
-         #endif
-      } // else doCallBack
 
       #ifdef E4STOP
          code4exit( c4 ) ;
@@ -1146,34 +1291,24 @@ int S4FUNCTION error4describeExecute( CODE4 *c4, const int errCode1, const long 
             code4exit( c4 ) ;
          switch ( errCode1 )
          {
-            case e4parm:
-            case e4parm_null:
-               code4exit( c4 ) ;
-         }
-      #endif
-
-      #ifdef E4STOP_UNRECOVERABLE
-         // AS 05/26/99 --> don't want to stop only if c4 is 0...
-         // if ( c4 == 0 )
-         //    code4exit( c4 ) ;
-         switch ( errCode1 )
-         {
             case e4info:
             case e4memory:
+            case e4parm:
+            case e4parm_null:
             case e4result:
             case e4struct:
                code4exit( c4 ) ;
          }
-
-         if ( errCode1 == e4demo )
-            code4exit( c4 ) ;
       #endif
+
+      if ( errCode1 == e4demo )
+         code4exit( c4 ) ;
 
       return errCode1 ;
    #endif
 }
 
-#if !defined( S4SERVER ) && !defined( S4PALM )
+#ifndef S4SERVER
 void S4FUNCTION error4exitTest( CODE4 *c4 )
 {
    if ( c4 == 0 )
@@ -1181,7 +1316,7 @@ void S4FUNCTION error4exitTest( CODE4 *c4 )
    if ( error4code( c4 ) < 0 )
       code4exit( c4 ) ;
 }
-#endif
+#endif /* S4SERVER */
 
 #ifdef S4CB51
 #ifndef S4SERVER
@@ -1193,7 +1328,7 @@ void S4FUNCTION e4severe( const int errCode, const char *desc )
       error4out( 0, errCode, 0, desc, 0, 0 ) ;
       #ifdef S4CONSOLE
       #ifdef E4PAUSE
-    error4pause() ;
+         error4pause() ;
       #endif
       #endif
    #endif

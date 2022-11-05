@@ -12,14 +12,13 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/* r4regs.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* revisited by altomaltes@gmail.com
+ */
+
+/* r4regs.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif  /* __TUROBC__ */
-#endif  /* S4UNIX */
+
 
 #ifdef S4REGISTERS
 #ifndef S4STAND_ALONE

@@ -1,18 +1,4 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* s4sort.h   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* s4sort.h   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 struct RELATE4St ;
 
@@ -22,8 +8,7 @@ typedef struct
    unsigned  pos ;    /* The current position withing 'ptr' */
    unsigned  len ;    /* The current data length pointed to by 'ptr' */
 
-   // AS 10/16/00 - support for large files - change from S4LONG to FILE4LONG
-   FILE4LONG   disk ;      /* Current Disk Position, Offset from start of 'spool' */
+   S4LONG   disk ;      /* Current Disk Position, Offset from start of 'spool' */
                       /* >= 'spoolBytes' means nothing is on disk. */
    int    spoolI ;   /* The spool number of this spool  */
 } S4SPOOL ;
@@ -101,10 +86,6 @@ S4EXPORT int   S4FUNCTION sort4initFree( SORT4 S4PTR *, CODE4 S4PTR *, const int
 S4EXPORT int   S4FUNCTION sort4initSet( SORT4 S4PTR *, CODE4 S4PTR *, const int, const int ) ;
 S4EXPORT int   S4FUNCTION sort4put( SORT4 S4PTR *, const S4LONG, const void S4PTR *, const void S4PTR * ) ;
 S4EXPORT int   S4FUNCTION sort4spoolsInit( SORT4 S4PTR *, const int ) ;
-
-S4EXPORT int S4FUNCTION sort4alloc( SORT4 S4PTR * S4PTR * ) ;
-S4EXPORT void S4FUNCTION sort4assignCmp2( SORT4 S4PTR *, S4CMP_FUNCTION ) ;
-S4EXPORT void S4FUNCTION sort4free2( SORT4 S4PTR * S4PTR * ) ;
 
 #ifdef __cplusplus
    }

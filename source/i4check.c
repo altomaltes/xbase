@@ -1,25 +1,58 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* i4check.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* i4check.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-
-#ifdef I4PRINT
-   #include <sys\timeb.h>
-   #include <time.h>
+#ifndef S4UNIX
+   #ifdef __TURBOC__
+      #pragma hdrstop
+   #endif
 #endif
+
+#ifdef S4CLIENT
+int S4FUNCTION d4check( DATA4 *d4 )
+{
+   #ifdef S4OFF_INDEX
+      return 0 ;
+   #else
+      CONNECTION4 *connection ;
+      int rc ;
+      CONNECTION4CHECK_INFO_OUT *out ;
+
+      #ifdef E4PARM_HIGH
+         if ( d4 == 0 )
+            return error4( 0, e4parm_null, E95702 ) ;
+      #endif
+
+      #ifndef S4OFF_MULTI
+         #ifdef S4SERVER
+            rc = dfile4lockFile( d4->dataFile, d4->currentClientId, d4->serverId ) ;   /* returns -1 if error4code( codeBase ) < 0 */
+         #else
+            rc = d4lockFile( d4 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
+         #endif
+         if ( rc )
+            return rc ;
+      #endif
+
+      connection = d4->dataFile->connection ;
+      if ( connection == 0 )
+         return e4connection ;
+      connection4assign( connection, CON4CHECK, data4clientId( d4 ), data4serverId( d4 ) ) ;
+      connection4sendMessage( connection ) ;
+      rc = connection4receiveMessage( connection ) ;
+      if ( rc < 0 )
+         return rc ;
+      rc = connection4status( connection ) ;
+      if ( rc != 0 )
+         return connection4error( connection, d4->codeBase, rc, E95702 ) ;
+
+      if ( connection4len( connection ) != sizeof( CONNECTION4CHECK_INFO_OUT ) )
+         return error4( d4->codeBase, e4packetLen, E95702 ) ;
+      out = (CONNECTION4CHECK_INFO_OUT *)connection4data( connection ) ;
+      if ( out->lockedDatafile == 1 )
+         d4->dataFile->fileLock = d4 ;
+      return 0 ;
+   #endif  /* S4OFF_INDEX */
+}
+#else
 
 #ifndef S4OFF_INDEX
 
@@ -29,8 +62,8 @@ typedef struct
 
    TAG4FILE *tag ;
    char *oldKey ;
-   unsigned long oldRec ;
-   unsigned long numRecs ;
+   long oldRec ;
+   long numRecs ;
    int doCompare ;  /* Do not compare the first time */
    CODE4 *codeBase ;
    DATA4 *data ;
@@ -40,9 +73,9 @@ static int c4checkInit( C4CHECK *check, CODE4 *cb, TAG4FILE *t4, long nRecs, DAT
 {
    int rc ;
 
-   c4memset( (void *)check, 0, sizeof(C4CHECK) ) ;
+   memset( (void *)check, 0, sizeof(C4CHECK) ) ;
 
-   rc = f4flagInit( &check->flag, cb, (unsigned long)nRecs, 0 ) ;
+   rc = f4flagInit( &check->flag, cb, (unsigned long)nRecs ) ;
    if ( rc < 0 )
       return rc ;
 
@@ -57,68 +90,47 @@ static int c4checkInit( C4CHECK *check, CODE4 *cb, TAG4FILE *t4, long nRecs, DAT
    return 0 ;
 }
 
-
-
 static void c4checkFree( C4CHECK *c4 )
 {
    u4free( c4->flag.flags ) ;
    u4free( c4->oldKey ) ;
 }
 
-
-
 static int c4checkRecord( C4CHECK *check )
 {
-   TAG4FILE *t4 = check->tag ;
-   CODE4 *c4 = check->codeBase ;
+   B4KEY_DATA *keyData ;
+   TAG4FILE *t4 ;
+   unsigned char *newPtr ;
+   int len, rc ;
    #ifdef S4FOX
       int i ;
    #endif
-   #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4group.c on HP */
-      S4UNSIGNED_LONG tempLong ;  /* LY 2001/07/20 : changed from unsigned long for 64-bit */
-   #endif
 
-   B4KEY_DATA *keyData = tfile4keyData( t4 ) ;
+   t4 = check->tag ;
+
+   keyData = tfile4keyData( check->tag ) ;
    if ( keyData == 0 )
-      return error4( c4, e4index, E95701 ) ;
+      return error4( check->codeBase, e4index, E95701 ) ;
 
-   #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4group.c on HP */
-      memcpy( &tempLong, &keyData->num, sizeof(S4LONG) ) ;
-      if ( tempLong == 0 || tempLong == INVALID4BLOCK_ID  ||  tempLong > check->numRecs )
-   #else
-      if ( keyData->num == 0 || keyData->num == INVALID4BLOCK_ID  ||  keyData->num > check->numRecs )
-   #endif
-      return error4describe( c4, e4index, E85703, check->tag->alias, (char *)0, (char *)0 ) ;
+   if ( keyData->num < 1  ||  keyData->num > check->numRecs )
+      return error4describe( check->codeBase, e4index, E85703, check->tag->alias, (char *)0, (char *)0 ) ;
 
-   #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4group.c on HP */
-      if ( f4flagIsSet( &check->flag, (unsigned long)tempLong) )
-   #else
-      if ( f4flagIsSet( &check->flag, keyData->num) )
-   #endif
-      return error4describe( c4, e4index, E85703, check->tag->alias, (char *)0, (char *)0 ) ;
+   if ( f4flagIsSet( &check->flag, (unsigned long)keyData->num) )
+      return error4describe( check->codeBase, e4index, E85703, check->tag->alias, (char *)0, (char *)0 ) ;
    else
-      #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4group.c on HP */
-         f4flagSet( &check->flag, (unsigned long)tempLong ) ;
-      #else
-         f4flagSet( &check->flag, keyData->num ) ;
-      #endif
+      f4flagSet( &check->flag, (unsigned long)keyData->num ) ;
 
-   #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4group.c on HP */
-      int rc = d4go( check->data, tempLong ) ;
-   #else
-      int rc = d4go( check->data, keyData->num ) ;
-   #endif
+   rc = d4go( check->data, keyData->num ) ;
    if ( rc < 0 )
       return rc ;
    rc = expr4context( t4->expr, check->data ) ;
    if ( rc < 0 )
       return rc ;
 
-   unsigned char *newPtr ;
-   int len = tfile4exprKey( t4, &newPtr ) ;
+   len = tfile4exprKey( t4, &newPtr ) ;
 
    if ( len != t4->header.keyLen )
-      return error4describe( c4, e4index, E85704, t4->alias, (char *)0, (char *)0 ) ;
+      return error4describe( check->codeBase, e4index, E85704, t4->alias, (char *)0, (char *)0 ) ;
 
    if ( t4->filter )
    {
@@ -126,33 +138,19 @@ static int c4checkRecord( C4CHECK *check )
       if ( rc < 0 )
          return rc ;
       if ( !expr4true( t4->filter ) )  /* means record should not be in the index, but it is... */
-         return error4describe( c4, e4index, E85705, t4->alias, (char *)0, (char *)0 ) ;
+         return error4describe( check->codeBase, e4index, E85705, t4->alias, (char *)0, (char *)0 ) ;
    }
 
    #ifdef S4MDX
       if ( expr4type( t4->expr ) == r4num )
       {
          if ( c4bcdCmp( newPtr, keyData->value, 0 ) != 0 )
-            return error4describe( c4, e4index, E85705, t4->alias, (char *)0, (char *)0 ) ;
+            return error4describe( check->codeBase, e4index, E85705, t4->alias, (char *)0, (char *)0 ) ;
       }
       else
    #endif
    if ( c4memcmp( newPtr, keyData->value, (unsigned int)t4->header.keyLen ) != 0 )
-   {
-      #ifdef I4PRINT
-         struct _timeb mTime ;
-         char *outTime, dump[120] ;
-         B4BLOCK *block = (B4BLOCK *)t4->blocks.lastNode ;
-         _ftime( &mTime ) ;
-         outTime = ctime( &( mTime.time ) ) ;
-
-         sprintf( dump, "id = %ld, mismatch: rec = %ld, fb = %ld, dbf key = %.20s, idx key = %.20s", (long)t4->indexFile, keyData->num,
-                  block->fileBlock, (char *)newPtr, (char *)keyData->value ) ;
-         log5( dump ) ;
-         log5( outTime ) ;
-      #endif
-      return error4describe( c4, e4index, E85705, t4->alias, (char *)0, (char *)0  ) ;
-   }
+      return error4describe( check->codeBase, e4index, E85705, t4->alias, (char *)0, (char *)0  ) ;
 
    #ifdef S4FOX
       /* blanks at the end of a key MUST be recorded as trailing blanks, and
@@ -161,29 +159,19 @@ static int c4checkRecord( C4CHECK *check )
          because it causes problems with FoxPro and CodeBase */
       /* There is an exception in one version of FoxPro (2.6) which strangely
          included trail blanks in some instances */
-      for ( i = t4->header.keyLen ; i > 0 ; i-- )
-      {
+      for( i = t4->header.keyLen ; i > 0 ; i-- )
          if ( keyData->value[i-1] != t4->pChar )
             break ;
-      }
 
-      assert5( c4->compatibility == 30 || c4->compatibility == 26 || c4->compatibility == 25 ) ;
-      if ( check->data->dataFile->compatibility == 26 && t4->filter != 0 )
+      if ( d4version( check->data ) != 0x30 && check->codeBase->compatibility == 26 && t4->filter != 0 )
       {
          if ( x4trailCnt( tfile4block( t4 ), tfile4block( t4 )->keyOn ) != 0 )
-            error4describe( c4, e4index, E85712, t4->alias, (char *)0, (char *)0 ) ;
+            error4describe( check->codeBase, e4index, E85712, t4->alias, (char *)0, (char *)0 ) ;
       }
       else
       {
          if ( x4trailCnt( tfile4block( t4 ), tfile4block( t4 )->keyOn ) != (t4->header.keyLen - i ) )
-         {
-            // AS 03/14/00 there is one case where this does not hold.  Namely, if we have
-            // keys as:  0x0001201f, 0x00012020, 0x00012021.  For key 2 in actual fact
-            // we need a duplicate of '7' and a trail of '1' in order for comparisons
-            // to work proper...  i.e. this is a case where trail + dup == key len...
-            if ( x4trailCnt( tfile4block( t4 ), tfile4block( t4 )->keyOn ) + x4dupCnt( tfile4block( t4 ), tfile4block( t4 )->keyOn ) != t4->header.keyLen )
-               error4describe( c4, e4index, E85712, t4->alias, (char *)0, (char *)0 ) ;
-         }
+            error4describe( check->codeBase, e4index, E85712, t4->alias, (char *)0, (char *)0 ) ;
       }
    #endif
 
@@ -195,75 +183,35 @@ static int c4checkRecord( C4CHECK *check )
                rc = c4memcmp( check->oldKey, newPtr, (unsigned int)t4->header.keyLen ) ;
             else
          #endif
-            {
-               // AS 07/27/99 -- this has been superseded by more simple collations for foxPro
-               // rc = u4keycmp( check->oldKey, newPtr, (unsigned int)t4->header.keyLen, (unsigned int)t4->header.keyLen, 0, &t4->vfpInfo ) ;
-               rc = u4keycmp( check->oldKey, newPtr, (unsigned int)t4->header.keyLen, (unsigned int)t4->header.keyLen, 0, collation4get( t4->collateName ) ) ;
-               /* AS 06/22/99 - not necessarily invalid.  for character keys the order is
-                  0x20,0x01,...0x19,0x21,..0xff.  So if rc > 0, check whether really is just
-                  a blank problem...
-                  AS 05/05/00 -- only applies to non-machine collation...
-               */
-               if ( t4->collateName != collate4none && t4->collateName != collate4machine )
-               {
-                  if ( rc > 0  && t4->pChar == 0x20 )
-                  {
-                     for ( i = 0 ; i < t4->header.keyLen ; i++ )
-                     {
-                        if ( check->oldKey[i] != newPtr[i] )
-                        {
-                           if ( check->oldKey[i] < newPtr[i] )  // we are done, and result is ok...
-                           {
-                              rc = -1 ;
-                              break ;
-                           }
-                           /* if oldKey is 0x20 and newPtr is < 0x20, this is ok... */
-                           if ( check->oldKey[i] == 0x20 )  // newPtr is < this, just skip this byte...
-                              continue ;
-                           // otherwise we got here and we really do have a mismatch because oldKey != 0x20
-                           rc = 1 ;
-                           break ;
-                        }
-                     }
-                  }
-               }
-            }
+               rc = u4keycmp( check->oldKey, newPtr, (unsigned int)t4->header.keyLen, (unsigned int)t4->header.keyLen, 0, &t4->vfpInfo ) ;
       #else
          rc = (*t4->cmp)( check->oldKey, newPtr, (unsigned int)t4->header.keyLen ) ;
       #endif
 
       if ( rc > 0)
-      {
-         error4describe( c4, e4index, E85706, t4->alias, (char *)0, (char *)0 ) ;
-      }
+         error4describe( check->codeBase, e4index, E85706, t4->alias, (char *)0, (char *)0 ) ;
       #ifdef S4FOX
          if ( rc == 0  &&  keyData->num <= check->oldRec )
-            error4describe( c4, e4index, E85707, t4->alias, (char *)0, (char *)0 ) ;
+            error4describe( check->codeBase, e4index, E85707, t4->alias, (char *)0, (char *)0 ) ;
       #endif /* S4FOX */
 
       #ifdef S4FOX
-         // AS Apr 7/03 - typeCode will be 0x04 for r4candidate/e4candidate
-         if ( t4->header.typeCode & 0x05 )
+         if ( t4->header.typeCode & 0x01 )
       #else
          if ( t4->header.unique )
       #endif /* S4FOX */
       if ( rc == 0 )
-         error4describe( c4, e4index, E85708, t4->alias, (char *)0, (char *)0 ) ;
+         error4describe( check->codeBase, e4index, E85708, t4->alias, (char *)0, (char *)0 ) ;
    }
    else
       check->doCompare = 1 ;
 
-   c4memcpy( check->oldKey, newPtr, (unsigned int)t4->header.keyLen ) ;
+   memcpy( check->oldKey, newPtr, (unsigned int)t4->header.keyLen ) ;
 
-   #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4group.c on HP */
-      memcpy( &tempLong, &keyData->num, sizeof(S4LONG) ) ;
-      check->oldRec = tempLong ;
-   #else
-      check->oldRec = keyData->num ;
-   #endif
+   check->oldRec = keyData->num ;
 
-   if ( error4code( c4 ) < 0 )
-      return error4code( c4 )  ;
+   if ( error4code( check->codeBase ) < 0 )
+      return error4code( check->codeBase )  ;
    return 0 ;
 }
 
@@ -281,14 +229,6 @@ static int tfile4blockCheck( TAG4FILE *t4, int firstTime )
    b4 = (B4BLOCK *)t4->blocks.lastNode ;
    if ( b4 == 0 )
       return 0 ;
-
-   // AS OCt 22/04 - verify the blocks as well
-   #if !defined( S4OFF_WRITE )
-      b4verifyPointers( b4 ) ;
-   #endif
-   if ( error4code( c4 ) < 0 )
-      return error4code( c4 ) ;
-
    if ( b4->nKeys < t4->header.keysHalf && t4->header.root / 512 != b4->fileBlock )
       return error4describe( c4, e4index, E85709, tfile4alias( t4 ), (char *)0, (char *)0 ) ;
    if ( !b4leaf( b4 ) )
@@ -303,7 +243,7 @@ static int tfile4blockCheck( TAG4FILE *t4, int firstTime )
             bType = b4leaf( (B4BLOCK *)t4->blocks.lastNode ) ;
          else
             if ( bType != b4leaf( (B4BLOCK *)t4->blocks.lastNode ) )
-               return error4describe( c4, e4index, E85709, tfile4alias( t4 ), "index tag is not properly balanced-leaf and branch nodes both detected as children of same block", (char *)0 ) ;
+               return error4describe( c4, e4index, E85709, tfile4alias( t4 ), (char *)0, (char *)0 ) ;
          rc = tfile4blockCheck( t4, 0 ) ;
          if ( rc != 0 )
             return rc ;
@@ -318,18 +258,36 @@ static int tfile4blockCheck( TAG4FILE *t4, int firstTime )
 
 int t4check( TAG4 *t4 )
 {
+   C4CHECK check ;
+   int rc, isRecord, keysSkip, rc2 ;
+   CODE4 *c4 ;
+   TAG4 *oldSelectedTag ;
+   B4BLOCK *blockOn ;
+   long baseSize, onRec ;
+   unsigned char *ptr ;
+   DATA4 *d4 ;
+   #ifdef S4FOX
+      unsigned char *tempVal ;
+      long tempLong ;
+   #endif
+   #ifndef S4CLIPPER
+      B4KEY_DATA *keyBranch, *keyLeaf ;
+   #endif
+   #ifdef S4PRINTF_OUT
+      unsigned long loop ;
+   #endif
+
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
          return error4( 0, e4parm_null, E95703 ) ;
    #endif
 
-   DATA4 *d4 = t4->index->data ;
-   CODE4 *c4 = d4->codeBase ;
+   d4 = t4->index->data ;
+   c4 = d4->codeBase ;
 
-   int rc = expr4context( t4->tagFile->expr, d4 ) ;
+   rc = expr4context( t4->tagFile->expr, d4 ) ;
    if ( rc < 0 )
       return rc ;
-
    if ( t4->tagFile->filter != 0 )
    {
       rc = expr4context( t4->tagFile->filter, d4 ) ;
@@ -338,7 +296,11 @@ int t4check( TAG4 *t4 )
    }
 
    #ifndef S4OFF_MULTI
-      rc = d4lockFileInternal( d4, 1, lock4any ) ;   /* returns -1 if error4code( codeBase ) < 0 */
+      #ifdef S4SERVER
+         rc = dfile4lockFile( d4->dataFile, data4clientId( d4 ), data4serverId( d4 ) ) ;   /* returns -1 if error4code( codeBase ) < 0 */
+      #else
+         rc = d4lockFile( d4 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
+      #endif
       if ( rc != 0 )
          return rc ;
       #ifdef S4CLIPPER
@@ -354,14 +316,14 @@ int t4check( TAG4 *t4 )
    #endif
 
    #ifndef S4OFF_WRITE
-      rc = d4updateRecord( d4, 0, 1 ) ;
+      rc = d4updateRecord( d4, 0 ) ;
       if ( rc < 0 )
          return rc ;
       if ( rc )
          return error4( c4, rc, E95703 ) ;
    #endif
 
-   TAG4 *oldSelectedTag = d4tagSelected( d4 ) ;
+   oldSelectedTag = d4tagSelected( d4 ) ;
    d4tagSelect( d4, t4 ) ;
 
    #ifdef S4CLIPPER
@@ -370,7 +332,7 @@ int t4check( TAG4 *t4 )
          return rc ;
    #endif
 
-   long baseSize = d4recCount( d4 ) ;
+   baseSize = d4recCount( d4 ) ;
    if ( baseSize < 0L )
       return (int)baseSize ;
 
@@ -391,16 +353,14 @@ int t4check( TAG4 *t4 )
          return error4describe( c4, e4index, E85710, d4alias( d4 ), tfile4alias( t4->tagFile ), (char *)0 ) ;
    }
 
-   C4CHECK check ;
-   int rc2 = c4checkInit( &check, c4, t4->tagFile, baseSize, d4 ) ;
+   rc2 = c4checkInit( &check, c4, t4->tagFile, baseSize, d4 ) ;
    if ( rc2 < 0 )
       return rc2 ;
 
-   unsigned long loop = 0 ;
    #ifdef S4PRINTF_OUT
+      loop = 0 ;
       printf( "On Rec %10ld\n", loop ) ;
    #endif
-
    while ( rc == 1 )
    {
       rc = c4checkRecord( &check ) ;
@@ -409,9 +369,8 @@ int t4check( TAG4 *t4 )
        rc = (int)tfile4skip( t4->tagFile, 1L ) ;
       if ( rc < 0 )
          break ;
-      loop++ ;
       #ifdef S4PRINTF_OUT
-         if ( (loop % 100) == 0 )
+         if ( (loop++ % 100) == 0 )
             printf( "\b\b\b\b\b\b\b\b\b\b%10ld", loop ) ;
       #endif
    }
@@ -422,10 +381,10 @@ int t4check( TAG4 *t4 )
       return rc ;
    }
 
-   int isRecord = 1 ;
+   isRecord = 1 ;
 
    /* Now Test for Duplication */
-   for ( long onRec = 1;  onRec <= baseSize; onRec++)
+   for ( onRec = 1;  onRec <= baseSize; onRec++)
    {
       if ( t4->tagFile->filter != 0 )
       {
@@ -452,8 +411,7 @@ int t4check( TAG4 *t4 )
             continue ;
 
          #ifdef S4FOX
-            // AS Apr 7/03 - typeCode will be 0x04 for r4candidate/e4candidate
-            if ( t4->tagFile->header.typeCode & 0x05 )
+            if ( t4->tagFile->header.typeCode & 0x01 )
          #else
             if ( t4->tagFile->header.unique )
          #endif
@@ -462,7 +420,6 @@ int t4check( TAG4 *t4 )
                   break ;
                if ( expr4context( t4->tagFile->expr, check.data ) < 0 )
                   break ;
-               unsigned char *ptr ;
                if ( tfile4exprKey( t4->tagFile, &ptr) < 0 )
                   break ;
                if ( tfile4seek( t4->tagFile, ptr, expr4keyLen( t4->tagFile->expr ) ) == 0 )
@@ -494,9 +451,9 @@ int t4check( TAG4 *t4 )
    for(;;)
    {
       #ifdef S4FOX
-         int keysSkip = -tfile4block(t4->tagFile)->header.nKeys ;
+         keysSkip = -tfile4block(t4->tagFile)->header.nKeys ;
       #else
-         int keysSkip = -tfile4block(t4->tagFile)->nKeys ;
+         keysSkip = -tfile4block(t4->tagFile)->nKeys ;
       #endif
 
       rc = (int)tfile4skip( t4->tagFile, (long) keysSkip ) ;
@@ -508,16 +465,16 @@ int t4check( TAG4 *t4 )
          return 0 ;
       }
 
-      B4BLOCK *blockOn = (B4BLOCK *)t4->tagFile->blocks.lastNode ;
+      blockOn = (B4BLOCK *)t4->tagFile->blocks.lastNode ;
       if ( blockOn == 0 )
          return error4describe( c4, e4index, E85712, tfile4alias( t4->tagFile ), (char *)0, (char *)0 ) ;
 
       #ifdef S4FOX
-         unsigned char *tempVal = (unsigned char *)u4allocFree( c4, (long)t4->tagFile->header.keyLen ) ;
+         tempVal = (unsigned char *)u4allocFree( c4, (long)t4->tagFile->header.keyLen ) ;
          if ( tempVal == 0 )
             return error4stack( c4, e4memory, E95703 ) ;
-         c4memcpy( tempVal, (void *)b4keyKey( blockOn, blockOn->keyOn ), (unsigned int)t4->tagFile->header.keyLen ) ;
-         unsigned long tempLong = b4recNo( blockOn, blockOn->keyOn ) ;
+         memcpy( tempVal, (void *)b4keyKey( blockOn, blockOn->keyOn ), (unsigned int)t4->tagFile->header.keyLen ) ;
+         tempLong = b4recNo( blockOn, blockOn->keyOn ) ;
 
          if ( tfile4go( t4->tagFile, tempVal, tempLong, 0 ) )
          {
@@ -542,8 +499,8 @@ int t4check( TAG4 *t4 )
                if ( blockOn->keyOn < blockOn->nKeys )
             #endif
                {
-                  B4KEY_DATA *keyBranch = b4key( blockOn, blockOn->keyOn ) ;
-                  B4KEY_DATA *keyLeaf = b4key( tfile4block( t4->tagFile ), tfile4block( t4->tagFile )->keyOn ) ;
+                  keyBranch = b4key( blockOn, blockOn->keyOn ) ;
+                  keyLeaf = b4key( tfile4block( t4->tagFile ), tfile4block( t4->tagFile )->keyOn ) ;
 
                   if ( c4memcmp( keyBranch->value, keyLeaf->value, (unsigned int)t4->tagFile->header.keyLen) != 0 )
                      return error4describe( c4, e4index, E85712, tfile4alias( t4->tagFile ), (char *)0, (char *)0 ) ;
@@ -558,29 +515,11 @@ int t4check( TAG4 *t4 )
 }
 
 #ifdef S4FOX
-static unsigned long getFlagFromNode( INDEX4FILE *indexFile, B4NODE node )
-{
-   // we need to get a unique ordered value to have an uninterupted flag sequence.
-   // we need to take into account:  the block multiplier (what to multiply block size by to
-   //   get physical file offset), and block size (indicates how much file offset seperation
-   //   between flags)
-
-   FILE4LONG filePos ;
-   b4nodeGetFilePosition( indexFile, node, &filePos ) ;
-   // AS actually, we use the 512 size as flag size, means for large blocks must set multiple times.
-   // need to do it this way because index headers are always 1024 bytes not matter what...
-   file4longDivide( filePos, B4BLOCK_SIZE_INTERNAL ) ;
-   assert5( file4longGetHi( filePos ) == 0 ) ;  // should be impossible or file is too big for nodes!
-   return file4longGetLo( filePos ) ;
-}
-
-
-
-
-static int flag4blocks( TAG4FILE *t4, F4FLAG *f4, B4NODE *node1, B4NODE *node2, B4NODE *node3 )
+static int flag4blocks( TAG4FILE *t4, F4FLAG *f4, long *node1, long *node2, long *node3 )
 {
    int i, rc ;
    B4BLOCK *blockOn ;
+   long flagNo ;
 
    rc = tfile4down( t4 ) ;
    if ( rc < 0 )
@@ -592,101 +531,55 @@ static int flag4blocks( TAG4FILE *t4, F4FLAG *f4, B4NODE *node1, B4NODE *node2, 
 
    blockOn = tfile4block(t4) ;
 
-   unsigned long flagNo = getFlagFromNode( t4->indexFile, blockOn->fileBlock ) ;
-
-   /* do verification on nodes - node2 should == our file block,
-                                 node1 should == our left node
-                                 node3 should == our right node
-   */
-
-   if ( !b4nodeUnknown( *node2 ) )
-      if ( b4nodesNotEqual( *node2, blockOn->fileBlock ) )
+   flagNo = blockOn->fileBlock / B4BLOCK_SIZE ;
+   if ( *node2 != -2 )
+      if ( *node2 != blockOn->fileBlock )
+         return error4( t4->codeBase, e4index, E81601 ) ;
+   if ( *node1 != -2 )
+      if ( *node1 != blockOn->header.leftNode )
+         return error4( t4->codeBase, e4index, E81601 ) ;
+   if ( *node3 != -2 )
+      if ( *node3 != blockOn->header.rightNode )
          return error4( t4->codeBase, e4index, E81601 ) ;
 
-   if ( !b4nodeUnknown( *node1 ) )
-      if ( b4nodesNotEqual( *node1, blockOn->header.leftNode ) )
-         return error4( t4->codeBase, e4index, E81601 ) ;
+   if ( f4flagIsSet( f4, (unsigned long)flagNo ) )
+      return error4( t4->codeBase, e4index, E81601 ) ;
 
-   if ( !b4nodeUnknown( *node3 ) )
-      if ( b4nodesNotEqual( *node3, blockOn->header.rightNode ) )
-         return error4( t4->codeBase, e4index, E81601 ) ;
-
-   #ifdef S4FOX
-      // each flag size is 512 bytes, for blocks larger than this, set multiplie flags...
-      long numFlagsInBlock = i4blockSize( t4->indexFile ) / B4BLOCK_SIZE_INTERNAL ;
-      for ( long setIndex = 0 ; setIndex < numFlagsInBlock ; setIndex++ )
-      {
-         if ( f4flagIsSet( f4, flagNo + setIndex  ) )
-            return error4( t4->codeBase, e4index, E81601 ) ;
-
-         rc = f4flagSet( f4, flagNo + setIndex ) ;
-         if ( rc < 0 )
-            return rc ;
-      }
-   #else
-      if ( f4flagIsSet( f4, flagNo ) )
-         return error4( t4->codeBase, e4index, E81601 ) ;
-
-      rc = f4flagSet( f4, flagNo ) ;
-      if ( rc < 0 )
-         return rc ;
-   #endif
-
-   if ( !b4leaf( blockOn ) )
+   rc = f4flagSet( f4, (unsigned long)flagNo ) ;
+   if ( rc < 0 )
+      return rc ;
+   if ( ! b4leaf(blockOn) )
    {
-      if ( b4nodeInvalid( blockOn->header.leftNode ) )
-      {
-         // we are the left-most block on our level, and since we check from left to right,
-         // our leftmost child must not have any left block nodes either.
-         b4nodeSetInvalid( node1 ) ;
-      }
+      if ( blockOn->header.leftNode == -1 )
+         *node1 = -1L ;
       else
+         *node1 = -2L ;
+      *node2 = b4key( blockOn, 0 )->num ;
+
+      for( i = 0; i < blockOn->header.nKeys; i++ )
       {
-         // we are not left-most block, and we don't know what our childs left neighbour should
-         // be, so indicate this by using -2 (unknown)
-         b4nodeSetUnknown( node1 ) ;
-      }
-
-      // our child's node is equal to our first entries node...
-      b4nodeAssignLong( node2, b4key( blockOn, 0 )->num ) ;
-
-      for( i = 0 ; i < blockOn->header.nKeys ; i++ )
-      {
-         b4go( blockOn, i ) ;
-
-         if ( i == blockOn->header.nKeys - 1 && b4nodeInvalid( blockOn->header.rightNode ) )
-         {
-            // we are rightmost node, so our rightmost child must have no right neighbour blocks
-            b4nodeSetInvalid( node3 ) ;
-         }
+         b4go( blockOn, (long)i ) ;
+         if ( i == blockOn->header.nKeys - 1 && blockOn->header.rightNode == -1 )
+            *node3 = -1 ;
          else
-         {
-            // we are not right-most block, and we don't know what our right-most childs
-            // node should be, so mark as unknown...
-            b4nodeSetUnknown( node3 ) ;
-         }
-
+            *node3 = -2 ;
          rc = flag4blocks( t4, f4, node1, node2, node3 ) ;
          if ( rc < 0 )
             return rc ;
       }
    }
 
-   // go to next block -- means node1 (left) becomes our current node
-   // and the current node becomes our 'right' node
-   b4nodeAssignNode( node1, blockOn->fileBlock ) ;
-   b4nodeAssignNode( node2, blockOn->header.rightNode ) ;
-   tfile4up( t4 ) ;
+   *node1 = blockOn->fileBlock ;
+   *node2 = blockOn->header.rightNode ;
+   tfile4up(t4) ;
    return 0 ;
 }
 #else
-
-
-
 static int flag4blocks( TAG4FILE *t4, F4FLAG *f4 )
 {
    int i, rc ;
    B4BLOCK *blockOn ;
+   long flagNo ;
 
    rc = tfile4down( t4 ) ;
    if ( rc < 0 )
@@ -699,17 +592,9 @@ static int flag4blocks( TAG4FILE *t4, F4FLAG *f4 )
    blockOn = tfile4block(t4) ;
 
    #ifdef S4CLIPPER
-      unsigned long flagNo = (blockOn->fileBlock) * I4MULTIPLY / B4BLOCK_SIZE_INTERNAL ;
+      flagNo = (blockOn->fileBlock) * I4MULTIPLY / B4BLOCK_SIZE ;
    #else
-      // unsigned long flagNo = (blockOn->fileBlock-4) * I4MULTIPLY / t4->indexFile->header.blockRw ;
-      // AS Nov 19/03 - large file support
-      // unsigned long flagNo = (blockOn->fileBlock-4) * I4MULTIPLY / i4blockSize( t4->indexFile ) ;
-      FILE4LONG flagNoLong ;
-      file4longAssign( flagNoLong, (blockOn->fileBlock-4), 0 ) ;
-      file4longMultiply( flagNoLong, I4MULTIPLY ) ;
-      file4longDivide( flagNoLong, i4blockSize( t4->indexFile ) ) ;
-      assert5( file4longGetHi( flagNoLong ) == 0 ) ;
-      unsigned long flagNo = file4longGetLo( flagNoLong ) ;
+      flagNo = (blockOn->fileBlock-4) * I4MULTIPLY / t4->indexFile->header.blockRw ;
    #endif
 
    if ( f4flagIsSet( f4, flagNo ) )
@@ -752,177 +637,142 @@ static int flag4blocks( TAG4FILE *t4, F4FLAG *f4 )
 static int i4checkBlocks( INDEX4 *i4 )
 {
    #ifndef S4CLIPPER
+      TAG4FILE *tagOn ;
+      F4FLAG flags ;
+      FILE4LONG pos ;
+      long flagNo ;
+      S4LONG totBlocks, freeBlock, eofBlockNo, len ;
+      CODE4 *c4 ;
       #ifndef S4OFF_MULTI
-         int rc = d4lockIndex( i4->data ) ;
+         int rc ;
+      #endif
+      #ifdef S4FOX
+         long node1, node2, node3 ;
+      #endif
+      #ifdef S4MDX
+         T4DESC  desc[48] ;
+         int i ;
+      #endif
+
+      c4 = i4->codeBase ;
+
+      #ifndef S4OFF_MULTI
+         rc = d4lockIndex( i4->data ) ;
          if ( rc < 0 )
             return rc ;
       #endif
 
-      INDEX4FILE *i4file = i4->indexFile ;
+      len = file4longGetLo( file4lenLow( &i4->indexFile->file ) ) ;
 
       #ifdef S4MDX
-         // AS Oct 28/03 - support for large files
-         //totBlocks = ( len - 2048 ) / i4file->header.blockRw ;
-         // S4LONG len = file4longGetLo( file4lenLow( &i4file->file ) ) ;
-         FILE4LONG totBlocksLong = file4lenLow( &i4file->file ) ;
-         file4longSubtract( &totBlocksLong, 2048 ) ;
-         file4longDivide( totBlocksLong, i4blockSize( i4file ) ) ;
-         assert5( file4longGetHi( totBlocksLong ) == 0 ) ;
-         S4LONG totBlocks = file4longGetLo( totBlocksLong ) ;
+         totBlocks = ( len - 2048 ) / i4->indexFile->header.blockRw ;
       #else
-         // actual blocks set by 512, based on sizeof header...
-         B4NODE eofBlockNo ;
-         b4nodeSetFromFilePosition( i4file, &eofBlockNo, file4lenLow( &i4file->file ) ) ;
-         long numFlagsInBlock = i4blockSize( i4file ) / B4BLOCK_SIZE_INTERNAL ;
-         S4LONG totBlocks = b4node( eofBlockNo ) * numFlagsInBlock / (i4blockSize( i4file ) / i4multiplier( i4file ) ) ;
+         totBlocks = len / B4BLOCK_SIZE ;
       #endif
 
       /* First Flag for the Free Chain */
-      F4FLAG flags ;
-      f4flagInit( &flags, i4->codeBase, (unsigned long)totBlocks, 0 ) ;
+      f4flagInit( &flags, i4->codeBase, (unsigned long)totBlocks ) ;
 
-
-      CODE4 *c4 = i4->codeBase ;
-      Bool5 checkFreeList = 1 ;
-
+      eofBlockNo = len/I4MULTIPLY ;
       #ifdef S4FOX
-         #ifdef S4COMIX
-            // for 2.5 or 2.6 compatible files, don't use free list entry in file (use local copy only)
-            if ( i4file->dataFile->compatibility != 30 )
-               checkFreeList = 0 ;
-         #endif
-         if ( checkFreeList == 1 )
-         {
-            B4NODE freeBlock ;
-            b4nodeAssignNode( &freeBlock, i4file->tagIndex->header.freeList ) ;
-            for ( ; b4node( freeBlock ) != 0 ; )
-            {
-               if ( b4nodesEqual( freeBlock, eofBlockNo )  ||  error4code( c4 ) < 0 )
-                  break ;
-
-               unsigned long flagNo = getFlagFromNode( i4file, freeBlock ) ;
-
-               if ( b4node( freeBlock ) >= b4node( eofBlockNo ) )
-               {
-                  error4( c4, e4index, E85701 ) ;
-                  break ;
-               }
-
-               // each flag size is 512 bytes, for blocks larger than this, set multiplie flags...
-               for ( int setIndex = 0 ; setIndex < numFlagsInBlock ; setIndex++ )
-               {
-                  if ( f4flagIsSet( &flags, flagNo + setIndex ) )
-                  {
-                     error4( c4, e4index, E85701 ) ;
-                     break ;
-                  }
-                  f4flagSet( &flags, flagNo + setIndex ) ;
-               }
-
-               FILE4LONG pos ;
-               b4nodeGetFilePosition( i4file, freeBlock, &pos ) ;
-               file4readAllInternal( &i4file->file, pos, &freeBlock, sizeof( freeBlock ) ) ;
-
-               #ifdef S4BYTE_SWAP
-                  freeBlock.node = x4reverseLong( (void *)&freeBlock ) ;
-               #endif
-            }
-         }
-         /* do the header tag */
-         TAG4FILE *tagOn = i4file->tagIndex ;
-         unsigned long flagNo = b4node( tagOn->headerOffset ) ;
-         if ( f4flagIsSet( &flags, flagNo ) )
-            return error4( i4->codeBase, e4index, E81601 ) ;
-         f4flagSet( &flags, flagNo ) ;
-         f4flagSet( &flags, flagNo + 1L ) ;  /* tag header is 2 blocks long */
-         double multiplier = ((double)i4multiplier( i4file )) / B4BLOCK_SIZE_INTERNAL ;
-
-         if ( tfile4freeAll( tagOn ) >= 0 )
-         {
-            B4NODE node1, node2, node3 ;
-            b4nodeSetInvalid( &node1 ) ;
-            b4nodeAssignNode( &node2, tagOn->header.root ) ;
-            b4nodeSetInvalid( &node3 ) ;
-            flag4blocks( tagOn, &flags, &node1, &node2, &node3 ) ;
-
-            /* Now Flag for each block in each tag */
-            for ( tagOn = 0 ;; )
-            {
-               tagOn = (TAG4FILE *)l4next( &i4file->tags,tagOn ) ;
-               if ( tagOn == 0 )
-                  break ;
-               flagNo = (unsigned long)( ((double)b4node( tagOn->headerOffset )) * multiplier ) ;
-               if ( f4flagIsSet( &flags, flagNo ) )
-                  return error4( i4->codeBase, e4index, E81601 ) ;
-               f4flagSet( &flags, flagNo ) ;
-               f4flagSet( &flags, flagNo + 1L ) ;  /* tag header is 2 blocks long */
-
-               if ( tfile4freeAll( tagOn ) < 0 )
-                  break ;
-               b4nodeSetInvalid( &node1) ;
-               b4nodeAssignNode( &node2, tagOn->header.root ) ;
-               b4nodeSetInvalid( &node3 ) ;
-               if ( b4nodeInvalid( node2 ) )
-               {
-                  FILE4LONG pos ;
-                  b4nodeGetFilePosition( i4file, tagOn->headerOffset, &pos ) ;
-                  if ( file4readAllInternal( &i4file->file, pos, &node2, sizeof(node2)) < 0 )
-                     return error4( i4->codeBase, e4index, E81601 ) ;
-                  #ifdef S4BYTE_SWAP
-                     node2.node = x4reverseLong( (void *)&node2 ) ;
-                  #endif
-               }
-               flag4blocks( tagOn, &flags, &node1, &node2, &node3 ) ;
-            }
-         }
+         for ( freeBlock = i4->indexFile->tagIndex->header.freeList ; freeBlock ; )
       #else
-         S4UNSIGNED_LONG freeBlock ;  /* LY 2004/02/03 : changed from unsigned long, for 64-bit */
-         // AS 05/07/99 --> inaccurate - the file length is not always updated all the way, so bad
-         // results were occasionally occurring in mdx.
-         // eofBlockNo = len/I4MULTIPLY ;
-         S4UNSIGNED_LONG eofBlockNo = i4file->header.eof ;
-         for ( freeBlock = i4file->header.freeList ; freeBlock ; )
+         for ( freeBlock = i4->indexFile->header.freeList ; freeBlock ; )
+      #endif
          {
             if ( freeBlock == eofBlockNo  ||  error4code( c4 ) < 0 )
                break ;
 
-            // unsigned long flagNo = (unsigned long )((freeBlock-4)*I4MULTIPLY/i4file->header.blockRw) ;
-            unsigned long flagNo = (unsigned long )( ( freeBlock - 4 ) * I4MULTIPLY / i4blockSize( i4file ) ) ;
+            #ifdef S4MDX
+               flagNo = (int)((freeBlock-4)*I4MULTIPLY/i4->indexFile->header.blockRw) ;
+            #else
+               flagNo = (int) (freeBlock / B4BLOCK_SIZE) ;
+            #endif
 
-            if ( freeBlock >= eofBlockNo )
+            if ( freeBlock >= eofBlockNo  || f4flagIsSet(&flags, (unsigned long)flagNo ) )
             {
                error4( c4, e4index, E85701 ) ;
                break ;
             }
+            f4flagSet( &flags, (unsigned long)flagNo ) ;
 
-            if ( f4flagIsSet( &flags, flagNo ) )
-            {
-               error4( c4, e4index, E85701 ) ;
-               break ;
-            }
-            f4flagSet( &flags, flagNo ) ;
-
-            FILE4LONG pos ;
-            file4longAssign( pos, freeBlock * I4MULTIPLY + sizeof(S4LONG), 0 ) ;
-            file4readAllInternal( &i4file->file, pos, &freeBlock, sizeof( freeBlock ) ) ;
+            #ifdef S4MDX
+               file4longAssign( pos, freeBlock * I4MULTIPLY + sizeof(S4LONG), 0 ) ;
+               file4readAllInternal( &i4->indexFile->file, pos, &freeBlock, sizeof( freeBlock ) ) ;
+            #else
+            file4longAssign( pos, freeBlock * I4MULTIPLY, 0 ) ;
+               file4readAllInternal( &i4->indexFile->file, pos, &freeBlock, sizeof( freeBlock ) ) ;
+            #endif
 
             #ifdef S4BYTE_SWAP
                freeBlock = x4reverseLong( (void *)&freeBlock ) ;
             #endif
          }
 
+      #ifdef S4FOX
+         /* do the header tag */
+         tagOn = i4->indexFile->tagIndex ;
+         flagNo = (int)((tagOn->headerOffset) / (long)B4BLOCK_SIZE) ;
+         if ( f4flagIsSet( &flags, (unsigned long)flagNo ) )
+            return error4( i4->codeBase, e4index, E81601 ) ;
+         f4flagSet( &flags, (unsigned long)flagNo ) ;
+         f4flagSet( &flags, (unsigned long)flagNo + 1L ) ;  /* tag header is 2 blocks long */
+
+         if ( tfile4freeAll( tagOn ) >= 0 )
+         {
+            #ifdef S4FOX
+               node1 = -1L ;
+               node2 = tagOn->header.root ;
+               node3 = -1L ;
+               flag4blocks( tagOn, &flags, &node1, &node2, &node3 ) ;
+            #else
+               flag4blocks( tagOn, &flags ) ;
+            #endif
+
+            /* Now Flag for each block in each tag */
+            for ( tagOn = 0 ;; )
+            {
+               tagOn = (TAG4FILE *)l4next( &i4->indexFile->tags,tagOn ) ;
+               if ( tagOn == 0 )
+                  break ;
+               flagNo = (int)( tagOn->headerOffset / (long)B4BLOCK_SIZE) ;
+               if ( f4flagIsSet( &flags, (unsigned long)flagNo ) )
+                  return error4( i4->codeBase, e4index, E81601 ) ;
+               f4flagSet( &flags, (unsigned long)flagNo ) ;
+               f4flagSet( &flags, (unsigned long)flagNo + 1L ) ;  /* tag header is 2 blocks long */
+
+               if ( tfile4freeAll( tagOn ) < 0 )
+                  break ;
+               #ifdef S4FOX
+                  node1 = -1L ;
+                  node2 = tagOn->header.root ;
+                  node3 = -1L ;
+                  if ( node2 == -1 )
+                  {
+                     file4longAssign( pos, tagOn->headerOffset, 0 ) ;
+                     if ( file4readAllInternal( &i4->indexFile->file, pos, &node2, sizeof(node2)) < 0 )
+                        return error4( i4->codeBase, e4index, E81601 ) ;
+                     #ifdef S4BYTE_SWAP
+                        node2 = x4reverseLong( (void *)&node2 ) ;
+                     #endif
+                  }
+                  flag4blocks( tagOn, &flags, &node1, &node2, &node3 ) ;
+               #else
+                  flag4blocks( tagOn, &flags ) ;
+               #endif
+            }
+         }
+      #else
          /* Read header information to flag the tag header blocks */
-         T4DESC  desc[48] ;
-         FILE4LONG pos ;
          file4longAssign( pos, 512, 0 ) ;
-         file4readAllInternal( &i4file->file, pos, desc, sizeof(desc) ) ;
+         file4readAllInternal( &i4->indexFile->file, pos, desc, sizeof(desc) ) ;
 
          /* Now Flag for each block in each tag */
-         int i = 1 ;
+         i = 1 ;
 
-         for ( TAG4FILE *tagOn = 0 ;; i++ )
+         for ( tagOn = 0 ;; i++ )
          {
-            tagOn = (TAG4FILE *)l4next( &i4file->tags, tagOn ) ;
+            tagOn = (TAG4FILE *)l4next( &i4->indexFile->tags, tagOn ) ;
             if ( tagOn == 0 )
                break ;
             #ifdef S4BYTE_SWAP
@@ -930,7 +780,7 @@ static int i4checkBlocks( INDEX4 *i4 )
                desc[i].x1000 = 0x1000 ;
             #endif
 
-            unsigned long flagNo = (unsigned long) ((desc[i].headerPos * I4MULTIPLY - 2048) / (long) i4file->header.blockRw) ;
+            flagNo = (int) ((desc[i].headerPos * I4MULTIPLY - 2048) / (long) i4->indexFile->header.blockRw) ;
             if ( f4flagIsSet( &flags, flagNo ) )
                return error4( i4->codeBase, e4index, E81601 ) ;
             f4flagSet( &flags, flagNo ) ;
@@ -941,9 +791,8 @@ static int i4checkBlocks( INDEX4 *i4 )
          }
       #endif
 
-      if ( checkFreeList )
-         if ( f4flagIsAllSet( &flags, 0UL, (unsigned long)totBlocks - 1L ) == 0 )
-            error4( i4->codeBase, e4index, E85702 ) ;
+      if ( f4flagIsAllSet( &flags, 0UL, (unsigned long)totBlocks - 1L ) == 0 )
+         error4( i4->codeBase, e4index, E85702 ) ;
 
       u4free( flags.flags ) ;
       if ( error4code( i4->codeBase ) < 0 )
@@ -1025,16 +874,17 @@ int S4FUNCTION d4check( DATA4 *d4 )
       oldTag = d4tagSelected( d4 ) ;
 
       #ifndef S4OFF_WRITE
-         // AS 07/07/00 - was not (at least in mdx) flushing blocks out until after we had
-         // detected file length, so was having block problems.  Free all blocks here to avoid... (t4index5.c/mdx/server)
-         d4freeBlocks( d4 ) ;
-         rc = d4updateRecord( d4, 0, 1 ) ;
+         rc = d4updateRecord( d4, 0 ) ;
          if ( rc != 0 )  /* either an error or r4unique */
             return rc ;
       #endif
 
       #ifndef S4OFF_MULTI
-         rc = d4lockFileInternal( d4, 1, lock4write ) ;   /* returns -1 if error4code( codeBase ) < 0 */
+         #ifdef S4SERVER
+            rc = dfile4lockFile( d4->dataFile, data4clientId( d4 ), data4serverId( d4 ) ) ;   /* returns -1 if error4code( codeBase ) < 0 */
+         #else
+            rc = d4lockFile( d4 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
+         #endif
          if ( rc )
             return rc ;
       #endif
@@ -1055,7 +905,10 @@ int S4FUNCTION d4check( DATA4 *d4 )
          }
          rc = i4check( indexOn ) ;
          if ( rc < 0 )
+         {
+            rc = -1 ;
             break ;
+         }
       }
 
       d4tagSelect( d4, oldTag ) ;
@@ -1063,4 +916,5 @@ int S4FUNCTION d4check( DATA4 *d4 )
    #endif  /* S4OFF_INDEX */
 }
 
+#endif /* S4CLIENT */
 

@@ -1,25 +1,159 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* i4ntag.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* i4ntag.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
+#ifdef __TURBOC__
+   #pragma hdrstop
+#endif
 
+#ifdef S4CLIENT
+TAG4 *S4FUNCTION t4openLow( DATA4 *d4, INDEX4 *i4ndx, const char *fileName, const char *indexName )
+{
+   CODE4 *c4 ;
+   CONNECTION4OPEN_TAG_INFO_IN *dataIn ;
+   CONNECTION4OPEN_TAG_INFO_OUT *out ;
+   CONNECTION4 *connection ;
+   int rc ;
+   TAG4 *returnTag ;
 
-#ifndef S4OFF_INDEX
+   #ifdef S4VBASIC
+      if ( c4parm_check( d4, 2, E94903 ) )
+         return 0 ;
+   #endif
 
-/* not S4CLIENT, not S4OFF_INDEX */
+   #ifdef E4PARM_HIGH
+      if ( d4 == 0 || fileName == 0 )
+      {
+         error4( 0, e4parm_null, E94903 ) ;
+         return 0 ; ;
+      }
+   #endif
+
+   c4 = d4->codeBase ;
+   if ( error4code( c4 ) < 0 )
+      return 0 ;
+
+   switch( code4indexFormat( c4 ) )
+   {
+      case r4ndx:
+      case r4ntx:
+         break ;
+      default:
+      {
+         error4( c4, e4notSupported, E81719 ) ;
+         return 0 ;
+      }
+   }
+
+   if ( strlen( fileName ) > LEN4PATH )
+   {
+      error4( c4, e4name, E94903 ) ;
+      return 0 ;
+   }
+
+   connection = d4->dataFile->connection ;
+   if ( connection == 0 )
+   {
+      error4( c4, e4connection, E81704 ) ;
+      return 0 ;
+   }
+   connection4assign( connection, CON4TAG_OPEN, data4clientId( d4 ), data4serverId( d4 ) ) ;
+   connection4addData( connection, NULL, sizeof( CONNECTION4OPEN_TAG_INFO_IN ), (void **)&dataIn ) ;
+   dataIn->openForCreate = htons(c4->openForCreate) ;
+
+   #ifdef S4SINGLE
+      dataIn->exclusiveClient = 1 ;
+   #else
+      if ( c4->singleOpen == OPEN4DENY_RW )
+         dataIn->accessMode = htons(OPEN4DENY_RW) ;
+      else
+         dataIn->accessMode = htons(c4->accessMode) ;
+   #endif
+
+   dataIn->readOnly = c4->readOnly ;
+   dataIn->safety = c4->safety ;  /* for catalog */
+   dataIn->errDefaultUnique = htons(c4->errDefaultUnique) ;
+   u4ncpy( dataIn->tagName, fileName, sizeof( dataIn->tagName ) ) ;
+   if ( i4ndx != 0 )
+      dataIn->hasIndex = 1 ;
+
+   if ( indexName != 0 )
+      u4ncpy( dataIn->indexName, indexName, sizeof( dataIn->indexName ) ) ;
+
+   if ( i4ndx != 0 )
+      dataIn->nameLen = strlen( i4ndx->indexFile->accessName ) + 1 ;
+   if ( i4ndx != 0 )
+      connection4addData( connection, i4ndx->indexFile->accessName, dataIn->nameLen, NULL ) ;
+   dataIn->nameLen = ntohs( dataIn->nameLen ) ;
+   connection4sendMessage( connection ) ;
+   rc = connection4receiveMessage( connection ) ;
+   if ( rc < 0 )
+   {
+      error4( c4, rc, E81701 ) ;
+      return 0 ;
+   }
+   rc = connection4status( connection ) ;
+   if ( rc != 0 )
+   {
+      if ( rc < 0 )
+      {
+         if ( c4->errOpen == 0 )
+         {
+            if ( error4code( c4 ) >= 0 )
+               error4set( c4, r4noOpen ) ;
+         }
+         else
+            connection4error( connection, c4, rc, E94903 ) ;
+      }
+      return 0 ;
+   }
+
+   out = (CONNECTION4OPEN_TAG_INFO_OUT *)connection4data( connection ) ;
+
+   if ( client4indexSetup( c4, d4, d4->dataFile, 1, connection4data( connection ) + sizeof(CONNECTION4OPEN_TAG_INFO_OUT),
+        (unsigned int)connection4len( connection ), (char*)fileName, i4ndx ) < 0 )
+   {
+      error4( c4, e4connection, E94903 ) ;
+      return 0 ;
+   }
+
+   i4setup( c4, d4, (char *)fileName, out->autoOpened, i4ndx ) ;
+
+   returnTag = d4tag( d4, fileName ) ;
+   #ifndef S4OFF_TRAN
+      returnTag->isValid = 1 ;
+   #endif
+   return returnTag ;
+}
+
+int S4FUNCTION t4close( TAG4 *t4 )
+{
+   INDEX4 *i4 ;
+   CODE4 *c4 ;
+
+   #ifdef S4VBASIC
+      if ( c4parm_check( t4, 4, E91637 ) )
+         return -1 ;
+   #endif
+
+   i4 = t4->index ;
+   c4 = i4->codeBase ;
+
+   if ( code4indexFormat( c4 ) != r4ntx )  /* function not supported */
+      return error4( c4, e4notSupported, E81719 ) ;
+
+   if ( l4numNodes( &i4->tags ) == 1 )   /* only the one tag, so remove index */
+      return i4closeLow( i4 ) ;
+   else /* just free up the one tag so it is no longer available */
+   {
+      l4remove( &i4->tags, t4 ) ;
+      mem4free( c4->tagMemory, t4 ) ;
+   }
+
+   return 0 ;
+}
+#else
+#ifndef S4INDEX_OFF
+
 int tfile4type( TAG4FILE *t4 )
 {
  #ifdef S4FOX
@@ -33,32 +167,27 @@ int tfile4type( TAG4FILE *t4 )
  #endif
 }
 
-
-
 #ifdef S4CLIPPER
-#ifdef E4ANALYZE
 
-/* for debug purposes only, else is an inline function */
-/* S4CLIPPER, E4ANALYZE, not S4OFF_INDEX */
-B4BLOCK *S4FUNCTION tfile4block( TAG4FILE *t4 )
+B4BLOCK *tfile4block( TAG4FILE *t4 )
 {
-   if ( t4 == 0 )
-   {
-      error4( 0, e4parm_null, E91642 ) ;
-      return 0 ;
-   }
-   if ( t4->blocks.lastNode == 0 )
-   {
-      error4( 0, e4struct, E91642 ) ;
-      return 0 ;
-   }
+   #ifdef E4PARM_LOW
+      if ( t4 == 0 )
+      {
+         error4( 0, e4parm_null, E91642 ) ;
+         return 0 ;
+      }
+   #endif
+   #ifdef E4ANALYZE
+      if ( t4->blocks.lastNode == 0 )
+      {
+         error4( 0, e4struct, E91642 ) ;
+         return 0 ;
+      }
+   #endif
    return (B4BLOCK *)t4->blocks.lastNode ;
 }
-#endif /* E4ANALYZE */
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4rlBottom( TAG4FILE *t4 )
 {
    int rc ;
@@ -109,9 +238,6 @@ int tfile4rlBottom( TAG4FILE *t4 )
    return 0 ;
 }
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 int S4FUNCTION tfile4bottom( TAG4FILE *t4 )
 {
    #ifdef E4PARM_LOW
@@ -128,22 +254,27 @@ int S4FUNCTION tfile4bottom( TAG4FILE *t4 )
       return tfile4rlBottom( t4 ) ;
 }
 
-
-
 #ifdef S4HAS_DESCENDING
-/* S4CLIPPER, HAS_DESCENDING, not S4OFF_INDEX */
 void S4FUNCTION tfile4descending( TAG4FILE *tag, const unsigned short int setting )
 {
    tag->header.descending = setting ;
 }
 #endif
 
-
-
 /* Returns  1 - Cannot move down; 0 - Success; -1 Error */
-/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4down( TAG4FILE *t4 )
 {
+   long blockDown ;
+   B4BLOCK *blockOn, *popBlock, *newBlock, *parent ;
+   int rc ;
+   FILE4LONG pos ;
+   #ifdef S4BYTE_SWAP
+      char *swapPtr ;
+      int i ;
+      short shortVal ;
+      long longVal ;
+   #endif
+
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
          return error4( 0, e4parm_null, E91642 ) ;
@@ -152,21 +283,19 @@ int tfile4down( TAG4FILE *t4 )
    if ( error4code( t4->codeBase ) < 0 )
       return e4codeBase ;
 
-   B4BLOCK *blockOn = (B4BLOCK *)t4->blocks.lastNode ;
+   blockOn = (B4BLOCK *)t4->blocks.lastNode ;
 
-   unsigned long blockDown ;
    if ( blockOn == 0 )    /* Read the root block */
    {
-      if ( t4->header.root == 0L || t4->header.root == INVALID4BLOCK_ID )
+      if ( t4->header.root <= 0L )
       {
-         FILE4LONG pos ;
-         file4longAssign( pos, t4->header.headerOffset + 2 * sizeof(short), 0 ) ;
-         if ( file4readAllInternal( &t4->file, pos, &t4->header.root, 2 * sizeof(S4LONG)) < 0 )
+         file4longAssign( pos, t4->header.headerOffset + 2*sizeof(short), 0 ) ;
+         if ( file4readAllInternal( &t4->file, pos, &t4->header.root, 2*sizeof(S4LONG)) < 0 )
             return -1 ;
 
          #ifdef S4BYTE_SWAP
             t4->header.root = x4reverseLong( (void *)&t4->header.root ) ;
-            t4->header.eof = x4reverseLong( (void *)&t4->header.eof ) ;
+            t4->header.eof  = x4reverseLong( (void *)&t4->header.eof ) ;
          #endif
       }
       blockDown = t4->header.root ;
@@ -175,11 +304,7 @@ int tfile4down( TAG4FILE *t4 )
    {
       if ( b4leaf( blockOn ) )
          return 1 ;
-      #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4seek.cpp for HP */
-         memcpy( &blockDown, &b4key( blockOn, blockOn->keyOn )->pointer, sizeof(S4LONG) ) ;
-      #else
-         blockDown = b4key( blockOn, blockOn->keyOn )->pointer ;
-      #endif
+      blockDown = b4key( blockOn, blockOn->keyOn )->pointer ;
       #ifdef E4ANALYZE
          if ( blockDown <= 0L || blockOn->nKeys -1 > t4->header.keysMax )
             error4( t4->codeBase, e4info, E81602 ) ;
@@ -187,13 +312,13 @@ int tfile4down( TAG4FILE *t4 )
    }
 
    /* Get memory for the new block */
-   B4BLOCK *popBlock = (B4BLOCK *)l4pop( &t4->saved ) ;
-   B4BLOCK *newBlock = popBlock ;
+   popBlock = (B4BLOCK *)l4pop( &t4->saved ) ;
+   newBlock = popBlock ;
    if ( newBlock == 0 )
       newBlock = b4alloc( t4, blockDown ) ;
    if ( newBlock == 0 )
       return -1 ;
-   B4BLOCK *parent = (B4BLOCK *)l4last( &t4->blocks ) ;
+   parent = (B4BLOCK *)l4last( &t4->blocks ) ;
    l4add( &t4->blocks, newBlock ) ;
 
    if ( popBlock == 0  ||  newBlock->fileBlock*I4MULTIPLY != blockDown )
@@ -204,7 +329,7 @@ int tfile4down( TAG4FILE *t4 )
                return -1 ;
       #endif
 
-      int rc = i4readBlock( &t4->file, blockDown, parent, newBlock ) ;
+      rc = i4readBlock( &t4->file, blockDown, parent, newBlock ) ;
 
       if ( rc < 0 )
          return -1 ;
@@ -233,10 +358,20 @@ int tfile4down( TAG4FILE *t4 )
    return 0 ;
 }
 
+int S4FUNCTION tfile4eof( TAG4FILE *t4 )
+{
+   B4BLOCK *b4 ;
 
+   #ifdef E4PARM_LOW
+      if ( t4 == 0 )
+         return error4( 0, e4parm_null, E91642 ) ;
+   #endif
+
+   b4 = tfile4block( t4 ) ;
+   return ( b4->keyOn >= b4->nKeys ) ;
+}
 
 #ifndef S4OFF_WRITE
-/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
 int tfile4flush( TAG4FILE *t4 )
 {
    int rc ;
@@ -255,9 +390,6 @@ int tfile4flush( TAG4FILE *t4 )
 }
 #endif
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4freeAll( TAG4FILE *t4 )
 {
    #ifdef E4PARM_LOW
@@ -269,9 +401,6 @@ int tfile4freeAll( TAG4FILE *t4 )
    return tfile4freeSaved( t4 ) ;
 }
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4freeSaved( TAG4FILE *t4 )
 {
    B4BLOCK *blockOn ;
@@ -299,9 +428,6 @@ int tfile4freeSaved( TAG4FILE *t4 )
    }
 }
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 B4KEY_DATA *tfile4keyData( TAG4FILE *t4 )
 {
    B4BLOCK *b4 ;
@@ -318,10 +444,7 @@ B4KEY_DATA *tfile4keyData( TAG4FILE *t4 )
    return b4key( b4, b4->keyOn ) ;
 }
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
-unsigned long S4FUNCTION tfile4recNo( TAG4FILE *t4 )
+long S4FUNCTION tfile4recNo( TAG4FILE *t4 )
 {
    B4BLOCK *blockOn ;
 
@@ -332,16 +455,13 @@ unsigned long S4FUNCTION tfile4recNo( TAG4FILE *t4 )
 
    blockOn = (B4BLOCK *)t4->blocks.lastNode ;
    if ( blockOn == 0 )
-      return ULONG_MAX - 1 ;
+      return -2L ;
    if ( blockOn->keyOn >= blockOn->nKeys )
-      return ULONG_MAX ;
+      return -1 ;
 
    return b4recNo( blockOn, blockOn->keyOn ) ;
 }
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 int S4FUNCTION tfile4seek( TAG4FILE *t4, const void *ptr, const int lenPtrIn )
 {
    int rc, lenPtr ;
@@ -434,7 +554,7 @@ int S4FUNCTION tfile4seek( TAG4FILE *t4, const void *ptr, const int lenPtrIn )
       /* reset the search_ptr ; */
       incPos++ ;
       cPtr[incPos]-- ;
-      c4memset( cPtr + incPos + 1, 0xFF, lenPtr - incPos - 1 ) ;
+      memset( cPtr + incPos + 1, 0xFF, lenPtr - incPos - 1 ) ;
       if ( dSet )
       {
          rc = (int)tfile4skip( t4, -1L ) ;
@@ -465,9 +585,6 @@ int S4FUNCTION tfile4seek( TAG4FILE *t4, const void *ptr, const int lenPtrIn )
    return rc ;
 }
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 long S4FUNCTION tfile4skip( TAG4FILE *t4, long numSkip )
 {
    int rc, sign, seekSpecial ;
@@ -556,28 +673,12 @@ long S4FUNCTION tfile4skip( TAG4FILE *t4, long numSkip )
             }
 
             /* not on a true key, so instead just go to the old position, and then try the skip again (unless r4after)*/
-            // LY Oct 15/04 : t4write.c crashing due to t4->codeBase->savedKey == 0
-            // AS Oct 29/04 - fix compiler warnings...
-            if ( (unsigned)t4->header.keyLen > t4->codeBase->savedKeyLen )
-            {
-               if ( u4allocAgain( t4->codeBase, &t4->codeBase->savedKey, &t4->codeBase->savedKeyLen, t4->header.keyLen  ) < 0 )
-                  return e4memory ;
-               t4->codeBase->savedKeyLen = t4->header.keyLen ;
-            }
-            c4memcpy( t4->codeBase->savedKey, b4keyKey( blockOn, blockOn->keyOn - 1 ), t4->header.keyLen ) ;
+            memcpy( t4->codeBase->savedKey, b4keyKey( blockOn, blockOn->keyOn - 1 ), t4->header.keyLen ) ;
             seekSpecial = 1 ;
          }
          else
          {
-            // LY Oct 15/04 : t4write.c crashing due to t4->codeBase->savedKey == 0
-            // AS Oct 29/04 - fix compiler warnings...
-            if ( (unsigned)t4->header.keyLen > t4->codeBase->savedKeyLen )
-            {
-               if ( u4allocAgain( t4->codeBase, &t4->codeBase->savedKey, &t4->codeBase->savedKeyLen, t4->header.keyLen  ) < 0 )
-                  return e4memory ;
-               t4->codeBase->savedKeyLen = t4->header.keyLen ;
-            }
-            c4memcpy( t4->codeBase->savedKey, b4keyKey( blockOn, blockOn->keyOn ), t4->header.keyLen ) ;
+            memcpy( t4->codeBase->savedKey, b4keyKey( blockOn, blockOn->keyOn ), t4->header.keyLen ) ;
             seekSpecial = 0 ;
          }
 
@@ -617,14 +718,15 @@ long S4FUNCTION tfile4skip( TAG4FILE *t4, long numSkip )
    return numSkip ;
 }
 
-
-
 #ifndef S4OFF_WRITE
 /* NTX only needs to do a copy and adjust the index pointers */
 /* if extraOld is true then the extra key is placed in old, otherwise in new */
-/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
 B4BLOCK *tfile4split( TAG4FILE *t4, B4BLOCK *oldBlock, const int extraOld )
 {
+   long  newFileBlock ;
+   B4BLOCK *newBlock ;
+   int isBranch ;
+
    if ( error4code( t4->codeBase ) < 0 )
       return 0 ;
 
@@ -633,22 +735,15 @@ B4BLOCK *tfile4split( TAG4FILE *t4, B4BLOCK *oldBlock, const int extraOld )
          error4describe( oldBlock->tag->codeBase, e4index, E91642, oldBlock->tag->alias, 0, 0 ) ;
    #endif
 
-   #ifdef E4DEBUG
-      b4verifyPointers( oldBlock ) ;
-   #endif
-
-   unsigned long newFileBlock = tfile4extend( t4 ) ;
-   B4BLOCK *newBlock = b4alloc( t4, newFileBlock ) ;
+   newFileBlock = tfile4extend( t4 ) ;
+   newBlock = b4alloc( t4, newFileBlock ) ;
    if ( newBlock == 0 )
       return 0 ;
 
    newBlock->changed = 1 ;
    oldBlock->changed = 1 ;
 
-   assert5( oldBlock->data != 0 ) ;
-   assert5( newBlock->data != 0 ) ;
-
-   c4memcpy( newBlock->data, oldBlock->data, B4BLOCK_SIZE_INTERNAL - ( t4->header.keysMax + 2 ) * sizeof(short) ) ;
+   memcpy( newBlock->data, oldBlock->data, B4BLOCK_SIZE - ( t4->header.keysMax + 2 ) * sizeof(short) ) ;
 
    if ( extraOld )
    {
@@ -673,37 +768,18 @@ B4BLOCK *tfile4split( TAG4FILE *t4, B4BLOCK *oldBlock, const int extraOld )
       assert5( oldBlock->nKeys <= t4->header.keysMax && oldBlock->nKeys > 0 ) ;
    }
 
-   int isBranch = !b4leaf( oldBlock ) ;
+   isBranch = !b4leaf( oldBlock ) ;
 
-   // AS 05/18/99 -- in branch case, don't move the last reference pointer over because if we have max key size
-   // we don't actually have room for a key.  Instead copy the reference over...
-   assert5( newBlock->nKeys >= 0 ) ;
-   if ( isBranch )  // AS 05/18/99 -- here is the code to copy the extra entry...
-   {
-      c4memcpy( newBlock->pointers, &oldBlock->pointers[oldBlock->nKeys + 1], (newBlock->nKeys - 1) * sizeof(short) ) ;
-      c4memcpy( &newBlock->pointers[newBlock->nKeys-1], oldBlock->pointers, (oldBlock->nKeys + 1) * sizeof(short) ) ;
-      // copy the extra pointer over to the available slot...
-      B4KEY_DATA *toKeyPtr = b4key( newBlock, newBlock->nKeys - 1 ) ;
-      B4KEY_DATA *fromKeyPtr = b4key( oldBlock,  oldBlock->nKeys + newBlock->nKeys ) ;
-      c4memcpy( &toKeyPtr->pointer, &fromKeyPtr->pointer, sizeof( long ) ) ;
-      newBlock->nKeys -= 1 ;
-   }
-   else
-   {
-      c4memcpy( newBlock->pointers, &oldBlock->pointers[oldBlock->nKeys], newBlock->nKeys * sizeof(short) ) ;
-      c4memcpy( &newBlock->pointers[newBlock->nKeys], oldBlock->pointers, oldBlock->nKeys * sizeof(short) ) ;
-      /* leaf blocks need one more copy */
+   memcpy( newBlock->pointers, &oldBlock->pointers[oldBlock->nKeys + isBranch], newBlock->nKeys * sizeof(short) ) ;
+   memcpy( &newBlock->pointers[newBlock->nKeys], oldBlock->pointers, (oldBlock->nKeys + isBranch) * sizeof(short) ) ;
+
+   if ( isBranch == 0 )  /* leaf blocks need one more copy */
       newBlock->pointers[t4->header.keysMax] = oldBlock->pointers[t4->header.keysMax] ;
-   }
-
-   #ifdef E4DEBUG
-      b4verifyPointers( oldBlock ) ;
-      b4verifyPointers( newBlock ) ;
-   #endif
 
    newBlock->keyOn = oldBlock->keyOn - oldBlock->nKeys - isBranch ;
    if ( newBlock->keyOn < 0 && extraOld == 1 )  // not adding to new anyway, just set to 0 for safety
        newBlock->keyOn = 0 ;
+   newBlock->nKeys -= isBranch ;
    // AS 05/05/98 is possible for newKeys to have 0 keys if new key going into newBlock
    assert5( newBlock->nKeys <= t4->header.keysMax && (newBlock->nKeys > 0 || (extraOld == 0 && (oldBlock->nKeys + isBranch ) == 2) )) ;
    assert5( newBlock->keyOn >= 0 && oldBlock->keyOn >= 0 ) ;
@@ -712,9 +788,6 @@ B4BLOCK *tfile4split( TAG4FILE *t4, B4BLOCK *oldBlock, const int extraOld )
 }
 #endif  /* S4OFF_WRITE */
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4rlTop( TAG4FILE *t4 )
 {
    int rc ;
@@ -751,9 +824,6 @@ int tfile4rlTop( TAG4FILE *t4 )
    return 0 ;
 }
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 int S4FUNCTION tfile4top( TAG4FILE *t4 )
 {
    #ifdef E4PARM_LOW
@@ -770,12 +840,24 @@ int S4FUNCTION tfile4top( TAG4FILE *t4 )
       return tfile4rlTop( t4 ) ;
 }
 
+int tfile4up( TAG4FILE *t4 )
+{
+   #ifdef E4PARM_LOW
+      if ( t4 == 0 )
+         return error4( 0, e4parm_null, E91642 ) ;
+   #endif
 
+   if ( t4->blocks.lastNode == 0 )
+      return 1 ;
+   l4add( &t4->saved, l4pop(&t4->blocks) ) ;
+   return 0 ;
+}
 
 #ifndef S4OFF_WRITE
-/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
 int tfile4update( TAG4FILE *t4 )
 {
+   B4BLOCK *blockOn ;
+   FILE4LONG pos ;
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
@@ -788,7 +870,6 @@ int tfile4update( TAG4FILE *t4 )
    if ( tfile4updateHeader( t4 ) < 0 )
       return -1 ;
 
-   B4BLOCK *blockOn ;
    for( blockOn = 0 ;; )
    {
       blockOn = (B4BLOCK *)l4next( &t4->saved ,blockOn ) ;
@@ -813,7 +894,6 @@ int tfile4update( TAG4FILE *t4 )
          t4->header.root = x4reverseLong( (void *)&t4->header.root ) ;
          t4->header.eof = x4reverseLong( (void *)&t4->header.eof ) ;
       #endif
-      FILE4LONG pos ;
       file4longAssign( pos, t4->headerOffset + 2*sizeof( short ), 0 ) ;
       if ( file4writeInternal( &t4->file, pos, &t4->header.root, 2*sizeof(S4LONG) ) < 0 )
          return -1 ;
@@ -828,9 +908,6 @@ int tfile4update( TAG4FILE *t4 )
 }
 #endif /* S4OFF_WRITE */
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4upToRoot( TAG4FILE *t4 )
 {
    LINK4 *linkOn ;
@@ -849,9 +926,6 @@ int tfile4upToRoot( TAG4FILE *t4 )
    }
 }
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4close( TAG4FILE *t4, DATA4FILE *d4 )
 {
    CODE4 *c4 ;
@@ -863,62 +937,56 @@ int tfile4close( TAG4FILE *t4, DATA4FILE *d4 )
    #endif
 
    c4 = t4->codeBase ;
-   // AS 01/24/00 -- if opening a group file with a missing tag, i4open() was returning 0
-   // but not setting the errorCode to r4noOpen if errOpen was 0.  This was because the
-   // positive error code was not being saved here...
-   finalRc = error4set( c4, 0 ) ;
+   finalRc = 0 ;
 
    #ifdef E4ANALYZE
       if ( t4->userCount <= 0 )
          return error4( c4, e4struct, E91638 ) ;
    #endif
 
-   /* AS 07/22/99 if keepOpen == 2, we also need to avoid userCount decrement... */
+   t4->userCount-- ;
    #ifdef S4SERVER
-      if ( c4->server->keepOpen != 2 || file4getTemporary( &t4->file ) != 1 )
+      if ( c4->server->keepOpen != 2 || t4->file.isTemp != 1 )
+   #endif
+   if ( t4->userCount == 0 )
+   {
+      if ( tfile4freeAll( t4 ) < 0 )
+         finalRc = error4set( c4, 0) ;
+      expr4free( t4->expr ) ;
+      expr4free( t4->filter ) ;
+      mem4release( t4->blockMemory ) ;
+      t4->blockMemory = 0 ;
+      if ( file4openTest( &t4->file ) )
       {
-   #endif
-         t4->userCount-- ;
-         if ( t4->userCount == 0 )
-         {
-            if ( tfile4freeAll( t4 ) < 0 )
-               finalRc = error4set( c4, 0) ;
-            if ( t4->expr )
-               expr4free( t4->expr ) ;
-            if ( t4->filter )
-               expr4free( t4->filter ) ;
-            mem4release( t4->blockMemory ) ;
-            t4->blockMemory = 0 ;
-            if ( file4openTest( &t4->file ) )
-            {
-               // AS 11/27/00 - doRemove must be set on client structure
-               // if ( c4->doRemove == 1 )
-               if ( c4getDoRemove( c4 ) == 1 )
-                  file4setTemporary( &t4->file, 1, 0 ) ;
-               if ( file4close( &t4->file ) < 0 )
-                  finalRc = error4set( c4, 0 ) ;
-            }
-            if ( t4->link.n != (LINK4 *)0 )
-               l4remove( &d4->tagfiles, t4 ) ;
-            mem4free( c4->tagFileMemory, t4 ) ;
-            error4set( c4, finalRc ) ;
-         }
-   #ifdef S4SERVER
+         if ( c4->doRemove == 1 )
+            t4->file.isTemp = 1 ;
+         if ( file4close( &t4->file ) < 0 )
+            finalRc = error4set( c4, 0 ) ;
       }
-   #endif
+      if ( t4->link.n != (LINK4 *)0 )
+         l4remove( &d4->tagfiles, t4 ) ;
+      mem4free( c4->tagFileMemory, t4 ) ;
+      error4set( c4, finalRc ) ;
+   }
 
    return finalRc ;
 }
 
-
-
-// AS Oct 20/04 - need an internal close to bypass the transaction check for internal close requests (temporary files)
-/* S4CLIPPER, not S4OFF_INDEX */
-int t4closeLow( TAG4 *t4 )
+int S4FUNCTION t4close( TAG4 *t4 )
 {
    int finalRc ;
    DATA4 *d4 ;
    CODE4 *c4 ;
+
+   #ifdef S4VBASIC
+      if ( c4parm_check( t4, 4, E91637 ) )
+         return -1 ;
+   #endif
+
+   #ifdef E4PARM_HIGH
+      if ( t4 == 0 )
+         return error4( 0, e4parm_null, E91637 ) ;
+   #endif
 
    if ( l4seek( &t4->index->tags, t4 ) == 1 )  /* i4close removes the tag, so if still there, was not called from i4closeLow() */
    {
@@ -930,6 +998,15 @@ int t4closeLow( TAG4 *t4 )
 
    c4 = t4->tagFile->codeBase ;
    d4 = t4->index->data ;
+
+   #ifndef S4OFF_TRAN
+      /* May 10/96 AS added line below which otherwise caused bad indexes not to close good tags */
+      if ( t4->index->isValid == 1 ) /* if invalid (failed create/open) then allow close */
+         if ( t4->isValid == 1 ) /* if invalid (failed create/open) then allow close */
+            if ( code4transEnabled( c4 ) )
+               if ( code4trans( c4 )->currentTranStatus == r4active )  /* disallow on current active only */
+                  return error4( c4, e4transViolation, E81522 ) ;
+   #endif
 
    finalRc = error4set( c4, 0 ) ;
 
@@ -960,55 +1037,22 @@ int t4closeLow( TAG4 *t4 )
    return finalRc ;
 }
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
-int S4FUNCTION t4close( TAG4 *t4 )
-{
-   #ifdef E4VBASIC
-      if ( c4parm_check( t4, 4, E91637 ) )
-         return -1 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91637 ) ;
-   #endif
-
-   CODE4 *c4 = t4->tagFile->codeBase ;
-   #ifndef S4OFF_TRAN
-      /* May 10/96 AS added line below which otherwise caused bad indexes not to close good tags */
-      if ( t4->index->isValid == 1 ) /* if invalid (failed create/open) then allow close */
-         if ( t4->isValid == 1 ) /* if invalid (failed create/open) then allow close */
-            if ( code4transEnabled( c4 ) )
-               if ( code4trans( c4 )->currentTranStatus == r4active )  /* disallow on current active only */
-                  return error4( c4, e4transViolation, E81522 ) ;
-   #endif
-
-   return t4closeLow( t4 ) ;
-}
-
-
-
 #ifndef S4OFF_WRITE
-/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
-unsigned long tfile4extend( TAG4FILE *t4 )
+long tfile4extend( TAG4FILE *t4 )
 {
+   long oldEof ;
    CODE4 *c4 = t4->codeBase ;
    FILE4LONG pos ;
 
    if ( error4code( c4 ) < 0 )
-      return INVALID4BLOCK_ID ;
+      return e4codeBase ;
 
    #ifdef E4ANALYZE
       if ( t4->header.version == t4->header.oldVersion )
-      {
-         error4( c4, e4info, E91636 ) ;
-         return INVALID4BLOCK_ID ;
-      }
+         return (long)error4( c4, e4info, E91636 ) ;
    #endif
 
-   unsigned long oldEof = t4->header.eof ;
+   oldEof = t4->header.eof ;
 
    #ifdef S4SINGLE
       if ( oldEof != 0 )   /* case where free-list exists */
@@ -1016,38 +1060,29 @@ unsigned long tfile4extend( TAG4FILE *t4 )
       else
       {
    #endif
-         oldEof = file4longGetLo( file4lenLow( &t4->file ) ) ;
+      oldEof = file4longGetLo( file4lenLow( &t4->file ) ) ;
+      #ifdef E4ANALYZE
+         if ( oldEof <= t4->checkEof )
+            return (long)error4( c4, e4info, E91636 ) ;
+         t4->checkEof = oldEof ;
+      #endif
 
-         // AS Nov 27/03 - turns out to be invalid in multi-user since another user may be shrinking the file
-         #if defined( E4MISC ) && defined( S4SINGLE )
-            if ( oldEof <= t4->checkEof )
-            {
-               error4( c4, e4info, E91636 ) ;
-               return INVALID4BLOCK_ID ;
-            }
-            t4->checkEof = oldEof ;
-         #endif
-
-         file4longAssign( pos, file4longGetLo( file4lenLow( &t4->file ) ) + 1024, 0 ) ;
-         file4lenSetLow( &t4->file, pos ) ; /* and extend the file */
+      file4longAssign( pos, file4longGetLo( file4lenLow( &t4->file ) ) + 1024, 0 ) ;
+      file4lenSetLow( &t4->file, pos ) ; /* and extend the file */
    #ifdef S4SINGLE
       }
    #endif
-
-   return oldEof / 512 ;
+   return oldEof/512 ;
 }
 #endif /* S4OFF_WRITE */
-
-
 
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
-/* S4CLIPPER, not S4OFF_INDEX */
-int tfile4go2( TAG4FILE *t4, const unsigned char *ptr, const unsigned long recNum, const int goAdd )
+int tfile4go2( TAG4FILE *t4, const unsigned char *ptr, const long recNum, const int goAdd )
 {
    int rc ;
-   unsigned long rec ;
+   long rec ;
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 || ptr == 0 || recNum < 1 )
@@ -1061,7 +1096,7 @@ int tfile4go2( TAG4FILE *t4, const unsigned char *ptr, const unsigned long recNu
    if ( rc )
       return rc ;
 
-   for( ;; )
+   for(;;)
    {
       rec = tfile4recNo( t4 ) ;
       if (rec == recNum )
@@ -1081,9 +1116,6 @@ int tfile4go2( TAG4FILE *t4, const unsigned char *ptr, const unsigned long recNu
    }
 }
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
 {
    TAG4FILE *tfile ;
@@ -1098,7 +1130,15 @@ static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
    c4 = d4->codeBase ;
 
    u4ncpy( buf, fileName, sizeof( buf ) ) ;
-   u4nameExt( buf, sizeof(buf), TAG4EXT, 0 ) ;
+   #ifndef S4CASE_SEN
+      c4upper(buf) ;
+   #endif
+
+   #ifdef S4CASE_SEN
+      u4nameExt( buf, sizeof(buf), "ntx", 0 ) ;
+   #else
+      u4nameExt( buf, sizeof(buf), "NTX", 0 ) ;
+   #endif
 
    oldTagNameError = c4->errTagName ;
    c4->errTagName = 0 ;
@@ -1134,7 +1174,7 @@ static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
          return 0 ;
    }
 
-   tfile = (TAG4FILE *)mem4allocZero( c4->tagFileMemory ) ;
+   tfile = (TAG4FILE *)mem4alloc( c4->tagFileMemory ) ;
    if ( tfile == 0 )
       return 0 ;
 
@@ -1142,7 +1182,7 @@ static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
    tfile->codeBase = c4 ;
    tfile->userCount = 1 ;
    if ( tfile->blockMemory == 0 )
-      tfile->blockMemory = mem4create( c4, c4->memStartBlock, (sizeof(B4BLOCK)) + B4BLOCK_SIZE_INTERNAL -
+      tfile->blockMemory = mem4create( c4, c4->memStartBlock, (sizeof(B4BLOCK)) + B4BLOCK_SIZE -
                                      (sizeof(B4KEY_DATA)) - (sizeof(short)) - (sizeof(char[2])),
                                      c4->memExpandBlock, 0 ) ;
 
@@ -1152,8 +1192,7 @@ static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
       return 0 ;
    }
 
-   // AS Apr 28/04 - use internal version
-   rc = file4openInternal( &tfile->file, c4, buf, 1, OPT4INDEX ) ;
+   rc = file4open( &tfile->file, c4, buf, 1 ) ;
    if ( rc != 0 )
    {
       tfile4close( tfile, d4->dataFile ) ;
@@ -1189,13 +1228,10 @@ static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
    tfile->header.headerOffset = 0 ;
 
    /* Perform some checks */
-   /* AS 5/12/99 - clipper version, if there is a filter, the sign is incremented to ...'7'.  This
-      should be valid.  */
    if ( tfile->header.keyLen > I4MAX_KEY_SIZE || tfile->header.keyLen <= 0 ||
       tfile->header.keysMax != 2* tfile->header.keysHalf || tfile->header.keysHalf <= 0 ||
       tfile->header.groupLen != tfile->header.keyLen+ 8 ||
-      (tfile->header.sign != 0x6 && tfile->header.sign != 0x106 && tfile->header.sign != 0x7 && tfile->header.sign != 0x107 )
-       )
+      (tfile->header.sign != 0x6 && tfile->header.sign != 0x106 ) )
    {
       error4describe( c4, e4index, E84904, buf, 0, 0 ) ;
       tfile4close( tfile, d4->dataFile ) ;
@@ -1203,13 +1239,13 @@ static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
    }
 
    tfile->cmp = (S4CMP_FUNCTION *)u4memcmp ;
-   tfile->header.root = INVALID4BLOCK_ID ;
+   tfile->header.root = -1 ;
    tfile->header.oldVersion = tfile->header.version ;
 
    u4namePiece( tfile->alias, sizeof( tfile->alias ), fileName, 0, 0 ) ;
-   /* LY 2001/03/14 : if file name in .cgp is lowercase, alias is lowercase,
-      and tag search fails in i4tag() against uppercase tag name */
-   c4upper( tfile->alias ) ;
+   #ifndef S4CASE_SEN
+      c4upper( tfile->alias ) ;
+   #endif
 
    file4seqReadAll( &seqRead, exprBuf, sizeof( exprBuf ) - 1 ) ;
    c4trimN( exprBuf, sizeof( exprBuf ) ) ;
@@ -1235,11 +1271,8 @@ static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
       return 0 ;
    }
 
-   /* AS 11/05/98 Added to read 1 extra byte, was reading off by 1 byte.  Caused problems if
-      reindexing through code base occurred - also don't need to read garbage byte anymore */
-   file4seqReadAll( &seqRead, &garbage, 1 ) ;
    file4seqReadAll( &seqRead, &tfile->header.unique, sizeof( tfile->header.unique ) ) ;
-/*   file4seqReadAll( &seqRead, &garbage, sizeof( garbage ) ) ; */
+   file4seqReadAll( &seqRead, &garbage, sizeof( garbage ) ) ;
    file4seqReadAll( &seqRead, &tfile->header.descending, sizeof( tfile->header.descending ) ) ;
    #ifdef S4BYTE_SWAP
       tfile->header.unique = x4reverseShort( (void *)&tfile->header.unique ) ;
@@ -1279,7 +1312,7 @@ static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
    tfile4initSeekConv( tfile, (char)expr4type( tfile->expr ) ) ;
 
    if ( tfile->blockMemory == 0 )
-      tfile->blockMemory = mem4create( c4, c4->memStartBlock, (sizeof(B4BLOCK)) + B4BLOCK_SIZE_INTERNAL -
+      tfile->blockMemory = mem4create( c4, c4->memStartBlock, (sizeof(B4BLOCK)) + B4BLOCK_SIZE -
                            (sizeof(B4KEY_DATA)) - (sizeof(short)) - (sizeof(char[2])), c4->memExpandBlock, 0 ) ;
 
    if ( tfile->blockMemory == 0 )
@@ -1296,21 +1329,17 @@ static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
    return tfile ;
 }
 
-
-
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
-/* S4CLIPPER, not S4OFF_INDEX */
 TAG4 *S4FUNCTION t4openLow( DATA4 *d4, INDEX4 *i4ndx, const char *fileName, const char *dummy )
 {
    CODE4 *c4 ;
    INDEX4 *i4 ;
    TAG4 *t4 ;
    int oldTagErr ;
-//   char tagName[32];
 
-   #ifdef E4VBASIC
+   #ifdef S4VBASIC
       if ( c4parm_check( d4, 2, E94903 ) )
          return 0 ;
    #endif
@@ -1329,17 +1358,9 @@ TAG4 *S4FUNCTION t4openLow( DATA4 *d4, INDEX4 *i4ndx, const char *fileName, cons
 
    oldTagErr = c4->errTagName ;
    c4->errTagName = 0 ;
-   /* LY 2001/07/11 : if opening Clipper indexes with same alias but different
-      extensions, -69 error occurs
-   u4namePiece(tagName,32,fileName,0,0) ;
-   if ( d4tag( d4, tagName ) ) */
-   // AS Jan 24/02 - This doesn't work if a path is included because the path is used instead of
-   // the root name.  So instead grab the name and extension.
-   char nameBuf[LEN4PATH+1] ;
-   u4namePiece( nameBuf, LEN4PATH, fileName, 0, 1 ) ;
-   if ( d4tag( d4, nameBuf ) )
+   if ( d4tag( d4, fileName ) )
    {
-      error4describe( c4, e4instance, E85308, nameBuf, 0, 0 ) ;
+      error4describe( c4, e4instance, E85308, fileName, 0, 0 ) ;
       c4->errTagName = oldTagErr ;
       return 0 ;
    }
@@ -1355,7 +1376,7 @@ TAG4 *S4FUNCTION t4openLow( DATA4 *d4, INDEX4 *i4ndx, const char *fileName, cons
             return 0 ;
       }
 
-      i4 = (INDEX4 *)mem4allocZero( c4->indexMemory ) ;
+      i4 = (INDEX4 *)mem4alloc( c4->indexMemory ) ;
       if ( i4 == 0 )
       {
          #ifdef E4STACK
@@ -1383,7 +1404,7 @@ TAG4 *S4FUNCTION t4openLow( DATA4 *d4, INDEX4 *i4ndx, const char *fileName, cons
       }
    }
 
-   t4 = (TAG4 *)mem4allocZero( c4->tagMemory ) ;
+   t4 = (TAG4 *)mem4alloc( c4->tagMemory ) ;
    if ( t4 == 0 )
    {
       #ifdef E4STACK
@@ -1406,11 +1427,6 @@ TAG4 *S4FUNCTION t4openLow( DATA4 *d4, INDEX4 *i4ndx, const char *fileName, cons
       return 0 ;
    }
 
-   // AS Oct 12/04 - We need to track the index access name associated with the TAG4FILE in case the indexfile gets opened again.
-   // in particular in client/server to keep the index associated with the correct structure in case it is opened again by another client.
-   if ( i4ndx )   // LY Oct 22/04 : avoid access violation if i4ndx == 0
-      strcpy( t4->tagFile->indexAccessName, i4ndx->accessName ) ;
-
    if ( t4->tagFile->header.unique )
       t4->errUnique = c4->errDefaultUnique ;
    t4->index = i4 ;
@@ -1424,207 +1440,95 @@ TAG4 *S4FUNCTION t4openLow( DATA4 *d4, INDEX4 *i4ndx, const char *fileName, cons
    #ifndef S4OFF_TRAN
       t4->isValid = 1 ;
    #endif
-   #ifdef S4SERVER
-      /* AS 04/05/01 - if the client requests the open after a create and it is temp, mark it as such */
-      if ( c4->createTemp == 1 )  // means the client is requesting this open as temp part of i4create
-         file4setTemporary( &t4->tagFile->file, 1, 0 ) ;
-   #endif
    return t4 ;
 }
 
-
-
 #ifndef S4OFF_WRITE
-
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
-/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
-int tfile4shrink( TAG4FILE *t4, unsigned long blockNo )
+int tfile4shrink( TAG4FILE *t4, long blockNo )
 {
    #ifdef S4SINGLE
       t4->header.eof = blockNo * 512 ;
    #endif
-   // AS Nov 27/03 - with E4MISC, if this block is our checkEof block, the file is getting shrunk, so we need to modify.
-   // was a problem with t4rel2.c - for check purposes only, so allow to make much smaller in the shrink case
-   // AS Nov 27/03 - turns out to be invalid in multi-user since another user may be shrinking the file
-   #if defined( E4MISC ) && defined( S4SINGLE )
-      if ( t4->checkEof >= blockNo * 512 )
-         t4->checkEof = (blockNo - 2) * 512 ;  // subtract 1024, which is the block size
-   #endif
    return 0 ;
 }
 
-
-
-#ifdef S4BYTE_SWAP
-static void tfile4swapHeaderForWrite( T4HEADER *header, I4IND_HEAD_WRITE *swappedWriteHeader, index4headerWrite desiredWrite )
-{
-   /*   If desiredWrite is updateOnly then only those fields header fields which can change will be
-        swapped:
-
-        i.e.: the update fields are:
-           version, root, eof
-   */
-   /* LY 99/06/21 : made swappedWriteHeader and header pointers in param, updated same vars in code below*/
-   swappedWriteHeader->version = x4reverseShort( (void *)&header->version ) ;
-   swappedWriteHeader->root = x4reverseLong( (void *)&header->root ) ;
-   swappedWriteHeader->eof = x4reverseLong( (void *)&header->eof ) ;
-
-   if ( desiredWrite == writeEntireHeader )
-   {
-      swappedWriteHeader->sign = x4reverseShort( (void *)&header->sign ) ;
-      swappedWriteHeader->groupLen = x4reverseShort( (void *)&header->groupLen ) ;
-      swappedWriteHeader->keyLen = x4reverseShort( (void *)&header->keyLen ) ;
-      swappedWriteHeader->keyDec = x4reverseShort( (void *)&header->keyDec ) ;
-      swappedWriteHeader->keysMax = x4reverseShort( (void *)&header->keysMax ) ;
-      swappedWriteHeader->keysHalf = x4reverseShort( (void *)&header->keysHalf ) ;
-   }
-}
-#endif
-
-
-
-#ifdef S4STRUCT_PAD
-   #define I4IND_HEADER_WRITE_SIZE (sizeof(I4IND_HEAD_WRITE) - 2 )
-#else
-   #define I4IND_HEADER_WRITE_SIZE (sizeof(I4IND_HEAD_WRITE) )
-#endif
-
-
-
-/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
-int tfile4writeHeader( TAG4FILE *t4, index4headerWrite desiredWrite )
-{
-   /*   If desiredWrite is updateOnly then only those fields header fields which can change will be
-        written:
-
-        i.e.: the update fields are:
-           version, root, eof
-   */
-   char seqBuf[B4BLOCK_SIZE_INTERNAL] ;
-   FILE4SEQ_WRITE seqwrite ;
-   FILE4LONG writePos ;
-   FILE4 *file = &t4->file ;
-   int exprSourceLen, filterSourceLen ;
-   const char *exprSourcePtr, *filterSourcePtr ;
-   #ifdef S4BYTE_SWAP
-      I4IND_HEAD_WRITE swap ;
-
-      /* swap the various values which will be written*/
-      short uniqueValueToWrite = x4reverseLong( (void *)&t4->header.unique ) ;
-      short descendingValueToWrite = x4reverseLong( (void *)&t4->header.descending ) ;
-      tfile4swapHeaderForWrite( &t4->header, &swap, desiredWrite ) ;
-
-      char *headerWritePtr = (char *) &swap ;   /* LY 99/06/21 : explicit cast */
-   #else
-      char *headerWritePtr = (char *)(&t4->header.sign) ;
-      short uniqueValueToWrite = t4->header.unique ;
-      short descendingValueToWrite = t4->header.descending ;
-   #endif
-
-   /* Now write the header */
-
-   /* basically updateOnly is a special case.  It is not placed in its own function in order
-      to keep all the writes to the header of the tag all in one place for easier maintenance */
-   if ( desiredWrite == updateOnly )
-   {
-      /* the update position starts at the version position in the file */
-      file4longAssign( writePos, INDEX5VERSION_POS, 0 ) ;
-      /* write out: version (short), root (long), and eof (long).  They are all together in the file */
-      return file4writeInternal( file, writePos, headerWritePtr + INDEX5VERSION_POS, 2 * sizeof( S4LONG ) + sizeof( short ) ) ;
-   }
-
-   /* the header is at the INDEX5SIGN_POS area of the file - i.e. sign is 1st memory of header */
-   // LY Mar 28/05 : changed for 64-bit FILE4LONG
-   // file4seqWriteInitLow( &seqwrite, file, INDEX5SIGN_POS, seqBuf, sizeof( seqBuf ) ) ;
-   FILE4LONG newPos ;
-   file4longAssign( newPos, INDEX5SIGN_POS, 0 ) ;
-   file4seqWriteInitLow( &seqwrite, file, newPos, seqBuf, sizeof( seqBuf ) ) ;
-
-   file4seqWrite( &seqwrite, headerWritePtr, I4IND_HEADER_WRITE_SIZE ) ;
-
-   /* write out the expression part */
-   exprSourcePtr = t4->expr->source ;
-   exprSourceLen = c4strlen( exprSourcePtr ) ;
-   if ( exprSourceLen > I4MAX_EXPR_SIZE )
-      return error4( t4->codeBase, e4index, E82106 ) ;
-
-   file4seqWrite( &seqwrite, exprSourcePtr, exprSourceLen ) ;
-
-   /* pad out the area after the expression to make always a consistent size (256 bytes) */
-   /* in header, 256 byters allocated for expression, though max expr size is 255 (I4MAX_EXPR_SIZE 255)
-      so for filler we need to write out 256 - len (OR I4MAX_EXPR_SIZE+1 - LEN ) */
-   file4seqWriteRepeat( &seqwrite, I4MAX_EXPR_SIZE - exprSourceLen + 1, 0 ) ;
-
-   /* write out the unique and descending */
-   file4seqWrite( &seqwrite, &uniqueValueToWrite, sizeof( uniqueValueToWrite ) ) ;
-//   file4seqWriteRepeat( &r4->seqwrite, 1, (char)0 ) ;
-   file4seqWrite( &seqwrite, &descendingValueToWrite, sizeof( descendingValueToWrite ) ) ;
-
-   /* note that the filter comes at the end, so we don't need to do any padding -- at
-      the end of the function we pad everything out to meet the required file length
-   */
-   if ( t4->filter != 0 )
-   {
-      /* write out the filter part only if there is a filter */
-
-      filterSourcePtr = t4->filter->source ;
-      filterSourceLen = c4strlen( filterSourcePtr ) ;
-      if ( filterSourceLen > I4MAX_EXPR_SIZE )
-         return error4( t4->codeBase, e4index, E82106 ) ;
-
-      file4seqWrite( &seqwrite, filterSourcePtr, filterSourceLen ) ;
-   }
-
-   #ifdef E4ANALYZE
-      /* there should have been enough room in the seq buffer to hold B4BLOCK_SIZE_INTERNAL - i.e. the
-         entire header.  Make sure of this
-      */
-      if ( B4BLOCK_SIZE_INTERNAL - (seqwrite.working - seqwrite.avail ) < 0 )
-         return error4( t4->codeBase, e4index, E82103 ) ;
-   #endif
-
-   /* pad out the header to the complete size of a header block */
-   // AS Jun 5/03 - If we have gone to the next seqwrite block (512), then we were overwriting here
-   // because we weren't taking the seqwrite.pos into account.
-   // file4seqWriteRepeat( &seqwrite, B4BLOCK_SIZE_INTERNAL - (seqwrite.working - seqwrite.avail) , 0 ) ;
-   // LY Mar 28/05 : changed for 64-bit FILE4LONG
-   // file4seqWriteRepeat( &seqwrite, B4BLOCK_SIZE_INTERNAL - seqwrite.pos - (seqwrite.working - seqwrite.avail) , 0 ) ;
-   file4longAssign( newPos, B4BLOCK_SIZE_INTERNAL, 0 ) ;
-   file4longSubtractLong( &newPos, &seqwrite.pos ) ;
-   file4longSubtract( &newPos, seqwrite.working - seqwrite.avail ) ;
-   file4seqWriteRepeat( &seqwrite, file4longGetLo( newPos ), 0 ) ;
-
-   if ( file4seqWriteFlush( &seqwrite ) < 0 )
-      return -1 ;
-
-   return 0 ;
-}
-
-
-/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
 int tfile4updateHeader( TAG4FILE *t4 )
 {
-   T4HEADER *header = &t4->header ;
+   T4HEADER *header ;
+   FILE4 *file ;
+   FILE4LONG tLong ;
 
+   #ifdef S4BYTE_SWAP
+      I4IND_HEAD_WRITE swap ;
+   #endif
    if ( error4code( t4->codeBase ) < 0 )
       return e4codeBase ;
 
+   header = &t4->header ;
+   file = &t4->file ;
+/*   header->version = header->oldVersion + 2 ; */
+
    if ( header->oldVersion != header->version )
    {
-      if ( tfile4writeHeader( t4, updateOnly ) < 0 )
-         return -1 ;
+      #ifdef S4BYTE_SWAP
+         swap.sign = x4reverseShort( (void *)&header->sign ) ;
+         swap.version = x4reverseShort( (void *)&header->version ) ;
+         swap.root = x4reverseLong( (void *)&header->root ) ;
+         swap.eof = x4reverseLong( (void *)&header->eof ) ;
+         swap.groupLen = x4reverseShort( (void *)&header->groupLen ) ;
+         swap.keyLen = x4reverseShort( (void *)&header->keyLen ) ;
+         swap.keyDec = x4reverseShort( (void *)&header->keyDec ) ;
+         swap.keysMax = x4reverseShort( (void *)&header->keysMax ) ;
+         swap.keysHalf = x4reverseShort( (void *)&header->keysHalf ) ;
+
+         if ( file4write( file, 0L, &swap, 2 * sizeof(S4LONG ) + 2 * sizeof( short ) ) < 0)
+            return -1 ;
+
+         header->unique = x4reverseShort( (void *)&header->unique ) ;
+         header->descending = x4reverseShort( (void *)&header->descending ) ;
+         #ifndef S4STRUCT_PAD
+            if ( file4write( file, sizeof(I4IND_HEAD_WRITE) + I4MAX_EXPR_SIZE, &header->unique, sizeof(header->unique)) < 0 )
+                    return -1 ;
+            if ( file4write( file, sizeof(I4IND_HEAD_WRITE) + I4MAX_EXPR_SIZE + sizeof(header->unique) + 1, &header->descending, sizeof(header->descending)) < 0 )
+               return -1 ;
+         #else
+            if ( file4write( file, sizeof(I4IND_HEAD_WRITE) + I4MAX_EXPR_SIZE - 2, &header->unique, sizeof(header->unique)) < 0 )
+               return -1 ;
+            if ( file4write( file, sizeof(I4IND_HEAD_WRITE) + I4MAX_EXPR_SIZE - 2 + sizeof(header->unique) + 1, &header->descending, sizeof(header->descending)) < 0 )
+               return -1 ;
+         #endif
+
+         header->unique = x4reverseShort( (void *)&header->unique ) ;
+         header->descending = x4reverseShort( (void *)&header->descending ) ;
+      #else
+         file4longAssign( tLong, 0, 0 ) ;
+         if ( file4writeInternal( file, tLong, &header->sign, 2 * sizeof(S4LONG ) + 2 * sizeof( short ) ) < 0 )
+            return -1 ;
+         #ifndef S4STRUCT_PAD
+            file4longAssign( tLong, sizeof(I4IND_HEAD_WRITE) + I4MAX_EXPR_SIZE, 0 ) ;
+            if ( file4writeInternal( file, tLong, &header->unique, sizeof(header->unique)) < 0 )
+               return -1 ;
+            file4longAssign( tLong, sizeof(I4IND_HEAD_WRITE) + I4MAX_EXPR_SIZE + sizeof(header->unique) + 1, 0 ) ;
+            if ( file4writeInternal( file, tLong, &header->descending, sizeof(header->descending)) < 0 )
+               return -1 ;
+         #else
+            file4longAssign( tLong, sizeof(I4IND_HEAD_WRITE) + I4MAX_EXPR_SIZE - 2, 0 ) ;
+            if ( file4writeInternal( file, tLong, &header->unique, sizeof(header->unique)) < 0 )
+               return -1 ;
+            file4longAssign( tLong, sizeof(I4IND_HEAD_WRITE) + I4MAX_EXPR_SIZE - 2 + sizeof(header->unique) + 1, 0 ) ;
+            if ( file4writeInternal( file, tLong, &header->descending, sizeof(header->descending)) < 0 )
+               return -1 ;
+         #endif
+      #endif
       header->oldVersion = header->version ;
    }
-
    return 0;
 }
 #endif  /* S4OFF_WRITE */
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4goEof( TAG4FILE *t4 )
 {
    int rc ;
@@ -1648,9 +1552,6 @@ int tfile4goEof( TAG4FILE *t4 )
    return 0 ;
 }
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4doVersionCheck( TAG4FILE *t4, int doSeek, int updateVersion )
 {
    #ifndef S4SINGLE
@@ -1669,7 +1570,7 @@ int tfile4doVersionCheck( TAG4FILE *t4, int doSeek, int updateVersion )
       if ( error4code( c4 ) < 0 )
          return e4codeBase ;
 
-      if ( tfile4lockTest( t4 ) == 1 )
+      if ( tfile4lockTest( t4 ) )
          return 0 ;
 
       #ifndef S4OPTIMIZE_OFF
@@ -1721,13 +1622,6 @@ int tfile4doVersionCheck( TAG4FILE *t4, int doSeek, int updateVersion )
                  error can later occur (in d4seek) --> this should be ok for S4CLIPPER */
                if ( b4->nKeys != 0 )
                {
-                  // LY Oct 15/04 : t4data2.c crashing due to c4->savedKey == 0
-                  if ( t4->header.keyLen + 2 * sizeof( S4LONG ) > c4->savedKeyLen )
-                  {
-                     if ( u4allocAgain( c4, &c4->savedKey, &c4->savedKeyLen, t4->header.keyLen + 2 * sizeof( S4LONG )  ) < 0 )
-                        return e4memory ;
-                     c4->savedKeyLen = t4->header.keyLen + 2 * sizeof( S4LONG ) ;
-                  }
                   memcpy( c4->savedKey, b4key( b4, b4->keyOn ), t4->header.keyLen + 2 * sizeof(S4LONG ) ) ;
                   needSeek = 1 ;
                }
@@ -1760,53 +1654,34 @@ int tfile4doVersionCheck( TAG4FILE *t4, int doSeek, int updateVersion )
    return 0;
 }
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 int S4FUNCTION i4versionCheck( INDEX4 *index, const int d1, const int d2 )
 {
    return error4( index->codeBase, e4notSupported, E94903 ) ;
 }
 
-
-
-/* S4CLIPPER, not S4OFF_INDEX */
 int S4FUNCTION tfile4versionCheck( TAG4FILE *t4, const int doSeek, const int updateVersion )
 {
-   /*   AS 02/02/99 --> even if bufferred, in this case we must do a version check because we
-        want to get the latest -- and we have already dumped the buffers from memory anyway,
-        so do a version check no matter what if not locked...
-      #ifndef S4OPTIMIZE_OFF
-        if ( t4->file.doBuffer == 0 )
-      #endif
-   */
+   #ifndef S4OPTIMIZE_OFF
+      if ( t4->file.doBuffer == 0 )
+   #endif
    #ifndef S4SINGLE
-      if ( tfile4lockTest( t4 ) != 1 )
+      if ( tfile4lockTest( t4 ) == 0 )
    #endif
       return tfile4doVersionCheck( t4, doSeek, updateVersion ) ;
    return 0 ;
 }
 
-
-#else  /* S4CLIPPER */
-
-int S4FUNCTION t4close( TAG4 *t4 )
-{
-   return error4( 0, e4notSupported, E81719 ) ;
-}
-
 #endif  /* S4CLIPPER */
-#endif  /* S4OFF_INDEX */
-
-
+#endif  /* S4INDEX_OFF */
 
 #ifdef S4VB_DOS
 #ifdef S4CLIPPER
 
-/* S4VB_DOS, S4CLIPPER */
 TAG4 *S4FUNCTION tfile4open_v(DATA4 *d4, char *name)
-{
-   return tfile4open( d4, 0, c4str(name) ) ;
-}
+   {
+      return tfile4open( d4, 0, c4str(name) ) ;
+   }
+
 #endif  /* S4CLIPPER */
 #endif  /* S4VB_DOS */
+#endif  /* S4CLIENT */

@@ -1,18 +1,4 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* o4opt.h   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* o4opt.h   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 /* these defines must be here even if no optimization for documentation purposes */
 
@@ -21,8 +7,6 @@
 #define OPT4DBF    1
 #define OPT4INDEX  2
 #define OPT4OTHER  3
-// AS Jan 16/03 - Modified file type to indicate a user type so that it would become encrypted
-#define OPT4USER   4
 
 #ifndef S4OFF_OPTIMIZE
 
@@ -52,8 +36,7 @@
 typedef struct
 {
    FILE4 S4PTR *file ;
-   // AS Oct 21/04 - support for large file optimization
-   FILE4LONG pos ;
+   long pos ;
 } OPT4CMP ;
 
 #ifdef __cplusplus
@@ -70,20 +53,15 @@ void file4setWriteOpt( FILE4 *, int ) ;
 
 int opt4blockClear( OPT4BLOCK * ) ;
 int opt4blockRemove( OPT4 *, OPT4BLOCK *, int ) ;
-// AS Nov 28/02 - need to extend out an existing block in some cases to contain more data if
-// file4lenSet() is called.  We don't actually need to assign any data in that case, since
-// at the low-level file we never actually are writing anything out.
-void opt4fileExtend( FILE4 *file, const FILE4LONG newLen, const FILE4LONG startPos ) ;
 
-int opt4fileDelete( FILE4 *, const FILE4LONG, const FILE4LONG ) ;
+int opt4fileDelete( FILE4 *, unsigned long, unsigned long ) ;
 int opt4fileFlushList( OPT4 *, FILE4 *, LIST4 *, int ) ;
-// AS Apr 13/04 - support for optimizing loarge files
-long opt4fileHash( OPT4 *, FILE4 *, FILE4LONG ) ;
-// #define opt4fileHash( opt, file, pos )  ((long)( (( (file)->hashInit + (pos) ) >> (opt)->blockPower ) & (opt)->mask ))
+/*long opt4fileHash( OPT4 *, FILE4 *, unsigned long ) ; */
+#define opt4fileHash( opt, file, pos )  ((long)( (( (file)->hashInit + (pos) ) >> (opt)->blockPower ) & (opt)->mask ))
 void opt4blockLruTop( OPT4BLOCK * ) ;
-unsigned opt4fileRead( FILE4 *, FILE4LONG, void *, unsigned ) ;
-OPT4BLOCK *opt4fileReturnBlock( FILE4 *, FILE4LONG, long ) ;
-int opt4fileWrite( FILE4 *, FILE4LONG, unsigned, const void *, char ) ;
+unsigned opt4fileRead( FILE4 *, unsigned long, void *, unsigned ) ;
+OPT4BLOCK *opt4fileReturnBlock( FILE4 *, unsigned long, long ) ;
+int opt4fileWrite( FILE4 *, unsigned long, unsigned, const void *, char ) ;
 
 int opt4fileFlush( FILE4 *, const int ) ;
 int opt4flushAll( OPT4 *, char ) ;

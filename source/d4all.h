@@ -1,18 +1,4 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* d4all.h   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* d4all.h   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #ifndef D4ALL_INC
 #define D4ALL_INC
@@ -21,33 +7,45 @@
 /**********            USER SWITCH SETTINGS AREA            ***********/
 
 /* CodeBase configuration */
-
-#define S4STAND_ALONE
+/* #define S4CLIENT */
+   #define S4STAND_ALONE
 
 /* Index File compatibility options */
+#ifndef S4CLIENT
 /* #define S4CLIPPER */
-#define S4FOX
+   #define S4FOX
 /* #define S4MDX     */
+#endif
+
+#ifdef S4FOX
+   /* FoxPro collating sequence support (select none, some or all) */
+   #define S4GENERAL       /* Supports German FoxPro 2.5a and Visual FoxPro with general collating sequences */
+
+   /* FoxPro codepage support (select none, some or all) */
+   #define S4CODEPAGE_437   /* U.S. MS-DOS CodePage */
+   #define S4CODEPAGE_1252  /* WINDOWS ANSI CodePage */
+#endif
 
 /* Output selection (alternatives to default) */
+/* #define S4CODE_SCREENS */
 /* #define S4CONSOLE */
 
 /* Specify Library Type (choose one) */
-/* #define S4STATIC */
-/* #define S4DLL    */
+   #define S4STATIC
+/* #define S4DLL     */
+/* #define S4DLL_BUILD */
 
-/* Choose Operating System JASC, removed
-
- #define S4WINCE        for Windows CE
- #define __unix__       requires CodeBase Portability version
- #define S4MACINTOSH    requires CodeBase Mac version
- #define S4WIN64        for IA-64 Windows
-*/
+/* Choose Operating System */
+//   #define S4DOS
+/* #define S4OS2        */   /* for OS/2 */
+/* #define S4WIN16      */   /* for Windows 3.x */
+/* #define S4WINCE      */   /* for Windows CE */
+/* #define S4UNIX       */   /* requires CodeBase Portability version */
+/* #define S4MACINTOSH  */   /* requires CodeBase Mac version */
+/* #define S4PASCAL_WIN */   /* requires CodePascal version */
 
 /* Selected default communications option */
 /* #define S4BERKSOCK */
-/* #define S4MAC_TCP  */
-/* #define S4MACOT_TCP */
    #define S4WINSOCK
 
 /* Alterable CodeBase Global Defines */
@@ -55,17 +53,11 @@
 #define DEF4PROCESS_ID "23165"
 
 /* General Configuration Options */
+/* #define S4CB51         */
 /* #define S4LOCK_HOOK    */
 /* #define S4MAX          */
 /* #define S4SAFE         */
 /* #define S4TIMEOUT_HOOK */
-
-/* #define S4ENCRYPT_COM */
-/* #define S4ENCRYPT_HOOK */
-/* #define S4ENCRYPT_AES */
-/* #define S4ENCRYPT_PUBLIC */
-/* #define S4TEST_KEEP_FILES */
-/* #define S4INTUIT */
 
 /* Error Configuration Options */
 /* #define E4ANALYZE    */
@@ -73,73 +65,163 @@
 /* #define E4HOOK       */
 /* #define E4LINK       */
 /* #define E4MISC       */
-   #define E4VBASIC
 /* #define E4OFF        */
 /* #define E4OFF_STRING */
    #define E4PARM_HIGH
    #define E4PAUSE
-/* #define E4DO_PAUSE */
-/* #define E4FILE_LINE  */
 /* #define E4STOP       */
-/* #define E4STOP_CRITICAL  */
+   #define E4STOP_CRITICAL
 /* #define E4MAC_ALERT 4444 */
 
 /* Library Reducing Switches */
+#ifndef S4CLIENT
 /* #define S4OFF_INDEX    */
-//#define S4OFF_MEMO
-#define S4OFF_MULTI
-#define S4OFF_OPTIMIZE
-#define S4OFF_REPORT
-#define S4OFF_TRAN
-/* #define S4OFF_WRITE    */
-#ifdef S4STAND_ALONE
-/* #define S4OFF_COMPRESS */
+/* #define S4OFF_MEMO     */
+/* #define S4OFF_MULTI    */
+/* #define S4OFF_OPTIMIZE */
+/* #define S4OFF_REPORT   */
 /* #define S4OFF_THREAD   */
+/* #define S4OFF_TRAN     */
+/* #define S4OFF_WRITE    */
 #endif
 
-#ifdef S4FOX
-   /* FoxPro collating sequence support (select none, some or all) */
-   #define S4GENERAL       /* Supports German FoxPro 2.5a and Visual FoxPro with general collating sequences */
-   #ifdef S4GENERAL
-      /* #define S4USE_GENERAL_TAGS_IN_RELATE  */
+/* Spoken Language Switches */
+/* #define S4ANSI         */
+/* #define S4DICTIONARY   */
+/* #define S4FINNISH      */
+/* #define S4FRENCH       */
+/* #define S4GERMAN       */
+/* #define S4NORWEGIAN    */
+/* #define S4SCANDINAVIAN */
+/* #define S4SWEDISH      */
+
+/**********************************************************************/
+
+#ifdef _MSC_VER
+   #if _MSC_VER >= 900
+      #pragma pack(push,1)
+   #else
+      #pragma pack(1)
    #endif
-
-   /* FoxPro codepage support (select none, some or all) */
-   #define S4CODEPAGE_437   /* U.S. MS-DOS CodePage */
-   #define S4CODEPAGE_1252  /* WINDOWS ANSI CodePage */
-   #define S4CODEPAGE_1250  /* WINDOWS Eastern European */
 #else
-   /* Spoken Language Switches */
-   /* #define S4ANSI         */
-   /* #define S4DICTIONARY   */
-   /* #define S4FINNISH      */
-   /* #define S4FRENCH       */
-   /* #define S4GERMAN       */
-   /* #define S4NORWEGIAN    */
-   /* #define S4SCANDINAVIAN */
-   /* #define S4SWEDISH      */
+   #ifdef __BORLANDC__
+      #pragma pack(1)
+   #endif
 #endif
 
-#ifndef S4OFF_COMPRESS
-   #define S4COMPRESS_ZLIB
-   //#define S4COMPRESS_QUICKLZ
+#include <stdlib.h>
+#include <string.h>
+#include <limits.h>
+#ifndef S4WINCE
+   #include <stdio.h>
+   #include <time.h>
 #endif
 
-#ifdef S4MACINTOSH
-   #define S4CARBON_APP
+#ifdef S4UNIX
+   #include "p4port.h"
+#else
+   #ifdef S4MACINTOSH
+      #include "p4port.h"
+   #else
+      #include <stdarg.h>
+      #ifndef S4WINCE
+         #include <io.h>
+      #endif
+      #ifdef S4OS2
+         #include <os2.h>
+         #include <direct.h>
+      #else
+         #ifndef S4WINCE
+            #include <dos.h>
+         #endif
+      #endif
+   #endif
 #endif
 
-/* Special switches required for internal testing - required in conjunction with d4switch */
-/* #define S4TESTING */
-/* #define S4OFF_ENCRYPT_TEST */
 
-#define S4VERSION 6503014
+#ifdef S4WIN16
+   #include <windows.h>
+#else
+   #ifdef __WIN32
+      #include <windows.h>
+   #else
+      #ifdef S4WINCE
+         #include <windows.h>
+      #endif
+   #endif
+#endif
 
-#include "d4inc.h"
+#ifndef S4STAND_ALONE
+   #ifdef S4WINSOCK
+      #include <winsock.h>
+   #endif
+#endif
 
+#include "d4defs.h"
+#include "d4data.h"
+#include "d4declar.h"
+#include "d4inline.h"
+#include "f4flag.h"
+#include "e4expr.h"
+#include "s4sort.h"
+#ifdef S4SERVER
+   #include "d4secure.h"
+#endif
+#include "e4string.h"
+#include "e4error.h"
+
+#include "o4opt.h"
+
+#include "c4com.h"
+#ifndef S4STAND_ALONE
+   #include "c4comlow.h"
+#endif
+
+#include "c4trans.h"
+
+#ifdef OLEDB5BUILD
+   #include "oledb5.hpp"
+#endif
+#ifdef S4SERVER
+   #include "d4server.h"
+#endif
+
+#include "r4relate.h"
+
+#ifdef S4VBX
+   #ifndef S4CONTROLS
+   #endif
+   #include "ctrl4vbx.h"
+#else
+   #ifdef S4CONTROLS
+      #include "ctrl4.h"
+   #endif
+#endif
+
+#include "r4report.h"
+
+#ifdef S4CODE_SCREENS
+   #include "w4.h"
+#endif
+
+#ifdef _MSC_VER
+   #if _MSC_VER >= 900
+      #pragma pack(pop)
+   #else
+      #pragma pack()
+   #endif
+#else
+   #ifdef __BORLANDC__
+      #pragma pack()
+   #endif
+#endif
+
+
+#define S4VERSION 6401
 
 #ifdef __TURBOC__
    #pragma hdrstop
 #endif  /* __TUROBC__ */
+
 
 #endif /* D4ALL_INC */

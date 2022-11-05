@@ -12,9 +12,14 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/* c4const.c  (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* revisited by altomaltes@gmail.com
+ */
+
+/* c4const.c */
 
 #include "d4all.h"
+
+
 
 #ifndef S4CLIENT
 #ifndef S4INDEX_OFF
@@ -48,31 +53,31 @@ static int bitmap4constantCombine( BITMAP4 *parent, BITMAP4 *oldAndMap, CONST4 *
    switch( conType )
    {
       case 1:
-         c4memcpy( (void *)&tempLeaf->lt, (void *)con, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&tempLeaf->lt, (void *)con, sizeof( CONST4 ) ) ;
          break ;
       case 2:
-         c4memcpy( (void *)&tempLeaf->le, (void *)con, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&tempLeaf->le, (void *)con, sizeof( CONST4 ) ) ;
          break ;
       case 3:
-         c4memcpy( (void *)&tempLeaf->gt, (void *)con, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&tempLeaf->gt, (void *)con, sizeof( CONST4 ) ) ;
          break ;
       case 4:
-         c4memcpy( (void *)&tempLeaf->ge, (void *)con, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&tempLeaf->ge, (void *)con, sizeof( CONST4 ) ) ;
          break ;
       case 5:
-         c4memcpy( (void *)&tempLeaf->eq, (void *)con, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&tempLeaf->eq, (void *)con, sizeof( CONST4 ) ) ;
          break ;
       case 6:
          temp = (CONST4 *)u4alloc( (long)sizeof( CONST4 ) ) ;
          if ( temp == 0 )
             return 0 ;
-         c4memcpy( (void *)temp, (void *)con, sizeof( CONST4 ) ) ;
+         memcpy( (void *)temp, (void *)con, sizeof( CONST4 ) ) ;
          l4add( &tempLeaf->ne, temp ) ;
          break ;
       default:
          return error4( parent->log->codeBase, e4info, E93701 ) ;
    }
-   c4memset( (void *)con, 0 ,sizeof( CONST4 ) ) ;
+   memset( (void *)con, 0 ,sizeof( CONST4 ) ) ;
    newBranch = bitmap4redistribute( 0, newBranch, 0 ) ;
 
    if ( error4code( parent->log->codeBase ) < 0 )
@@ -86,295 +91,117 @@ static int bitmap4constantCombine( BITMAP4 *parent, BITMAP4 *oldAndMap, CONST4 *
    return 0 ;
 }
 
-
-
-static void bitmap4redistributeChildren( BITMAP4 *map )
+/* this function redistributes (splits and combines) and/and, or/or block sequences */
+BITMAP4 * bitmap4redistribute( BITMAP4 *parent, BITMAP4 *map, const char doShrink )
 {
-   for( BITMAP4 *childOn = (BITMAP4 *)l4first( &map->children ) ;; )
+   BITMAP4 *childMap, *childOn, *parent2map ;
+   char split ;
+
+   if ( map->branch == 0 )
+      return map ;
+
+   /* first combine all the children of this map */
+   childOn = childMap = (BITMAP4 *)l4first( &map->children ) ;
+   for( ;; )
    {
       if ( childOn == 0 )
          break ;
       childOn = bitmap4redistribute( map, childOn, 0 ) ;
       childOn = (BITMAP4 *)l4next( &map->children, childOn ) ;
    }
-}
 
+   /* now combine all leaf children where possible */
+   if ( parent != 0 )
+      if ( parent->andOr != map->andOr )  /* case where no combos possible */
+         return map ;
 
-
-static BITMAP4 *bitmap4redistributeShrink( BITMAP4 *parent, BITMAP4 *map )
-{
-   if ( map->children.nLink == 1 )   /* just a child, so remove myself */
+   parent2map = 0 ;
+   childMap = (BITMAP4 *)l4first( &map->children ) ;
+   for( ; childMap != 0 ; )
    {
-      BITMAP4 *childMap = (BITMAP4 *)l4first( &map->children ) ;
-      l4remove( &map->children, childMap ) ;
-      if ( parent != 0 )
-      {
-         #ifdef E4ANALYZE
-            if ( childMap->tag == 0 && childMap->children.nLink == 0 )
-            {
-               error4( childMap->log->codeBase, e4info, E93701 ) ;
-               return 0 ;
-            }
-         #endif
-         if ( parent->tag == 0 && childMap->tag != 0 )
-            parent->tag = childMap->tag ;
-         l4addAfter( &parent->children, map, childMap ) ;
-         l4remove( &parent->children, map ) ;
-      }
-      bitmap4destroy( map ) ;
-      map = childMap ;
-   }
-
-   return map ;
-}
-
-
-
-static int bitmap4redistributeSplit( BITMAP4 *map, BITMAP4 **parent, BITMAP4 **parent2map, BITMAP4 *rightChild )
-{
-   // returns 1 if we are to continue, or 0 if we cannot continue (i.e. error) (return 0 to caller)
-
-   /*
-      go from:    (parent)         to            (parent)
-                ...(map)...                ...(map)    (parent2map)...
-           ...(child1) (child2)...    ...(child1)...     (child2)
-   */
-   if ( (*parent2map) == 0 )
-   {
-      (*parent2map) = bitmap4create( map->log, map->relate, map->andOr, 1 ) ;
-      if ( (*parent2map) == 0 )  /* must handle by freeing... */
-         return 0 ;
-      if ( (*parent) == 0 )
-      {
-         (*parent) = bitmap4create( map->log, map->relate, map->andOr, 1 ) ;
-         if ( (*parent) == 0 )  /* must handle by freeing... */
-            return 0 ;
-         l4add( &(*parent)->children, map ) ;
-      }
-      l4add( &(*parent)->children, (*parent2map) ) ;
-   }
-   l4remove( &map->children, rightChild ) ;
-   l4add( &(*parent2map)->children, rightChild ) ;
-
-   return 1 ;
-}
-
-
-
-static int bitmap4redistributeCombine( BITMAP4 *map, BITMAP4 **parent, BITMAP4 **parent2map )
-{
-   // returns 1 if we are to continue, or 0 if we cannot continue (i.e. error) (return 0 to caller)
-   BITMAP4 *childMap ;
-   /* going in we have:
-
-          (parent)
-       ... (map) ...
-
-   */
-   for( childMap = (BITMAP4 *)l4first( &map->children ) ; childMap != 0 ; )
-   {
-      BITMAP4 *rightChild = (BITMAP4 *)l4next( &map->children, childMap ) ;
-      if ( rightChild == 0 )
+      childOn = (BITMAP4 *)l4next( &map->children, childMap ) ;
+      if ( childOn == 0 )
          break ;
 
-      char split = 0 ;
-      if ( rightChild->tag != childMap->tag || rightChild->andOr != childMap->andOr )
-      {
-         split = 1 ;
-      }
+      split = 0 ;
+      if ( childOn->tag != childMap->tag || childOn->andOr != childMap->andOr )
+        split = 1 ;
       else
       {
-         assert5( map != 0 ) ;  // should never be case, don't need if...
-         assert5( rightChild != 0 ) ;  // should never be case, don't need if...
-
-         if ( map->andOr != rightChild->andOr )
-            split = 1 ;
-      }
-
-      // AS Aug 9/04 - special case where we have one map with eq and the other with ne values and the lengths do not match (partial seeks)
-      // in that case do not combine the leafs because that instance is very complicated.
-      if ( split == 0 )
-      {
-         BITMAP4 *eqMap = 0, *neMap = 0 ;
-         if ( childMap->eq.len && rightChild->ne.nLink != 0 )
-         {
-            eqMap = childMap ;
-            neMap = rightChild ;
-         }
-         else if ( rightChild->eq.len && childMap->ne.nLink != 0 )
-         {
-            eqMap = rightChild ;
-            neMap = childMap ;
-         }
-         if ( eqMap && neMap )
-         {
-            CONST4 *cNext, *cOn = (CONST4 *)l4first( &neMap->ne ) ;
-            while ( cOn != 0 )
-            {
-               cNext = (CONST4 *)l4next( &neMap->ne, cOn ) ;
-               if ( cOn->len != eqMap->eq.len )
-               {
-                  short smallestLen = min( cOn->len, eqMap->eq.len ) ;
-                  if ( c4memcmp( const4return( neMap->log, &eqMap->eq ), const4return( neMap->log, cOn ), smallestLen ) == 0 )
-                  {
-                     split = 1 ;
-                     break ;
-                  }
-               }
-               cOn = cNext ;
-            }
-         }
+        if ( map != 0 )
+           if ( map->andOr != childOn->andOr )
+              split = 1 ;
       }
 
       if ( split == 1 )
       {
-         if ( bitmap4redistributeSplit( map, parent, parent2map, rightChild ) == 0 )
-            return 0 ;
+         if ( parent2map == 0 )
+         {
+            parent2map = bitmap4create( map->log, map->relate, map->andOr, 1 ) ;
+            if ( parent2map == 0 )  /* must handle by freeing... */
+               return 0 ;
+            if ( parent == 0 )
+            {
+               parent = bitmap4create( map->log, map->relate, map->andOr, 1 ) ;
+               if ( parent == 0 )  /* must handle by freeing... */
+                  return 0 ;
+               l4add( &parent->children, map ) ;
+            }
+            l4add( &parent->children, parent2map ) ;
+         }
+         l4remove( &map->children, childOn ) ;
+         l4add( &parent2map->children, childOn ) ;
       }
       else
       {
-         /*
-            go from:    (parent)           to           (parent)
-                      ...(map)...                     ...(map)...
-                ...(childMap) (rightChild)...        ...(childMap-rightChild-combined)...
-         */
-         // AS Dec 30/03 ensure they are both leafs...
-         if ( childMap->branch == 1 || rightChild->branch == 1 )  // just skip to next child
-            childMap = rightChild ;
-         else
-         {
-            childMap = bitmap4combineLeafs( map, childMap, rightChild ) ;
-            if ( error4code( map->log->codeBase ) < 0 )
-               return 0 ;
-         }
+         childMap = bitmap4combineLeafs( map, childMap, childOn ) ;
+         if ( error4code( map->log->codeBase ) < 0 )
+            return 0 ;
       }
    }
 
-   if ( (*parent2map) != 0 )   // means we inserted a new parent.  Redistribute this map...
+   if ( parent2map != 0 )
    {
       #ifdef E4ANALYZE
-         if ( (*parent) == 0 )
+         if ( parent == 0 )
          {
             error4( map->log->codeBase, e4info, E93701 ) ;
             return 0 ;
          }
       #endif
-      /* AS 02/22/99 --> parent2map may change, so get it here... (i.e. if shrunk out)*/
-      *parent2map = bitmap4redistribute( (*parent), (*parent2map), 1 ) ;
+      bitmap4redistribute( parent, parent2map, 1 ) ;
    }
-
-   return 1 ;
-}
-
-
-
-BITMAP4 *bitmap4reduce( BITMAP4 *parent, BITMAP4 *map )
-{
-  // reduce the map by eliminating unneeded branches.
-  // basically just go through the tree getting rid of branches with only 1 child.
-  // this is done before the distribution because the original expression may have had more
-  // levels (eg. more braces) than were actually needed.
-
-  // we reduce all our children, then see if we can be reduced...
-
-   for( BITMAP4 *childOn = (BITMAP4 *)l4first( &map->children ) ;; )
-   {
-      if ( childOn == 0 )
-         break ;
-      childOn = bitmap4reduce( map, childOn ) ;
-      childOn = (BITMAP4 *)l4next( &map->children, childOn ) ;
-   }
-
-   // now reduce ourselves if possible...  -- return result because we may be reduced out
-   return bitmap4redistributeShrink( parent, map ) ;
-}
-
-
-
-BITMAP4 *bitmap4redistribute( BITMAP4 *parent, BITMAP4 *map, const char doShrink )
-{
-   /* this function redistributes (splits and combines) and/and, or/or block sequences
-      Basically we want to try to create easier bitmaps for calculations.  For eg, if a bitmap
-      is (val < 10 && val > 5 ), we want to create a simple bitmap between 5 and 10, instead
-      of having 2 different bitmaps.  This is important because it reduces computation time
-      and memory requirements of having multiple maps.
-   */
-
-   // this function returns a new parent as its return if there is no input parent...
-   int parentWasZero = (parent == 0) ? 1 : 0 ;
-
-   if ( map->branch == 0 )  // can't redistribute leaf maps
-      return map ;
-
-   /* first redistribute all the children of this map */
-   #ifdef RELATE4PRINT
-      static inPos = 0 ;
-      #ifdef S4CONSOLE
-         short lineLoop ;
-         for ( lineLoop = 0 ; lineLoop < inPos ; lineLoop++ )
-            printf( "   " ) ;
-         printf( "bitmap4redistribute 1:\n" ) ;
-      #endif
-      bitmap4print( map, inPos ) ;
-      inPos++ ;
-   #endif
-   bitmap4redistributeChildren( map ) ;
-   #ifdef RELATE4PRINT
-      #ifdef S4CONSOLE
-         for ( lineLoop = 0 ; lineLoop < inPos ; lineLoop++ )
-            printf( "   " ) ;
-         printf( "bitmap4redistribute 2:\n" ) ;
-      #endif
-      bitmap4print( map, inPos ) ;
-   #endif
-
-   if ( parent != 0 )
-      if ( parent->andOr != map->andOr )  /* case where no combos possible */
-         return map ;
-
-   /* now combine all leaf children where possible */
-   BITMAP4 *parent2map = 0 ;
-   if ( bitmap4redistributeCombine( map, &parent, &parent2map ) == 0 )
-      return 0 ;
-
-   #ifdef RELATE4PRINT
-      #ifdef S4CONSOLE
-         for ( lineLoop = 0 ; lineLoop < inPos ; lineLoop++ )
-            printf( "   " ) ;
-         printf( "bitmap4redistribute 3:\n" ) ;
-      #endif
-      bitmap4print( map, inPos ) ;
-   #endif
 
    if ( doShrink )
    {
-      map = bitmap4redistributeShrink( parent, map ) ;
-      #ifdef RELATE4PRINT
-         #ifdef S4CONSOLE
-            for ( lineLoop = 0 ; lineLoop < inPos ; lineLoop++ )
-               printf( "   " ) ;
-            printf( "bitmap4redistribute 4:\n" ) ;
-         #endif
-         bitmap4print( map, 0 ) ;
-      #endif
+      if ( map->children.nLink == 1 )   /* just a child, so remove myself */
+      {
+         childMap = (BITMAP4 *)l4first( &map->children ) ;
+         l4remove( &map->children, childMap ) ;
+         if ( parent != 0 )
+         {
+            #ifdef E4ANALYZE
+               if ( childMap->tag == 0 && childMap->children.nLink == 0 )
+               {
+                  error4( childMap->log->codeBase, e4info, E93701 ) ;
+                  return 0 ;
+               }
+            #endif
+            if ( parent->tag == 0 && childMap->tag != 0 )
+               parent->tag = childMap->tag ;
+            l4addAfter( &parent->children, map, childMap ) ;
+            l4remove( &parent->children, map ) ;
+         }
+         bitmap4destroy( map ) ;
+         map = childMap ;
+      }
    }
-
-   #ifdef RELATE4PRINT
-      inPos-- ;
-   #endif
 
    if ( parent2map != 0 && parent != 0 )
-   {
-      if ( parentWasZero == 1 )
-         return parent ;
-      else
-         return parent2map ;
-   }
+      return parent ;
+
    return map ;
 }
-
-
-
 
 /* this function redistributes the input maps by breaking the one up into constants and creating maps for each */
 BITMAP4 *bitmap4redistributeLeaf( BITMAP4 *parent, BITMAP4 *map1, BITMAP4 *map2 )
@@ -518,10 +345,10 @@ BITMAP4 * bitmap4redistributeBranch( BITMAP4 *parent, BITMAP4 *map )
 }
 
 /* location = 0 if seek_before, 1 if seek 1st, 2 if seek last, 3 if seek_after,  */
-/* add 10 if it is to be an approximate seek ?? */
-/* returns record number - ULONG_MAX returned if error */
+/* add 10 if it is to be an approximate seek */
+/* returns record number */
 #ifdef S4HAS_DESCENDING
-unsigned long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location, const unsigned long check, const int doCheck )
+long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location, const long check, const int doCheck )
 {
    int len, rc ;
    TAG4FILE *tag ;
@@ -530,9 +357,9 @@ unsigned long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location,
       char holdResult[20] ;  /* enough space for a numerical key */
    #endif
 
-   // #ifdef S4VFP_KEY
-   //    char buf[I4MAX_KEY_SIZE] ;
-   // #endif
+   #ifdef S4VFP_KEY
+      char buf[I4MAX_KEY_SIZE] ;
+   #endif
 
    tag = map->tag ;
    result = (char *)const4return( map->log, con ) ;
@@ -541,37 +368,28 @@ unsigned long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location,
    if ( map->type != r4str )
    {
       #ifdef S4CLIPPER
-         c4memcpy( holdResult, result, con->len ) ;
+         memcpy( holdResult, result, con->len ) ;
          result = holdResult ;
       #endif
       #ifdef E4ANALYZE
          if ( expr4len( tag->expr ) == -1 )
-         {
-            error4( map->log->codeBase, e4info, E83701 ) ;
-            return ULONG_MAX ;
-         }
+            return error4( map->log->codeBase, e4info, E83701 ) ;
       #endif
       len = expr4keyConvert( tag->expr, (char **)&result, con->len, map->type, tag ) ;
    }
    else
    {
-      #ifdef S4FOX
-         len = expr4keyConvert( tag->expr, (char **)&result, con->len, map->type, tag ) ;
-         /* AS 07/27/99 -> support for generic collating for Unicode and character fields...
-           #ifdef S4VFP_KEY
-            if ( tfile4vfpKey( tag ) )
-            {
-               if ( len * 2 > sizeof( buf ) )
-                  return error4( map->log->codeBase, e4info, E82102 ) ;
-               len = t4strToVFPKey( buf, result, len, len * 2, &tag->vfpInfo ) ;
-               if ( len < 0 )
-                  return error4( map->log->codeBase, e4info, E85404 ) ;
-               result = buf ;
-            }
-          #endif
-         */
-      #else
-         len = con->len ;
+      len = con->len ;
+      #ifdef S4VFP_KEY
+      if ( tfile4vfpKey( tag ) )
+      {
+         if ( len*2 > sizeof(buf) )
+            return error4( map->log->codeBase, e4info, E82102 ) ;
+         len = t4strToVFPKey( buf, result, len, len*2, &tag->vfpInfo ) ;
+         if ( len < 0 )
+            return error4( map->log->codeBase, e4info, E85404 ) ;
+         result = buf ;
+      }
       #endif
    }
 
@@ -579,135 +397,69 @@ unsigned long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location,
       tfile4descending( tag, 1 ) ;
    else
       tfile4descending( tag, 0 ) ;
-   // AS 04/25/01 - seekRc never used, so removed
    tfile4seek( tag, result, len ) ;
    tfile4descending( tag, 0 ) ;
 
-   /* if doCheck == 1, it means we want to ensure that the record found is not == to
-      another found value (i.e. check).  For example if our range is: >3 && <4, if 4
-      has been found the previous seek (>3), then check is set to 4 and doCheck to 1,
-      that way if our seek finds '4', then we want to stop right away (no find) before
-      we do the adjustment of moving back a record.  Note that if the 2nd operator
-      is <= or >=, we should not be doing this check (i.e. the caller should have
-      inputed doCheck = 0)
-
-      This works because we always do forward seeking (we change the descend
-      flag as required)
-   */
-
-   if ( doCheck == 1 )
-      if ( !tfile4eof( tag ) )
+   if ( !tfile4eof( tag ) )
+      if ( doCheck == 1 )
         if ( check == tfile4recNo( tag ) )
-           return ULONG_MAX ;
+           return -1 ;
 
    switch ( location )
    {
       case 0:
-         /* in this instance, location is indicating that we want a 'less
-            than' position.  Therefore we need to go backwards by one.
-            Note that if we are already at the top (i.e. the 1st record
-            in the set matches), then clearly a less than condition is
-            impossible, so '-1' is returned to indicate this.
-         */
          if ( tfile4skip( tag, -1L ) != -1L )   /* at top already */
-            return ULONG_MAX ;
+            return -1 ;
          break ;
       case 1:
-         /* in this instance, location is indicating that we want a 'greater
-            than or equal' position.  Note that if we reached end of tag, then
-            clearly all values in the tag are less than our input value so
-            '>=' is impossible, so '-1' is returned to indicate this.
-         */
          if ( tfile4eof( tag ) )
-            return ULONG_MAX ;
+            return -1 ;
          break ;
       case 2:
-         /* in this instance location is indicating that want a less than
-            or equal seek.  Note that we convert the tag to a descending
-            tag before the seek.  This means that we seek starting at the
-            larger values and end when we hit the first value which is
-            '<=' our desired value we stop.
-
-            Note that we potentilly do a doCheck comparison as well.
-         */
-         if ( doCheck == 1 )
-            if ( !tfile4eof( tag ) )
+         if ( !tfile4eof( tag ) )
+         #ifdef S4FOX
+            if( u4keycmp( tfile4keyData(tag)->value, result, (unsigned int)len, (unsigned int)tag->header.keyLen, 0, &tag->vfpInfo ) != 0 )
+          #else
+            if( (*tag->cmp)( tfile4keyData(tag)->value, result, (unsigned int)len ) != 0 )  /* last one is too far, go back one for a closure */
+         #endif
+         {
+            if ( doCheck == 1 )
                if ( check == tfile4recNo( tag ) )   /* case where none belong, so break now */
-               {
-                  #ifdef S4FOX
-                     // AS 07/27/99 -- this has been superseded by more simple collations for foxPro
-                     // if ( u4keycmp( tfile4keyData(tag)->value, result, (unsigned int)len, (unsigned int)tag->header.keyLen, 0, &tag->vfpInfo ) != 0 )
-                     if ( u4keycmp( tfile4keyData(tag)->value, result, (unsigned int)len, (unsigned int)tag->header.keyLen, 0, collation4get( tag->collateName ) ) != 0 )
-                  #else
-                     if( (*tag->cmp)( tfile4keyData(tag)->value, result, (unsigned int)len ) != 0 )  /* last one is too far, go back one for a closure */
-                  #endif
-                        return ULONG_MAX ;
-               }
+                  return -1 ;
+         }
          break ;
       case 3:
-         /* in this instance location is indicating that we want a 'greater
-            than' value.  Notice that we switch the tag to descending before
-            the seek, which means we will effectively seek from the largest
-            values to the smallest values, and stop at the first value
-            which is <= our seek value.
-
-            If we reach eof this then means that all the records are in
-            actual fact greater than the value we want.  Therefore just
-            go to the top of the file.  Note that a top failure means
-            an empty file which means no records match, so return '-1'
-            to indicate no matches.
-
-            We need to skip forwards once after the seek since we want
-            'greater than' not 'greater than or equal to'.  Note that the
-            property of seeking descending is that we will be on the
-            first value less than or equal to search key, so we will always
-            want to skip one forwards to move onto the first greater than
-            key.  If we cannot skip forward then it means that no records
-            were found greater than what we seeked for, so return '-1' to
-            indicate this.
-
-         */
          if ( tfile4eof( tag ) )
          {
             rc = tfile4top( tag ) ;
             if ( rc != 0 )  /* no records */
-               return ULONG_MAX ;
+               return -1 ;
          }
          else
          {
             rc = (int)tfile4skip( tag, 1L ) ;
             if ( rc == 0L )
-               return ULONG_MAX ;
+               return -1 ;
          }
          break ;
       default:
-         error4( map->log->codeBase, e4info, E93701 ) ;
-         return ULONG_MAX ;
+         return error4( map->log->codeBase, e4info, E93701 ) ;
    }
 
    return tfile4recNo( tag ) ;
 }
 #endif
-
-
-
 #ifdef S4MDX
-unsigned long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location, const unsigned long check, const int doCheck )
+long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location, const long check, const int doCheck )
 {
-   /*
-      con is the constant value we are seeking for
-      location has the following meanings:
-        '0' --> we want a '<' position from the constant
-        '1' --> we want a '>=' position
-        '2' --> we want a '<=' position
-        '3' --> we want a '>' position
-   */
-   int len, rc ;
+   int len, rc, seekRc, isDesc ;
+   TAG4FILE *tag ;
+   char *result ;
    char didSkip ;
 
-   TAG4FILE *tag = map->tag ;
-   char *result = (char *)const4return( map->log, con ) ;
-   int isDesc = ( tag->header.typeCode & 8 ) ? 1 : 0 ;
+   tag = map->tag ;
+   result = (char *)const4return( map->log, con ) ;
+   isDesc = ( tag->header.typeCode & 8 ) ? 1 : 0 ;
 
    if ( map->type != r4str )   /* must convert to a proper key */
    {
@@ -715,38 +467,21 @@ unsigned long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location,
          if ( expr4len( tag->expr ) == -1 )
             return error4( map->log->codeBase, e4info, E83701 ) ;
       #endif
-      /* AS 07/27/99 -> support for generic collating for Unicode and character fields...  */
-      // #ifdef S4VFP_KEY
-      //#ifdef S4FOX
-      //   len = expr4keyConvert( tag->expr, (char **)&result, con->len, map->type, tag->expr->vfpInfo->sortType ) ;
-      //#else
-         len = expr4keyConvert( tag->expr, (char **)&result, con->len, map->type, tag ) ;
-      //#endif
+      #ifdef S4VFP_KEY
+         len = expr4keyConvert( tag->expr, (char **)&result, con->len, map->type, tag->expr->vfpInfo->sortType ) ;
+      #else
+         len = expr4keyConvert( tag->expr, (char **)&result, con->len, map->type, 0 ) ;
+      #endif
    }
    else
       len = con->len ;
 
-   int seekRc = tfile4seek( tag, result, len ) ;
+   seekRc = tfile4seek( tag, result, len ) ;
 
-   /* if doCheck == 1, it means we want to ensure that the record found is not == to
-      another found value (i.e. check).  For example if our range is: >3 && <4, if 4
-      has been found the previous seek (>3), then check is set to 4 and doCheck to 1,
-      that way if our seek finds '4', then we want to stop right away (no find) before
-      we do the adjustment of moving back a record.  Note that if the 2nd operator
-      is <= or >=, we should not be doing this check (i.e. the caller should have
-      inputed doCheck = 0)
-
-      This does not work as simply if the index is actually a descending index.
-      In that case we have to do the check after compensating for the descend.
-   */
-
-   if ( !isDesc )
-   {
-      if ( !tfile4eof( tag ) )
-         if ( doCheck && location < 2 )
-            if ( check == tfile4recNo( tag ) )
-               return -1 ;
-   }
+   if ( !tfile4eof( tag ) )
+      if ( doCheck && location < 2 )
+         if ( check == tfile4recNo( tag ) )
+            return -1 ;
 
    switch ( location )
    {
@@ -755,14 +490,8 @@ unsigned long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location,
          {
             if ( tfile4eof( tag ) )
                return -1 ;
-            for( ;; )
+            for(; (*tag->cmp)( tfile4keyData(tag)->value, result, len ) == 0; )
             {
-               // AS 05/17/99 --> to avoid potential gpf if tfile4keyData fails...
-               B4KEY_DATA *currentKey = tfile4keyData(tag) ;
-               if ( currentKey == 0 ) // means an error
-                  return error4( map->log->codeBase, e4info, E93701 ) ;
-               if ( (*tag->cmp)( tfile4keyData(tag)->value, result, len ) != 0 )
-                  break ;
                rc = (int)tfile4skip( tag, 1L ) ;
                if ( rc < 0 )
                  return -1 ;
@@ -787,20 +516,13 @@ unsigned long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location,
                  if ( check == tfile4recNo( tag ) )   /* case where none belong, so break now */
                     return -1 ;
                if ( tfile4skip( tag, -1L ) != -1L )
-                  return -1 ;
+                 return -1 ;
             }
             else
             {
                rc = -1 ;
-               // keep skipping as long as the current key == result
-               for( ;; )
+               for(; (*tag->cmp)( tfile4keyData(tag)->value, result, len ) == 0; )
                {
-                  // AS 05/17/99 --> to avoid potential gpf if tfile4keyData fails...
-                  B4KEY_DATA *currentKey = tfile4keyData(tag) ;
-                  if ( currentKey == 0 ) // means an error
-                     return error4( map->log->codeBase, e4info, E93701 ) ;
-                  if ( (*tag->cmp)( currentKey->value, result, len ) != 0 )
-                     break ;
                   rc = (int)tfile4skip( tag, 1L ) ;
                   if ( rc < 0 )
                      return -1 ;
@@ -825,26 +547,13 @@ unsigned long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location,
             if ( tfile4eof( tag ) )
                return -1 ;
             if ( seekRc == 2 )
-               if ( doCheck == 1 )
-                  if ( check == tfile4recNo( tag ) )   /* case where none belong, so break now */
-                     return -1 ;
+               if ( check == tfile4recNo( tag ) )   /* case where none belong, so break now */
+                  return -1 ;
             break ;
          }
          else
          {
-            // AS 05/17/99 --> to avoid potential gpf if tfile4keyData fails...
-            // AS 07/06/99 --> if at eof was failing because tfile4keyData fails...
-            if ( tfile4eof( tag ) )
-            {
-               /* we want <=, and are at eof, so just skip backwards 1 and we are there (assuming there are records in the datafile) */
-               if ( tfile4skip( tag, -1L ) != -1L )   /* no records... */
-                  return -1 ;
-               break ;
-            }
-            B4KEY_DATA *currentKey = tfile4keyData(tag) ;
-            if ( currentKey == 0 ) // means an error
-               return error4( map->log->codeBase, e4info, E93701 ) ;
-            if ( (*tag->cmp)( currentKey->value, result, len ) != 0 )  /* last one is too far, go back one for a closure */
+            if( (*tag->cmp)( tfile4keyData(tag)->value, result, len ) != 0 )  /* last one is too far, go back one for a closure */
             {
                if ( !tfile4eof( tag ) )
                   if ( check == tfile4recNo( tag ) )   /* case where none belong, so break now */
@@ -852,10 +561,8 @@ unsigned long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location,
                if ( tfile4skip( tag, -1L ) != -1L )
                   return -1 ;
             }
-            // just skip down to case 3...
          }
-         // just skip down to case 3...
-      case 3:  // sometimes we skip through into here from 'case 2'
+      case 3:
          if ( isDesc )
          {
             if ( tfile4skip( tag, -1L ) != -1L )   /* at top already */
@@ -863,23 +570,10 @@ unsigned long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location,
          }
          else
          {
-            // AS 05/17/99 --> if tag file is empty, or at eof already, was failing...
-            if ( tfile4eof( tag ) )
-            {
-               /* on last record not far enough, so none match */
-               return -1 ;
-            }
             didSkip = 0 ;
 
-            // keep skipping as long as the current key == result
-            for( ;; )
+            for(; (*tag->cmp)( tfile4keyData(tag)->value, result, len ) == 0; )
             {
-               // AS 05/17/99 --> to avoid potential gpf if tfile4keyData fails...
-               B4KEY_DATA *currentKey = tfile4keyData(tag) ;
-               if ( currentKey == 0 ) // means an error
-                  return error4( map->log->codeBase, e4info, E93701 ) ;
-               if ( (*tag->cmp)( currentKey->value, result, len ) != 0 )
-                  break ;
                rc = (int)tfile4skip( tag, 1L ) ;
                if ( rc < 0 )
                   return -1 ;
@@ -902,7 +596,7 @@ unsigned long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location,
             }
             else
                if ( didSkip == 1 )
-                  if ( tfile4skip( tag, -1L ) != -1L )
+                 if ( tfile4skip( tag, -1L ) != -1L )
                      return -1 ;
          }
          break ;
@@ -914,19 +608,15 @@ unsigned long bitmap4seek( BITMAP4 *map, const CONST4 *con, const char location,
 }
 #endif
 
-
-
+/* returns a pointer to the constant value */
 void *const4return( L4LOGICAL *log, const CONST4 *c1 )
 {
-   /* returns a pointer to the constant value */
    return (void *)( log->buf + c1->offset ) ;
 }
 
-
-
+/* updates the log's constant memory buffer, re-allocating memory if required */
 int const4memAlloc( L4LOGICAL *log, const unsigned len )
 {
-   /* updates the log's constant memory buffer, re-allocating memory if required */
    if ( ( log->bufPos + len ) > log->bufLen )
    {
       #ifdef E4ANALYZE
@@ -948,12 +638,12 @@ int const4duplicate( CONST4 *to, const CONST4 *from, L4LOGICAL *log )
    len = (unsigned int)from->len ;
 
    if ( len == 0 )
-      c4memset( (void *)to, 0, (unsigned int)sizeof( CONST4 ) ) ;
+      memset( (void *)to, 0, (unsigned int)sizeof( CONST4 ) ) ;
    else
    {
       if ( const4memAlloc( log, len ) < 0 )
          return -1 ;
-      c4memcpy( log->buf + log->bufPos - len, const4return( log, from ), len ) ;
+      memcpy( log->buf + log->bufPos - len, const4return( log, from ), len ) ;
       to->offset = log->bufLen - len ;
       to->len = len ;
    }
@@ -981,7 +671,7 @@ int const4get( CONST4 *con, BITMAP4 *map, L4LOGICAL *log, const int pos )
    if ( rc < 0 )
       return error4stack( map->log->codeBase, rc, E93704 ) ;
 
-   c4memcpy( log->buf + log->bufPos - len, result, len ) ;
+   memcpy( log->buf + log->bufPos - len, result, len ) ;
    map->type = v4functions[log->expr->info[pos].functionI].returnType ;
    con->offset = log->bufLen - len ;
    con->len = len ;
@@ -1051,8 +741,6 @@ int const4eq( CONST4 *p1, CONST4 *p2, BITMAP4 *map )
    return 0 ;
 }
 
-
-// returns true if constant value p1 <= constant value p2.
 int const4lessEq( CONST4 *p1, CONST4 *p2, BITMAP4 *map )
 {
    switch( map->type )
@@ -1098,14 +786,14 @@ void const4addNe( BITMAP4 *map, CONST4 *con )
    cOn = (CONST4 *) u4alloc( (long)sizeof( CONST4 ) ) ;
    if ( cOn == 0 )
       return ;
-   c4memcpy( (void *)cOn, (void *)con, (unsigned int)sizeof( CONST4 ) ) ;
+   memcpy( (void *)cOn, (void *)con, (unsigned int)sizeof( CONST4 ) ) ;
    l4add( &map->ne, cOn ) ;
-   c4memset( (void *)con, 0, (unsigned int)sizeof( CONST4 ) ) ;
+   memset( (void *)con, 0, (unsigned int)sizeof( CONST4 ) ) ;
 }
 
-void const4deleteNe( LIST4 *listIn, CONST4 *con )
+void const4deleteNe( LIST4 *list, CONST4 *con )
 {
-   l4remove( listIn, con ) ;
+   l4remove( list, con ) ;
    u4free( con ) ;
 }
 

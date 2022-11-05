@@ -1,20 +1,12 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* d4extra.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* d4extra.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
+
+#ifndef UNIX
+   #ifdef __TURBOC__
+      #pragma hdrstop
+   #endif
+#endif
 
 #ifdef E4ANALYZE
 #ifdef P4ARGS_USED
@@ -49,7 +41,8 @@ int dfile4verify( DATA4FILE *d4, int subs )
 }
 
 #ifndef S4SINGLE
-int lock4groupVerify( LOCK4GROUP *lock, const int subs )
+#ifndef S4CLIENT
+int lock4verify( LOCK4 *lock, const int subs )
 {
    int rc ;
 
@@ -57,7 +50,7 @@ int lock4groupVerify( LOCK4GROUP *lock, const int subs )
       return error4( 0, e4parm_null, E93903 ) ;
 
    if ( subs == 1 )
-      if ( ( rc = dfile4verify( lock->data->dataFile, 1 ) ) < 0 )
+      if ( ( rc = dfile4verify( lock->data, 1 ) ) < 0 )
          return rc ;
 
 /*
@@ -67,73 +60,85 @@ int lock4groupVerify( LOCK4GROUP *lock, const int subs )
 
    return 0 ;
 }
+#endif  /* S4CLIENT */
 #endif  /* S4SINGLE */
 #endif  /* E4ANALYZE */
 
 #ifndef S4SINGLE
-int lock4groupLock( LOCK4GROUP *lock )
+#ifndef S4CLIENT
+int lock4lock( LOCK4 *lock )
 {
    int rc ;
 
 #ifdef E4ANALYZE
-   if ( ( rc = lock4groupVerify( lock, 1 ) ) < 0 )
+   if ( ( rc = lock4verify( lock, 1 ) ) < 0 )
       return rc ;
 #endif
 
    switch( lock->id.type )
    {
-      case LOCK4ALL:    rc = d4lockAllInternal( lock->data, 0 ) ;         break ;
-      case LOCK4APPEND: rc = d4lockAppendInternal( lock->data, 0 ) ;         break ;
-      case LOCK4FILE:   rc = d4lockFileInternal( lock->data, 0, lock4any ) ;         break ;
-      case LOCK4RECORD: rc = d4lockInternal( lock->data, lock->id.recNum, 0, lock4any ) ;         break ;
-      default:          rc = error4( lock->data->codeBase, e4lock, E83901 ) ;         break ;
+      case LOCK4ALL:
+         rc = dfile4lockAll( lock->data, lock->id.clientId, lock->id.serverId ) ;
+         break ;
+      case LOCK4APPEND:
+         rc = dfile4lockAppend( lock->data, lock->id.clientId, lock->id.serverId ) ;
+         break ;
+      case LOCK4FILE:
+         rc = dfile4lockFile( lock->data, lock->id.clientId, lock->id.serverId ) ;
+         break ;
+      case LOCK4RECORD:
+         rc = dfile4lock( lock->data, lock->id.clientId, lock->id.serverId, lock->id.recNum ) ;
+         break ;
+      default:
+         rc = error4( lock->data->c4, e4lock, E83901 ) ;
+         break ;
    }
 
    return rc ;
 }
 
-int lock4groupUnlock( LOCK4GROUP *lock )
+int lock4unlock( LOCK4 *lock )
 {
    int rc, oldUnlockAuto ;
 
-   #ifdef E4ANALYZE
-      if ( ( rc = lock4groupVerify( lock, 1 ) ) < 0 )
-         return rc ;
-   #endif
+#ifdef E4ANALYZE
+   if ( ( rc = lock4verify( lock, 1 ) ) < 0 )
+      return rc ;
+#endif
 
-   oldUnlockAuto = code4unlockAuto( lock->data->codeBase ) ;
-   code4unlockAutoSet( lock->data->codeBase, 1 ) ;
+   oldUnlockAuto = code4unlockAuto( lock->data->c4 ) ;
+   code4unlockAutoSet( lock->data->c4, 1 ) ;
 
    switch ( lock->id.type )
    {
       case LOCK4ALL:
-         #ifndef S4CLIPPER
+         #ifndef N4OTHER
             #ifndef S4MEMO_OFF
-               dfile4memoUnlock( lock->data->dataFile ) ;
+               dfile4memoUnlock( lock->data ) ;
             #endif
          #endif
          #ifndef S4INDEX_OFF
-            dfile4unlockIndex( lock->data->dataFile, lock->id.serverId ) ;
+            dfile4unlockIndex( lock->data, lock->id.serverId ) ;
          #endif
-         // AS Apr 15/03 - support for new lockId for shared clone locking
-         rc = dfile4unlockFile( lock->data->dataFile, lock->id.lockId, lock->id.serverId ) ;
+         rc = dfile4unlockFile( lock->data, lock->id.clientId, lock->id.serverId ) ;
          break ;
       case LOCK4APPEND:
-         rc = dfile4unlockAppend( lock->data->dataFile, lock->id.lockId, lock->id.serverId ) ;
+         rc = dfile4unlockAppend( lock->data, lock->id.clientId, lock->id.serverId ) ;
          break ;
       case LOCK4FILE:
-         rc = dfile4unlockFile( lock->data->dataFile, lock->id.lockId, lock->id.serverId ) ;
+         rc = dfile4unlockFile( lock->data, lock->id.clientId, lock->id.serverId ) ;
          break ;
       case LOCK4RECORD:
-         rc = d4unlockRecord( lock->data, lock->id.recNum ) ;
+         rc = dfile4unlockRecord( lock->data, lock->id.clientId, lock->id.serverId, lock->id.recNum ) ;
          break ;
       default:
-         rc = error4( lock->data->codeBase, e4info, E93801 ) ;
+         rc = error4( lock->data->c4, e4info, E93801 ) ;
          break ;
    }
 
-   code4unlockAutoSet( lock->data->codeBase, oldUnlockAuto ) ;
+   code4unlockAutoSet( lock->data->c4, oldUnlockAuto ) ;
 
    return rc ;
 }
+#endif  /* S4CLIENT */
 #endif  /* S4SINGLE */

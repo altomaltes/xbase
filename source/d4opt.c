@@ -1,18 +1,4 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* d4opt.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* d4opt.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
 #ifndef S4UNIX
@@ -31,195 +17,163 @@
    #endif
 #endif
 
-
-
 #ifndef S4OFF_OPTIMIZE
-   void code4memStartMaxSet( CODE4 *c4, const int percent )
-   {
-      /* if possible, it gets the physical amount of available memory and sets the
-         memStartMax to a percentage of that amount (the input percent)
-         It won't auto-start optimizatino if it was suspended physically */
-      LONGLONG availMem ;
+/* if possible, it gets the physical amount of available memory and sets the
+   memStartMax to a percentage of that amount (the input percent)
+   It won't auto-start optimizatino if it was suspended physically */
+void code4memStartMaxSet( CODE4 *c4, const int percent )
+{
+   double availMem ;
+   #ifdef __WIN32
+      MEMORYSTATUS memory;
+   #endif
 
-      if ( c4->hadOpt == 1 || c4->opt.numBuffers || c4->hasOpt )   /* don't enable if suspend was requested or is already initialized */
-         return ;
-
-      availMem = 0 ;
-
-      #ifdef S4WIN32
-         // CS 2012/05/24 If the compiler is VC2005, use the more recommended GlobalMemoryStatusEx(). Otherwise use the older GlobalMemoryStatus().
-         #if defined(_MSC_VER) && _MSC_VER >= 1400
-            MEMORYSTATUSEX memoryx;
-            memoryx.dwLength = sizeof( MEMORYSTATUSEX ) ;   /* reqd by Windows to set */
-            BOOL result = GlobalMemoryStatusEx( &memoryx ) ;
-            // GlobalMemoryStatusEx returns true on success.
-            if (result)
-            {
-               availMem = memoryx.ullAvailPhys ;
-            }
-         #else
-            MEMORYSTATUS memory;
-            memory.dwLength = sizeof( MEMORYSTATUS ) ;   /* reqd by Windows to set */
-            GlobalMemoryStatus( &memory ) ;
-            // GlobalMemoryStatus sets values to -1 on error.
-            if (memory.dwAvailPhys != -1)
-            {
-               availMem = memory.dwAvailPhys ;
-            }
-         #endif
-      #endif
-
-      if ( availMem != 0 && percent <= 100 && percent >= 0 )
-      {
-         c4->memStartMax = (long) ( ((double)percent / 100) * availMem ) ;
-
-         // CS 2012/02/02 Maximum 1 GB.
-         if ((unsigned long)(c4->memStartMax) > 0x40000000)
-         {
-            c4->memStartMax = 0x40000000;
-         }
-         // AS 04/20/01 - no longer actually enforces this...
-         // code4optStart( c4 ) ;
-      }
-      else
-         c4->hadOpt = 1 ;    /* had chance to enable optimization but it was denied */
-
+   if ( c4->hadOpt == 1 || c4->opt.numBuffers || c4->hasOpt )   /* don't enable if suspend was requested or is already initialized */
       return ;
+
+   availMem = 0 ;
+
+   #ifdef __WIN32
+      memory.dwLength = sizeof( MEMORYSTATUS ) ;   /* reqd by Windows to set */
+      GlobalMemoryStatus( &memory ) ;
+      availMem = memory.dwAvailPhys ;
+   #endif
+
+   if ( availMem != 0 && percent <= 100 && percent >= 0 )
+   {
+      c4->memStartMax = (long) ( ((double)percent / 100) * availMem ) ;
+      code4optStart( c4 ) ;
    }
+   else
+      c4->hadOpt = 1 ;    /* had chance to enable optimization but it was denied */
+
+   return ;
+}
 #endif
 
-
-
 #ifndef S4CLIENT
-   #ifdef S4CB51
-      int S4FUNCTION code4freeBlocks( CODE4 *c4 )
-   #else
-      static int code4freeBlocks( CODE4 *c4 )
+#ifdef S4CB51
+int S4FUNCTION code4freeBlocks( CODE4 *c4 )
+#else
+static int code4freeBlocks( CODE4 *c4 )
+#endif
+{
+   #ifdef S4SERVER
+      SERVER4CLIENT *client ;
    #endif
-   {
-      #ifdef S4SERVER
-         SERVER4CLIENT *client ;
-      #endif
-      #ifndef S4CLIENT
-         DATA4 *data ;
-      #endif
+   #ifndef S4CLIENT
+      DATA4 *data ;
+   #endif
 
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-            return error4( 0, e4parm_null, E92510 ) ;
-      #endif
+   #ifdef E4PARM_HIGH
+      if ( c4 == 0 )
+         return error4( 0, e4parm_null, E92510 ) ;
+   #endif
 
-      #ifdef S4SERVER
-         /* reserve the client list during this process */
-         server4clientListReserve( c4->server ) ;
+   #ifdef S4SERVER
+      /* reserve the client list during this process */
+      list4mutexWait( &c4->server->clients ) ;
 
-         for( client = 0 ;; )
-         {
-            client = server4clientGetNext( c4->server, client ) ;
-            if ( client == 0 )
-               break ;
-            for ( data = 0 ;; )
-            {
-               data = (DATA4 *)l4next( tran4dataList( &client->trans ), data ) ;
-               if ( data == 0 )
-                  break ;
-               d4freeBlocks( data ) ;
-            }
-         }
-         server4clientListRelease( c4->server ) ;
-      #endif
-
-      #ifdef S4STAND_ALONE
+      for( client = 0 ;; )
+      {
+         client = (SERVER4CLIENT *)l4next( &c4->server->clients.list, client ) ;
+         if ( client == 0 )
+            break ;
          for ( data = 0 ;; )
          {
-            data = (DATA4 *)l4next( tran4dataList( &c4->c4trans.trans ), data ) ;
+            data = (DATA4 *)l4next( tran4dataList( &client->trans ), data ) ;
             if ( data == 0 )
                break ;
             d4freeBlocks( data ) ;
          }
-      #endif
+      }
+      list4mutexRelease( &c4->server->clients ) ;
+   #endif
 
-      return 0 ;
-   }
+   #ifdef S4STAND_ALONE
+      for ( data = 0 ;; )
+      {
+         data = (DATA4 *)l4next( tran4dataList( &c4->c4trans.trans ), data ) ;
+         if ( data == 0 )
+            break ;
+         d4freeBlocks( data ) ;
+      }
+   #endif
+
+   return 0 ;
+}
 #endif
 
-
-
 #ifdef S4STAND_ALONE
-   #ifndef S4OFF_OPTIMIZE
-      int S4FUNCTION code4optAll( CODE4 *c4 )
+#ifndef S4OFF_OPTIMIZE
+int S4FUNCTION code4optAll( CODE4 *c4 )
+{
+   LIST4 *list ;
+   int rc ;
+   DATA4FILE *dfile ;
+   DATA4 *data ;
+
+   #ifdef E4PARM_HIGH
+      if ( c4 == 0 )
+         return error4( 0, e4parm_null, E92531 ) ;
+   #endif
+
+   list = tran4dataList( code4trans( c4 ) ) ;
+   for ( dfile = 0 ;; )
+   {
+      dfile = (DATA4FILE *)l4next( &c4->dataFileList, dfile ) ;
+      if ( dfile == 0 )
+         break ;
+      #ifdef S4OPTIMIZE_STATS
+         /* don't optimize the stat file or nested d4appends occur */
+         if ( c4->statusDbf != 0 )
+            if ( &dfile->file == &c4->statusDbf->dataFile->file )  /* don't do for the stat file! */
+               continue ;
+      #endif
+      for ( data = 0 ;; )
       {
-         LIST4 *list ;
-         int rc ;
-         DATA4FILE *dfile ;
-         DATA4 *data ;
-
-         #ifdef E4PARM_HIGH
-            if ( c4 == 0 )
-               return error4( 0, e4parm_null, E92531 ) ;
-         #endif
-
-         list = tran4dataList( code4trans( c4 ) ) ;
-         for ( dfile = 0 ;; )
+         data = (DATA4 *)l4next( list, data ) ;
+         if ( data == 0 )
          {
-            dfile = (DATA4FILE *)l4next( &c4->dataFileList, dfile ) ;
-            if ( dfile == 0 )
+            #ifdef E4ANALYZE
+               #ifndef S4OFF_MULTI
+                  code4lockClear( c4 ) ;
+               #endif
+               return error4( c4, e4info, E92531 ) ;
+            #else
                break ;
-            #ifdef S4OPTIMIZE_STATS
-               /* don't optimize the stat file or nested d4appends occur */
-               if ( c4->statusDbf != 0 )
-                  if ( &dfile->file == &c4->statusDbf->dataFile->file )  /* don't do for the stat file! */
-                     continue ;
             #endif
-            for ( data = 0 ;; )
-            {
-               data = (DATA4 *)l4next( list, data ) ;
-               if ( data == 0 )
-               {
-                  #ifdef E4ANALYZE
-                     #ifndef S4OFF_MULTI
-                        #ifndef S4SERVER
-                           /* in server we never leave locks in place, since clientId not avail */
-                           code4lockClear( c4 ) ;
-                        #endif
-                     #endif
-                     return error4( c4, e4info, E92531 ) ;
-                  #else
-                     break ;
-                  #endif
-               }
-               if ( data->dataFile == dfile )
-               {
-                  #ifndef S4OFF_MULTI
-                     rc = d4lockAddAll( data ) ;
-                     if ( rc != 0 )
-                        return rc ;
-                  #endif
-                  rc = d4optimize( data, OPT4ALL ) ;
-                  if ( rc != 0 )
-                     return rc ;
-                  rc = d4optimizeWrite( data, OPT4ALL ) ;
-                  if ( rc != 0 )
-                     return rc ;
-                  break ;
-               }
-            }
          }
-
-         #ifndef S4OFF_MULTI
-            rc = code4lock( c4 ) ;
+         if ( data->dataFile == dfile )
+         {
+            #ifndef S4OFF_MULTI
+               rc = d4lockAddAll( data ) ;
+               if ( rc != 0 )
+                  return rc ;
+            #endif
+            rc = d4optimize( data, OPT4ALL ) ;
             if ( rc != 0 )
                return rc ;
-         #endif
-
-         code4optStart( c4 ) ;
-
-         return 0 ;
+            rc = d4optimizeWrite( data, OPT4ALL ) ;
+            if ( rc != 0 )
+               return rc ;
+            break ;
+         }
       }
-   #endif /* S4OFF_OPTIMIZE */
+   }
+
+   #ifndef S4OFF_MULTI
+      rc = code4lock( c4 ) ;
+      if ( rc != 0 )
+         return rc ;
+   #endif
+
+   code4optStart( c4 ) ;
+
+   return 0 ;
+}
+#endif /* S4OFF_OPTIMIZE */
 #endif /* S4STAND_ALONE */
-
-
 
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -246,8 +200,6 @@ int S4FUNCTION code4optStart( CODE4 *c4 )
    #endif /* S4OFF_OPTIMIZE */
 }
 
-
-
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -260,14 +212,14 @@ int code4optRestart( CODE4 *c4 )
       FILE4 *fileOn ;
       FILE4LONG len ;
       double hitCountAdd ;
-      #ifdef S4WIN32
+      #ifdef __WIN32
          DWORD sectorsPerCluster, bytesPerSector, numberFreeClusters, totalNumberClusters ;
       #endif
 
-      #ifdef E4VBASIC
+      #ifdef S4VBASIC
          if ( c4parm_check( c4, 1, E92502 ) )
             return -1 ;
-      #endif  /* E4VBASIC */
+      #endif  /* S4VBASIC */
 
       #ifdef E4PARM_HIGH
          if ( c4 == 0 )
@@ -287,7 +239,7 @@ int code4optRestart( CODE4 *c4 )
       if ( opt->numBuffers || c4->hasOpt )  /* no initialization required */
          return 0 ;
 
-      #ifdef S4WIN32
+      #ifdef __WIN32
          /* set block sizes based on sector-size values */
          /* if used, final version must address different drives for different
             files */
@@ -442,8 +394,6 @@ int code4optRestart( CODE4 *c4 )
    return 0 ;
 }
 
-
-
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -454,17 +404,15 @@ int S4FUNCTION code4optSuspend( CODE4 *c4 )
       FILE4 *fileOn ;
       int rc, saveRc ;
 
-      #ifdef E4VBASIC
+      #ifdef S4VBASIC
          if ( c4parm_check( c4, 1, E92503 ) )
             return -1 ;
-      #endif  /* E4VBASIC */
+      #endif  /* S4VBASIC */
 
       #ifdef E4PARM_HIGH
          if ( c4 == 0 )
             return error4( 0, e4parm_null, E92503 ) ;
       #endif
-
-      c4->hadOpt = 1 ;   /* indicate that at one time optimization was enabled */   // CS 2000/04/11 move up
 
       opt = &c4->opt ;
       if ( opt->numBuffers == 0 || c4->hasOpt == 0 )
@@ -484,6 +432,7 @@ int S4FUNCTION code4optSuspend( CODE4 *c4 )
          file4setWriteOpt( fileOn, 0 ) ;
       }
       c4->hasOpt = 0 ;
+      c4->hadOpt = 1 ;   /* indicate that at one time optimization was enabled */
 
       opt4freeAlloc( opt ) ;
 
@@ -499,40 +448,120 @@ int S4FUNCTION code4optSuspend( CODE4 *c4 )
    return 0 ;
 }
 
-
-
 #ifndef S4SERVER
-   int S4FUNCTION d4optimize( DATA4 *d4, const int optFlag )
-   {
-      #ifdef S4CLIENT
-         return 0 ;
-      #else
-         #ifdef E4VBASIC
-            if ( c4parm_check( d4, 2, E92504 ) )
-               return -1 ;
-         #endif  /* E4VBASIC */
+int S4FUNCTION d4optimize( DATA4 *d4, const int optFlag )
+{
+   #ifdef S4CLIENT
+      return 0 ;
+   #else
+      #ifdef S4VBASIC
+         if ( c4parm_check( d4, 2, E92504 ) )
+            return -1 ;
+      #endif  /* S4VBASIC */
 
-         #ifdef E4PARM_HIGH
-            if ( d4 == 0 || optFlag < -1 || optFlag > 1 )
-               return error4( 0, e4parm, E92504 ) ;
-         #endif
-         return dfile4optimize( d4->dataFile, optFlag ) ;
+      #ifdef E4PARM_HIGH
+         if ( d4 == 0 || optFlag < -1 || optFlag > 1 )
+            return error4( 0, e4parm, E92504 ) ;
       #endif
-   }
+      return dfile4optimize( d4->dataFile, optFlag ) ;
+   #endif
+}
 #endif /* S4SERVER */
 
+#ifndef S4CLIENT
+#ifdef P4ARGS_USED
+   #pragma argsused
+#endif
+int dfile4optimize( DATA4FILE *d4, const int optFlag )
+{
+   #ifndef S4OFF_OPTIMIZE
+      int rc ;
+      #ifndef S4OFF_INDEX
+         #ifdef N4OTHER
+            TAG4FILE *tagOn ;
+         #else
+            INDEX4FILE *indexOn ;
+         #endif
+      #endif
 
+      #ifdef E4PARM_LOW
+         if ( d4 == 0 || optFlag < -1 || optFlag > 1 )
+            return error4( 0, e4parm, E91102 ) ;
+      #endif
+
+      if ( dfile4recWidth( d4 ) > d4->c4->opt.bufferSize )  /* don't optimize records larger than the buffer size */
+      {
+         rc = file4optimizeLow( &d4->file, optFlag, OPT4DBF, dfile4recWidth( d4 ), d4 ) ;
+         if ( rc < 0 )
+            return rc ;
+      }
+
+      #ifndef S4OFF_INDEX
+         #ifdef N4OTHER
+            for( tagOn = 0;;)
+            {
+               tagOn = dfile4tagNext( d4, tagOn ) ;
+               if ( tagOn == 0 )
+                  break ;
+
+               rc = file4optimizeLow( &tagOn->file, optFlag, OPT4INDEX, 0, tagOn ) ;
+               if ( rc < 0 )
+                  return rc ;
+            }
+         #else
+            for ( indexOn = 0 ;; )
+            {
+               indexOn = (INDEX4FILE *)l4next( &d4->indexes, indexOn ) ;
+               if ( indexOn == 0 )
+                  break ;
+               rc = file4optimizeLow( &indexOn->file, optFlag, OPT4INDEX, 0, indexOn ) ;
+               if ( rc < 0 )
+                  return rc ;
+            }
+         #endif
+      #endif
+
+      #ifndef S4OFF_MEMO
+         if ( d4->memoFile.file.hand != INVALID4HANDLE )
+            return file4optimize( &d4->memoFile.file, optFlag, OPT4OTHER ) ;
+      #endif
+
+      return 0 ;
+   #else
+      return 0 ;
+   #endif
+}
+#endif
+
+int S4FUNCTION d4optimizeWrite( DATA4 *d4, const int optFlag )
+{
+   #ifdef S4CLIENT
+      return 0 ;
+   #else
+      #ifdef S4VBASIC
+         if ( c4parm_check( d4, 2, E92506 ) )
+            return -1 ;
+      #endif  /* S4VBASIC */
+
+      #ifdef E4PARM_HIGH
+         if ( d4 == 0 || optFlag < -1 || optFlag > 1 )
+            return error4( 0, e4parm, E92506 ) ;
+      #endif
+      return dfile4optimizeWrite( d4->dataFile, optFlag ) ;
+   #endif
+}
 
 #ifndef S4CLIENT
-   #ifdef P4ARGS_USED
-      #pragma argsused
-   #endif
-   int dfile4optimize( DATA4FILE *d4, const int optFlag )
-   {
+#ifdef P4ARGS_USED
+   #pragma argsused
+#endif
+int dfile4optimizeWrite( DATA4FILE *d4, const int optFlag )
+{
+   #ifndef S4OFF_WRITE
       #ifndef S4OFF_OPTIMIZE
          int rc ;
          #ifndef S4OFF_INDEX
-            #ifdef S4CLIPPER
+            #ifdef N4OTHER
                TAG4FILE *tagOn ;
             #else
                INDEX4FILE *indexOn ;
@@ -544,381 +573,267 @@ int S4FUNCTION code4optSuspend( CODE4 *c4 )
                return error4( 0, e4parm, E91102 ) ;
          #endif
 
-         // CS 2000/05/29 change operator to <=
-         if ( dfile4recWidth( d4 ) <= d4->c4->opt.bufferSize )  /* don't optimize records larger than the buffer size */
-         {
-            rc = file4optimizeLow( &d4->file, optFlag, OPT4DBF, dfile4recWidth( d4 ), d4 ) ;
-            if ( rc < 0 )
-               return rc ;
-         }
+         rc = file4optimizeWrite( &d4->file, optFlag ) ;
+         if ( rc < 0 )
+            return error4stack( d4->c4, rc, E91102 ) ;
+
+         #ifndef S4OFF_MEMO
+            if ( d4->memoFile.file.hand != INVALID4HANDLE )
+            {
+
+               rc = file4optimizeWrite( &d4->memoFile.file, optFlag ) ;
+               if ( rc < 0 )
+                  return error4stack( d4->c4, rc, E91102 ) ;
+            }
+         #endif
 
          #ifndef S4OFF_INDEX
-            #ifdef S4CLIPPER
+            #ifndef N4OTHER
+               indexOn = (INDEX4FILE *) l4first( &d4->indexes ) ;
+               if ( indexOn != 0 )
+                  do
+                  {
+                     rc = file4optimizeWrite( &indexOn->file, optFlag ) ;
+                     if ( rc < 0 )
+                        return error4stack( d4->c4, rc, E91102 ) ;
+                     indexOn = (INDEX4FILE *)l4next( &d4->indexes, indexOn ) ;
+                  } while ( indexOn != 0 ) ;
+            #else
                for( tagOn = 0;;)
                {
                   tagOn = dfile4tagNext( d4, tagOn ) ;
                   if ( tagOn == 0 )
                      break ;
-
-                  rc = file4optimizeLow( &tagOn->file, optFlag, OPT4INDEX, 0, tagOn ) ;
-                  if ( rc < 0 )
-                     return rc ;
-               }
-            #else
-               for ( indexOn = 0 ;; )
-               {
-                  indexOn = (INDEX4FILE *)l4next( &d4->indexes, indexOn ) ;
-                  if ( indexOn == 0 )
-                     break ;
-                  rc = file4optimizeLow( &indexOn->file, optFlag, OPT4INDEX, 0, indexOn ) ;
-                  if ( rc < 0 )
-                     return rc ;
-               }
-            #endif
-         #endif
-
-         #ifndef S4OFF_MEMO
-            // LY 2003/07/31 #ifdef S4WIN64 /* LY 00/09/20 */
-            //    if ( d4->memoFile.file.hand != NULL )
-            // #else
-               if ( d4->memoFile.file.hand != INVALID4HANDLE )
-            // #endif
-               return file4optimize( &d4->memoFile.file, optFlag, OPT4OTHER ) ;
-         #endif
-
-         return 0 ;
-      #else
-         return 0 ;
-      #endif
-   }
-#endif
-
-
-
-int S4FUNCTION d4optimizeWrite( DATA4 *d4, const int optFlag )
-{
-   #ifdef S4CLIENT
-      return 0 ;
-   #else
-      #ifdef E4VBASIC
-         if ( c4parm_check( d4, 2, E92506 ) )
-            return -1 ;
-      #endif  /* E4VBASIC */
-
-      #ifdef E4PARM_HIGH
-         if ( d4 == 0 || optFlag < -1 || optFlag > 1 )
-            return error4( 0, e4parm, E92506 ) ;
-      #endif
-      return dfile4optimizeWrite( d4->dataFile, optFlag ) ;
-   #endif
-}
-
-
-
-#ifndef S4CLIENT
-   #ifdef P4ARGS_USED
-      #pragma argsused
-   #endif
-   int dfile4optimizeWrite( DATA4FILE *d4, const int optFlag )
-   {
-      #ifndef S4OFF_WRITE
-         #ifndef S4OFF_OPTIMIZE
-            int rc ;
-            #ifndef S4OFF_INDEX
-               #ifdef S4CLIPPER
-                  TAG4FILE *tagOn ;
-               #else
-                  INDEX4FILE *indexOn ;
-               #endif
-            #endif
-
-            #ifdef E4PARM_LOW
-               if ( d4 == 0 || optFlag < -1 || optFlag > 1 )
-                  return error4( 0, e4parm, E91102 ) ;
-            #endif
-
-            rc = file4optimizeWrite( &d4->file, optFlag ) ;
-            if ( rc < 0 )
-               return error4stack( d4->c4, rc, E91102 ) ;
-
-            #ifndef S4OFF_MEMO
-               // LY 2003/07/31 #ifdef S4WIN64 /* LY 00/09/20 */
-               //    if ( d4->memoFile.file.hand != NULL )
-               // #else
-                  if ( d4->memoFile.file.hand != INVALID4HANDLE )
-               // #endif
-               {
-
-                  rc = file4optimizeWrite( &d4->memoFile.file, optFlag ) ;
+                  rc = file4optimizeWrite( &tagOn->file, optFlag ) ;
                   if ( rc < 0 )
                      return error4stack( d4->c4, rc, E91102 ) ;
                }
             #endif
-
-            #ifndef S4OFF_INDEX
-               #ifndef S4CLIPPER
-                  indexOn = (INDEX4FILE *) l4first( &d4->indexes ) ;
-                  if ( indexOn != 0 )
-                     do
-                     {
-                        rc = file4optimizeWrite( &indexOn->file, optFlag ) ;
-                        if ( rc < 0 )
-                           return error4stack( d4->c4, rc, E91102 ) ;
-                        indexOn = (INDEX4FILE *)l4next( &d4->indexes, indexOn ) ;
-                     } while ( indexOn != 0 ) ;
-               #else
-                  for( tagOn = 0;;)
-                  {
-                     tagOn = dfile4tagNext( d4, tagOn ) ;
-                     if ( tagOn == 0 )
-                        break ;
-                     rc = file4optimizeWrite( &tagOn->file, optFlag ) ;
-                     if ( rc < 0 )
-                        return error4stack( d4->c4, rc, E91102 ) ;
-                  }
-               #endif
-            #endif
          #endif
       #endif
-      return 0 ;
-   }
+   #endif
+   return 0 ;
+}
 #endif
 
-
-
 #ifndef S4OFF_OPTIMIZE
-   static void opt4freeAlloc( OPT4 *opt )
-   {
-      OPT4BLOCK *curBlock ;
-      int i ;
-      #ifdef S4ADVANCE_READ
-         FILE4ADVANCE_READ *advanceRead ;
-         LINK4 *advanceLink ;
-         FILE4 *f4 ;
-      #endif
+static void opt4freeAlloc( OPT4 *opt )
+{
+   OPT4BLOCK *curBlock ;
+   int i ;
+   #ifdef S4ADVANCE_READ
+      FILE4ADVANCE_READ *advanceRead ;
+      LINK4 *advanceLink ;
+      FILE4 *f4 ;
+   #endif
 
-      #ifdef E4PARM_LOW
-         if ( opt == 0 )
+   #ifdef E4PARM_LOW
+      if ( opt == 0 )
+      {
+         error4( 0, e4parm_null, E92508 ) ;
+         return ;
+      }
+   #endif
+
+   #ifdef S4WRITE_DELAY
+      if ( opt->delayWriteBuffer != 0 )
+      {
+         while ( l4numNodes( &opt->delayAvail ) != opt->maxBlocks )  /* wait for delay-write to finish on blocks */
+            Sleep( 0 ) ;
+
+         for ( i = 0 ; i < (int)opt->maxBlocks ; i++ )
          {
-            error4( 0, e4parm_null, E92508 ) ;
-            return ;
+            curBlock = &opt->blocks[ opt->numBuffers * opt->maxBlocks + i] ;
+            l4remove( &opt->delayAvail, &curBlock->lruLink ) ;
          }
-      #endif
 
-      #ifdef S4WRITE_DELAY
-         if ( opt->delayWriteBuffer != 0 )
-         {
-            while ( l4numNodes( &opt->delayAvail ) != opt->maxBlocks )  /* wait for delay-write to finish on blocks */
+         DeleteCriticalSection( &opt->critical4optWrite ) ;
+         u4free( opt->delayWriteBuffer ) ;
+         opt->delayWriteBuffer = 0 ;
+      }
+   #endif
+
+   #ifdef S4ADVANCE_READ
+      if ( opt->advanceLargeBuffer != 0 )
+      {
+         /* just cancel it */
+         EnterCriticalSection( &opt->critical4optRead ) ;
+         f4 = opt->advanceReadFile ;
+         if ( f4 != 0 )
+            if ( l4numNodes( &f4->advanceReadFileList ) != 0 )
             {
-               // AS Apr 5/07 - adjust...don't sleep unless the code4 is running as high priority
-               CODE4 *c4 = 0 ;
-               if ( opt->writeFile != 0 )
-                  c4 = opt->writeFile->codeBase ;
-               else
-                  if ( opt->readFile != 0 )
-                     c4 = opt->readFile->codeBase ;
-
-               u4sleep( c4 ) ;
-            }
-
-            for ( i = 0 ; i < (int)opt->maxBlocks ; i++ )
-            {
-               curBlock = &opt->blocks[ opt->numBuffers * opt->maxBlocks + i] ;
-               l4remove( &opt->delayAvail, &curBlock->lruLink ) ;
-            }
-
-            critical4sectionInitUndo( &opt->critical4optWrite ) ;
-            u4free( opt->delayWriteBuffer ) ;
-            opt->delayWriteBuffer = 0 ;
-         }
-      #endif
-
-      #ifdef S4ADVANCE_READ
-         if ( opt->advanceLargeBuffer != 0 )
-         {
-            /* just cancel it */
-            critical4sectionEnter( &opt->critical4optRead ) ;
-            f4 = opt->advanceReadFile ;
-            if ( f4 != 0 )
-               if ( l4numNodes( &f4->advanceReadFileList ) != 0 )
+               EnterCriticalSection( &f4->critical4file ) ;
+               for ( advanceLink = (LINK4 *)l4first( &f4->advanceReadFileList ) ;; )
                {
-                  critical4sectionEnter( &f4->critical4file ) ;
-                  for ( advanceLink = (LINK4 *)l4first( &f4->advanceReadFileList ) ;; )
-                  {
-                     if ( advanceLink == 0 )
-                        break ;
-                     advanceRead = (FILE4ADVANCE_READ *)(advanceLink - 1 ) ;
-                     advanceLink = (LINK4 *)l4next( &f4->advanceReadFileList, advanceLink ) ;
+                  if ( advanceLink == 0 )
+                     break ;
+                  advanceRead = (FILE4ADVANCE_READ *)(advanceLink - 1 ) ;
+                  advanceLink = (LINK4 *)l4next( &f4->advanceReadFileList, advanceLink ) ;
 
-                     if ( advanceRead->data == opt->advanceLargeBuffer )  /* found the one we want */
-                        break ;
-                  }
-
-                  if ( advanceRead != 0 )  /* have the advance-read, just remove it */
-                  {
-                     while ( advanceRead->usageFlag == r4inUse )  /* is being read, so wait */
-                     {
-                        // AS Apr 5/07 - adjust...don't sleep unless the code4 is running as high priority
-                        u4sleep( advanceRead->file->codeBase ) ;
-                     }
-                     if ( advanceRead->usageFlag == r4queued )  /* remove ourselves */
-                     {
-                        critical4sectionEnter( &advanceRead->file->codeBase->critical4advanceReadList ) ;
-                        l4remove( &advanceRead->file->codeBase->advanceReadList, advanceRead ) ;
-                        l4remove( &advanceRead->file->advanceReadFileList, &advanceRead->fileLink ) ;
-                        critical4sectionLeave( &advanceRead->file->codeBase->critical4advanceReadList ) ;
-                     }
-                  }
-                  critical4sectionLeave( &f4->critical4file ) ;
+                  if ( advanceRead->data == opt->advanceLargeBuffer )  /* found the one we want */
+                     break ;
                }
 
-            critical4sectionLeave( &opt->critical4optRead ) ;
-            critical4sectionInitUndo( &opt->critical4optRead ) ;
-            u4free( opt->advanceLargeBuffer ) ;
-            opt->advanceLargeBuffer = 0 ;
-         }
-      #endif
-
-      opt4flushAll( opt, 1 ) ;  /* move all blocks over to avail list */
-
-      if ( opt->buffers )
-      {
-         for ( --opt->numBuffers; opt->numBuffers >= 0 ; opt->numBuffers-- )
-         {
-            for ( i = 0 ; i < (int)opt->maxBlocks ; i++ )
-            {
-               curBlock = &opt->blocks[ opt->numBuffers * opt->maxBlocks + i] ;
-               l4remove( &opt->avail, &curBlock->lruLink ) ;
+               if ( advanceRead != 0 )  /* have the advance-read, just remove it */
+               {
+                  while ( advanceRead->usageFlag == r4inUse )  /* is being read, so wait */
+                     Sleep( 0 ) ;
+                  if ( advanceRead->usageFlag == r4queued )  /* remove ourselves */
+                  {
+                     EnterCriticalSection( &advanceRead->file->codeBase->critical4advanceReadList ) ;
+                     l4remove( &advanceRead->file->codeBase->advanceReadList, advanceRead ) ;
+                     l4remove( &advanceRead->file->advanceReadFileList, &advanceRead->fileLink ) ;
+                     LeaveCriticalSection( &advanceRead->file->codeBase->critical4advanceReadList ) ;
+                  }
+               }
+               LeaveCriticalSection( &f4->critical4file ) ;
             }
-            if ( opt->buffers[opt->numBuffers] != 0 )
-               u4free( opt->buffers[opt->numBuffers] ) ;
-         }
-         u4free( opt->buffers ) ;
-         opt->buffers = 0 ;
+
+         LeaveCriticalSection( &opt->critical4optRead ) ;
+         DeleteCriticalSection( &opt->critical4optRead ) ;
+         u4free( opt->advanceLargeBuffer ) ;
+         opt->advanceLargeBuffer = 0 ;
       }
+   #endif
 
-      opt->writeBuffer = 0 ;
-      #ifdef S4WRITE_DELAY
-         u4free( opt->delayLargeBuffer ) ;
-         opt->delayLargeBuffer = 0 ;
-      #endif
-      u4free( opt->writeBufferActual ) ;
-      opt->writeBufferActual = 0 ;
-      u4free( opt->readBuffer ) ;
-      opt->readBuffer = 0 ;
-      u4free( opt->blocks ) ;
-      opt->blocks = 0 ;
-      u4free( opt->lists ) ;
-      opt->lists = 0 ;
-      u4free( opt->lists ) ;
-      opt->lists = 0 ;
-   }
+   opt4flushAll( opt, 1 ) ;  /* move all blocks over to avail list */
 
-
-
-   static int opt4initAlloc( CODE4 *c4, int numBuffers )
+   if ( opt->buffers )
    {
-      OPT4BLOCK *curBlock ;
-      OPT4 *opt ;
-      int numAlloc, i ;
-
-      #ifdef E4PARM_LOW
-         if ( c4 == 0 || numBuffers < 0 )
-            return error4( c4, e4parm, E92508 ) ;
-      #endif
-
-      opt = &c4->opt ;
-
-      opt->buffers = (void **)u4alloc( ( (long)numBuffers ) * sizeof( void * ) ) ;
-      if ( opt->buffers == 0 )
+      for ( --opt->numBuffers; opt->numBuffers >= 0 ; opt->numBuffers-- )
       {
-         code4optSuspend( c4 ) ;
-         return error4stack( c4, e4memory, E92508 ) ;
-      }
-
-      opt->lists = (LIST4 *)u4alloc( opt->numLists * sizeof (LIST4) ) ;
-      if ( opt->lists == 0 )
-      {
-         code4optSuspend( c4 ) ;
-         return error4stack( c4, e4memory, E92508 ) ;
-      }
-
-      #ifdef S4WRITE_DELAY
-         #ifdef S4ADVANCE_READ
-            opt->blocks = (OPT4BLOCK *)u4alloc( (long)(numBuffers + 2) * opt->maxBlocks * sizeof( OPT4BLOCK ) ) ;
-         #else
-            opt->blocks = (OPT4BLOCK *)u4alloc( (long)(numBuffers + 1) * opt->maxBlocks * sizeof( OPT4BLOCK ) ) ;
-         #endif
-      #else
-         #ifdef S4ADVANCE_READ
-            opt->blocks = (OPT4BLOCK *)u4alloc( (long)(numBuffers + 1) * opt->maxBlocks * sizeof( OPT4BLOCK ) ) ;
-         #else
-            opt->blocks = (OPT4BLOCK *)u4alloc( (long)numBuffers * opt->maxBlocks * sizeof( OPT4BLOCK ) ) ;
-         #endif
-      #endif
-      if ( opt->blocks == 0 )
-      {
-         code4optSuspend( c4 ) ;
-         return error4stack( c4, e4memory, E92508 ) ;
-      }
-
-      opt->writeBufferActual = (char *)u4alloc( opt->bufferSize ) ;
-      if( opt->writeBufferActual == 0 )
-         return 0 ;
-      opt->writeBuffer = opt->writeBufferActual ;
-
-      opt->writeBlockCount = 0 ;
-      // AS Apr 13/04 - support for optimizing loarge files
-      file4longAssign( opt->writeCurPos, 0, 0 ) ;
-      file4longAssign( opt->writeStartPos, 0, 0 ) ;
-      opt->writeFile = 0 ;
-
-      opt->readBuffer = (char *)u4alloc( opt->bufferSize ) ;
-      if( opt->readBuffer == 0 )
-         return 0 ;
-
-      #ifdef S4WRITE_DELAY
-         opt->delayWriteBuffer = (char *)u4alloc( opt->bufferSize ) ;
-         if( opt->delayWriteBuffer == 0 )
-            return 0 ;
-         opt->delayLargeBuffer = (char *)u4alloc( opt->bufferSize ) ;
-         if( opt->delayLargeBuffer == 0 )
-            return 0 ;
-         critical4sectionInit( &opt->critical4optWrite ) ;
-         opt->delayLargeBufferAvail = 1 ;
-         opt->writeBufferActualAvail = 1 ;
-      #endif
-      #ifdef S4ADVANCE_READ
-         opt->advanceLargeBuffer = (char *)u4alloc( opt->bufferSize ) ;
-         if( opt->advanceLargeBuffer == 0 )
-            return 0 ;
-         critical4sectionInit( &opt->critical4optRead ) ;
-         opt->advanceLargeBufferAvail = 1 ;
-      #endif
-
-      for ( numAlloc = 0 ; numAlloc < numBuffers ; numAlloc++ )
-      {
-         opt->buffers[numAlloc] = (void *)u4alloc( opt->bufferSize ) ;
-         if( opt->buffers[numAlloc] == 0 )
-            break ;
          for ( i = 0 ; i < (int)opt->maxBlocks ; i++ )
          {
-            curBlock = &opt->blocks[ numAlloc * opt->maxBlocks + i] ;
-            curBlock->data = (OPT4BLOCK *)( (char *)opt->buffers[numAlloc] + i * opt->blockSize ) ;
-            l4add( &opt->avail, &curBlock->lruLink ) ;
+            curBlock = &opt->blocks[ opt->numBuffers * opt->maxBlocks + i] ;
+            l4remove( &opt->avail, &curBlock->lruLink ) ;
          }
+         if ( opt->buffers[opt->numBuffers] != 0 )
+            u4free( opt->buffers[opt->numBuffers] ) ;
       }
-
-      #ifdef S4WRITE_DELAY
-         /* now set up the delay write buffer. numAlloc already 1 greater than max, so just use */
-         for ( i = 0 ; i < (int)opt->maxBlocks ; i++ )
-         {
-            curBlock = &opt->blocks[ numAlloc * opt->maxBlocks + i] ;
-            curBlock->data = (OPT4BLOCK *)( (char *)opt->delayWriteBuffer + i * opt->blockSize ) ;
-            l4add( &opt->delayAvail, &curBlock->lruLink ) ;
-         }
-      #endif
-
-      return numAlloc ;
+      u4free( opt->buffers ) ;
+      opt->buffers = 0 ;
    }
+
+   opt->writeBuffer = 0 ;
+   #ifdef S4WRITE_DELAY
+      u4free( opt->delayLargeBuffer ) ;
+      opt->delayLargeBuffer = 0 ;
+   #endif
+   u4free( opt->writeBufferActual ) ;
+   opt->writeBufferActual = 0 ;
+   u4free( opt->readBuffer ) ;
+   opt->readBuffer = 0 ;
+   u4free( opt->blocks ) ;
+   opt->blocks = 0 ;
+   u4free( opt->lists ) ;
+   opt->lists = 0 ;
+   u4free( opt->lists ) ;
+   opt->lists = 0 ;
+}
+
+static int opt4initAlloc( CODE4 *c4, int numBuffers )
+{
+   OPT4BLOCK *curBlock ;
+   OPT4 *opt ;
+   int numAlloc, i ;
+
+   #ifdef E4PARM_LOW
+      if ( c4 == 0 || numBuffers < 0 )
+         return error4( c4, e4parm, E92508 ) ;
+   #endif
+
+   opt = &c4->opt ;
+
+   opt->buffers = (void **)u4alloc( ( (long)numBuffers ) * sizeof( void * ) ) ;
+   if ( opt->buffers == 0 )
+   {
+      code4optSuspend( c4 ) ;
+      return error4stack( c4, e4memory, E92508 ) ;
+   }
+
+   opt->lists = (LIST4 *)u4alloc( opt->numLists * sizeof (LIST4) ) ;
+   if ( opt->lists == 0 )
+   {
+      code4optSuspend( c4 ) ;
+      return error4stack( c4, e4memory, E92508 ) ;
+   }
+
+   #ifdef S4WRITE_DELAY
+      #ifdef S4ADVANCE_READ
+         opt->blocks = (OPT4BLOCK *)u4alloc( (long)(numBuffers + 2) * opt->maxBlocks * sizeof( OPT4BLOCK ) ) ;
+      #else
+         opt->blocks = (OPT4BLOCK *)u4alloc( (long)(numBuffers + 1) * opt->maxBlocks * sizeof( OPT4BLOCK ) ) ;
+      #endif
+   #else
+      #ifdef S4ADVANCE_READ
+         opt->blocks = (OPT4BLOCK *)u4alloc( (long)(numBuffers + 1) * opt->maxBlocks * sizeof( OPT4BLOCK ) ) ;
+      #else
+         opt->blocks = (OPT4BLOCK *)u4alloc( (long)numBuffers * opt->maxBlocks * sizeof( OPT4BLOCK ) ) ;
+      #endif
+   #endif
+   if ( opt->blocks == 0 )
+   {
+      code4optSuspend( c4 ) ;
+      return error4stack( c4, e4memory, E92508 ) ;
+   }
+
+   opt->writeBufferActual = (char *)u4alloc( opt->bufferSize ) ;
+   if( opt->writeBufferActual == 0 )
+      return 0 ;
+   opt->writeBuffer = opt->writeBufferActual ;
+
+   opt->writeBlockCount = 0 ;
+   opt->writeCurPos = 0 ;
+   opt->writeStartPos = 0 ;
+   opt->writeFile = 0 ;
+
+   opt->readBuffer = (char *)u4alloc( opt->bufferSize ) ;
+   if( opt->readBuffer == 0 )
+      return 0 ;
+
+   #ifdef S4WRITE_DELAY
+      opt->delayWriteBuffer = (char *)u4alloc( opt->bufferSize ) ;
+      if( opt->delayWriteBuffer == 0 )
+         return 0 ;
+      opt->delayLargeBuffer = (char *)u4alloc( opt->bufferSize ) ;
+      if( opt->delayLargeBuffer == 0 )
+         return 0 ;
+      InitializeCriticalSection( &opt->critical4optWrite ) ;
+      opt->delayLargeBufferAvail = 1 ;
+      opt->writeBufferActualAvail = 1 ;
+   #endif
+   #ifdef S4ADVANCE_READ
+      opt->advanceLargeBuffer = (char *)u4alloc( opt->bufferSize ) ;
+      if( opt->advanceLargeBuffer == 0 )
+         return 0 ;
+      InitializeCriticalSection( &opt->critical4optRead ) ;
+      opt->advanceLargeBufferAvail = 1 ;
+   #endif
+
+   for ( numAlloc = 0 ; numAlloc < numBuffers ; numAlloc++ )
+   {
+      opt->buffers[numAlloc] = (void *)u4alloc( opt->bufferSize ) ;
+      if( opt->buffers[numAlloc] == 0 )
+         break ;
+      for ( i = 0 ; i < (int)opt->maxBlocks ; i++ )
+      {
+         curBlock = &opt->blocks[ numAlloc * opt->maxBlocks + i] ;
+         curBlock->data = (OPT4BLOCK *)( (char *)opt->buffers[numAlloc] + i * opt->blockSize ) ;
+         l4add( &opt->avail, &curBlock->lruLink ) ;
+      }
+   }
+
+   #ifdef S4WRITE_DELAY
+      /* now set up the delay write buffer. numAlloc already 1 greater than max, so just use */
+      for ( i = 0 ; i < (int)opt->maxBlocks ; i++ )
+      {
+         curBlock = &opt->blocks[ numAlloc * opt->maxBlocks + i] ;
+         curBlock->data = (OPT4BLOCK *)( (char *)opt->delayWriteBuffer + i * opt->blockSize ) ;
+         l4add( &opt->delayAvail, &curBlock->lruLink ) ;
+      }
+   #endif
+
+   return numAlloc ;
+}
+
 #endif /* S4OFF_OPTIMIZE */

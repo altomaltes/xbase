@@ -1,58 +1,35 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* f4flag.c  (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* f4flag.c  (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
+#ifndef S4UNIX
+   #ifdef __TURBOC__
+      #pragma hdrstop
+   #endif
+#endif
 
-/* note:  This module is excluded from the CodeBase error handling
-   This is because it may be convenient to call these functions regardless
-   of the error state of CodeBase
-*/
-
-int S4FUNCTION f4flagInit( F4FLAG *f4, CODE4 *c4, const unsigned long nFlags, Bool5 discardOutOfRangeIn )
+int S4FUNCTION f4flagInit( F4FLAG *f4, CODE4 *c4, const unsigned long nFlags )
 {
-   // AS Jul 12/02 - Support for discardOutOfRange records...
-   // in particular with transactions interacting with the relate module's bitmaps where the
-   // # of rows in the bitmap may be less than the physical record count (and those records in
-   // the tags).  In that case, we still want to discount the rows not in the set yet, so allow
-   // the set to be smaller than the actual range, and just skip...
-   // cushion was not being used, so removed it.
    #ifdef E4PARM_LOW
       if ( f4 == 0 || c4 == 0 )
          return error4( c4, e4parm, E90812 ) ;
    #endif
 
-   c4memset( (void *)f4, 0, sizeof(F4FLAG) ) ;
+   memset( (void *)f4, 0, sizeof(F4FLAG) ) ;
+
+   if ( error4code( c4 ) < 0 )
+      return e4codeBase ;
+
+   f4->codeBase = c4 ;
+   f4->numFlags = nFlags ;
 
    if ( nFlags == 0 )
       return 0 ;
 
-   f4->codeBase = c4 ;
-
-   f4->discardOutOfRange = discardOutOfRangeIn ;
-
-   f4->flags = (unsigned char *)u4allocFree( c4, ( nFlags >> 3 ) + 2 ) ;
-
-   f4->numFlags = nFlags ;
-
+   f4->flags = (unsigned char *)u4allocFree( c4, nFlags / 8 + 2 ) ;
    if ( f4->flags == 0 )
-      return e4memory ;
+      return error4stack( c4, e4memory, E90812 ) ;
    return 0 ;
 }
-
-
 
 int S4FUNCTION f4flagReset( F4FLAG *f4, const unsigned long flagNum )
 {
@@ -64,20 +41,15 @@ int S4FUNCTION f4flagReset( F4FLAG *f4, const unsigned long flagNum )
          return error4( f4->codeBase, e4parm, E90812 ) ;
    #endif
 
-   if ( flagNum > f4->numFlags )
+   if ( error4code( f4->codeBase ) < 0 )
    {
-      // AS Jul 12/02 - It is ok now if this happens in some cases...
-      // in particular with transactions interacting with the relate module's bitmaps where the
-      // # of rows in the bitmap may be less than the physical record count (and those records in
-      // the tags).  In that case, we still want to discount the rows not in the set yet, so allow
-      // the set to be smaller than the actual range, and just skip...
-      if ( f4->discardOutOfRange == 1 )
-         return 0 ;
-      return error4( f4->codeBase, e4info, E90812 ) ;
+      u4free( f4->flags ) ;
+      f4->flags = 0 ;
+      return e4codeBase ;
    }
 
    #ifdef E4ANALYZE
-      if ( f4->flags == 0 )
+      if ( flagNum > f4->numFlags || f4->flags == 0 )
          return error4( f4->codeBase, e4info, E90812 ) ;
    #endif
 
@@ -91,8 +63,6 @@ int S4FUNCTION f4flagReset( F4FLAG *f4, const unsigned long flagNum )
    return 0 ;
 }
 
-
-
 int S4FUNCTION f4flagSet( F4FLAG *f4, const unsigned long flagNum )
 {
    unsigned char lowVal, setVal ;
@@ -103,20 +73,15 @@ int S4FUNCTION f4flagSet( F4FLAG *f4, const unsigned long flagNum )
          return error4( f4->codeBase, e4parm, E90812 ) ;
    #endif
 
-   if ( flagNum > f4->numFlags )
+   if ( error4code( f4->codeBase ) < 0 )
    {
-      // AS Jul 12/02 - It is ok now if this happens in some cases...
-      // in particular with transactions interacting with the relate module's bitmaps where the
-      // # of rows in the bitmap may be less than the physical record count (and those records in
-      // the tags).  In that case, we still want to discount the rows not in the set yet, so allow
-      // the set to be smaller than the actual range, and just skip...
-      if ( f4->discardOutOfRange == 1 )
-         return 0 ;
-      return error4( f4->codeBase, e4info, E90812 ) ;
+      u4free( f4->flags ) ;
+      f4->flags = 0 ;
+      return e4codeBase ;
    }
 
    #ifdef E4ANALYZE
-      if ( f4->flags == 0 )
+      if ( flagNum > f4->numFlags || f4->flags == 0 )
          return error4( f4->codeBase, e4info, E90812 ) ;
    #endif
 
@@ -128,8 +93,6 @@ int S4FUNCTION f4flagSet( F4FLAG *f4, const unsigned long flagNum )
 
    return 0 ;
 }
-
-
 
 int S4FUNCTION f4flagSetRange( F4FLAG *f4, const unsigned long flagNum, const unsigned long numFlags )
 {
@@ -145,12 +108,10 @@ int S4FUNCTION f4flagSetRange( F4FLAG *f4, const unsigned long flagNum, const un
    {
       rc = f4flagSet( f4, flagNum + iFlag ) ;
       if ( rc < 0 )
-         return rc ;
+         return error4stack( f4->codeBase, (short)rc, E90812 ) ;
    }
    return 0 ;
 }
-
-
 
 int S4FUNCTION f4flagIsSet( F4FLAG *f4, const unsigned long flagNum )
 {
@@ -162,20 +123,15 @@ int S4FUNCTION f4flagIsSet( F4FLAG *f4, const unsigned long flagNum )
          return error4( 0, e4parm, E90812 ) ;
    #endif
 
-   if ( flagNum > f4->numFlags )
+   if ( error4code( f4->codeBase ) < 0 )
    {
-      // AS Jul 12/02 - It is ok now if this happens in some cases...
-      // in particular with transactions interacting with the relate module's bitmaps where the
-      // # of rows in the bitmap may be less than the physical record count (and those records in
-      // the tags).  In that case, we still want to discount the rows not in the set yet, so allow
-      // the set to be smaller than the actual range, and just skip...
-      if ( f4->discardOutOfRange == 1 )  // return that it is not set...
-         return 0 ;
-      return error4( f4->codeBase, e4info, E90812 ) ;
+      u4free( f4->flags ) ;
+      f4->flags = 0 ;
+      return e4codeBase ;
    }
 
    #ifdef E4ANALYZE
-      if ( f4->flags == 0 )
+      if ( flagNum > f4->numFlags || f4->flags == 0 )
          return error4( f4->codeBase, e4info, E90812 ) ;
    #endif
 
@@ -186,48 +142,52 @@ int S4FUNCTION f4flagIsSet( F4FLAG *f4, const unsigned long flagNum )
    return (int) retVal ;
 }
 
-
-
 int S4FUNCTION f4flagIsAllSet( F4FLAG *f4, const unsigned long flagNum, const unsigned long nFlags )
 {
    int rc ;
-   unsigned long iFlag ;
+   unsigned long iFlag, numFlags ;
 
    #ifdef E4PARM_LOW
       if ( f4 == 0 )
          return error4( 0, e4parm, E90812 ) ;
    #endif
 
-   for ( iFlag = flagNum; iFlag <= nFlags; iFlag++ )
+   if ( error4code( f4->codeBase ) < 0 )
+      numFlags = 1 ;
+   else
+      numFlags = nFlags ;
+
+   for ( iFlag = flagNum; iFlag <= numFlags; iFlag++ )
    {
       rc = f4flagIsSet( f4, iFlag ) ;
       if ( rc < 0 )
-         return rc ;
+         return error4stack( f4->codeBase, (short)rc, E90812 ) ;
       if ( rc == 0 )
          return 0 ;
    }
    return 1 ;
 }
 
-
-
 int S4FUNCTION f4flagIsAnySet( F4FLAG *f4, const unsigned long flagNum, const unsigned long nFlags )
 {
    int rc ;
-   unsigned long iFlag ;
+   unsigned long iFlag, numFlags ;
 
    #ifdef E4PARM_LOW
       if ( f4 == 0 )
          return error4( 0, e4parm, E90812 ) ;
    #endif
 
-   for ( iFlag = flagNum; iFlag <= nFlags; iFlag++ )
+   if ( error4code( f4->codeBase ) < 0 )
+      numFlags = 1 ;
+   else
+      numFlags = nFlags ;
+
+   for ( iFlag = flagNum; iFlag <= numFlags; iFlag++ )
       if ( (rc = f4flagIsSet( f4, iFlag )) < 0 )
-         return rc ;
+         return error4stack( f4->codeBase, (short)rc, E90812 ) ;
    return 0 ;
 }
-
-
 
 int S4FUNCTION f4flagAnd( F4FLAG *flagPtr, const F4FLAG *andPtr )
 {
@@ -243,9 +203,9 @@ int S4FUNCTION f4flagAnd( F4FLAG *flagPtr, const F4FLAG *andPtr )
       if ( flagPtr->numFlags == 0 )
          return 0 ;
       if ( flagPtr->isFlip != andPtr->isFlip )
-         c4memset( (void *)flagPtr->flags, 1, (unsigned)((flagPtr->numFlags) / 8L + 2L ) ) ;
+         memset( (void *)flagPtr->flags, 1, (unsigned)((flagPtr->numFlags) / 8L + 2L ) ) ;
       else
-         c4memset( (void *)flagPtr->flags, 0, (unsigned)((flagPtr->numFlags) / 8L + 2L ) ) ;
+         memset( (void *)flagPtr->flags, 0, (unsigned)((flagPtr->numFlags) / 8L + 2L ) ) ;
       return 0 ;
    }
 
@@ -298,8 +258,6 @@ int S4FUNCTION f4flagAnd( F4FLAG *flagPtr, const F4FLAG *andPtr )
 
    return 0 ;
 }
-
-
 
 int S4FUNCTION f4flagOr( F4FLAG *flagPtr, const F4FLAG *orPtr )
 {
@@ -356,8 +314,6 @@ int S4FUNCTION f4flagOr( F4FLAG *flagPtr, const F4FLAG *orPtr )
    return 0 ;
 }
 
-
-
 void S4FUNCTION f4flagFlipReturns( F4FLAG *flagPtr )
 {
    #ifdef E4PARM_LOW
@@ -371,8 +327,6 @@ void S4FUNCTION f4flagFlipReturns( F4FLAG *flagPtr )
    flagPtr->isFlip = !flagPtr->isFlip ;
 }
 
-
-
 void S4FUNCTION f4flagSetAll( F4FLAG *flagPtr )
 {
    #ifdef E4PARM_LOW
@@ -383,38 +337,5 @@ void S4FUNCTION f4flagSetAll( F4FLAG *flagPtr )
       }
    #endif
 
-   c4memset( (void *)flagPtr->flags, 0xFF, (unsigned)((flagPtr->numFlags+7)/8) ) ;
-}
-
-
-
-// AS Jun 24/02 - New functionality for relate4count -- count the flags...
-unsigned long f4flagCount( F4FLAG *flagPtr, unsigned long startPos )
-{
-   // ULONG_MAX (-1 in long) is returned in case of failure, else the # of 'on' flags is returned
-   // we compensate for reversed flags, and also assume that there is an extra unused flag which
-   // is ignored.
-   // startPos allows the count to start at a different position from the start (this is useful
-   // because for the bitmaps, we flag the record number, so the 0th position is ignored)
-   #ifdef E4PARM_LOW
-      if ( flagPtr == 0 )
-      {
-         error4( 0, e4parm_null, E90812 ) ;
-         return ULONG_MAX ;
-      }
-   #endif
-
-   // first count the flags...
-   unsigned long count = 0 ;
-
-   for ( unsigned long loop = startPos ; loop < flagPtr->numFlags ; loop++ )
-   {
-      if ( f4flagIsSet( flagPtr, loop ) )
-         count++ ;
-   }
-
-   if ( flagPtr->isFlip ) // flip the results (the count is reversed)
-      return (flagPtr->numFlags - startPos) - count ;
-
-   return count ;
+   memset( (void *)flagPtr->flags, 0xFF, (unsigned)((flagPtr->numFlags+7)/8) ) ;
 }

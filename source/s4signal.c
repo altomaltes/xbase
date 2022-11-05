@@ -1,17 +1,3 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
 #include "d4all.h"
 #ifndef S4STAND_ALONE
 #ifndef S4OFF_THREAD
@@ -344,7 +330,7 @@ int signal4arrayWait(SIGNAL4ROUTINE_ARRAY *signalArray, SIGNAL4ROUTINE **signal,
    This function is used to suspend a thread until one of the signals in
      the SIGNAL4ROUTINE_ARRAY has been released
 
-   In S4WIN32, this function performs a WaitForMultipleObjects() on
+   In __WIN32, this function performs a WaitForMultipleObjects() on
      SIGNAL4ROUTINE_ARRAY.handleArray
    This function waits infinitely until a signal is released
 

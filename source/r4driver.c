@@ -12,13 +12,14 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/* r4driver.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* revisited by altomaltes@gmail.com
+ */
+
+/* r4driver.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
 #ifndef S4OFF_REPORT
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
+
 #ifdef S4WINTEL
    #ifndef S4WINDOWS
       #include <conio.h>
@@ -29,32 +30,26 @@
    #include "t4test.h"
 #endif
 
-#ifndef S4WINCE
-   #include <time.h>  // CS 2001/06/25 no time.h in Win CE
+#include <time.h>
 
-   #include <fcntl.h>
-   #include <errno.h>
-#endif
 
-#include <math.h>
-
-#if defined(S4WINTEL) && !defined(S4WINCE)  // CS 2001/06/25 more headers not in Win CE
-   #ifndef S4IBMOS2
-      #ifndef __TURBOC__
-         #include <sys\locking.h>
-         #define S4LOCKING
-      #endif
-      #ifdef __ZTC__
-         extern int  errno ;
-      #endif
-      #ifdef _MSC_VER
-         #include <sys\types.h>
-         #include <sys\locking.h>
-      #endif
-      #ifdef __TURBOC__
-   /*      extern int cdecl errno ; */
-      #endif
+#ifdef S4WINTEL
+#ifndef S4IBMOS2
+   #ifndef __TURBOC__
+      #include <sys\locking.h>
+      #define S4LOCKING
    #endif
+   #ifdef __ZTC__
+      extern int  errno ;
+   #endif
+   #ifdef _MSC_VER
+      #include <sys\types.h>
+      #include <sys\locking.h>
+   #endif
+   #ifdef __TURBOC__
+/*      extern int cdecl errno ; */
+   #endif
+#endif
 
    #include <sys\stat.h>
    #include <share.h>
@@ -63,6 +58,9 @@
 #ifdef S4MACINTOSH
    #include <unix.h>
 #endif
+
+#include <fcntl.h>
+#include <errno.h>
 
 #ifdef S4DO_ERRNO
    extern int errno ;
@@ -369,12 +367,9 @@ PREPORT4 report ;
       PAGE4 *hDC ;
    #endif
 
-   #ifdef E4PARM_HIGH
-           if( report == 0 )
-                   return error4( 0, e4parm_null, E95702 ) ;
-   #endif
-
    #ifdef S4DEBUG
+      if( !report  )
+         return -1 ;
       #ifdef S4WINDOWS
          if( !hDC && !report->for_dbf )
             return -1 ;
@@ -413,8 +408,6 @@ PREPORT4 report ;
 
       if( group_on && group_on->reset_pagenum )
          report->codeBase->pageno = 1 ;
-/*
-   JH 10/12/99 - This section of code is repetitive within below while( 1 )
 
       if( report->tdone == 0 )
       {
@@ -423,19 +416,6 @@ PREPORT4 report ;
          while( total_on )
          {
             if( !total_on->obj || !total_on->obj->lookahead )
-               total4value_update( total_on ) ;
-            total_on = (TOTAL4 *)l4next( &report->codeBase->totalList, total_on ) ;
-         }
-      }
-*/
-      /* LY 01/02/06 - repeated lookahead code from 01/01/15 for book example */
-      if ( report->tdone == 0 )
-      {
-         total_on = (TOTAL4 *)l4first( &report->codeBase->totalList ) ;
-         while( total_on )
-         {
-            if (( !total_on->obj || !total_on->obj->lookahead )
-               && ( total_on->lookahead ))
                total4value_update( total_on ) ;
             total_on = (TOTAL4 *)l4next( &report->codeBase->totalList, total_on ) ;
          }
@@ -473,15 +453,13 @@ PREPORT4 report ;
 
          if( flag )
          {
-            /* LY 2001/01/15 : duplicated totalling code before group header
-               output for lookahead totals */
-            if ( report->tdone == 0 )
+            if( report->tdone == 0 )
             {
+               report->tdone = 1 ;
                total_on = (TOTAL4 *)l4first( &report->codeBase->totalList ) ;
                while( total_on )
                {
-                  if (( !total_on->obj || !total_on->obj->lookahead )
-                     && ( total_on->lookahead ))
+                  if( !total_on->obj || !total_on->obj->lookahead )
                      total4value_update( total_on ) ;
                   total_on = (TOTAL4 *)l4next( &report->codeBase->totalList, total_on ) ;
                }
@@ -501,23 +479,6 @@ PREPORT4 report ;
                report->first = group_on->position ;
 
                group_on = (GROUP4 *)l4next( &report->groups, group_on ) ;
-            }
-/*
-   JH 10/12/99
-   The following if( report->tdone == 0 ) section was moved to here
-   from right after the above if( flag ) due to a totalling problem
-*/
-            if( report->tdone == 0 )
-            {
-               report->tdone = 1 ;
-               total_on = (TOTAL4 *)l4first( &report->codeBase->totalList ) ;
-               while( total_on )
-               {
-                  if (( !total_on->obj || !total_on->obj->lookahead )
-                     && ( !total_on->lookahead ))  /* LY 2001/01/15 : lookahead done above */
-                     total4value_update( total_on ) ;
-                  total_on = (TOTAL4 *)l4next( &report->codeBase->totalList, total_on ) ;
-               }
             }
 
             report4make_old_rec( report ) ;
@@ -580,17 +541,14 @@ PREPORT4 report ;
                   /*do not end report if summmary group area still not outputted */
                   if (!(report->area_on != NULL) && (report->group_on->title_summary) )
                         report->end_report = 2 ;
+
                   report->tdone = 0 ;
                }
 
                /* if report has been broken, then the total should not be
                   recalculated at the beginning of the next page */
                if( group_on == group_first && report->broken != 2 && report->tdone != 2 )
-                   if( report->tdone == 0 )
-                      report->tdone = 2 ;
-                   else
-                      report->tdone = 0 ;
-                   /* JH fix (04/14/99) */
+                   report->tdone = 2 ;
 
                if( report->for_dbf && report->output_group == group_on )
                {
@@ -598,8 +556,8 @@ PREPORT4 report ;
                      d4append( report->data_file ) ;
                      d4appendStart( report->data_file, 0 ) ;
                   #else
-                     // AS May 29/02 - changed d4recWidth to be an exposed only function due to record length changes with aes encryption
-                     file4seqWrite( &report->dfile_seq, d4record(report->data_file), (unsigned)(dfile4recWidth(report->data_file->dataFile)) ) ;
+                     file4seqWrite( &report->dfile_seq, d4record(report->data_file),
+                        (unsigned)(d4recWidth(report->data_file)) ) ;
                      report->rcount++ ;
                   #endif
                }
@@ -612,8 +570,8 @@ PREPORT4 report ;
                   d4append( report->data_file ) ;
                   d4appendStart( report->data_file, 0 ) ;
                #else
-                  // AS May 29/02 - changed d4recWidth to be an exposed only function due to record length changes with aes encryption
-                  file4seqWrite( &report->dfile_seq, d4record(report->data_file), (unsigned)(dfile4recWidth(report->data_file->dataFile)) ) ;
+                  file4seqWrite( &report->dfile_seq, d4record(report->data_file),
+                     (unsigned)(d4recWidth(report->data_file)) ) ;
                   report->rcount++ ;
                #endif
             }
@@ -770,29 +728,20 @@ PAGE4 *hDC ;
 #endif
 {
    REPORT4 *report ;
-   #ifdef S4UNICODE
-      TCHAR text[LEN4PATH];
-   #endif
-   //char *output_ptr ;
-   char *cptr ;
+   char *output_ptr, *cptr ;
    long len ;
    int offset_break ;
    OBJ4 *obj_on ;
    #ifdef S4WINDOWS
-      LPTSTR ptext;
       PBITMAPINFO pbmi ;
-      //HANDLE hDIB ;
+      HANDLE hDIB ;
       HPEN hpen ;
       HBRUSH hbrush ;
-      //LOGBRUSH lbrush ;
+      LOGBRUSH lbrush ;
       RECT rect ;
       UINT alignment ;
       POINT pt ;
       int lwidth, sdc ;
-      HDC hdcBMP ;
-      HBITMAP hBMP ;
-      void *pvBits ;
-      short numBMIColors ;
    #else
       long lval, obj_len, data_len ;
       int  i ;
@@ -821,7 +770,7 @@ PAGE4 *hDC ;
    if( error4code( report->codeBase ) < 0 )
       return -1 ;
 
-   //output_ptr = NULL ;
+   output_ptr = NULL ;
 
    if( report->broken == 2 )
       offset_break = (int)report->break_height ;
@@ -848,64 +797,30 @@ PAGE4 *hDC ;
                obj4evaluate( obj ) ;
             if( obj->eval_text )
             {
-               //hDIB = bmp4GetDIB( obj->eval_text, obj->area->report->codeBase ) ;
-               pbmi = bmp4GetDIB( obj->eval_text, obj->area->report->codeBase ) ;
-               //if( !hDIB )
-               if( !pbmi )
+               hDIB = bmp4GetDIB( obj->eval_text, obj->area->report->codeBase ) ;
+               if( !hDIB )
                   break ;
 
-               //pbmi = (PBITMAPINFO)GlobalLock(hDIB) ;
-               /*StretchDIBits( hDC, (int)(obj->dev_x + report->dev_margin_left),
+               pbmi = (PBITMAPINFO)GlobalLock(hDIB) ;
+               StretchDIBits( hDC, (int)(obj->dev_x + report->dev_margin_left),
                   (int)(obj->dev_y + report->ypos - offset_break), (int)(obj->dev_w), (int)(obj->dev_h),
-                  0, 0, (int)pDIB->bmiHeader.biWidth, (int)(pDIB->bmiHeader.biHeight),
-                  bmp4FindDIBBits(pDIB), pDIB, DIB_RGB_COLORS, SRCCOPY ) ;*/
-               StretchBlt( hDC, (int)(obj->dev_x + report->dev_margin_left),
-                  (int)(obj->dev_y + report->ypos - offset_break), (int)(obj->dev_w),
-                  (int)(obj->dev_h), hDC, 0, 0, (int)pbmi->bmiHeader.biWidth,
-                  (int)(pbmi->bmiHeader.biHeight), SRCCOPY ) ;
-               //GlobalUnlock( hDIB ) ;
-               //GlobalFree( hDIB ) ;
-               HeapFree( GetProcessHeap(), 0, pbmi ) ;
+                  0, 0, (int)pbmi->bmiHeader.biWidth, (int)pbmi->bmiHeader.biHeight,
+                  (LPSTR)bmp4FindDIBBits((LPSTR)pbmi), pbmi, DIB_RGB_COLORS, SRCCOPY ) ;
+               GlobalUnlock( hDIB ) ;
+               GlobalFree( hDIB ) ;
             }
             break ;
          case obj4type_bitmap1:
          case obj4type_bitmap2:
             if( report->for_dbf )
                break ;
-            //pbmi = (PBITMAPINFO)GlobalLock((HANDLE)obj->data) ;
-            pbmi = (PBITMAPINFO)obj->data ;
-            if ( pbmi->bmiHeader.biBitCount == 0 ) // don't support JPG or PNG
-               break ;
-            /*StretchDIBits( hDC, (int)(obj->dev_x + report->dev_margin_left),
+            pbmi = (PBITMAPINFO)GlobalLock((HANDLE)obj->data) ;
+            StretchDIBits( hDC, (int)(obj->dev_x + report->dev_margin_left),
                (int)(obj->dev_y + report->ypos - offset_break),
                (int)obj->dev_w, (int)obj->dev_h,
                0, 0, (int)pbmi->bmiHeader.biWidth, (int)pbmi->bmiHeader.biHeight,
-               (LPSTR)bmp4FindDIBBits((LPSTR)pbmi), pbmi, DIB_RGB_COLORS, SRCCOPY ) ;*/
-            // LY Dec 9/04 : fixed so bitmap will be displayed
-            hdcBMP = CreateCompatibleDC( hDC ) ;
-            if ( !hdcBMP )
-               break ;
-            hBMP = CreateDIBSection( hdcBMP, pbmi, DIB_RGB_COLORS, &pvBits, 0, 0 ) ;
-            if ( !hBMP )
-            {
-               DeleteDC( hdcBMP ) ;
-               break ;
-            }
-            if ( pbmi->bmiHeader.biBitCount > 8 )
-               numBMIColors = 0 ;
-            else
-               numBMIColors = (short)pow( (double)2, (double)pbmi->bmiHeader.biBitCount ) ;  // AS Dec 13/05 - compile fix
-            memcpy( pvBits, &pbmi->bmiColors[numBMIColors], pbmi->bmiHeader.biSizeImage ) ;
-            if ( SelectObject( hdcBMP, hBMP ) )
-            {
-               StretchBlt( hDC, (int)(obj->dev_x + report->dev_margin_left),
-                  (int)(obj->dev_y + report->ypos - offset_break), (int)obj->dev_w,
-                  (int)obj->dev_h, hdcBMP, 0, 0, (int)pbmi->bmiHeader.biWidth,
-                  (int)pbmi->bmiHeader.biHeight, SRCCOPY ) ;
-            }
-            DeleteObject( hBMP ) ;
-            DeleteDC( hdcBMP ) ;
-            //GlobalUnlock((HANDLE)obj->data) ;
+               (LPSTR)bmp4FindDIBBits((LPSTR)pbmi), pbmi, DIB_RGB_COLORS, SRCCOPY ) ;
+            GlobalUnlock((HANDLE)obj->data) ;
             break ;
          case obj4type_hline:
          case obj4type_vline:
@@ -913,10 +828,8 @@ PAGE4 *hDC ;
             if( report->for_dbf )
                break ;
             sdc = SaveDC( hDC ) ;
-            #ifndef S4WINCE
-               SetMapMode( hDC, MM_HIENGLISH ) ;
-               SetMapMode( hDC, MM_ANISOTROPIC ) ;
-            #endif
+            SetMapMode( hDC, MM_HIENGLISH ) ;
+            SetMapMode( hDC, MM_ANISOTROPIC ) ;
             pt.x = obj->dec ;
             LPtoDP( hDC, &pt, 1 ) ;
             lwidth = pt.x ;
@@ -926,11 +839,10 @@ PAGE4 *hDC ;
             hpen = (HPEN)NULL ;
             if( obj->style )
             {
-               /*lbrush.lbColor = obj->style->color ;
+               lbrush.lbColor = obj->style->color ;
                lbrush.lbStyle = BS_SOLID ;
                lbrush.lbHatch = 0L ;
-               hbrush = CreateBrushIndirect( &lbrush ) ;*/
-               hbrush = CreateSolidBrush( obj->style->color );
+               hbrush = CreateBrushIndirect( &lbrush ) ;
                hpen = CreatePen( PS_SOLID, lwidth, obj->style->color ) ;
             }
             if( hbrush && hpen )
@@ -944,18 +856,16 @@ PAGE4 *hDC ;
                SelectObject( hDC, GetStockObject(BLACK_BRUSH) ) ;
             }
 
-            #ifndef S4WINCE
-               if( obj->obj_type_num == obj4type_hline )
-               {
-                  MoveToEx( hDC, (int)(obj->dev_x + report->dev_margin_left), (int)(obj->dev_y + obj->dev_h/2 + report->ypos - offset_break), NULL ) ;
-                  LineTo( hDC, (int)(obj->dev_x + obj->dev_w + report->dev_margin_left), (int)(obj->dev_y + obj->dev_h/2 + report->ypos - offset_break) ) ;
-               }
-               if( obj->obj_type_num == obj4type_vline )
-               {
-                  MoveToEx( hDC, (int)(obj->dev_x + obj->dev_w/2 + report->dev_margin_left), (int)(obj->dev_y + report->ypos - offset_break), NULL ) ;
-                  LineTo( hDC, (int)(obj->dev_x + obj->dev_w/2 + report->dev_margin_left), (int)(obj->dev_y + obj->dev_h + report->ypos - offset_break) ) ;
-               }
-            #endif
+            if( obj->obj_type_num == obj4type_hline )
+            {
+               MoveToEx( hDC, (int)(obj->dev_x + report->dev_margin_left), (int)(obj->dev_y + obj->dev_h/2 + report->ypos - offset_break), NULL ) ;
+               LineTo( hDC, (int)(obj->dev_x + obj->dev_w + report->dev_margin_left), (int)(obj->dev_y + obj->dev_h/2 + report->ypos - offset_break) ) ;
+            }
+            if( obj->obj_type_num == obj4type_vline )
+            {
+               MoveToEx( hDC, (int)(obj->dev_x + obj->dev_w/2 + report->dev_margin_left), (int)(obj->dev_y + report->ypos - offset_break), NULL ) ;
+               LineTo( hDC, (int)(obj->dev_x + obj->dev_w/2 + report->dev_margin_left), (int)(obj->dev_y + obj->dev_h + report->ypos - offset_break) ) ;
+            }
 
             if( obj->obj_type_num == obj4type_frame )
             {
@@ -996,8 +906,8 @@ PAGE4 *hDC ;
                break ;
             }
 
-            //output_ptr = obj->wintext ;
-            len = strlen( obj->wintext ) ;
+            output_ptr = obj->wintext ;
+            len = lstrlen( obj->wintext ) ;
             if( len > 0 )
             {
                if( obj->style )
@@ -1027,14 +937,7 @@ PAGE4 *hDC ;
                      break ;
                }
 
-               #ifdef S4UNICODE
-                  ptext = text;
-                  c4atou(obj->wintext, ptext, LEN4PATH);
-               #else
-                  ptext = obj->wintext ;
-               #endif
-
-               DrawText( hDC, ptext, (int)len, &rect, DT_WORDBREAK | alignment | DT_NOPREFIX ) ;
+               DrawText( hDC, output_ptr, (int)len, &rect, DT_WORDBREAK | alignment | DT_NOPREFIX ) ;
             }
             break ;
          case obj4type_total:
@@ -1075,7 +978,7 @@ PAGE4 *hDC ;
                   obj4evaluate( obj ) ;
 
                if( obj->field )
-               switch( f4typeInternal(obj->field) )
+               switch( f4type(obj->field) )
                {
                   case r4str:
                   case r4date:
@@ -1125,14 +1028,8 @@ PAGE4 *hDC ;
                      break ;
                }
 
-               #ifdef S4UNICODE
-                  ptext = text;
-                  c4atou(obj->eval_text, ptext, LEN4PATH);
-               #else
-                  ptext = obj->eval_text ;
-               #endif
+               DrawText( hDC, obj->eval_text, obj->eval_len-1, &rect, DT_WORDBREAK | alignment | DT_NOPREFIX ) ;
 
-               DrawText( hDC, ptext, obj->eval_len-1, &rect, DT_WORDBREAK | alignment | DT_NOPREFIX ) ;
             }
             break ;
       #else
@@ -1143,7 +1040,7 @@ PAGE4 *hDC ;
                   f4assign( obj->field, obj->wintext ) ;
                break ;
             }
-//            output_ptr = obj->wintext ;
+            output_ptr = obj->wintext ;
             break ;
          case obj4type_total:
             if( obj->field && report->for_dbf )
@@ -1176,7 +1073,7 @@ PAGE4 *hDC ;
                if( !obj->lookahead )
                   obj4evaluate( obj ) ;
                if( obj->field )
-               switch( f4typeInternal(obj->field) )
+               switch( f4type(obj->field) )
                {
                   case r4str:
                   case r4date:
@@ -1197,10 +1094,10 @@ PAGE4 *hDC ;
             if( !obj->lookahead )
                obj4evaluate( obj ) ;
 
-/*            if( obj->eval_text )
+            if( obj->eval_text )
                output_ptr = obj->eval_text ;
             else
-               output_ptr = NULL ;*/
+               output_ptr = NULL ;
             break ;
       #endif
    }
@@ -1618,8 +1515,8 @@ PAGE4 *hDC ;
 
    if( group->report->broken  == 2 )
    {
-      group->report->broken = 0 ;
-      group->report->break_height = 0 ;
+           group->report->broken = 0 ;
+           group->report->break_height = 0 ;
    }
 
 }
@@ -1632,47 +1529,40 @@ int S4FUNCTION report4pageInit( PREPORT4 report )
    GROUP4 *group_on ;
    char   *ptr ;
    PSTYLE4 style ;
-   #ifdef S4WINDOWS
-      HINSTANCE hInst;
-   #else
-      char name_buf[13] ;
-      int tsafety ;
+   #ifndef S4WINDOWS
+   char name_buf[13] ;
+   int tsafety ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if( report == 0 )
-         return error4( 0, e4parm_null, E95702 ) ;
-   #endif
+   if( !report )
+   {
+      return -1 ;
+   }
 
    relate4skipEnable( report->relate, 1 ) ;
 
    #ifdef S4WINDOWS
       report->hWnd2 = 0 ;
-
-      #if   defined(S4WINCE)
-         hInst = report->codeBase->hInst;
-      #elif defined(S4WIN32)
-         hInst = (HINSTANCE)GetWindowLong(report->hWnd, GWL_HINSTANCE);
+      #ifdef __WIN32
+      report->hWnd2 = CreateWindowEx( WS_EX_TRANSPARENT, "MouseEat", "EatInput",
+         WS_POPUP | WS_CAPTION | WS_BORDER | WS_VISIBLE,
+         0, 0, 5, 5, report->hWnd, NULL,
+         (HINSTANCE)GetWindowLong(report->hWnd, GWLP_HINSTANCE), NULL ) ;  // JACS
       #else
-         hInst = (HINSTANCE)GetWindowWord(report->hWnd, GWW_HINSTANCE);
+      report->hWnd2 = CreateWindowEx( WS_EX_TRANSPARENT, "MouseEat", "EatInput",
+         WS_POPUP | WS_CAPTION | WS_BORDER | WS_VISIBLE,
+         0, 0, 5, 5, report->hWnd, (HMENU)NULL,
+          (HINSTANCE)GetWindowWord(report->hWnd, GWW_HINSTANCE), NULL ) ;
       #endif
-      /*report->hWnd2 = CreateWindowEx( WS_EX_TRANSPARENT, "MouseEat", "EatInput",
-         WS_POPUP | WS_CAPTION | WS_BORDER | WS_VISIBLE, 0, 0, 5, 5, report->hWnd,
-         NULL, hInst, NULL ) ;*/
-      // CS 2001/06/15 Had to hard code the WS_EX_TRANSPARENT constant because
-      // Windows CE does not seem to define it.
-      report->hWnd2 = CreateWindowEx( 0x00000020, TEXT("MouseEat"), TEXT("EatInput"),
-         WS_POPUP | WS_CAPTION | WS_BORDER | WS_VISIBLE, 0, 0, 5, 5, report->hWnd,
-         NULL, hInst, NULL ) ;
 
       if( report->hWnd2 )
       {
-         #ifdef S4WIN32
-            SetClassLong( report->hWnd2, GCL_HCURSOR, 0L ) ;
-         #else
-            SetClassWord( report->hWnd2, GCW_HCURSOR, 0 ) ;
-         #endif
-         SetCursor( LoadCursor((HINSTANCE)NULL,IDC_WAIT) ) ;
+        #ifdef __WIN32
+         SetClassLong( report->hWnd2, GCLP_HCURSOR, 0L ) ; // JACS
+       #else
+       SetClassWord( report->hWnd2, GCW_HCURSOR, 0 ) ;
+       #endif
+         SetCursor( LoadCursor((HWND)NULL,IDC_WAIT) ) ;
          SetCapture( report->hWnd2 ) ;
       }
    #endif
@@ -1719,7 +1609,7 @@ int S4FUNCTION report4pageInit( PREPORT4 report )
       if( group_on->resetExpression )
       {
          len = expr4vary( group_on->resetExpression, &ptr ) ;
-         group_on->lastResetValue = (LPTSTR)u4allocFree( report->codeBase, (len + 1) * sizeof(TCHAR) ) ;
+         group_on->lastResetValue = (char *)u4allocFree( report->codeBase, len + 1 ) ;
          if( group_on->lastResetValue )
             memcpy( group_on->lastResetValue, ptr, len ) ;
       }
@@ -1785,9 +1675,8 @@ int S4FUNCTION report4pageInit( PREPORT4 report )
    {
       tsafety = report->codeBase->safety ;
       report->codeBase->safety = 0 ;
-      // AS Dec 13/05 - improvements for function deprecation
       if( !report->report_file_name || *report->report_file_name =='\0' )
-         c4strcpy( name_buf, sizeof(name_buf), "crep2.buf" ) ;
+         strcpy( name_buf, "crep2.buf" ) ;
       else
       {
          u4namePiece( name_buf, sizeof(name_buf), report->report_file_name, 0, 1 ) ;
@@ -1811,10 +1700,10 @@ int S4FUNCTION report4pageFree( PREPORT4 report )
 {
    char name_buf[512] ;
 
-   #ifdef E4PARM_HIGH
-           if( report == 0 )
-                   return error4( 0, e4parm_null, E95702 ) ;
-   #endif
+   if( !report )
+   {
+      return -1 ;
+   }
 
    if( report->page_buf.object.info != NULL )
    {
@@ -1831,7 +1720,7 @@ int S4FUNCTION report4pageFree( PREPORT4 report )
 
    if( report->page_buf.file_buf.name != NULL )
    {
-      c4strcpy( name_buf, sizeof( name_buf ), report->page_buf.file_buf.name ) ;
+      strcpy( name_buf, report->page_buf.file_buf.name ) ;
       file4close( &report->page_buf.file_buf ) ;
       u4remove( name_buf ) ;
    }
@@ -1848,13 +1737,10 @@ POBJECT4 S4FUNCTION report4pageObjNext( PREPORT4 report )
    FILE4SEQ_READ *file_buf ;
    FILE4LONG pos;
 
-   #ifdef E4PARM_HIGH
-           if( report == 0 )
-      {
-         error4( 0, e4parm_null, E95702 ) ;
-         return NULL ;
-      }
-   #endif
+   if( !report )
+   {
+      return NULL ;
+   }
 
    if( report->page_buf.file_buf.name == NULL )
    {
@@ -1922,13 +1808,10 @@ POBJECT4 S4FUNCTION report4pageObjFirst( PREPORT4 report )
 {
    FILE4LONG pos;
 
-   #ifdef E4PARM_HIGH
-           if( report == 0 )
-      {
-         error4( 0, e4parm_null, E95702 ) ;
-         return NULL ;
-      }
-   #endif
+   if( !report )
+   {
+      return NULL ;
+   }
 
    if( report->page_buf.file_buf.name == NULL )
    {
@@ -2206,11 +2089,6 @@ int report4output_screen_dos( PREPORT4 report )
 int S4FUNCTION report4do( REPORT4 *report )
 {
    int rc ;
-
-   #ifdef E4PARM_HIGH
-           if( report == 0 )
-                   return error4( 0, e4parm_null, E95702 ) ;
-   #endif
 
    if( report4pageInit( report ) < 0 )
       return -1 ;

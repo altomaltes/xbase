@@ -12,13 +12,13 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/* s4string.cpp/cxx (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* revisited by altomaltes@gmail.com
+ */
+
+/* s4string.cpp/cxx (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.hpp"
-#ifndef S4JNI  /* LY 99/07/08 */
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif  /* __TUROBC__ */
+
 
 static int  num_per_type[16] = { 8, 6, 4, 3, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
 
@@ -71,17 +71,12 @@ void Str4flex::free()
       p =  0 ;
    }
    curLen = 0  ;
-   maxLen = 0 ;  /* LY 00/06/29 : fix #240 */
 }
 
-int Str4flex::setMax( unsigned long n )
+int Str4flex::setMax( unsigned n )
 {
    DEBUG4INT(codeBase == 0, E61053)
-   #ifdef D4DLL_CPP
-      if ( code4errorCode( codeBase, -5 ) )  return -1 ;
-   #else
-      if ( codeBase->errorCode )  return -1 ;
-   #endif
+   if ( codeBase->errorCode )  return -1 ;
    if ( n >= UINT_MAX )  return error4( codeBase, e4memory, E61053 ) ;
 
    if ( n == 0 )
@@ -108,12 +103,10 @@ int Str4flex::setMax( unsigned long n )
       if ( codeBase->stringTypes[i_type] == 0 )  return error4( codeBase, e4memory, E61053 );
    }
 
-   char *new_p =  (char *)mem4allocZero( codeBase->stringTypes[i_type] ) ;
-   if ( new_p == 0 )
-      return error4( codeBase, e4memory, E61053 ) ;
+   char *new_p =  (char *) mem4alloc( codeBase->stringTypes[i_type] ) ;
+   if ( new_p == 0 )  return error4( codeBase, e4memory, E61053 ) ;
 
-   if ( curLen > new_max )
-      curLen =  new_max ;
+   if ( curLen > new_max )  curLen =  new_max ;
    memcpy( new_p, p, curLen ) ;
 
    free() ;
@@ -123,4 +116,3 @@ int Str4flex::setMax( unsigned long n )
 
    return 0 ;
 }
-#endif   /* !S4JNI  LY 99/07/08 */

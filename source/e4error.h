@@ -1,18 +1,4 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* e4error.h  (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* e4error.h  (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 /*            (c)Copyright Sequiter Software Inc.,1990-1991. Alle Rechte vorbehalten.  */
 /*                German translation: Mgr. Gertruda TKACIKOVA, Jan. 1992.  */
 
@@ -27,8 +13,7 @@
       #define E4_ERROR_COD   "CODEBASE ERROR"
    #endif
    #define E4_MEMORY_ERR     "Memory Error"
-   #define E4_ERROR_NUM      "\n\nError Number"
-   #define E4_ERROR_ENT      "Press ENTER to continue:"
+   #define E4_ERROR_NUM      "\r\n\r\nError Number"
 #else
    #ifdef S4GERMAN
       #define E4_MESSAG_EXI     "Abbruch der Anwendung"
@@ -39,7 +24,7 @@
          #define E4_ERROR_COD   "CODEBASE FEHLER"
       #endif
       #define E4_MEMORY_ERR     "Speicherverwaltungs-Fehler"
-      #define E4_ERROR_NUM      "\n\nFehler Nummer"
+      #define E4_ERROR_NUM      "\r\n\r\nFehler Nummer"
    #else
       #define E4_MESSAG_EXI     "EXITING APPLICATION"
       #define E4_ERROR          "Error"
@@ -49,7 +34,7 @@
          #define E4_ERROR_COD   "CODEBASE ERROR"
       #endif
       #define E4_MEMORY_ERR     "Memory Error"
-      #define E4_ERROR_NUM      "\n\nError Number"
+      #define E4_ERROR_NUM      "\r\n\r\nError Number"
    #endif
    #ifdef S4FRENCH
       #define  E4A_GRA   0x85

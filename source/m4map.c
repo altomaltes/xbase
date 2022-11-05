@@ -12,10 +12,16 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/* m4map.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* revisited by altomaltes@gmail.com
+ */
+
+/* m4map.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
 
+
+
+#ifndef S4CLIENT
 #ifndef S4INDEX_OFF
 
 static void bitmaps4free( BITMAP4 * ) ;
@@ -25,9 +31,10 @@ BITMAP4 *bitmap4create( L4LOGICAL *log, RELATE4 *relate, const char andOr, const
 {
    BITMAP4 *map ;
 
-   map = (BITMAP4 *)mem4allocZero( log->codeBase->bitmapMemory ) ;
+   map = (BITMAP4 *)mem4alloc( log->codeBase->bitmapMemory ) ;
    if ( map == 0 )  /* must handle by freeing... */
       return 0 ;
+   memset( (void *)map, 0, sizeof( BITMAP4 ) ) ;
 
    map->log = log ;
    map->relate = relate ;
@@ -52,14 +59,6 @@ int bitmap4destroy( BITMAP4 *map )
       c_next = (CONST4 *)l4next( &map->ne, c_on ) ;
       const4deleteNe( &map->ne, c_on ) ;
       c_on = c_next ;
-   }
-   // AS 06/28/00 - was not destroying the child maps...
-   for ( ;; )
-   {
-      BITMAP4 *child = (BITMAP4 *)l4pop( &(map->children) ) ;
-      if ( child == 0 )
-         break ;
-      bitmap4destroy( child ) ;
    }
    mem4free( map->log->codeBase->bitmapMemory, map ) ;
    return 0 ;
@@ -93,10 +92,7 @@ static BITMAP4 *bitmap4can( L4LOGICAL *log, int *savePos, RELATE4 *relate )
 
       map = bitmap4create( log, relate, cTemp, 1 ) ;
       if ( map == 0 )
-      {
-         log->relation->fullyMapped = 0 ;
          return 0 ;
-      }
 
       for( i = 0 ; i < infoPtr->numParms ; i++ )
       {
@@ -105,7 +101,6 @@ static BITMAP4 *bitmap4can( L4LOGICAL *log, int *savePos, RELATE4 *relate )
          {
             error4set( log->codeBase, 0 ) ;
             bitmaps4free( map ) ;
-            log->relation->fullyMapped = 0 ;
             return 0 ;
          }
 
@@ -116,10 +111,7 @@ static BITMAP4 *bitmap4can( L4LOGICAL *log, int *savePos, RELATE4 *relate )
                childMap->andOr = map->andOr ;
          }
          else
-         {
-            log->relation->fullyMapped = 0 ;  // cannot be fully mapped if any conditions are not satisfied.
             if ( cTemp == 2 )   /* if an or case, then cannot create if any sub-expression is not bitmap optimizeable */
-            {
                for ( ;; )
                {
                   childMap = (BITMAP4 *)l4first( &map->children ) ;
@@ -131,8 +123,6 @@ static BITMAP4 *bitmap4can( L4LOGICAL *log, int *savePos, RELATE4 *relate )
                   l4remove( &map->children, childMap ) ;
                   bitmap4destroy( childMap ) ;
                }
-            }
-         }
       }
       if ( map->children.nLink == 0 )   /* not bitmap optimizeable */
       {
@@ -142,9 +132,7 @@ static BITMAP4 *bitmap4can( L4LOGICAL *log, int *savePos, RELATE4 *relate )
    }
    else
    {
-      // AS 08/11/00 had problems when query was '1000 = val', etc
-      int functionI = infoPtr->functionI ;
-      if ( functionI >= E4COMPARE_START && functionI <= E4COMPARE_END )
+      if ( infoPtr->functionI >= E4COMPARE_START && infoPtr->functionI <= E4COMPARE_END )
       {
          /* One must be a constant and the other a tag. */
          infoPtr-- ;
@@ -165,131 +153,75 @@ static BITMAP4 *bitmap4can( L4LOGICAL *log, int *savePos, RELATE4 *relate )
             if ( e4isConstant( infoTwo ) == 0 || !e4isTag( log->infoReport + tagPos, log->expr, infoPtr, relate->data ) )
                return 0 ;
             constPos = tagPos2 ;
-            /* infoPtr = infoTwo ; */
+            infoPtr = infoTwo ;
          }
 
          map = bitmap4create( log, relate, 0, 0 ) ;
          if ( map == 0 )
-         {
-            log->relation->fullyMapped = 0 ;
             return 0 ;
-         }
          map->tag = ( log->infoReport + tagPos )->tag ;
 
-         // infoPtr++ ;
+         infoPtr++ ;
 
-         c4memset( (void *)&hold, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&hold, 0, sizeof( CONST4 ) ) ;
          if ( const4get( &hold, map, log, constPos ) < 0 )
          {
             bitmap4destroy( map ) ;
-            log->relation->fullyMapped = 0 ;
             return 0 ;
          }
 
-         if ( functionI >= E4COMPARE_START && functionI <= E4COMPARE_END )
+         if ( infoPtr->functionI >= E4COMPARE_START && infoPtr->functionI <= E4COMPARE_END )
          {
-            if ( functionI >= E4NOT_EQUAL && functionI < E4GREATER_EQ ) /* != */
+            if ( infoPtr->functionI >= E4NOT_EQUAL && infoPtr->functionI < E4GREATER_EQ ) /* != */
             {
                temp = (CONST4 *)u4alloc( (long)sizeof( CONST4 ) ) ;
                if ( temp == 0 )
                {
                   error4set( log->codeBase, 0 ) ;
                   bitmaps4free( map ) ;
-                  log->relation->fullyMapped = 0 ;
                   return 0 ;
                }
-               c4memcpy( (void *)temp, (void *)&hold, sizeof( CONST4 ) ) ;
+               memcpy( (void *)temp, (void *)&hold, sizeof( CONST4 ) ) ;
                l4add( &map->ne, temp ) ;
             }
-            if (functionI >= E4EQUAL && functionI < E4GREATER) /* == */
-               c4memcpy( (void *)&map->eq, (void *)&hold, sizeof( CONST4 ) ) ;
-            if ( functionI >= E4GREATER && functionI < E4LESS ) /* > */
+            if (infoPtr->functionI >= E4EQUAL && infoPtr->functionI < E4GREATER) /* == */
+               memcpy( (void *)&map->eq, (void *)&hold, sizeof( CONST4 ) ) ;
+            if ( infoPtr->functionI >= E4GREATER && infoPtr->functionI < E4LESS ) /* > */
             {
-               // AS Feb 19/13 - problem if expression is val > tag instead of tag < val.  note that val > tag is equivalent to tag < val, so we should treat as lt
-               if ( tagPos = 1 && constPos == 0 )
-                  c4memcpy( (void *)&map->lt, (void *)&hold, sizeof( CONST4 ) ) ;
+               keyLen = map->tag->header.keyLen ;
+               #ifdef S4VFP_KEY
+                  if ( map->type == r4str && tfile4vfpKey( map->tag ) )
+                  {
+                     #ifdef E4_ANALYZE
+                        if ( keyLen%2 == 1 )
+                           return error4( data->codeBase, e4index, E82107 ) ;
+                     #endif
+                     keyLen = keyLen / 2 ;
+                  }
+               #endif
+               if ( map->type == r4str && hold.len < keyLen )   /* same as >= since a partial > */
+                  memcpy( (void *)&map->ge, (void *)&hold, sizeof( CONST4 ) ) ;
                else
-               {
-                  keyLen = map->tag->header.keyLen ;
-                  #ifdef S4VFP_KEY
-                     if ( map->type == r4str && tfile4vfpKey( map->tag ) )
-                     {
-                        #ifdef E4ANALYZE
-                           if ( keyLen % 2 == 1 )
-                           {
-                              error4( log->codeBase, e4index, E82107 ) ;
-                              return 0 ;
-                           }
-                        #endif
-                        keyLen = keyLen / 2 ;
-                     }
-                  #endif
-                  if ( map->type == r4str && hold.len < keyLen )   /* same as >= since a partial > */
-                     c4memcpy( (void *)&map->ge, (void *)&hold, sizeof( CONST4 ) ) ;
-                  else
-                     c4memcpy( (void *)&map->gt, (void *)&hold, sizeof( CONST4 ) ) ;
-               }
+                  memcpy( (void *)&map->gt, (void *)&hold, sizeof( CONST4 ) ) ;
             }
-            if ( functionI >= E4GREATER_EQ && functionI < E4LESS_EQ ) /* >= */
-            {
-               // AS Feb 19/13 - problem if expression is val >= tag instead of tag <= val.  note that val >= tag is equivalent to tag <= val, so we should treat as le
-               if ( tagPos = 1 && constPos == 0 )
-                  c4memcpy( (void *)&map->le, (void *)&hold, sizeof( CONST4 ) ) ;
-               else
-                  c4memcpy( (void *)&map->ge, (void *)&hold, sizeof( CONST4 ) ) ;
-            }
-            if ( functionI >= E4LESS && functionI < E4CHR )  /* < */
-            {
-               // AS Feb 19/13 - problem if expression is val < tag instead of tag < val.  note that val < tag is equivalent to tag > val, so we should treat as gt
-               if ( tagPos = 1 && constPos == 0 )
-               {
-                  keyLen = map->tag->header.keyLen ;
-                  #ifdef S4VFP_KEY
-                     if ( map->type == r4str && tfile4vfpKey( map->tag ) )
-                     {
-                        #ifdef E4ANALYZE
-                           if ( keyLen % 2 == 1 )
-                           {
-                              error4( log->codeBase, e4index, E82107 ) ;
-                              return 0 ;
-                           }
-                        #endif
-                        keyLen = keyLen / 2 ;
-                     }
-                  #endif
-                  if ( map->type == r4str && hold.len < keyLen )   /* same as >= since a partial > */
-                     c4memcpy( (void *)&map->ge, (void *)&hold, sizeof( CONST4 ) ) ;
-                  else
-                     c4memcpy( (void *)&map->gt, (void *)&hold, sizeof( CONST4 ) ) ;
-               }
-               else
-                  c4memcpy( (void *)&map->lt, (void *)&hold, sizeof( CONST4 ) ) ;
-            }
-            if ( functionI >= E4LESS_EQ && functionI < E4EQUAL ) /* <= */
-            {
-               // AS Feb 19/13 - problem if expression is val <= tag instead of tag >= val.  note that val <= tag is equivalent to tag >= val, so we should treat as ge
-               if ( tagPos = 1 && constPos == 0 )
-                  c4memcpy( (void *)&map->ge, (void *)&hold, sizeof( CONST4 ) ) ;
-               else
-                  c4memcpy( (void *)&map->le, (void *)&hold, sizeof( CONST4 ) ) ;
-            }
+            if ( infoPtr->functionI >= E4GREATER_EQ && infoPtr->functionI < E4LESS_EQ ) /* >= */
+               memcpy( (void *)&map->ge, (void *)&hold, sizeof( CONST4 ) ) ;
+            if ( infoPtr->functionI >= E4LESS && infoPtr->functionI < E4CHR )  /* < */
+               memcpy( (void *)&map->lt, (void *)&hold, sizeof( CONST4 ) ) ;
+            if ( infoPtr->functionI >= E4LESS_EQ && infoPtr->functionI < E4EQUAL ) /* <= */
+               memcpy( (void *)&map->le, (void *)&hold, sizeof( CONST4 ) ) ;
          }
       }
       else
-      {
-         log->relation->fullyMapped = 0 ;  // if not comparison or and/or, cannot be mapped...
          return 0 ;
-      }
    }
 
    return map ;
 }
 
-
-
+/* free the bitmap tree */
 static void bitmaps4free( BITMAP4 *map )
 {
-   /* free the bitmap tree */
    BITMAP4 *mapOn, *mapNext ;
 
    if ( map->branch == 1 )
@@ -307,11 +239,9 @@ static void bitmaps4free( BITMAP4 *map )
    bitmap4destroy( map ) ;
 }
 
-
-
+/* free all the bitmap info */
 static void bitmap4free( L4LOGICAL *log, BITMAP4 *map )
 {
-   /* free all the bitmap info */
    bitmaps4free( map ) ;
    u4free( log->buf ) ;
    log->buf = 0 ;
@@ -319,11 +249,9 @@ static void bitmap4free( L4LOGICAL *log, BITMAP4 *map )
    log->bufPos = 0 ;
 }
 
-
-
+/* initialize the bitmap structures, determine if bitmapping is possible */
 static BITMAP4 *bitmap4init( L4LOGICAL *log, int pos )
 {
-   /* initialize the bitmap structures, determine if bitmapping is possible */
    E4INFO *infoPtr ;
    int passPos ;
    BITMAP4 *map ;
@@ -334,7 +262,6 @@ static BITMAP4 *bitmap4init( L4LOGICAL *log, int pos )
    if ( log->relation->bitmapDisable == 1 || ( (unsigned long)d4recCount( log->relation->relate.data ) / 16UL >= ( (unsigned long)((unsigned long)UINT_MAX - 2UL)) / 2UL ) )
    {
       log->relation->bitmapsFreed = 1 ;
-      log->relation->fullyMapped = 0 ;  // AS July 2/02 - not fully mapped in this case
       return 0 ;
    }
 
@@ -342,22 +269,10 @@ static BITMAP4 *bitmap4init( L4LOGICAL *log, int pos )
    {
       log->codeBase->bitmapMemory = mem4create( log->codeBase, 10, sizeof( BITMAP4 ), 5, 0 ) ;
       if ( log->codeBase->bitmapMemory == 0 )  /* no memory available for bitmap optimization */
-      {
-         log->relation->fullyMapped = 0 ;  // AS July 2/02 - not fully mapped in this case
          return 0 ;
-      }
    }
 
    passPos = pos ;
-
-   // AS Jun 24/02 - To enable an optimized relate4count(), we now track a condition whereby there is
-   // a flag that indicates whether or not the bitmap entirely defines the scope of the relation (i.e.
-   // in this case no actual evaluation is required as the bitmap maps 1 to 1 with the # of records
-   // meeting the query condition).
-
-   // AS Aug 25/03 - if in count, we may not be fully mapped if there are more expression pieces, moved fullyMapped marker
-   // log->relation->fullyMapped = 1 ;
-
    if ( infoPtr->functionI == E4AND )
       map = bitmap4can( log, &passPos, &log->relation->relate ) ;
    else
@@ -366,16 +281,12 @@ static BITMAP4 *bitmap4init( L4LOGICAL *log, int pos )
    if ( map == 0 && error4code( log->codeBase ) == e4memory )
       error4set( log->codeBase, 0 ) ;
 
-   if ( map == 0 )
-      log->relation->fullyMapped = 0 ;
    return map ;
 }
 
-
-
+/* this function removes all bitmaps from the parent and marks the parent as zero */
 static BITMAP4 *bitmap4collapse( BITMAP4 *parent )
 {
-   /* this function removes all bitmaps from the parent and marks the parent as zero */
    BITMAP4 *childOn, *childNext ;
 
    childOn = (BITMAP4 *)l4first( &parent->children ) ;
@@ -412,7 +323,7 @@ static int bitmap4combineAndLe( BITMAP4 *map1, BITMAP4 *map2 )
          return 1 ;
       else
       {
-         c4memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -430,8 +341,8 @@ static int bitmap4combineAndLe( BITMAP4 *map1, BITMAP4 *map2 )
          if ( map2->eq.len )
             if ( !const4eq( &map2->eq, &map2->le, map1 ) )
                return 1 ;
-         c4memcpy( (void *)&map2->eq, (void *)&map2->le, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map2->eq, (void *)&map2->le, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -453,8 +364,8 @@ static int bitmap4combineAndLe( BITMAP4 *map1, BITMAP4 *map2 )
       }
       if ( eqFound )
       {
-         c4memcpy( (void *)&map2->lt, (void *)&map2->le, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map2->lt, (void *)&map2->le, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -463,8 +374,8 @@ static int bitmap4combineAndLe( BITMAP4 *map1, BITMAP4 *map2 )
    {
       if ( const4less( &map2->le, &map1->lt, map1 ) )
       {
-         c4memcpy( (void *)&map1->le, (void *)&map2->le, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map1->lt, 0, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map1->le, (void *)&map2->le, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->lt, 0, sizeof( CONST4 ) ) ;
       }
    }
    else
@@ -472,13 +383,13 @@ static int bitmap4combineAndLe( BITMAP4 *map1, BITMAP4 *map2 )
       if ( map1->le.len )
       {
          if ( const4less( &map2->le, &map1->le, map1 ) )
-            c4memcpy( (void *)&map1->le, (void *)&map2->le, sizeof( CONST4 ) ) ;
+            memcpy( (void *)&map1->le, (void *)&map2->le, sizeof( CONST4 ) ) ;
       }
       else
-         c4memcpy( (void *)&map1->le, (void *)&map2->le, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map1->le, (void *)&map2->le, sizeof( CONST4 ) ) ;
    }
 
-   c4memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
+   memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
    return 0 ;
 }
 
@@ -494,7 +405,7 @@ static int bitmap4combineAndGe( BITMAP4 *map1, BITMAP4 *map2 )
          return 1 ;
       else
       {
-         c4memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -514,8 +425,8 @@ static int bitmap4combineAndGe( BITMAP4 *map1, BITMAP4 *map2 )
             if ( map2->eq.len )
                if ( !const4eq( &map2->eq, &map2->ge, map1 ) )
                   return 1 ;
-            c4memcpy( (void *)&map2->eq, (void *)&map2->ge, sizeof( CONST4 ) ) ;
-            c4memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
+            memcpy( (void *)&map2->eq, (void *)&map2->ge, sizeof( CONST4 ) ) ;
+            memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
             return 0 ;
          }
       }
@@ -537,8 +448,8 @@ static int bitmap4combineAndGe( BITMAP4 *map1, BITMAP4 *map2 )
       }
       if ( eqFound )
       {
-         c4memcpy( (void *)&map2->gt, (void *)&map2->ge, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map2->gt, (void *)&map2->ge, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -547,8 +458,8 @@ static int bitmap4combineAndGe( BITMAP4 *map1, BITMAP4 *map2 )
    {
       if ( const4less( &map1->gt, &map2->ge, map1 ) )
       {
-         c4memcpy( (void *)&map1->ge, (void *)&map2->ge, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map1->gt, 0, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map1->ge, (void *)&map2->ge, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->gt, 0, sizeof( CONST4 ) ) ;
       }
    }
    else
@@ -556,12 +467,12 @@ static int bitmap4combineAndGe( BITMAP4 *map1, BITMAP4 *map2 )
       if ( map1->ge.len )
       {
          if ( const4less( &map1->ge, &map2->ge, map1 ) )
-            c4memcpy( (void *)&map1->ge, (void *)&map2->ge, sizeof( CONST4 ) ) ;
+            memcpy( (void *)&map1->ge, (void *)&map2->ge, sizeof( CONST4 ) ) ;
       }
       else
-         c4memcpy( (void *)&map1->ge, (void *)&map2->ge, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map1->ge, (void *)&map2->ge, sizeof( CONST4 ) ) ;
    }
-   c4memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
+   memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
    return 0 ;
 }
 
@@ -576,7 +487,7 @@ static int bitmap4combineAndLt( BITMAP4 *map1, BITMAP4 *map2 )
          return 1 ;
       else
       {
-         c4memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -606,7 +517,7 @@ static int bitmap4combineAndLt( BITMAP4 *map1, BITMAP4 *map2 )
    if ( map1->lt.len )
    {
       if ( const4lessEq( &map2->lt, &map1->lt, map1 ) )
-         c4memcpy( (void *)&map1->lt, (void *)&map2->lt, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map1->lt, (void *)&map2->lt, sizeof( CONST4 ) ) ;
    }
    else
    {
@@ -614,14 +525,14 @@ static int bitmap4combineAndLt( BITMAP4 *map1, BITMAP4 *map2 )
       {
          if ( const4lessEq( &map2->lt, &map1->le, map1 ) )
          {
-            c4memcpy( (void *)&map1->lt, (void *)&map2->lt, sizeof( CONST4 ) ) ;
-            c4memset( (void *)&map1->le, 0, sizeof( CONST4 ) ) ;
+            memcpy( (void *)&map1->lt, (void *)&map2->lt, sizeof( CONST4 ) ) ;
+            memset( (void *)&map1->le, 0, sizeof( CONST4 ) ) ;
          }
       }
       else
-         c4memcpy( (void *)&map1->lt, (void *)&map2->lt, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map1->lt, (void *)&map2->lt, sizeof( CONST4 ) ) ;
    }
-   c4memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
+   memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
    return 0 ;
 }
 
@@ -636,7 +547,7 @@ static int bitmap4combineAndGt( BITMAP4 *map1, BITMAP4 *map2 )
          return 1 ;
       else
       {
-         c4memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -666,7 +577,7 @@ static int bitmap4combineAndGt( BITMAP4 *map1, BITMAP4 *map2 )
    if ( map1->gt.len )
    {
       if ( const4less( &map1->gt, &map2->gt, map1 ) )
-         c4memcpy( (void *)&map1->gt, (void *)&map2->gt, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map1->gt, (void *)&map2->gt, sizeof( CONST4 ) ) ;
    }
    else
    {
@@ -674,14 +585,14 @@ static int bitmap4combineAndGt( BITMAP4 *map1, BITMAP4 *map2 )
       {
          if ( const4lessEq( &map1->ge, &map2->gt, map1 ) )
          {
-            c4memcpy( (void *)&map1->gt, (void *)&map2->gt, sizeof( CONST4 ) ) ;
-            c4memset( (void *)&map1->ge, 0, sizeof( CONST4 ) ) ;
+            memcpy( (void *)&map1->gt, (void *)&map2->gt, sizeof( CONST4 ) ) ;
+            memset( (void *)&map1->ge, 0, sizeof( CONST4 ) ) ;
          }
       }
       else
-         c4memcpy( (void *)&map1->gt, (void *)&map2->gt, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map1->gt, (void *)&map2->gt, sizeof( CONST4 ) ) ;
    }
-   c4memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
+   memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
    return 0 ;
 }
 
@@ -722,8 +633,8 @@ static int bitmap4combineAndNe( BITMAP4 *map1, BITMAP4 *map2 )
          {
             if ( const4eq( cOn, &map1->ge, map1 ) )
             {
-               c4memcpy( (void *)&map1->gt, (void *)&map1->ge, sizeof( CONST4 ) ) ;
-               c4memset( (void *)&map1->ge, 0, sizeof( CONST4 ) ) ;
+               memcpy( (void *)&map1->gt, (void *)&map1->ge, sizeof( CONST4 ) ) ;
+               memset( (void *)&map1->ge, 0, sizeof( CONST4 ) ) ;
                const4deleteNe( &map2->ne, cOn ) ;
                cOn = cNext ;
                continue ;
@@ -750,8 +661,8 @@ static int bitmap4combineAndNe( BITMAP4 *map1, BITMAP4 *map2 )
          {
             if ( const4eq( cOn, &map1->le, map1 ) )
             {
-               c4memcpy( (void *)&map1->lt, (void *)&map1->le, sizeof( CONST4 ) ) ;
-               c4memset( (void *)&map1->le, 0, sizeof( CONST4 ) ) ;
+               memcpy( (void *)&map1->lt, (void *)&map1->le, sizeof( CONST4 ) ) ;
+               memset( (void *)&map1->le, 0, sizeof( CONST4 ) ) ;
                const4deleteNe( &map2->ne, cOn ) ;
                cOn = cNext ;
                continue ;
@@ -807,7 +718,7 @@ static int bitmap4combineAndEq( BITMAP4 *map1, BITMAP4 *map2 )
    {
       if ( const4eq( &map2->eq, &map1->eq, map1 ) )
       {
-         c4memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
       else
@@ -823,16 +734,7 @@ static int bitmap4combineAndEq( BITMAP4 *map1, BITMAP4 *map2 )
          if ( const4eq( &map2->eq, cOn, map1 ) )
             return 1 ;
          else
-         {
-            // AS Aug 9/04 ... turns out there is a special case here...the code here was comparing the 2 constants (we are combining
-            // a case of == and <> ... if the constants are equal to each other we will never have a match because one of the 2 will
-            // always conflict, on the other hand if the 2 constants differ, all the records will always match since one of the conditionals
-            // will always be true...however, this was not taking into account the partial matching case...ie.. field == "AA" and field <>"AABC",
-            // in which case AABB and AABD would match but AABC would not...
-            // we moved this up further, so we should never get here...
-            // assert5( cOn->len == map2->eq.len ) ;
             const4deleteNe( &map1->ne, cOn ) ;
-         }
          cOn = cNext ;
       }
    }
@@ -841,32 +743,32 @@ static int bitmap4combineAndEq( BITMAP4 *map1, BITMAP4 *map2 )
    {
       if ( const4less( &map1->le, &map2->eq, map1 ) )
          return 1 ;
-      c4memset( (void *)&map1->le, 0, sizeof( CONST4 ) ) ;
+      memset( (void *)&map1->le, 0, sizeof( CONST4 ) ) ;
    }
    else
       if ( map1->lt.len )
       {
          if ( const4lessEq( &map1->lt, &map2->eq, map1 ) )
             return 1 ;
-         c4memset( (void *)&map1->lt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->lt, 0, sizeof( CONST4 ) ) ;
       }
 
    if ( map1->ge.len )
    {
       if ( const4less( &map2->eq, &map1->ge, map1 ) )
          return 1 ;
-      c4memset( (void *)&map1->ge, 0, sizeof( CONST4 ) ) ;
+      memset( (void *)&map1->ge, 0, sizeof( CONST4 ) ) ;
    }
    else
       if ( map1->gt.len )
       {
          if ( const4lessEq( &map2->eq, &map1->gt, map1 ) )
             return 1 ;
-         c4memset( (void *)&map1->gt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->gt, 0, sizeof( CONST4 ) ) ;
       }
 
-   c4memcpy( (void *)&map1->eq, (void *)&map2->eq, sizeof( CONST4 ) ) ;
-   c4memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
+   memcpy( (void *)&map1->eq, (void *)&map2->eq, sizeof( CONST4 ) ) ;
+   memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
    return 0 ;
 }
 
@@ -876,7 +778,7 @@ static int bitmap4combineOrLe( BITMAP4 *map1, BITMAP4 *map2 )
 
    if ( map1->eq.len )
       if ( const4lessEq( &map1->eq, &map2->le, map1 ) )
-         c4memset( (void *)&map1->eq, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->eq, 0, sizeof( CONST4 ) ) ;
 
    if ( map1->gt.len )
    {
@@ -899,7 +801,7 @@ static int bitmap4combineOrLe( BITMAP4 *map1, BITMAP4 *map2 )
          return 1 ;
       else
       {
-         c4memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -907,10 +809,10 @@ static int bitmap4combineOrLe( BITMAP4 *map1, BITMAP4 *map2 )
    if ( map1->lt.len )
    {
       if ( const4lessEq( &map1->lt, &map2->le, map1 ) )
-         c4memset( (void *)&map1->lt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->lt, 0, sizeof( CONST4 ) ) ;
       else
       {
-         c4memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -918,33 +820,30 @@ static int bitmap4combineOrLe( BITMAP4 *map1, BITMAP4 *map2 )
       if ( map1->le.len )
          if ( !const4lessEq( &map1->le, &map2->le, map1 ) )
          {
-            c4memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
+            memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
             return 0 ;
          }
 
-   c4memcpy( (void *)&map1->le, (void *)&map2->le, sizeof( CONST4 ) ) ;
-   c4memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
+   memcpy( (void *)&map1->le, (void *)&map2->le, sizeof( CONST4 ) ) ;
+   memset( (void *)&map2->le, 0, sizeof( CONST4 ) ) ;
    return 0 ;
 }
 
 static int bitmap4combineOrGe( BITMAP4 *map1, BITMAP4 *map2 )
 {
-   // attempt to combine a <val1 op const> OR <val3 >= const> into a single map
-   // map2 is the map that has the '>=' operator
-   // returns true if the merge results in ALL items possibly meeting the criteria (eg. fld >= 0 OR fld < 100 -- all records match)
    CONST4 *cOn ;
 
    if ( map1->eq.len )
       if ( const4lessEq( &map2->ge, &map1->eq, map1 ) )
-         c4memset( (void *)&map1->eq, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->eq, 0, sizeof( CONST4 ) ) ;
 
-   if ( map1->lt.len )    // combine a '>=' node with a '<' node
+   if ( map1->lt.len )
    {
       if ( const4lessEq( &map2->ge, &map1->lt, map1 ) )
          return 1 ;
    }
    else
-      if ( map1->le.len )    // combine a '>=' node with a '<=' node
+      if ( map1->le.len )
          if ( const4lessEq( &map2->ge, &map1->le, map1 ) )
             return 1 ;
 
@@ -959,7 +858,7 @@ static int bitmap4combineOrGe( BITMAP4 *map1, BITMAP4 *map2 )
          return 1 ;
       else
       {
-         c4memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -967,10 +866,10 @@ static int bitmap4combineOrGe( BITMAP4 *map1, BITMAP4 *map2 )
    if ( map1->gt.len )
    {
       if ( const4lessEq( &map2->ge, &map1->gt, map1 ) )
-         c4memset( (void *)&map1->gt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->gt, 0, sizeof( CONST4 ) ) ;
       else
       {
-         c4memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -978,19 +877,12 @@ static int bitmap4combineOrGe( BITMAP4 *map1, BITMAP4 *map2 )
       if ( map1->ge.len )
          if ( !const4lessEq( &map2->ge, &map1->ge, map1 ) )
          {
-            // in this case both nodes were >= but the map1 >= node overides (i.e. it is >= a smaller value...
-            // eg. map1 >= 10 || map2 >= 15  ---  clearly the map2's ge is already accounted for by map1, so just
-            // remove map2's ge
-            c4memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
+            memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
             return 0 ;
          }
 
-   // if here, then we can merge the maps.  What we want to do is add map2's 'ge' constant to map1, then just
-   // remove map2's ge.  Thus, we merge the 2 maps into a single map where map1 will now have multiple expressions
-   // contained within it (it's existing node along with the new 'ge' node)
-
-   c4memcpy( (void *)&map1->ge, (void *)&map2->ge, sizeof( CONST4 ) ) ;
-   c4memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
+   memcpy( (void *)&map1->ge, (void *)&map2->ge, sizeof( CONST4 ) ) ;
+   memset( (void *)&map2->ge, 0, sizeof( CONST4 ) ) ;
    return 0 ;
 }
 
@@ -1006,13 +898,13 @@ static int bitmap4combineOrLt( BITMAP4 *map1, BITMAP4 *map2 )
             if ( map2->le.len != 0 )
                return error4( map1->log->codeBase, e4info, E93701 ) ;
          #endif
-         c4memcpy( (void *)&map2->le, (void *)&map2->lt, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map1->eq, 0, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map2->le, (void *)&map2->lt, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->eq, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
       if ( const4less( &map1->eq, &map2->lt, map1 ) )
-         c4memset( (void *)&map1->eq, 0 , sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->eq, 0 , sizeof( CONST4 ) ) ;
    }
 
    if ( map1->ne.nLink != 0 )  /* special case */
@@ -1026,7 +918,7 @@ static int bitmap4combineOrLt( BITMAP4 *map1, BITMAP4 *map2 )
          return 1 ;
       else
       {
-         c4memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -1038,8 +930,8 @@ static int bitmap4combineOrLt( BITMAP4 *map1, BITMAP4 *map2 )
       if ( const4eq( &map1->gt, &map2->lt, map1 ) )
       {
          const4addNe( map1, &map2->lt ) ;
-         c4memset( (void *)&map1->gt, 0, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->gt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -1052,7 +944,7 @@ static int bitmap4combineOrLt( BITMAP4 *map1, BITMAP4 *map2 )
    {
       if ( !const4less( &map1->lt, &map2->lt, map1 ) )
       {
-         c4memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -1061,15 +953,15 @@ static int bitmap4combineOrLt( BITMAP4 *map1, BITMAP4 *map2 )
       {
          if ( const4lessEq( &map2->lt, &map1->le, map1 ) )
          {
-            c4memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
+            memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
             return 0 ;
          }
          else
-            c4memset( (void *)&map1->le, 0, sizeof( CONST4 ) ) ;
+            memset( (void *)&map1->le, 0, sizeof( CONST4 ) ) ;
       }
 
-   c4memcpy( (void *)&map1->lt, (void *)&map2->lt, sizeof( CONST4 ) ) ;
-   c4memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
+   memcpy( (void *)&map1->lt, (void *)&map2->lt, sizeof( CONST4 ) ) ;
+   memset( (void *)&map2->lt, 0, sizeof( CONST4 ) ) ;
    return 0 ;
 }
 
@@ -1085,13 +977,13 @@ static int bitmap4combineOrGt( BITMAP4 *map1, BITMAP4 *map2 )
             if ( map2->ge.len != 0 )
                return error4( map1->log->codeBase, e4info, E93701 ) ;
          #endif
-         c4memcpy( (void *)&map2->ge, (void *)&map2->gt, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map1->eq, 0, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map2->ge, (void *)&map2->gt, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->eq, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
       if ( const4less( &map2->gt, &map1->eq, map1 ) )
-         c4memset( (void *)&map1->eq, 0 , sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->eq, 0 , sizeof( CONST4 ) ) ;
    }
 
    if ( map1->ne.nLink != 0 )  /* special case */
@@ -1105,7 +997,7 @@ static int bitmap4combineOrGt( BITMAP4 *map1, BITMAP4 *map2 )
          return 1 ;
       else
       {
-         c4memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -1117,8 +1009,8 @@ static int bitmap4combineOrGt( BITMAP4 *map1, BITMAP4 *map2 )
       if ( const4eq( &map2->gt, &map1->lt, map1 ) )
       {
          const4addNe( map1, &map2->gt ) ;
-         c4memset( (void *)&map1->lt, 0, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->lt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -1131,7 +1023,7 @@ static int bitmap4combineOrGt( BITMAP4 *map1, BITMAP4 *map2 )
    {
       if ( const4less( &map1->gt, &map2->gt, map1 ) )
       {
-         c4memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -1140,15 +1032,15 @@ static int bitmap4combineOrGt( BITMAP4 *map1, BITMAP4 *map2 )
       {
          if ( const4lessEq( &map1->ge, &map2->gt, map1 ) )
          {
-            c4memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
+            memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
             return 0 ;
          }
          else
-            c4memset( (void *)&map1->ge, 0, sizeof( CONST4 ) ) ;
+            memset( (void *)&map1->ge, 0, sizeof( CONST4 ) ) ;
       }
 
-   c4memcpy( (void *)&map1->gt, (void *)&map2->gt, sizeof( CONST4 ) ) ;
-   c4memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
+   memcpy( (void *)&map1->gt, (void *)&map2->gt, sizeof( CONST4 ) ) ;
+   memset( (void *)&map2->gt, 0, sizeof( CONST4 ) ) ;
    return 0 ;
 }
 
@@ -1160,7 +1052,7 @@ static int bitmap4combineOrEq( BITMAP4 *map1, BITMAP4 *map2 )
    {
       if ( const4eq( &map1->eq, &map2->eq, map1 ) )
       {
-         c4memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -1174,7 +1066,7 @@ static int bitmap4combineOrEq( BITMAP4 *map1, BITMAP4 *map2 )
       cOn = (CONST4 *)l4first( &map1->ne ) ;
       if ( const4eq( &map2->eq, cOn, map1 ) )
          return 1 ;
-      c4memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
+      memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
       return 0 ;
    }
 
@@ -1182,14 +1074,14 @@ static int bitmap4combineOrEq( BITMAP4 *map1, BITMAP4 *map2 )
    {
       if ( const4eq( &map1->lt, &map2->eq, map1 ) )
       {
-         c4memcpy( (void *)&map1->le, (void *)&map1->lt, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map1->lt, 0, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map1->le, (void *)&map1->lt, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->lt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
       if ( const4less( &map2->eq, &map1->lt, map1 ) )
       {
-         c4memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -1197,7 +1089,7 @@ static int bitmap4combineOrEq( BITMAP4 *map1, BITMAP4 *map2 )
       if ( map1->le.len )
          if ( const4lessEq( &map2->eq, &map1->le, map1 ) )
          {
-            c4memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
+            memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
             return 0 ;
          }
 
@@ -1205,14 +1097,14 @@ static int bitmap4combineOrEq( BITMAP4 *map1, BITMAP4 *map2 )
    {
       if ( const4eq( &map1->gt, &map2->eq, map1 ) )
       {
-         c4memcpy( (void *)&map1->ge, (void *)&map1->gt, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map1->gt, 0, sizeof( CONST4 ) ) ;
-         c4memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
+         memcpy( (void *)&map1->ge, (void *)&map1->gt, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->gt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
       if ( const4less( &map1->gt, &map2->eq, map1 ) )
       {
-         c4memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
          return 0 ;
       }
    }
@@ -1220,14 +1112,14 @@ static int bitmap4combineOrEq( BITMAP4 *map1, BITMAP4 *map2 )
       if ( map1->ge.len )
          if ( const4lessEq( &map1->ge, &map2->eq, map1 ) )
          {
-            c4memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
+            memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
             return 0 ;
          }
 
    if ( map1->eq.len == 0 )
    {
-      c4memcpy( (void *)&map1->eq, (void *)&map2->eq, sizeof( CONST4 ) ) ;
-      c4memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
+      memcpy( (void *)&map1->eq, (void *)&map2->eq, sizeof( CONST4 ) ) ;
+      memset( (void *)&map2->eq, 0, sizeof( CONST4 ) ) ;
    }
    return 0 ;
 }
@@ -1247,7 +1139,7 @@ static int bitmap4combineOrNe( BITMAP4 *map1, BITMAP4 *map2 )
    {
       if ( const4eq( &map1->eq, cOn, map1 ) )
          return 1 ;
-      c4memset( (void *)&map1->eq, 0, sizeof( CONST4 ) ) ;
+      memset( (void *)&map1->eq, 0, sizeof( CONST4 ) ) ;
    }
 
    if ( map1->ne.nLink != 0 )  /* special case */
@@ -1271,7 +1163,7 @@ static int bitmap4combineOrNe( BITMAP4 *map1, BITMAP4 *map2 )
       if ( const4less( cOn, &map1->lt, map1 ) )
          return 1 ;
       else
-         c4memset( (void *)&map1->lt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->lt, 0, sizeof( CONST4 ) ) ;
    }
    else
       if ( map1->le.len )
@@ -1279,7 +1171,7 @@ static int bitmap4combineOrNe( BITMAP4 *map1, BITMAP4 *map2 )
          if ( const4lessEq( cOn, &map1->le, map1 ) )
             return 1 ;
          else
-            c4memset( (void *)&map1->le, 0, sizeof( CONST4 ) ) ;
+            memset( (void *)&map1->le, 0, sizeof( CONST4 ) ) ;
       }
 
    if ( map1->gt.len )
@@ -1287,7 +1179,7 @@ static int bitmap4combineOrNe( BITMAP4 *map1, BITMAP4 *map2 )
       if ( const4less( &map1->gt, cOn, map1 ) )
          return 1 ;
       else
-         c4memset( (void *)&map1->gt, 0, sizeof( CONST4 ) ) ;
+         memset( (void *)&map1->gt, 0, sizeof( CONST4 ) ) ;
    }
    else
       if ( map1->ge.len )
@@ -1295,7 +1187,7 @@ static int bitmap4combineOrNe( BITMAP4 *map1, BITMAP4 *map2 )
          if ( const4lessEq( &map1->ge, cOn, map1 ) )
             return 1 ;
          else
-            c4memset( (void *)&map1->ge, 0, sizeof( CONST4 ) ) ;
+            memset( (void *)&map1->ge, 0, sizeof( CONST4 ) ) ;
       }
 
    l4remove( &map2->ne, cOn ) ;
@@ -1319,12 +1211,6 @@ BITMAP4 * bitmap4combineLeafs( BITMAP4 *parent, BITMAP4 *map1, BITMAP4 *map2 )
          return 0 ;
       }
    #endif
-
-   // AS Dec 30/03 - just ensure that neither map is a branch...
-   assert5( map1->branch == 0 && map2->branch == 0 ) ;
-   // AS Aug 25/03 - If one of the 'leaf' maps is not really a leaf, just return without changing
-   // if ( map1->branch == 1 || map2->branch == 1 )
-   //   return parent ;
 
    if ( parent->andOr == 1 )  /* and */
    {
@@ -1365,11 +1251,11 @@ BITMAP4 * bitmap4combineLeafs( BITMAP4 *parent, BITMAP4 *map1, BITMAP4 *map2 )
                return 0 ;
             }
          if ( map1->ne.nLink )
-           if ( map1->eq.len )
-           {
-              error4( parent->log->codeBase, e4info, E93701 ) ;
-              return 0 ;
-           }
+            if ( map1->eq.len )
+            {
+               error4( parent->log->codeBase, e4info, E93701 ) ;
+               return 0 ;
+            }
          if ( map1->ge.len )
             if ( map1->gt.len || map1->eq.len )
             {
@@ -1452,7 +1338,7 @@ int bitmap4copy( BITMAP4 *to, const BITMAP4 *from )
       if ( from->branch )
          return error4( to->log->codeBase, e4info, E93701 ) ;
    #endif
-   c4memset( (void *)to, 0, sizeof( BITMAP4 ) ) ;
+   memset( (void *)to, 0, sizeof( BITMAP4 ) ) ;
    to->andOr = from->andOr ;
    to->log = from->log ;
    to->relate = from->relate ;
@@ -1479,7 +1365,7 @@ int bitmap4copy( BITMAP4 *to, const BITMAP4 *from )
 /* flags a range of bits for the given F4FLAG and map */
 static long bitmap4flagRange( F4FLAG *flags, BITMAP4 *map, CONST4 *startCon, CONST4 *endCon, long doFlip, char startVal, char endVal, long check )
 {
-   long rc ;
+   long start, end, rc ;
    double pos1 = 0.0 ;
    double pos2 = 0.0 ;
    TAG4FILE *tag ;
@@ -1493,68 +1379,32 @@ static long bitmap4flagRange( F4FLAG *flags, BITMAP4 *map, CONST4 *startCon, CON
    #ifdef S4MDX
       isDesc = ( tag->header.typeCode & 8 ) ? 1 : 0 ;
    #endif
-   unsigned long start = 0L ;
-   unsigned long end = 0L ;
-
-   /*
-       Basically what we want to do here is flag all the records between
-       the input range of 'startCon' and 'endCon'.
-
-       Note that the startCon is actually the upper value in the range
-       and endCon is the lower value in the range.  For example, if
-       the seek expression was 2 <= x <= 4, the startCon would be '4'
-       and the endCon would be '2'.
-
-       The basic algorithm is:
-         We seek for the startCon (end value) and record the record number
-         Then we seek for the endCon (start value)
-         Then we loop on:
-           - mark the current record
-           - skip tag by 1
-           - if we have reached the recorded record number, stop loop
-
-       The only compications are the cases where the range is exclusive
-       ( eg. 4 <= x <= 2  - x can never match).  To handle this case
-       we record the index positions when the 2 seeks are performed.
-       if the startCon position (end value) is less than the endCon
-       position (start value) then clearly we have no match.
-
-       First do a basic seek for the start of the range:
-          startCon is the value to seek for
-          startVal is either '0' or '1' and indicates the following:
-             '0' means we should skip backwards 1 record after finding
-             the value because we are looking for a 'less than'
-             condition (i.e. the matching record should not be included)
-             '1' means
-
-   */
+   start = end = 0L ;
 
    if ( startCon != 0 )
    {
-      // bitmap4seek returns ULONG_MAX (or -1) if at end of tag - i.e. not found
       start = bitmap4seek( map, startCon, startVal, 0L, 0 ) ;
-      if ( start == ULONG_MAX || tfile4eof( map->tag ) )
+      if ( start == -1L || tfile4eof( map->tag ) )
          return -2L ;
-      if ( start != ULONG_MAX && start != 0 )
+      if ( start > 0L )
          pos1 = tfile4position( tag ) ;
    }
 
    if ( endCon != 0 )
    {
-      // bitmap4seek returns ULONG_MAX (or -1) if at end of tag - i.e. not found
       end = bitmap4seek( map, endCon, endVal, start, (int)check ) ;
-      if ( end == ULONG_MAX )
+      if ( end == -1L )
          return -2L ;
-      if ( end != ULONG_MAX && end != 0 )
+      if ( end > 0L )
          pos2 = tfile4position( tag ) ;
    }
 
    #ifdef S4MDX
       if ( isDesc )
       {
-         if ( start != ULONG_MAX && start != 0  )
+         if ( start > 0L )
          {
-            if ( end != ULONG_MAX && end != 0  )
+            if ( end > 0L )
             {
                if ( pos1 < pos2 )   /* wrap around case, no matches */
                   return doFlip ;
@@ -1565,14 +1415,14 @@ static long bitmap4flagRange( F4FLAG *flags, BITMAP4 *map, CONST4 *startCon, CON
                   {
                      if ( tfile4skip( tag, -1L ) != -1L )
                         break ;
-                     f4flagSet( flags, tfile4recNo( tag ) ) ;
+                     f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
                   }
                   start = bitmap4seek( map, startCon, startVal, 0, 0 ) ;
                   for(;;)
                   {
                      if ( tfile4skip( tag, 1L ) != 1L )
                         break ;
-                     f4flagSet( flags, tfile4recNo( tag ) ) ;
+                     f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
                   }
                }
                else
@@ -1583,9 +1433,9 @@ static long bitmap4flagRange( F4FLAG *flags, BITMAP4 *map, CONST4 *startCon, CON
                   for( ; rc == doFlip ; )
                   {
                      if ( doFlip == -1 )
-                        f4flagReset( flags, tfile4recNo( tag ) ) ;
+                        f4flagReset( flags, (unsigned long)tfile4recNo( tag ) ) ;
                      else
-                        f4flagSet( flags, tfile4recNo( tag ) ) ;
+                        f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
                      if ( tfile4recNo( tag ) == start )
                         break ;
                      rc = tfile4skip( tag, 1L ) == 1L ? doFlip : -doFlip ;
@@ -1613,14 +1463,14 @@ static long bitmap4flagRange( F4FLAG *flags, BITMAP4 *map, CONST4 *startCon, CON
 
               for( ; rc == doSkip ; )
                {
-                  f4flagSet( flags, tfile4recNo( tag ) ) ;
+                  f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
                   rc = tfile4skip( tag, doSkip ) ;
                }
             }
          }
          else
          {
-            if ( end != ULONG_MAX && end != 0  )
+            if ( end > 0L )
             {
                if ( doFlip == 0 )
                {
@@ -1641,7 +1491,7 @@ static long bitmap4flagRange( F4FLAG *flags, BITMAP4 *map, CONST4 *startCon, CON
 
                for( ; rc == doSkip ; )
                {
-                  f4flagSet( flags, tfile4recNo( tag ) ) ;
+                f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
                   rc = tfile4skip( tag, doSkip ) ;
                }
            }
@@ -1652,93 +1502,93 @@ static long bitmap4flagRange( F4FLAG *flags, BITMAP4 *map, CONST4 *startCon, CON
       else
       {
    #endif
-         if ( start != ULONG_MAX && start != 0  )
+   if ( start > 0L )
+   {
+      if ( end > 0L )
+      {
+         if ( pos1 > pos2 )   /* wrap around case, no matches */
+            return doFlip ;
+         if ( doFlip == 0 && ( pos2 - pos1 ) > 0.5 )   /* go around */
          {
-            if ( end != ULONG_MAX && end != 0  )
+            rc = doFlip = -1L ;
+            for(;;)
             {
-               if ( pos1 > pos2 )   /* wrap around case, no matches */
-                  return doFlip ;
-               if ( doFlip == 0 && ( pos2 - pos1 ) > 0.5 )   /* go around */
-               {
-                  rc = doFlip = -1L ;
-                  for(;;)
-                  {
-                     if ( tfile4skip( tag, 1L ) != 1L )
-                        break ;
-                     f4flagSet( flags, tfile4recNo( tag ) ) ;
-                  }
-                  bitmap4seek( map, startCon, startVal, 0L, 0 ) ;
-                  for(;;)
-                  {
-                     if ( tfile4skip( tag, -1L ) != -1L )
-                        break ;
-                     f4flagSet( flags, tfile4recNo( tag ) ) ;
-                  }
-               }
-               else
-               {
-                  if ( doFlip == 0 )
-                     doFlip = 1 ;
-                  rc = doFlip ;
-                  for( ; rc == doFlip ; )
-                  {
-                     if ( doFlip == -1 )
-                        f4flagReset( flags, tfile4recNo( tag ) ) ;
-                     else
-                        f4flagSet( flags, tfile4recNo( tag ) ) ;
-                     if ( tfile4recNo( tag ) == start )
-                        break ;
-                     rc = tfile4skip( tag, -1L ) == -1L ? doFlip : -doFlip ;
-                  }
-               }
+               if ( tfile4skip( tag, 1L ) != 1L )
+                  break ;
+               f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
             }
-            else
+            bitmap4seek( map, startCon, startVal, 0L, 0 ) ;
+            for(;;)
             {
-               if ( doFlip == 0 )
-               {
-                  if ( pos1 < 0.5 )
-                  {
-                     doFlip = -1L ;
-                     rc = tfile4skip( tag, doFlip ) ;
-                  }
-                  else
-                     rc = doFlip = 1L ;
-               }
-               else
-                  rc = doFlip ;
-               for( ; rc == doFlip ; )
-               {
-                  f4flagSet( flags, tfile4recNo( tag ) ) ;
-                  rc = tfile4skip( tag, doFlip ) ;
-               }
+               if ( tfile4skip( tag, -1L ) != -1L )
+                  break ;
+               f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
             }
          }
          else
          {
-            if ( end != ULONG_MAX && end != 0  )
+            if ( doFlip == 0 )
+               doFlip = 1 ;
+            rc = doFlip ;
+            for( ; rc == doFlip ; )
             {
-               if ( doFlip == 0 )
-               {
-                  if ( pos2 < .5 )
-                     rc = doFlip = -1L ;
-                  else
-                  {
-                     doFlip = 1L ;
-                     rc = tfile4skip( tag, doFlip ) ;
-                  }
-               }
+               if ( doFlip == -1 )
+                  f4flagReset( flags, (unsigned long)tfile4recNo( tag ) ) ;
                else
-                  rc = doFlip ;
-               for( ; rc == doFlip ; )
-               {
-                  f4flagSet( flags, tfile4recNo( tag ) ) ;
-                  rc = tfile4skip( tag, doFlip ) ;
-               }
-               doFlip = ( doFlip == -1L ) ? 1L : -1L ;
+                  f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
+               if ( tfile4recNo( tag ) == start )
+                  break ;
+               rc = tfile4skip( tag, -1L ) == -1L ? doFlip : -doFlip ;
+            }
+         }
+      }
+      else
+      {
+         if ( doFlip == 0 )
+         {
+            if ( pos1 < 0.5 )
+            {
+               doFlip = -1L ;
+               rc = tfile4skip( tag, doFlip ) ;
             }
             else
-               return -1L ;
+               rc = doFlip = 1L ;
          }
+         else
+            rc = doFlip ;
+         for( ; rc == doFlip ; )
+         {
+            f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
+            rc = tfile4skip( tag, doFlip ) ;
+         }
+      }
+   }
+   else
+   {
+      if ( end > 0L )
+      {
+         if ( doFlip == 0 )
+         {
+            if ( pos2 < .5 )
+               rc = doFlip = -1L ;
+            else
+            {
+               doFlip = 1L ;
+               rc = tfile4skip( tag, doFlip ) ;
+            }
+         }
+         else
+            rc = doFlip ;
+         for( ; rc == doFlip ; )
+         {
+            f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
+            rc = tfile4skip( tag, doFlip ) ;
+         }
+         doFlip = ( doFlip == -1L ) ? 1L : -1L ;
+      }
+      else
+         return -1L ;
+   }
    #ifdef S4MDX
       }
    #endif
@@ -1746,27 +1596,8 @@ static long bitmap4flagRange( F4FLAG *flags, BITMAP4 *map, CONST4 *startCon, CON
    return doFlip ;
 }
 
-
-
 static long bmf4AndEq( BITMAP4 *map, F4FLAG *flags, long doFlip )
 {
-   /*
-
-      This function takes the input flags (i.e. bitmap) and "&'s" it with
-      all the record numbers whose records match the 'equal' constant
-      given by the map paramater.
-
-      We do this by setting:
-         start range = equal constant
-         end range = equal constant
-         call flagRange() function for all data values which lie between
-           or are equal to these 2 values:
-           startVal set to 1 to indicate seek from top and include the
-             equality value found
-           endVal set to 2 to indicate seek from bottom and include the
-             equality value found
-
-   */
    CONST4 *startCon, *endCon ;
    char startVal, endVal ;
 
@@ -1780,22 +1611,15 @@ static long bmf4AndEq( BITMAP4 *map, F4FLAG *flags, long doFlip )
    return bitmap4flagRange( flags, map, startCon, endCon, doFlip, startVal, endVal, 0L ) ;
 }
 
-
-
 static long bmf4AndOt( BITMAP4 *map, F4FLAG *flags, long doFlip )
 {
    CONST4 *startCon, *endCon, *cOn ;
    char startVal, endVal ;
    long prevFlip ;
-   int doCheck ;
 
    startVal = endVal = 0 ;
    startCon = endCon = 0 ;
 
-   if ( map->ge.len || map->le.len )  /* AS 08/27/98 t4les1.c shouldn't in either case */
-      doCheck = 0 ;
-   else
-      doCheck = 1 ;
 
    if ( map->gt.len )
    {
@@ -1822,8 +1646,7 @@ static long bmf4AndOt( BITMAP4 *map, F4FLAG *flags, long doFlip )
       }
 
    /* AS 10/06/97 - check last paramater to 0L, having problems geting 1 record between ranges otherwise working.  test.c - added as t3les1.c */
-   /* AS 08/20/98 - updated, only occurs if both ge and le, so made conditional on that */
-   doFlip = bitmap4flagRange( flags, map, startCon, endCon, doFlip, startVal, endVal, doCheck ) ;
+   doFlip = bitmap4flagRange( flags, map, startCon, endCon, doFlip, startVal, endVal, 0L ) ;
    if ( doFlip == -2L )  /* no matches */
    {
       f4flagSetAll( flags ) ;
@@ -1863,22 +1686,18 @@ static long bmf4AndOt( BITMAP4 *map, F4FLAG *flags, long doFlip )
    return doFlip ;
 }
 
-
-
 static int bmf4OrNe( BITMAP4 *map, F4FLAG *flags, long doFlip )
 {
-   // return of -1000 means an error occurred, -999 means success, -1 means the results need to be flipped
-   CONST4 *cOn = (CONST4 *)l4first( &map->ne ) ;
-   CONST4 *startCon = cOn ;
-   CONST4 *endCon = cOn ;
-   char startVal = 1 ;
-   char endVal = 2 ;
+   CONST4 *startCon, *endCon, *cOn ;
+   char startVal, endVal ;
 
+   cOn = (CONST4 *)l4first( &map->ne ) ;
+   startCon = endCon = cOn ;
+   startVal = 1 ;
+   endVal = 2 ;
    doFlip = bitmap4flagRange( flags, map, startCon, endCon, doFlip, startVal, endVal, 0L ) ;
-
    if ( doFlip != -1 )
       f4flagFlipReturns( flags ) ;
-
    #ifdef E4ANALYZE
       cOn = (CONST4 *)l4next( &map->ne, cOn ) ;
       if ( cOn != 0 )
@@ -1890,22 +1709,19 @@ static int bmf4OrNe( BITMAP4 *map, F4FLAG *flags, long doFlip )
    return -999 ;
 }
 
-
-
 static long bmf4OrOt( BITMAP4 *map, F4FLAG *flags, CODE4 *codeBase )
 {
-   // return of -1000 means an error occurred, -999 means success, -1 means the results need to be flipped
    CONST4 *startCon, *endCon ;
    char startVal, endVal ;
-   long doFlip, rc, prevFlip, doSkip ;
-   unsigned long startRecNo, endRecNo ;
+   long doFlip, rc, prevFlip, doSkip, start, end ;
    double pos1 = 0 ;
    double pos2 ;
+   TAG4FILE *tag ;
    #ifdef S4MDX
       int isDesc ;
    #endif
 
-   TAG4FILE *tag = map->tag ;
+   tag = map->tag ;
    #ifdef S4MDX
       isDesc = ( tag->header.typeCode & 8 ) ? 1 : 0 ;
    #endif
@@ -1918,40 +1734,33 @@ static long bmf4OrOt( BITMAP4 *map, F4FLAG *flags, CODE4 *codeBase )
       }
    #endif
 
-   startRecNo = endRecNo = doFlip = doSkip = 0L ;
+   start = end = doFlip = doSkip = 0L ;
    if ( map->gt.len )
-      startRecNo = bitmap4seek( map, &map->gt, 3, 0L, 0 ) ;
+      start = bitmap4seek( map, &map->gt, 3, 0L, 0 ) ;
    else
       if ( map->ge.len )
-         startRecNo = bitmap4seek( map, &map->ge, 1, 0L, 0 ) ;
+         start = bitmap4seek( map, &map->ge, 1, 0L, 0 ) ;
 
-   // Nov 29/01 - This also applies in the FOX case - need to obtain pos1 BEFORE we reposition
-   //#ifdef S4MDX
-      if ( startRecNo != ULONG_MAX && startRecNo != 0  )
+   #ifdef S4MDX
+      if ( start > 0L )
          pos1 = (double)tfile4position( tag ) ;
-   //#endif
+   #endif
 
    if ( map->lt.len )
-      endRecNo = bitmap4seek( map, &map->lt, 0, startRecNo, 1 ) ;
+      end = bitmap4seek( map, &map->lt, 0, start, 1 ) ;
    else
       if ( map->le.len )
-         endRecNo = bitmap4seek( map, &map->le, 2, startRecNo, 1 ) ;
+        end = bitmap4seek( map, &map->le, 2, start, 1 ) ;
 
-   // AS Nov 29/01 -- This does not always hold.  For example, if we have the following case:
-   // INT_FLD >= 100 OR INT_FLD <= 0   (This is one of those outside clauses.  Clearly, even if the end value
-   //  (i.e. <= 0) fails (i.e. no negative records), there still may be records >= 100.
-   // This was happening with a customer example, I am adding it to a test...
-   // if ( endRecNo == ULONG_MAX )  /* no matches */
-   //    return -999L ;
-   if ( endRecNo == ULONG_MAX && startRecNo == ULONG_MAX )  /* no matches */
+   if ( end == -1L )  /* no matches */
       return -999L ;
 
    #ifdef S4MDX
       if ( isDesc )
       {
-         if ( startRecNo != ULONG_MAX && startRecNo != 0  )
+         if ( start > 0L )
          {
-            if ( endRecNo != ULONG_MAX && endRecNo != 0  )
+            if ( end > 0L )
             {
                pos2 = (double)tfile4position( tag ) ;
                if ( ( pos1 - pos2 ) < 0.5 )   /* do between */
@@ -1963,16 +1772,16 @@ static long bmf4OrOt( BITMAP4 *map, F4FLAG *flags, CODE4 *codeBase )
                   }
                   else
                      doSkip = doFlip = 1L ;
-                  if ( tfile4recNo( tag ) != startRecNo )
+                  if ( tfile4recNo( tag ) != start )
                   {
                      rc = tfile4skip( tag, doSkip ) ;
                      for( ; rc == doSkip ; )
                      {
                         if ( error4code( codeBase ) < 0 )
                            return -1000L ;
-                        if ( tfile4recNo( tag ) == startRecNo )
+                        if ( tfile4recNo( tag ) == start )
                            break ;
-                        f4flagSet( flags, tfile4recNo( tag ) ) ;
+                        f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
                         rc = tfile4skip( tag, doSkip ) ;
                      }
                   }
@@ -1981,20 +1790,20 @@ static long bmf4OrOt( BITMAP4 *map, F4FLAG *flags, CODE4 *codeBase )
                {
                   for(;;)
                   {
-                     f4flagSet( flags, tfile4recNo( tag ) ) ;
+                     f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
                      if ( error4code( codeBase ) < 0 )
                         return -1000L ;
                      if ( tfile4skip( tag, -1L ) != -1L )
                         break ;
                   }
                   if ( map->gt.len )
-                     startRecNo = bitmap4seek( map, &map->gt, 1, 0, 0 ) ;
+                     start = bitmap4seek( map, &map->gt, 1, 0, 0 ) ;
                   else
                      if ( map->ge.len )
-                        startRecNo = bitmap4seek( map, &map->ge, 2, 0, 0 ) ;
+                        start = bitmap4seek( map, &map->ge, 2, 0, 0 ) ;
                   for(;;)
                   {
-                     f4flagSet( flags, tfile4recNo( tag ) ) ;
+                     f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
                      if ( error4code( codeBase ) < 0 )
                         return -1000L ;
                      if ( tfile4skip( tag, 1L ) != 1L )
@@ -2021,14 +1830,14 @@ static long bmf4OrOt( BITMAP4 *map, F4FLAG *flags, CODE4 *codeBase )
                {
                   if ( error4code( codeBase ) < 0 )
                      return -1000 ;
-                  f4flagSet( flags, tfile4recNo( tag ) ) ;
+                  f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
                   rc = tfile4skip( tag, doSkip ) ;
                }
             }
          }
          else
          {
-            if ( endRecNo != ULONG_MAX && endRecNo != 0  )
+            if ( end > 0L )
             {
                if ( (double)tfile4position( tag ) > 0.5 )
                {
@@ -2047,7 +1856,7 @@ static long bmf4OrOt( BITMAP4 *map, F4FLAG *flags, CODE4 *codeBase )
                {
                   if ( error4code( codeBase ) < 0 )
                      return -1000 ;
-                  f4flagSet( flags, tfile4recNo( tag ) ) ;
+                  f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
                   rc = tfile4skip( tag, doSkip ) ;
                }
             }
@@ -2057,110 +1866,102 @@ static long bmf4OrOt( BITMAP4 *map, F4FLAG *flags, CODE4 *codeBase )
       else
       {
    #endif
-         if ( startRecNo != ULONG_MAX && startRecNo != 0  )
+
+   if ( start > 0L )
+   {
+      pos1 = (double)tfile4position( tag ) ;
+      if ( end > 0L )
+      {
+         pos2 = (double)tfile4position( tag ) ;
+         if ( ( pos2 - pos1 ) < 0.5 )   /* flip and do between */
          {
-            // pos1 = (double)tfile4position( tag ) ;
-            if ( endRecNo != ULONG_MAX && endRecNo != 0  )
+            doSkip = doFlip = 1L ;
+            if ( tfile4recNo( tag ) != start )
             {
-               pos2 = (double)tfile4position( tag ) ;
-               if ( ( pos2 - pos1 ) < 0.5 )   /* flip and do between */
-               {
-                  doSkip = doFlip = 1L ;
-                  if ( tfile4recNo( tag ) != startRecNo )
-                  {
-                     rc = tfile4skip( tag, doSkip ) ;
-                     for( ; rc == doSkip ; )
-                     {
-                        if ( error4code( codeBase ) < 0 )
-                           return -1000L ;
-                        if ( tfile4recNo( tag ) == startRecNo )
-                           break ;
-                        f4flagSet( flags, tfile4recNo( tag ) ) ;
-                        rc = tfile4skip( tag, doSkip ) ;
-                     }
-                  }
-                  doFlip = doSkip = -1L ;
-               }
-               else  /* do both ways */
-               {
-                  for(;;)
-                  {
-                     f4flagSet( flags, tfile4recNo( tag ) ) ;
-                     if ( error4code( codeBase ) < 0 )
-                        return -1000L ;
-                     if ( tfile4skip( tag, -1L ) != -1L )
-                        break ;
-                  }
-                  if ( map->gt.len )
-                     bitmap4seek( map, &map->gt, 1, 0L, 0 ) ;
-                  else
-                     if ( map->ge.len )
-                        bitmap4seek( map, &map->ge, 2, 0L, 0 ) ;
-                  for(;;)
-                  {
-                     f4flagSet( flags, tfile4recNo( tag ) ) ;
-                     if ( error4code( codeBase ) < 0 )
-                        return -1000L ;
-                     if ( tfile4skip( tag, 1L ) != 1L )
-                        break ;
-                  }
-               }
-            }
-            else
-            {
-               if ( endRecNo == ULONG_MAX )  // case where the end record was off the end, but the start record is still valid
-               {
-                  // in this case we are currently positioned at invalid spot, so go back to the start position
-                  if ( map->gt.len )
-                     bitmap4seek( map, &map->gt, 1, 0L, 0 ) ;
-                  else
-                     if ( map->ge.len )
-                        bitmap4seek( map, &map->ge, 2, 0L, 0 ) ;
-               }
-
-               if ( pos1 < 0.5 )
-               {
-                  doFlip = doSkip = -1 ;
-                  rc = tfile4skip( tag, doSkip ) ;
-               }
-               else
-                  doFlip = doSkip = rc = 1 ;
-
+               rc = tfile4skip( tag, doSkip ) ;
                for( ; rc == doSkip ; )
                {
                   if ( error4code( codeBase ) < 0 )
-                     return -1000 ;
-                  f4flagSet( flags, tfile4recNo( tag ) ) ;
+                     return -1000L ;
+                  if ( tfile4recNo( tag ) == start )
+                     break ;
+                  f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
                   rc = tfile4skip( tag, doSkip ) ;
                }
             }
+            doFlip = doSkip = -1L ;
+         }
+         else  /* do both ways */
+         {
+            for(;;)
+            {
+               f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
+               if ( error4code( codeBase ) < 0 )
+                  return -1000L ;
+               if ( tfile4skip( tag, -1L ) != -1L )
+                  break ;
+            }
+            if ( map->gt.len )
+               bitmap4seek( map, &map->gt, 1, 0L, 0 ) ;
+            else
+               if ( map->ge.len )
+                  bitmap4seek( map, &map->ge, 2, 0L, 0 ) ;
+            for(;;)
+            {
+               f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
+               if ( error4code( codeBase ) < 0 )
+                  return -1000L ;
+               if ( tfile4skip( tag, 1L ) != 1L )
+                  break ;
+            }
+         }
+      }
+      else
+      {
+         if ( pos1 < 0.5 )
+         {
+            doFlip = doSkip = -1 ;
+            rc = tfile4skip( tag, doSkip ) ;
+         }
+         else
+            doFlip = doSkip = rc = 1 ;
+
+         for( ; rc == doSkip ; )
+         {
+            if ( error4code( codeBase ) < 0 )
+               return -1000 ;
+            f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
+            rc = tfile4skip( tag, doSkip ) ;
+         }
+      }
+   }
+   else
+   {
+      if ( end > 0L )
+      {
+         if ( (double)tfile4position( tag ) > 0.5 )
+         {
+            doSkip = 1 ;
+            doFlip = 1 ;
+            rc = tfile4skip( tag, doSkip ) ;
          }
          else
          {
-            if ( endRecNo != ULONG_MAX && endRecNo != 0  )
-            {
-               if ( (double)tfile4position( tag ) > 0.5 )
-               {
-                  doSkip = 1 ;
-                  doFlip = 1 ;
-                  rc = tfile4skip( tag, doSkip ) ;
-               }
-               else
-               {
-                 doFlip = -1 ;
-                 rc = doSkip = -1 ;
-               }
-
-               for( ; rc == doSkip ; )
-               {
-                  if ( error4code( codeBase ) < 0 )
-                     return -1000 ;
-                  f4flagSet( flags, tfile4recNo( tag ) ) ;
-                  rc = tfile4skip( tag, doSkip ) ;
-               }
-               doFlip = doSkip = ( doFlip == -1L ) ? 1L : -1L ;
-            }
+           doFlip = -1 ;
+           rc = doSkip = -1 ;
          }
+
+         for( ; rc == doSkip ; )
+         {
+            if ( error4code( codeBase ) < 0 )
+               return -1000 ;
+            f4flagSet( flags, (unsigned long)tfile4recNo( tag ) ) ;
+            rc = tfile4skip( tag, doSkip ) ;
+         }
+         doFlip = doSkip = ( doFlip == -1L ) ? 1L : -1L ;
+      }
+   }
+
    #ifdef S4MDX
       }
    #endif
@@ -2179,11 +1980,9 @@ static long bmf4OrOt( BITMAP4 *map, F4FLAG *flags, CODE4 *codeBase )
    return doFlip ;
 }
 
-
-
+/* generate the flags for the bitmap tree */
 static int bitmap4flagGenerate( BITMAP4 *map, int mode, F4FLAG *flags )
 {
-   /* generate the flags for the bitmap tree.  mode indicates whether it is an and map (1) or an or map (2) */
    CODE4 *codeBase ;
    CONST4 *cOn ;
    long doFlip ;
@@ -2210,13 +2009,7 @@ static int bitmap4flagGenerate( BITMAP4 *map, int mode, F4FLAG *flags )
    if ( flags->flags == 0 )
    {
       allocSize = (unsigned long)d4recCount( map->relate->data ) + 1L ;
-      // AS Jul 12/02 - discard flags out of range, this was happening
-      // in particular with transactions interacting with the relate module's bitmaps where the
-      // # of rows in the bitmap may be less than the physical record count (and those records in
-      // the tags).  In that case, we still want to discount the rows not in the set yet, so allow
-      // the set to be smaller than the actual range, and just skip...
-      // cushion was not being used, so removed it.
-      if ( f4flagInit( flags, codeBase, allocSize, 1 ) < 0 )
+      if ( f4flagInit( flags, codeBase, allocSize ) < 0 )
       {
          #ifndef S4OPTIMIZE_OFF
             #ifdef S4LOW_MEMORY
@@ -2228,13 +2021,7 @@ static int bitmap4flagGenerate( BITMAP4 *map, int mode, F4FLAG *flags )
                   codeBase->hadOpt = 0 ;   /* mark to automatically restart optimization later */
                   if ( codeBase->opt.numBuffers > 8 )
                      codeBase->opt.numBuffers-- ;
-                  // AS Jul 12/02 - discard flags out of range, this was happening
-                  // in particular with transactions interacting with the relate module's bitmaps where the
-                  // # of rows in the bitmap may be less than the physical record count (and those records in
-                  // the tags).  In that case, we still want to discount the rows not in the set yet, so allow
-                  // the set to be smaller than the actual range, and just skip...
-                  // cushion was not being used, so removed it.
-                  f4flagInit( flags, codeBase, allocSize, 1 ) ;
+                  f4flagInit( flags, codeBase, allocSize ) ;
                }
             #endif
          #endif
@@ -2309,11 +2096,6 @@ static int bitmap4flagGenerate( BITMAP4 *map, int mode, F4FLAG *flags )
 /* generate the bitmaps */
 static F4FLAG *bitmap4generate( BITMAP4 *map )
 {
-   // Takes the input map (which describes an expression) and creates a resulting bitmap set that will contain
-   // flags marking all the records that match the condition.  Note that the meaning is different for 'or' maps then
-   // it is for 'and' maps.  For 'and' maps the meaning is that the bitmap marks as true all records which meet at least
-   // one condition for the map (but they still need to be checked against other possibly not bitmappable expressions).
-   // for an or, if the entry is set, then the record is in the set, so no further checking is needed.
    BITMAP4 *mapOn ;
    F4FLAG *flag1, *flag2 ;
 
@@ -2322,7 +2104,7 @@ static F4FLAG *bitmap4generate( BITMAP4 *map )
       flag1 = (F4FLAG *)u4alloc( (long)sizeof( F4FLAG ) ) ;
       if ( flag1 == 0 )  /* insufficient memory */
          return 0 ;
-      c4memset( (void *)flag1, 0, sizeof( F4FLAG ) ) ;
+      memset( (void *)flag1, 0, sizeof( F4FLAG ) ) ;
       if ( bitmap4flagGenerate( map, map->andOr, flag1 ) < 0 )
       {
          u4free( flag1->flags ) ;
@@ -2338,16 +2120,6 @@ static F4FLAG *bitmap4generate( BITMAP4 *map )
    while( mapOn != 0 )
    {
       flag2 = bitmap4generate( mapOn ) ;
-      // AS Sept. 16/02 - flag2 may return 0 if a codebase error occurs.
-      if ( flag2 == 0 )
-      {
-         if ( flag1 != 0 )
-         {
-            u4free( flag1->flags ) ;
-            u4free( flag1 ) ;
-         }
-         return 0 ;
-      }
       if ( flag1 == 0 )
          flag1 = flag2 ;
       else
@@ -2372,49 +2144,6 @@ static F4FLAG *bitmap4generate( BITMAP4 *map )
    return flag1 ;
 }
 
-
-
-// AS Aug 25/03 - allow for printing out of bitmap for debugging
-#ifdef RELATE4PRINT
-   void bitmap4print( BITMAP4 *map, int level )
-   {
-      #ifdef S4CONSOLE
-         // for indentation
-         short lineLoop ;
-         for ( lineLoop = 0 ; lineLoop < level ; lineLoop++ )
-            printf( "   " ) ;
-         // print ourselves, then all our children
-         if ( map->tag != 0 )
-            printf( "Tag: %s   ", map->tag->alias ) ;
-         switch( map->andOr )
-         {
-            case 0:
-               printf( "map->andOr : unknown\n" ) ;
-               break ;
-            case 1:
-               printf( "map->andOr : and\n" ) ;
-               break ;
-            case 2:
-               printf( "map->andOr : or\n" ) ;
-               break ;
-            default:
-               printf( "map->andOr : invalid\n" ) ;
-               break ;
-         }
-         BITMAP4 *child = 0 ;
-         for ( ;; )
-         {
-            child = (BITMAP4 *)l4next( &(map->children), child ) ;
-            if ( child == 0 )
-               break ;
-            bitmap4print( child, level+1 ) ;
-         }
-      #endif
-   }
-#endif
-
-
-
 /* evaluate bitmaps out of the log */
 int bitmap4evaluate( L4LOGICAL *log, const int pos )
 {
@@ -2428,23 +2157,13 @@ int bitmap4evaluate( L4LOGICAL *log, const int pos )
    if ( map == 0 )
       return 0 ;
 
-   map = bitmap4reduce( 0, map ) ;  // first reduce the map by eliminating unneeded branches.
-   #ifdef RELATE4PRINT
-      bitmap4print( map, 0 ) ;
-   #endif
    map = bitmap4redistribute( 0, map, 1 ) ;
-   #ifdef RELATE4PRINT
-      bitmap4print( map, 0 ) ;
-   #endif
    if ( error4code( log->codeBase ) < 0 )
       return error4code( log->codeBase ) ;
    if ( map == 0 )
       return 0 ;
 
    map = bitmap4redistributeBranch( 0, map ) ;
-   #ifdef RELATE4PRINT
-      bitmap4print( map, 0 ) ;
-   #endif
    if ( map == 0 )
    {
       if ( error4code( log->codeBase ) == e4memory )
@@ -2455,7 +2174,7 @@ int bitmap4evaluate( L4LOGICAL *log, const int pos )
    flags = bitmap4generate( map ) ;
    if ( flags != 0 )
    {
-      c4memcpy( (void *)&map->relate->set, (void *)flags, sizeof( F4FLAG ) ) ;
+      memcpy( (void *)&map->relate->set, (void *)flags, sizeof( F4FLAG ) ) ;
       u4free( flags ) ;
    }
    bitmap4free( log, map ) ;
@@ -2482,18 +2201,11 @@ int S4FUNCTION relate4optimizeable( RELATE4 *relate )
       {
          relate4changed( relate ) ;
 
-         // AS Oct 5/04 - need to set the datalist as well in server case
-         log = &relation->log ;
-         #ifdef S4SERVER
-            LIST4 *oldList = tran4dataList( code4trans( log->codeBase ) ) ;
-            tran4dataListSet( code4trans( log->codeBase ), &relation->localDataList ) ;
-         #endif
          relation->log.expr = expr4parseLow( relate->data, relation->exprSource, 0 ) ;
-         #ifdef S4SERVER
-            tran4dataListSet( code4trans( log->codeBase ), oldList ) ;
-         #endif
          if ( relation->log.expr == 0 )
             return -1 ;
+
+         log = &relation->log ;
 
          if ( error4code( log->codeBase ) < 0 )
             return -1 ;
@@ -2514,3 +2226,52 @@ int S4FUNCTION relate4optimizeable( RELATE4 *relate )
       return 0 ;
    #endif
 }
+#else
+int S4FUNCTION relate4optimizeable( RELATE4 *relate )
+{
+   CONNECTION4 *connection ;
+   CONNECTION4RELATE_OPT_INFO_IN *info ;
+   int rc ;
+   CODE4 *c4 ;
+
+   #ifdef E4PARM_HIGH
+      if ( relate == 0 )
+         return error4( 0, e4parm_null, E94426 ) ;
+   #endif
+
+   c4 = relate->codeBase ;
+
+   #ifdef E4ANALYZE
+      if ( relate->data == 0 )
+         return error4( c4, e4struct, E94426 ) ;
+      if ( relate->data->dataFile == 0 )
+         return error4( c4, e4struct, E94426 ) ;
+   #endif
+
+   if ( relate->relation->isInitialized == 0 || relate->dataTag != relate->data->tagSelected )
+   {
+      relate->dataTag = relate->data->tagSelected ;
+      rc = relate4clientInit( relate ) ;
+      if ( rc != 0 )
+         return rc ;
+   }
+
+   connection = relate->data->dataFile->connection ;
+   #ifdef E4ANALYZE
+      if ( connection == 0 )
+         return error4( c4, e4struct, E94426 ) ;
+   #endif
+   connection4assign( connection, CON4RELATE_OPT, 0, 0 ) ;
+   connection4addData( connection, NULL, sizeof( CONNECTION4RELATE_OPT_INFO_IN ), (void **)&info ) ;
+   info->relationId = htonl(relate->relation->relationId) ;
+   connection4sendMessage( connection ) ;
+   rc = connection4receiveMessage( connection ) ;
+   if ( rc < 0 )
+      return error4stack( c4, rc, E94426 ) ;
+   rc = connection4status( connection ) ;
+   if ( rc < 0 )
+      return connection4error( connection, c4, rc, E94426 ) ;
+
+   return rc ;
+}
+#endif   /* S4CLIENT */

@@ -1,18 +1,4 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* f4lock.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* f4lock.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
 #ifdef S4IBMOS2
@@ -25,44 +11,54 @@
    #endif
 #endif
 
+#ifdef __TURBOC__
+   #pragma hdrstop
+#endif
+
 #ifdef S4TEMP
    #include "t4test.h"
 #endif
 
 #ifndef S4SINGLE
-   // AS Nov 8/02 - New capability to use sema4's for (file) locking
-   #ifdef S4MUTEX4LOCK
-   #else
-      #ifndef S4WINTEL
-         #include <unistd.h>
-         #ifdef S4NO_LOCKF
-            #include <fcntl.h>
-         #endif
-      #else
-         #ifndef __WIN32
-            #if !defined( __TURBOC__ ) && !defined( S4IBMOS2 )
-               #include <sys\locking.h>
-               #define S4LOCKING
-            #endif
-            #ifdef __ZTC__
-               extern int  errno ;
-            #endif
-            #ifdef _MSC_VER
-               #include <sys\types.h>
-            #endif
-            #if defined( __TURBOC__ ) && !defined( S4OS2 )
-              #ifdef __BORLANDC__
-                 #include <sys\locking.h> /* Borland C++ compilers */
-              #else
-                 #include <locking.h>             /* Turbo C++ for DOS compilers */
-              #endif
-            #endif
-         #endif
-      #endif
-   #endif /* S4MUTEX4LOCK else */
-#endif /* !S4SINGLE */
 
-#if !defined( __WIN32 ) && !defined( S4PALM )
+#ifndef S4WINTEL
+   #include <unistd.h>
+   #ifdef S4NO_LOCKF
+      #include <fcntl.h>
+   #endif
+#else
+   #ifndef __WIN32
+   #ifndef __TURBOC__
+      #ifndef S4IBMOS2
+         #include <sys\locking.h>
+         #define S4LOCKING
+      #endif
+   #endif
+   #ifdef __ZTC__
+      extern int  errno ;
+   #endif
+   #ifdef _MSC_VER
+      #include <sys\types.h>
+   #endif
+   #ifdef __TURBOC__
+      #ifndef S4OS2
+        #ifdef __BORLANDC__
+           #include <sys\locking.h> /* Borland C++ compilers */
+        #else
+           #include <locking.h>             /* Turbo C++ for DOS compilers */
+           /* #include <sys\locking.h> */   /* Turbo C++ for Win compilers */
+        #endif
+   /*   extern int cdecl errno ; */
+      #endif
+   #endif
+/*   #include <sys\stat.h>*/
+/*   #include <share.h>*/
+   #endif
+#endif
+
+#endif
+
+#ifndef __WIN32
 /*   #include <fcntl.h>*/
    #include <errno.h>
 #endif
@@ -72,121 +68,109 @@
 #endif
 
 #ifndef S4SINGLE
-      int dfile4registerLocked( DATA4FILE *d4, const long lockId, int doExtra )
+#ifdef S4CLIENT
+static char this4application[] = "THIS APPLICATION" ;
+int dfile4registerLocked( DATA4FILE *locker, const long lockId )
+{
+   CODE4 *c4 ;
+
+   if ( locker == 0 )
+      return 0 ;
+
+   c4 = locker->c4 ;
+
+   c4->lockedLockItem = lockId ;
+   c4->lockedFileName = locker->accessName ;
+   c4->lockedUserName = this4application ;
+   c4->lockedNetName = this4application ;
+
+   return 0 ;
+}
+#else
+int dfile4registerLocked( DATA4FILE *d4, const long lockId, int doExtra )
+{
+   DATA4 *lockedData ;
+   TRAN4 *trans ;
+   CODE4 *c4 ;
+   long clientId, serverId ;
+
+   if ( d4 == 0 )
+      return 0 ;
+
+   c4 = d4->c4 ;
+
+   #ifdef E4PARM_LOW
+      if ( lockId < -2L )
+         return error4( c4, e4parm, E96701 ) ;
+   #endif
+
+   #ifdef S4SERVER
+      c4->server->lockedLockItem = lockId ;
+   #else
+      c4->lockedLockItem = lockId ;
+   #endif
+
+   if ( doExtra )
+   {
+      switch( lockId )
       {
-         TRAN4 *trans ;
-         CODE4 *c4 ;
-         long clientId, serverId ;
-
-         if ( d4 == 0 )
-            return 0 ;
-
-         c4 = d4->c4 ;
-
-         #ifdef S4SERVER
-            if ( c4->currentClient->isStream )  /* don't bother, we don't use anyway */
-               return 0 ;
-         #endif
-
-         #ifdef E4PARM_LOW
-            if ( lockId < -2L )
-               return error4( c4, e4parm, E96701 ) ;
-         #endif
-
-         #ifdef S4SERVER
-            c4->server->lockedLockItem = lockId ;
-         #else
-            c4->lockedLockItem = lockId ;
-         #endif
-
-         if ( doExtra )
-         {
-            switch( lockId )
+         case -1:  /* file */
+            clientId = d4->fileClientLock ;
+            serverId = d4->fileServerLock ;
+            break ;
+         case 0:  /* append lock */
+            clientId = d4->appendClientLock ;
+            serverId = d4->appendServerLock ;
+            if ( clientId == 0 || serverId == 0 )  /* probably due to a file lock */
             {
-               case -1:  /* file */
-                  clientId = d4->fileClientWriteLock ;
-                  serverId = d4->fileServerWriteLock ;
-                  break ;
-               case 0:  /* append lock */
-                  clientId = d4->appendClientLock ;
-                  serverId = d4->appendServerLock ;
-                  if ( clientId == 0 || serverId == 0 )  /* probably due to a file lock */
-                  {
-                     clientId = d4->fileClientWriteLock ;
-                     serverId = d4->fileServerWriteLock ;
-                  }
-                  if ( clientId == 0 || serverId == 0 )  /* probably due to an exclusive open */
-                  {
-                     clientId = d4->tempClientLock ;
-                     serverId = d4->tempServerLock ;
-                  }
-                  break ;
-               default:  /* record number */
-                  clientId = d4->tempClientLock ;
-                  serverId = d4->tempServerLock ;
-                  if ( clientId == 0 || serverId == 0 )  /* probably due to a file lock */
-                  {
-                     clientId = d4->fileClientWriteLock ;
-                     serverId = d4->fileServerWriteLock ;
-                  }
-                  if ( clientId == 0 || serverId == 0 )  /* probably due to an exclusive open */
-                  {
-                     clientId = d4->tempClientLock ;
-                     serverId = d4->tempServerLock ;
-                  }
-                  break ;
+               clientId = d4->fileClientLock ;
+               serverId = d4->fileServerLock ;
             }
+            if ( clientId == 0 || serverId == 0 )  /* probably due to an exclusive open */
+            {
+               clientId = d4->tempClientLock ;
+               serverId = d4->tempServerLock ;
+            }
+            break ;
+         default:  /* record number */
+            clientId = d4->tempClientLock ;
+            serverId = d4->tempServerLock ;
+            if ( clientId == 0 || serverId == 0 )  /* probably due to a file lock */
+            {
+               clientId = d4->fileClientLock ;
+               serverId = d4->fileServerLock ;
+            }
+            if ( clientId == 0 || serverId == 0 )  /* probably due to an exclusive open */
+            {
+               clientId = d4->tempClientLock ;
+               serverId = d4->tempServerLock ;
+            }
+            break ;
+      }
 
-            if ( clientId == 0 || serverId == 0 )  // means system has the lock...
-               return 0 ;
-
-            trans = code4idDataTrans( c4, serverId, clientId ) ;
-
-            #ifdef S4SERVER
-               if ( trans )
-               {
-                  c4->server->lockedFileName = code4idDataAlias( c4, serverId, clientId ) ;
-                  c4->server->lockedUserName = trans->userId ;
-                  c4->server->lockedNetName = trans->netId ;
-               }
-               else
-               {  // CS for CJ 2000/05/04  code4idDataTrans might return null
-                  c4->server->lockedFileName = 0 ;
-                  c4->server->lockedUserName = 0 ;
-                  c4->server->lockedNetName = 0 ;
-               }
-            #else
-               if ( trans )
-               {
-                  // AS May 5/03 - Ensure DATA4 is available.
-                  // AS May 5/03 - if trans lock shared, user serverId for both
-                  // since the clientId actuall == the lockId
-                  // AS Jun 20/03 - trans-shared was made into a runtime switch
-                  DATA4 *data ;
-                  #ifndef S4OFF_TRAN   // LY Aug 16/04
-                     if ( c4->transShared == 1 )
-                        data = tran4data( code4trans( c4 ), serverId, serverId ) ;
-                     else
-                  #endif
-                     data = tran4data( code4trans( c4 ), serverId, clientId ) ;
-                  if ( data == 0 )
-                     c4->lockedFileName = 0 ;
-                  else
-                     c4->lockedFileName = d4alias( data ) ;
-                  c4->lockedUserName = trans->userId ;
-                  c4->lockedNetName = trans->netId ;
-               }
-               else
-               {
-                  c4->lockedFileName = 0 ;
-                  c4->lockedUserName = 0 ;
-                  c4->lockedNetName = 0 ;
-               }
-            #endif
-         }
-
+      if ( clientId == 0 || serverId == 0 )  /* means system has the lock... */
+      {
          return 0 ;
       }
+      lockedData = code4idData( c4, serverId, clientId ) ;
+      if ( lockedData == 0 )
+         return 0 ;
+      trans = lockedData->trans ;
+
+      #ifdef S4SERVER
+         c4->server->lockedFileName = lockedData->alias ;
+         c4->server->lockedUserName = trans->userId ;
+         c4->server->lockedNetName = trans->netId ;
+      #else
+         c4->lockedFileName = lockedData->alias ;
+         c4->lockedUserName = trans->userId ;
+         c4->lockedNetName = trans->netId ;
+      #endif
+   }
+
+   return 0 ;
+}
+#endif /* S4CLIENT */
 #endif /* S4SINGLE */
 
 #ifdef S4SERVER
@@ -211,208 +195,54 @@
       return c4->server->lockedLockItem ;
    }
 #else
-   const char *S4FUNCTION code4lockFileName( CODE4 *c4 )
-   {
-      #ifdef S4OFF_MULTI
-         return 0 ;
-      #else
-         #ifdef E4PARM_HIGH
-            if ( c4 == 0 )
-            {
-               error4( 0, e4parm_null, E91011 ) ;
-               return 0 ;
-            }
-         #endif
-
-         #ifdef E4VBASIC
-            if ( c4parm_check( c4, 1, E91011 ) )
-               return 0 ;
-         #endif
-
-         return c4->lockedFileName ;
-      #endif
-   }
-
-   long S4FUNCTION code4lockItem( CODE4 *c4 )
-   {
-      #ifdef S4OFF_MULTI
-         return -2 ;
-      #else
-         #ifdef E4PARM_HIGH
-            if ( c4 == 0 )
-            {
-               error4( 0, e4parm_null, E91012 ) ;
-               return 0 ;
-            }
-         #endif
-         return c4->lockedLockItem ;
-      #endif
-   }
-
    const char *S4FUNCTION code4lockNetworkId( CODE4 *c4 )
    {
-      #ifdef S4OFF_MULTI
-         return 0 ;
-      #else
-         #ifdef E4PARM_HIGH
-            if ( c4 == 0 )
-            {
-               error4( 0, e4parm_null, E91009 ) ;
-               return 0 ;
-            }
-         #endif
-
-         #ifdef E4VBASIC
-            if ( c4parm_check( c4, 1, E91009 ) )
-               return 0 ;
-         #endif
-
-         return c4->lockedNetName ;
+      #ifdef E4PARM_HIGH
+         if ( c4 == 0 )
+         {
+            error4( 0, e4parm_null, E91009 ) ;
+            return 0 ;
+         }
       #endif
+      return c4->lockedNetName ;
    }
 
    const char *S4FUNCTION code4lockUserId( CODE4 *c4 )
    {
-      #ifdef S4OFF_MULTI
-         return 0 ;
-      #else
-         #ifdef E4PARM_HIGH
-            if ( c4 == 0 )
-            {
-               error4( 0, e4parm_null, E91010 ) ;
-               return 0 ;
-            }
-         #endif
-
-         #ifdef E4VBASIC
-            if ( c4parm_check( c4, 1, E91010 ) )
-               return 0 ;
-         #endif
-
-         return c4->lockedUserName ;
+      #ifdef E4PARM_HIGH
+         if ( c4 == 0 )
+         {
+            error4( 0, e4parm_null, E91010 ) ;
+            return 0 ;
+         }
       #endif
+      return c4->lockedUserName ;
+   }
+
+   const char *S4FUNCTION code4lockFileName( CODE4 *c4 )
+   {
+      #ifdef E4PARM_HIGH
+         if ( c4 == 0 )
+         {
+            error4( 0, e4parm_null, E91011 ) ;
+            return 0 ;
+         }
+      #endif
+      return c4->lockedFileName ;
+   }
+
+   long S4FUNCTION code4lockItem( CODE4 *c4 )
+   {
+      #ifdef E4PARM_HIGH
+         if ( c4 == 0 )
+         {
+            error4( 0, e4parm_null, E91012 ) ;
+            return 0 ;
+         }
+      #endif
+      return c4->lockedLockItem ;
    }
 #endif
-
-
-
-// AS Nov 8/02 - isolate this code out to make code more readable
-static int file4lockLow( FILE4 *file
-                       , unsigned long posStart, long posStartHi
-                       , unsigned long numBytes, long numBytesHi )
-{ int numAttempts= 0; // JACS
-
-   int rc = 0 ;
-
-   #ifdef S4MUTEX4LOCK
-      // AS Nov 8/02 - sema4 locking is implemented as a counter.  Every lock done just increments the
-      // counter.  When the counter hits 0 another user can lock.  Thus every lock is equivalent to a
-      // full file lock
-      rc = mutex4wait( &(file->lockMutex), 0 ) ;
-   #else
-      #ifdef S4LOCKING
-         #ifdef S4WINDOWS
-            _llseek( file->hand, posStart, 0 ) ;
-         #else
-            lseek( file->hand, posStart, 0 ) ;
-         #endif
-         rc = locking( file->hand, LK_NBLCK, numBytes ) ;
-      #else
-         #ifdef __unix__
-            #ifndef S4NO_LOCKF
-               lseek( file->hand, posStart, 0 ) ;
-            #else
-               fstruct.l_type = F_WRLCK ;
-               fstruct.l_whence = SEEK_SET ;
-               fstruct.l_start = posStart ;
-               fstruct.l_len = numBytes ;
-            #endif
-            #ifdef S4MULTIC4
-               if ((pid = fork())<0)
-                  return error4(c4, e4lock, E80609);
-               if (pid ==0)               /* Child fork() */
-               {
-                  #ifndef S4NO_LOCKF
-                     if ( numAttempts == WAIT4EVER )    /* sleep until lock */
-                        rc = lockf( file->hand, F_LOCK, numBytes ) ;
-                     else
-                        rc = lockf( file->hand, F_TLOCK, numBytes ) ;
-                  #else
-                     if ( numAttempts == WAIT4EVER )    /* sleep until lock */
-                        rc = fcntl( file->hand, F_SETLKW, &fstruct ) ;
-                     else
-                        rc = fcntl( file->hand, F_SETLK, &fstruct ) ;
-                  #endif
-                  exit(rc);
-               }
-               while (wait(&status)!=pid)    /* Parent fork() */
-                  ;
-               if ((WIFEXITED(status)==0))   /* If it didn't exit properly */
-                  return error4(c4, e4lock, E80609);
-               if ((rc=WEXITSTATUS(status)) == 0)   /*IF it was able to lock*/
-               {
-               #ifndef S4NO_LOCKF
-                  if ( numAttempts == WAIT4EVER )    /* sleep until lock */
-                     rc = lockf( file->hand, F_LOCK, numBytes ) ;
-                  else
-                     rc = lockf( file->hand, F_TLOCK, numBytes ) ;
-               #else
-                  if ( numAttempts == WAIT4EVER )    /* sleep until lock */
-                     rc = fcntl( file->hand, F_SETLKW, &fstruct ) ;
-                  else
-                     rc = fcntl( file->hand, F_SETLK, &fstruct ) ;
-               #endif
-               }
-            #else
-               #ifndef S4NO_LOCKF
-                  if ( numAttempts == WAIT4EVER )    /* sleep until lock */
-                     rc = lockf( file->hand, F_LOCK, numBytes ) ;
-                  else
-                     rc = lockf( file->hand, F_TLOCK, numBytes ) ;
-               #else
-                  if ( numAttempts == WAIT4EVER )    /* sleep until lock */
-                     rc = fcntl( file->hand, F_SETLKW, &fstruct ) ;
-                  else
-                     rc = fcntl( file->hand, F_SETLK, &fstruct ) ;
-               #endif
-            #endif  /*  !S4MULTIC4  */
-         #endif  /*  __unix__  */
-
-         #ifdef S4IBMOS2
-            L4RANGE.FileOffset = posStart ;
-            L4RANGE.RangeLength = numBytes ;
-
-            rc = DosSetFileLocks( (HFILE) file->hand, 0L,(PFILELOCK) &L4RANGE, 100L, 0L ) ;
-         #endif
-
-         #ifdef S4MACINTOSH
-            ParamBlockRec MACParmBlk ; // LY Jul 19/04 : moved from file4lockInternal()
-            MACParmBlk.ioParam.ioRefNum = file->hand ;
-            MACParmBlk.ioParam.ioReqCount = numBytes ;
-            MACParmBlk.ioParam.ioPosMode = fsFromStart ;
-            MACParmBlk.ioParam.ioPosOffset = posStart ;
-
-            PBLockRangeSync( &MACParmBlk ) ;
-            rc = MACParmBlk.ioParam.ioResult ;
-         #endif
-
-         #if defined(__WIN32) && !defined(S4WINCE) /* LY 2002/11/12 : added !S4WINCE */
-            if ( LockFile( (HANDLE)file->hand, posStart, posStartHi, numBytes, numBytesHi ) )
-               rc = NO_ERROR ;
-            else
-               rc = GetLastError() ;
-         #else
-            #ifdef __TURBOC__
-               rc = lock( file->hand, posStart, numBytes ) ;
-            #endif
-         #endif
-      #endif
-   #endif
-
-   return rc ;
-}
-
-
 
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -424,7 +254,7 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
    #else
       int rc, numAttempts ;
       CODE4 *c4 ;
-      #ifdef __unix__
+      #ifdef S4UNIX
          #ifdef S4MULTIC4
             int pid, status;
          #endif
@@ -439,45 +269,20 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
             long RangeLength ;
          } L4RANGE ;
       #endif
-      // LY Jul 19/04 : moved MACParmBlk to file4lockLow()
-      // #ifdef S4MACINTOSH
-      //    ParamBlockRec MACParmBlk ;
-      // #endif
+      #ifdef S4MACINTOSH
+         ParamBlockRec MACParmBlk ;
+      #endif
 
       #ifdef E4PARM_HIGH
          if ( file == 0 )
             return error4( 0, e4parm_null, E90613 ) ;
-         // AS Sep 19/01 - S4MDX does support negative locking if the o/s supports it, so don't do this test
-         // AS July 25/01 - Was checking this if NOT MDX, instead of if it was MDX, t4fail was failing
-         //#ifndef S4MDX
-         //#ifdef S4MDX
-         //   if ( (long)numBytes < 0 || (long)posStart < 0 )  // in MDX negative locking (i.e. very high byte locking) is not multi-user compatible with dBase
-         //      return error4( 0, e4parm, E90613 ) ;
-         //#endif
+         #ifndef S4MDX
+            if ( numBytes < 0 || posStart < 0 )
+               return error4( 0, e4parm, E90613 ) ;
+         #endif
       #endif
 
-      /* AS 01/06/98 - relaxed isReadOnly contraint.  Will lock even then.
-         Generally f4lock() would only get called if user explicitly requested
-         it;  they may want to force a lock, so allow them to do so.
-
-         if ( numBytes == 0 || file->isReadOnly || file->lowAccessMode != OPEN4DENY_NONE )  // don't check error code
-            return 0 ;
-
-         AS 01/04/00 - if open in DENY_WRITE mode, we want to still enforce locks.
-         this is because OLE-DB and ODBC perform locks to ensure records are committed.
-         if locks are not placed on writes, the other client may place locks on the
-         record but the value can still be changed or rolled back because no locks
-         are actually placed.  t4odbc4.c displays problem.
-
-         if ( numBytes == 0 || file->lowAccessMode != OPEN4DENY_NONE )  // don't check error code
-            return 0 ;
-      */
-
-      // AS July 16/02 - if the file is opened exclusive, we shouldn't be calling this function (handled at a higher level)
-      // otherwise we can get into deadlock with ourselves (when opening clones of data files)
-      // I have been fixing this for fox, other indexes may need some work yet...
-      assert5( file->lowAccessMode != OPEN4DENY_RW ) ;
-      if ( numBytes == 0 || file->lowAccessMode == OPEN4DENY_RW )  /* don't check error code */
+      if ( numBytes == 0 || file->isReadOnly || file->lowAccessMode != OPEN4DENY_NONE )  /* don't check error code */
          return 0 ;
 
       #ifdef E4PARM_HIGH
@@ -501,69 +306,164 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
          errno = 0 ;
       #endif
 
-      // AS Nov 19/03 in S4TESTING case avoid a potential endless deadlock
-      #ifdef S4TESTING
-         long loopcount = 0 ;
-      #endif
-
       for( ;; )
       {
-         rc = file4lockLow( file, posStart, posStartHi, numBytes, numBytesHi ) ;
-
-         #ifndef S4MUTEX4LOCK
-            #ifdef __ZTC__
-               if (rc == 0 || errno == 1)
+         #ifdef S4LOCKING
+            #ifdef S4WINDOWS
+               _llseek( file->hand, posStart, 0 ) ;
             #else
-               #ifdef S4IBMOS2
-                  if (rc == NO_ERROR )
+               lseek( file->hand, posStart, 0 ) ;
+            #endif
+            rc = locking( file->hand, LK_NBLCK, numBytes ) ;
+         #else
+            #ifdef S4UNIX
+               #ifndef S4NO_LOCKF
+                  lseek( file->hand, posStart, 0 ) ;
                #else
-                  #ifdef S4MACINTOSH
-                     if (rc == 0 )
-                  #else
-                     #ifdef __WIN32
-                        if (rc == NO_ERROR )
+                  fstruct.l_type = F_WRLCK ;
+                  fstruct.l_whence = SEEK_SET ;
+                  fstruct.l_start = posStart ;
+                  fstruct.l_len = numBytes ;
+               #endif
+               #ifdef S4MULTIC4
+                  if ((pid = fork())<0)
+                     return error4(c4, e4lock, E80609);
+                  if (pid ==0)               /* Child fork() */
+                  {
+                     #ifndef S4NO_LOCKF
+                        if ( numAttempts == WAIT4EVER )    /* sleep until lock */
+                           rc = lockf( file->hand, F_LOCK, numBytes ) ;
+                        else
+                           rc = lockf( file->hand, F_TLOCK, numBytes ) ;
                      #else
-                        if (rc == 0 || errno == EINVAL)
+                        if ( numAttempts == WAIT4EVER )    /* sleep until lock */
+                           rc = fcntl( file->hand, F_SETLKW, &fstruct ) ;
+                        else
+                           rc = fcntl( file->hand, F_SETLK, &fstruct ) ;
                      #endif
+                     exit(rc);
+                  }
+                  while (wait(&status)!=pid)    /* Parent fork() */
+                     ;
+                  if ((WIFEXITED(status)==0))   /* If it didn't exit properly */
+                     return error4(c4, e4lock, E80609);
+                  if ((rc=WEXITSTATUS(status)) == 0)   /*IF it was able to lock*/
+                  {
+                  #ifndef S4NO_LOCKF
+                     if ( numAttempts == WAIT4EVER )    /* sleep until lock */
+                        rc = lockf( file->hand, F_LOCK, numBytes ) ;
+                     else
+                        rc = lockf( file->hand, F_TLOCK, numBytes ) ;
+                  #else
+                     if ( numAttempts == WAIT4EVER )    /* sleep until lock */
+                        rc = fcntl( file->hand, F_SETLKW, &fstruct ) ;
+                     else
+                        rc = fcntl( file->hand, F_SETLK, &fstruct ) ;
+                  #endif
+                  }
+               #else
+                  #ifndef S4NO_LOCKF
+                     if ( numAttempts == WAIT4EVER )    /* sleep until lock */
+                        rc = lockf( file->hand, F_LOCK, numBytes ) ;
+                     else
+                        rc = lockf( file->hand, F_TLOCK, numBytes ) ;
+                  #else
+                     if ( numAttempts == WAIT4EVER )    /* sleep until lock */
+                        rc = fcntl( file->hand, F_SETLKW, &fstruct ) ;
+                     else
+                        rc = fcntl( file->hand, F_SETLK, &fstruct ) ;
+                  #endif
+               #endif  /*  !S4MULTIC4  */
+            #endif  /*  S4UNIX  */
+
+            #ifdef S4IBMOS2
+               L4RANGE.FileOffset = posStart ;
+               L4RANGE.RangeLength = numBytes ;
+
+               rc = DosSetFileLocks( (HFILE) file->hand, 0L,(PFILELOCK) &L4RANGE, 100L, 0L ) ;
+            #endif
+
+            #ifdef S4MACINTOSH
+               MACParmBlk.ioParam.ioRefNum = file->hand ;
+               MACParmBlk.ioParam.ioReqCount = numBytes ;
+               MACParmBlk.ioParam.ioPosMode = fsFromStart ;
+               MACParmBlk.ioParam.ioPosOffset = posStart ;
+
+               PBLockRangeSync( &MACParmBlk ) ;
+               rc = MACParmBlk.ioParam.ioResult ;
+            #endif
+
+            #ifdef __WIN32
+               if ( LockFile( (HANDLE)file->hand, posStart, posStartHi, numBytes, numBytesHi ) )
+                  rc = NO_ERROR ;
+               else
+                  rc = GetLastError() ;
+            #else
+               #ifdef __TURBOC__
+                  rc = lock( file->hand, posStart, numBytes ) ;
+               #endif
+            #endif
+         #endif
+
+         #ifdef __ZTC__
+            if (rc == 0 || errno == 1)
+         #else
+            #ifdef S4IBMOS2
+               if (rc == NO_ERROR )
+            #else
+               #ifdef S4MACINTOSH
+                  if (rc == 0 )
+               #else
+                  #ifdef __WIN32
+                     if (rc == NO_ERROR )
+                  #else
+                     if (rc == 0 || errno == EINVAL)
                   #endif
                #endif
             #endif
-               {
-                  #ifdef S4LOCK_CHECK
-                     l4lockSave( c4, file->hand, posStart, numBytes ) ;
-                  #endif
-                  return 0 ;
-               }
          #endif
+            {
+               #ifdef S4LOCK_CHECK
+                  l4lock_save( file->hand, posStart, numBytes ) ;
+               #endif
+               return 0 ;
+            }
 
-         #ifdef S4MUTEX4LOCK
-            if ( rc != r4locked )
+         if ( rc == 0 )
+         {
+            #ifdef S4LOCK_CHECK
+               l4lock_save( file->hand, posStart, numBytes ) ;
+            #endif
+            #ifndef S4OPTIMIZE_OFF
+               file4setWriteOpt( file, 1 ) ;
+            #endif
+            return 0 ;
+         }
+
+         #ifdef __WIN32
+            if ( rc != ERROR_LOCK_VIOLATION )
          #else
-            #ifdef __WIN32
-               if ( rc != ERROR_LOCK_VIOLATION )
-            #else
-               #ifdef _MSC_VER
-                  #if _MSC_VER == 600
-                     #ifdef S4WINDOWS
-                        if (errno != -1 )       /* Microsoft 6.00a does not return */
-                     #else                      /* valid 'errno' under Windows,    */
-                        if (errno != EACCES)    /* but performs locking correctly  */
-                     #endif
-                  #else
-                     if (errno != EACCES)
+            #ifdef _MSC_VER
+               #if _MSC_VER == 600
+                  #ifdef S4WINDOWS
+                     if (errno != -1 )       /* Microsoft 6.00a does not return */
+                  #else                      /* valid 'errno' under Windows,    */
+                     if (errno != EACCES)    /* but performs locking correctly  */
                   #endif
                #else
-                  #ifdef __ZTC__
-                     if (errno != 33)
+                  if (errno != EACCES)
+               #endif
+            #else
+               #ifdef __ZTC__
+                  if (errno != 33)
+               #else
+                  #ifdef S4IBMOS2
+                     if ( rc != ERROR_LOCK_VIOLATION )
                   #else
-                     #ifdef S4IBMOS2
-                        if ( rc != ERROR_LOCK_VIOLATION )
+                     #ifdef S4MACINTOSH
+                        if ( (rc != fLckdErr ) && (rc != afpRangeOverlap ) )
                      #else
-                        #ifdef S4MACINTOSH
-                           if ( (rc != fLckdErr ) && (rc != afpRangeOverlap ) )
-                        #else
-                           if ((errno != EACCES) && (errno != EAGAIN) && (errno != 0) )
-                        #endif
+                        if ((errno != EACCES) && (errno != EAGAIN) && (errno != 0) )
                      #endif
                   #endif
                #endif
@@ -586,53 +486,47 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
                return error4( c4, e4result, E80604 ) ;
          #endif
 
-         // AS Nov 19/03 in S4TESTING case avoid a potential endless deadlock
-         #ifdef S4TESTING
-            if ( loopcount++ > 750 )   // LY Sep 23/04 : increased timeout count for slower test environments
-               return error4( c4, e4result, E80604 ) ;
-         #endif
-
          u4delayHundredth( (unsigned int)c4->lockDelay ) ;   /* delay & try lock again */
       }
    #endif
 }
 
 #ifdef S4LOCK_MODE_REQD
-   /* tests for workaround to Novell same process lock inconsistency/bug */
-   /* returns '1' if overlapping locks are allowed by same process on file */
-   int file4lockMode( FILE4 *file )
+/* tests for workaround to Novell same process lock inconsistency/bug */
+/* returns '1' if overlapping locks are allowed by same process on file */
+int file4lockMode( FILE4 *file )
+{
+   int rc, lockMode, oldLockAttempts ;
+   CODE4 *c4 ;
+
+   if ( file->hand == INVALID4HANDLE )
+      return -1 ;
+
+   c4 = file->codeBase ;
+
+   lockMode = 0 ;
+   oldLockAttempts = c4->lockAttempts ;
+   c4->lockAttempts = 1 ;
+
+   if ( file4lock( file, 0x50000000L, 2L ) != 0 )
    {
-      int rc, lockMode, oldLockAttempts ;
-      CODE4 *c4 ;
-
-      if ( file->hand == INVALID4HANDLE )
-         return -1 ;
-
-      c4 = file->codeBase ;
-
-      lockMode = 0 ;
-      oldLockAttempts = c4->lockAttempts ;
-      c4->lockAttempts = 1 ;
-
-      if ( file4lock( file, 0x50000000L, 2L ) != 0 )
-      {
-         c4->lockAttempts = oldLockAttempts ;
-         return -1 ;
-      }
-      rc = file4lock( file, 0x50000000L, 1L ) ;
-      if ( rc == 0 )
-      {
-         lockMode = 1 ;
-         file4unlock( file, 0x50000000L, 1L ) ;
-      }
-      if ( rc < 0 )
-         lockMode = rc ;
-
-      file4unlock( file, 0x50000000L, 2L ) ;
-
       c4->lockAttempts = oldLockAttempts ;
-      return lockMode ;
+      return -1 ;
    }
+   rc = file4lock( file, 0x50000000L, 1L ) ;
+   if ( rc == 0 )
+   {
+      lockMode = 1 ;
+      file4unlock( file, 0x50000000L, 1L ) ;
+   }
+   if ( rc < 0 )
+      lockMode = rc ;
+
+   file4unlock( file, 0x50000000L, 2L ) ;
+
+   c4->lockAttempts = oldLockAttempts ;
+   return lockMode ;
+}
 #endif
 
 #ifdef P4ARGS_USED
@@ -641,7 +535,7 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
 int S4FUNCTION file4unlockInternal( FILE4 *file, unsigned long posStart, long posStartHi, unsigned long numBytes, long numBytesHi )
 {
    #ifndef S4SINGLE
-      int rc = 0 ;
+      int rc ;
 
       #ifdef S4IBMOS2
          struct LockStrc
@@ -661,34 +555,13 @@ int S4FUNCTION file4unlockInternal( FILE4 *file, unsigned long posStart, long po
       #ifdef E4PARM_HIGH
          if ( file == 0 )
             return error4( 0, e4parm_null, E90614 ) ;
-         // AS Sep 19/01 - S4MDX does support negative locking if the o/s supports it, so don't do this test
-         // AS July 25/01 - Was checking this if NOT MDS, instead of if it was MDX, t4fail was failing
-         // #ifndef S4MDX
-         // #ifdef S4MDX
-         //    if ( (long)numBytes < 0 || (long)posStart < 0 )  // in MDX negative locking (i.e. very high byte locking) is not multi-user compatible with dBase
-         //       return error4( file->codeBase, e4parm, E90614 ) ;
-         // #endif
+         #ifndef S4MDX
+            if ( numBytes < 0 || posStart < 0 )
+               return error4( file->codeBase, e4parm, E90614 ) ;
+         #endif
       #endif
 
-      /* AS 01/06/98 - relaxed isReadOnly contraint.  Will lock even then.
-         Generally f4lock() would only get called if user explicitly requested
-         it;  they may want to force a lock, so allow them to do so.
-
-         AS 01/04/00 - if open in DENY_WRITE mode, we want to still enforce locks.
-         this is because OLE-DB and ODBC perform locks to ensure records are committed.
-         if locks are not placed on writes, the other client may place locks on the
-         record but the value can still be changed or rolled back because no locks
-         are actually placed.  t4odbc4.c displays problem.
-
-         if ( numBytes == 0 || file->lowAccessMode != OPEN4DENY_NONE )
-            return 0 ;
-      */
-
-      // AS July 16/02 - if the file is opened exclusive, we shouldn't be calling this function (handled at a higher level)
-      // otherwise we can get into deadlock with ourselves (when opening clones of data files)
-      // I have been fixing this for fox, other indexes may need some work yet...
-      assert5( file->lowAccessMode != OPEN4DENY_RW ) ;
-      if ( numBytes == 0 || file->lowAccessMode == OPEN4DENY_RW )
+      if ( numBytes == 0 || file->isReadOnly || file->lowAccessMode != OPEN4DENY_NONE )
          return 0 ;
 
       #ifndef S4OPTIMIZE_OFF
@@ -696,65 +569,60 @@ int S4FUNCTION file4unlockInternal( FILE4 *file, unsigned long posStart, long po
       #endif
 
       #ifdef S4LOCK_CHECK
-         l4lockRemove( file->codeBase, file->hand, file->name, posStart, numBytes ) ;
+         l4lockRemove( file->hand, posStart, numBytes ) ;
       #endif
 
       #ifndef __WIN32
          errno = 0 ;
       #endif
 
-      // AS Nov 8/02 - sema4 locking for Windows CE
-      #ifdef S4MUTEX4LOCK
-         mutex4release( &(file->lockMutex) ) ;
-      #else
-         #ifdef S4LOCKING
-            #ifdef S4WINDOWS
-               _llseek( file->hand, posStart, 0 ) ;
-            #else
-               lseek( file->hand, posStart, 0 ) ;
-            #endif
-            rc = locking( file->hand, LK_UNLCK, numBytes ) ;
+      #ifdef S4LOCKING
+         #ifdef S4WINDOWS
+            _llseek( file->hand, posStart, 0 ) ;
          #else
-            #ifdef __unix__
-               #ifndef S4NO_LOCKF /* lockf() replaces locking() for SUN OS, AT&T */
-                  lseek( file->hand, posStart, 0 ) ;
-                  rc = lockf( file->hand, F_ULOCK, numBytes ) ;
-               #else
-                  fstruct.l_type = F_UNLCK ;
-                  fstruct.l_whence = SEEK_SET ;
-                  fstruct.l_start = posStart ;
-                  fstruct.l_len = numBytes ;
-
-                  rc = fcntl( file->hand, F_SETLK, &fstruct ) ;
-               #endif
-            #endif
-
-            #ifdef S4IBMOS2
-               L4RANGE.FileOffset = posStart ;
-               L4RANGE.RangeLength = numBytes ;
-
-               rc = DosSetFileLocks( (HFILE)file->hand, (PFILELOCK)&L4RANGE, 0L, 100L , 0L ) ;
-            #endif
-
-            #ifdef S4MACINTOSH
-               MACParmBlk.ioParam.ioRefNum = file->hand ;
-               MACParmBlk.ioParam.ioReqCount = numBytes ;
-               MACParmBlk.ioParam.ioPosMode = fsFromStart ;
-               MACParmBlk.ioParam.ioPosOffset = posStart ;
-
-               PBUnlockRangeSync( &MACParmBlk ) ;
-               rc = MACParmBlk.ioParam.ioResult ;
-            #endif
-
-            #if defined(__WIN32) && !defined(S4WINCE) /* LY 2002/11/12 : added !S4WINCE */
-               if ( UnlockFile( (HANDLE)file->hand, posStart, posStartHi, numBytes, numBytesHi ) )
-                  rc = NO_ERROR ;
-               else
-                  rc = -1 ;
+            lseek( file->hand, posStart, 0 ) ;
+         #endif
+         rc = locking( file->hand, LK_UNLCK, numBytes ) ;
+      #else
+         #ifdef S4UNIX
+            #ifndef S4NO_LOCKF /* lockf() replaces locking() for SUN OS, AT&T */
+               lseek( file->hand, posStart, 0 ) ;
+               rc = lockf( file->hand, F_ULOCK, numBytes ) ;
             #else
-               #ifdef __TURBOC__
-                  rc = unlock( file->hand, posStart, numBytes ) ;
-               #endif
+               fstruct.l_type = F_UNLCK ;
+               fstruct.l_whence = SEEK_SET ;
+               fstruct.l_start = posStart ;
+               fstruct.l_len = numBytes ;
+
+               rc = fcntl( file->hand, F_SETLK, &fstruct ) ;
+            #endif
+         #endif
+
+         #ifdef S4IBMOS2
+            L4RANGE.FileOffset = posStart ;
+            L4RANGE.RangeLength = numBytes ;
+
+            rc = DosSetFileLocks( (HFILE)file->hand, (PFILELOCK)&L4RANGE, 0L, 100L , 0L ) ;
+         #endif
+
+         #ifdef S4MACINTOSH
+            MACParmBlk.ioParam.ioRefNum = file->hand ;
+            MACParmBlk.ioParam.ioReqCount = numBytes ;
+            MACParmBlk.ioParam.ioPosMode = fsFromStart ;
+            MACParmBlk.ioParam.ioPosOffset = posStart ;
+
+            PBUnlockRangeSync( &MACParmBlk ) ;
+            rc = MACParmBlk.ioParam.ioResult ;
+         #endif
+
+         #ifdef __WIN32
+            if ( UnlockFile( (HANDLE)file->hand, posStart, posStartHi, numBytes, numBytesHi ) )
+               rc = NO_ERROR ;
+            else
+               rc = -1 ;
+         #else
+            #ifdef __TURBOC__
+               rc = unlock( file->hand, posStart, numBytes ) ;
             #endif
          #endif
       #endif
@@ -762,24 +630,21 @@ int S4FUNCTION file4unlockInternal( FILE4 *file, unsigned long posStart, long po
       #ifdef __ZTC__
          if ( rc < 0  && errno != 1 )
       #else
-         #if defined(S4IBMOS2) || defined(S4MACINTOSH)
-            if (rc != 0 )
-         #elif defined(__WIN32)
-            if( rc != NO_ERROR )
+         #ifdef S4IBMOS2
+            if ( rc != NO_ERROR )
          #else
-            if ( rc < 0  && errno != EINVAL )
+            #ifdef S4MACINTOSH
+               if ( rc != 0 )
+            #else
+               #ifdef __WIN32
+                  if (rc != NO_ERROR )
+               #else
+                  if ( rc < 0  && errno != EINVAL )
+               #endif
+            #endif
          #endif
       #endif
-         if ( file->codeBase->errUnlock != 0 )
-         {
-            // AS Mar 26/03 - display bytes that failed lock
-            char lockBytes[20] ;
-            c4ltoa45( posStart, lockBytes, 19 ) ;
-            lockBytes[19] = 0 ;
-            return error4describe( file->codeBase, e4unlock, E90614, file->name, lockBytes, (char *)0 ) ;
-         }
-         else
-            return e4unlock ;
+         return error4describe( file->codeBase, e4unlock, E90614, file->name, (char *)0, (char *)0 ) ;
    #endif
 
    return 0 ;

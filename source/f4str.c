@@ -1,63 +1,20 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* f4str.c (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* f4str.c (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 /* Returns a pointer to static string corresponding to the field.
    This string will end in a NULL character.
 */
 
 #include "d4all.h"
+#ifndef S4UNIX
+   #ifdef __TURBOC__
+      #pragma hdrstop
+   #endif
+#endif
 
 #ifndef S4OFF_WRITE
-static void f4assignNumericN( FIELD4 *field, const char *ptr, const unsigned ptrLen )
-{
-   /* special function for assigning to numeric field such that the data is shifted to the left which
-      is required for dbase standard, and in particular the descend() function.  AS 03/29/99
-      internal function only
-   */
-
-   char *fieldRecordPtr = f4assignPtr( field ) ;
-
-   unsigned short numBytesToCopy ;
-   unsigned short offset ;   // the offset into the buffer to precede the data with blanks...
-
-   if ( (unsigned long)ptrLen > (unsigned long)field->len )
-   {
-      numBytesToCopy = field->len ;
-      offset = 0 ;
-   }
-   else
-   {
-      numBytesToCopy = ptrLen ;
-      offset = field->len - numBytesToCopy ;
-
-      // in this case, also need to blank out extra bytes in field.
-      // use f4blank() because of possible null
-      f4blank( field ) ;
-   }
-
-   /* Copy the data into the record buffer. */
-   c4memcpy( fieldRecordPtr + offset, ptr, (size_t)numBytesToCopy ) ;
-}
-
-
-
-
 void S4FUNCTION f4assign( FIELD4 *field, const char *str )
 {
-   #ifdef E4VBASIC
+   #ifdef S4VBASIC
       if ( c4parm_check( field, 3, E90533 ) )
          return ;
    #endif
@@ -89,7 +46,7 @@ void S4FUNCTION f4assign( FIELD4 *field, const char *str )
    #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( field->data->codeBase->lockEnforce && field->data->recNum > 0L )
-            if ( d4lockTest( field->data, field->data->recNum, lock4write ) != 1 )
+            if ( d4lockTest( field->data, field->data->recNum ) != 1 )
             {
                error4( field->data->codeBase, e4lock, E90533 ) ;
                return ;
@@ -97,29 +54,15 @@ void S4FUNCTION f4assign( FIELD4 *field, const char *str )
       #endif
    #endif
 
-   /* AS  03/29/99 - in order for numeric fields to be valid, they must be right shifted to the end of the
-      field.  Otherwise, function descend() produces inconsistent results (and also the field is invalid).
-      However, it is nice to assign "1" to a field.  Therefore massage the field contents here... */
-   switch( field->type )
-   {
-      case r4num:
-      case r4float:
-         f4assignNumericN( field, str, (unsigned)c4strlen(str) ) ;
-         break ;
-      default:
-         f4assignN( field, str, (unsigned)c4strlen(str) ) ;
-         break ;
-   }
+   f4assignN( field, str, (unsigned)strlen(str) ) ;
 }
-
-
 
 void S4FUNCTION f4assignN( FIELD4 *field, const char *ptr, const unsigned ptrLen )
 {
    char *fPtr ;
    unsigned pLen ;
 
-   #ifdef E4VBASIC
+   #ifdef S4VBASIC
       if ( c4parm_check( field, 3, E90534 ) )
          return ;
    #endif
@@ -138,7 +81,7 @@ void S4FUNCTION f4assignN( FIELD4 *field, const char *ptr, const unsigned ptrLen
    #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( field->data->codeBase->lockEnforce && field->data->recNum > 0L )
-            if ( d4lockTest( field->data, field->data->recNum, lock4write ) != 1 )
+            if ( d4lockTest( field->data, field->data->recNum ) != 1 )
             {
                error4( field->data->codeBase, e4lock, E90534 ) ;
                return ;
@@ -148,32 +91,30 @@ void S4FUNCTION f4assignN( FIELD4 *field, const char *ptr, const unsigned ptrLen
 
    fPtr = f4assignPtr( field ) ;
 
-   if ( (unsigned long)ptrLen > (unsigned long)field->len )
+   if ( ptrLen > field->len )
       pLen = field->len ;
    else
    {
       pLen = ptrLen ;
 
-      // in this case, also need to blank out extra bytes in field.
-      // use f4blank() because of possible null
+      /* in this case, also need to blank out extra bytes in field. */
+      /* use f4blank() because of possible null */
       f4blank( field ) ;
    }
 
    /* Copy the data into the record buffer. */
-   c4memcpy( fPtr, ptr, (size_t)pLen ) ;
+   memcpy( fPtr, ptr, (size_t)pLen ) ;
 }
 #endif
 
-
-
-unsigned long S4FUNCTION f4ncpy( FIELD4 *field, char *memPtr, const unsigned int memLen )
+unsigned int S4FUNCTION f4ncpy( FIELD4 *field, char *memPtr, const unsigned int memLen )
 {
    unsigned numCpy ;
 
    if ( memLen == 0 )
       return 0 ;
 
-   #ifdef E4VBASIC
+   #ifdef S4VBASIC
       if ( c4parm_check( field, 3, E90535 ) )
          return 0 ;
    #endif
@@ -191,7 +132,7 @@ unsigned long S4FUNCTION f4ncpy( FIELD4 *field, char *memPtr, const unsigned int
       numCpy = memLen - 1 ;
 
    /* 'f4ptr' returns a pointer to the field within the database record buffer. */
-   c4memcpy( memPtr, f4ptr( field ), (size_t)numCpy ) ;
+   memcpy( memPtr, f4ptr( field ), (size_t)numCpy ) ;
 
    memPtr[numCpy] = '\000' ;
 
@@ -202,7 +143,7 @@ char *S4FUNCTION f4str( FIELD4 *field )
 {
    CODE4 *codeBase ;
 
-   #ifdef E4VBASIC
+   #ifdef S4VBASIC
       if ( c4parm_check( field, 3, E90536 ) )
          return 0 ;
    #endif
@@ -217,9 +158,9 @@ char *S4FUNCTION f4str( FIELD4 *field )
 
    codeBase = field->data->codeBase ;
 
-   if ( codeBase->bufLen < (unsigned)(field->len + 2))  // CS 1999/09/10 buffer length = field length + Unicode null (2)
+   if ( codeBase->bufLen <= field->len )   /* not room for field length + null */
    {
-      if ( u4allocAgain( codeBase, &codeBase->fieldBuffer, &codeBase->bufLen, field->len + 2 ) < 0 )
+      if ( u4allocAgain( codeBase, &codeBase->fieldBuffer, &codeBase->bufLen, field->len + 1 ) < 0 )
       {
          #ifdef E4STACK
             error4stack( codeBase, e4memory, E90536 ) ;
@@ -227,15 +168,10 @@ char *S4FUNCTION f4str( FIELD4 *field )
          return 0 ;
       }
    }
+   else
+      codeBase->fieldBuffer[field->len] = 0 ;
 
-   // AS 02/07/01 - We always need to null out these value
-   // else
-   // {
-      codeBase->fieldBuffer[(field->len) + 0] = 0 ;  // CS 1999/09/10 2 nulls for Unicode
-      codeBase->fieldBuffer[(field->len) + 1] = 0 ;
-   // }
-
-   c4memcpy( codeBase->fieldBuffer, f4ptr( field ), field->len ) ;
+   memcpy( codeBase->fieldBuffer, f4ptr( field ), field->len ) ;
    return codeBase->fieldBuffer ;
 }
 

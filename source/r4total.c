@@ -1,25 +1,9 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* r4total.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* r4total.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-
-#ifndef S4OFF_REPORT
-
 #include <math.h>
 
+#ifndef S4OFF_REPORT
 /* resets the totals values */
 void S4FUNCTION   total4value_reset( TOTAL4 *t4 )
 {
@@ -59,7 +43,7 @@ void S4FUNCTION   total4free( TOTAL4 *total )
       total->addCondition = NULL ;
    }
 
-   expr4calcDelete( total->report->codeBase, total->calcPtr ) ;
+   expr4calcDelete( total->calcPtr ) ;
 
 }
 
@@ -87,7 +71,7 @@ TOTAL4 * S4FUNCTION   total4create( REPORT4 *r4, char *name, char *expr_src, int
    }
 
    /* allocate the TOTAL4 structure */
-   t4 = (TOTAL4 *)mem4createAllocZero( r4->codeBase, &r4->codeBase->totalMemory,
+   t4 = (TOTAL4 *)mem4createAlloc( r4->codeBase, &r4->codeBase->totalMemory,
                                     5, sizeof(TOTAL4), 5, 0 ) ;
    if( !t4 )
    {
@@ -304,9 +288,8 @@ void total4value_update( TOTAL4 *total )
       {
          memset( total->lastResetValue, 0, len+1 ) ;
          memcpy( total->lastResetValue, ptr, len ) ;
-         // AS De3c 13/05 MSVC 2005 compile fix
-         total->low = (double)1.7 * pow( (double)10, (double)308 ) ;
-         total->high = (double)-1.7 * pow( (double)10, (double)308 ) ;
+         total->low = (double)1.7 * pow( 10,308 ) ;
+         total->high = (double)-1.7 * pow( 10,308 ) ;
          total->total = 0.0 ;
          total->count = 0 ;
       }
@@ -318,8 +301,7 @@ void total4value_update( TOTAL4 *total )
       addflag = 1 ;
 
       /* check for conditional total */
-      /* LY 2001/02/06 : check that addCondition is valid EXPR4 */
-      if( total->addCondition && total->addCondition->codeBase && total->addCondition->type < 'z' )
+      if( total->addCondition )
       {
          addflag = 0 ;
          if( total->logcon == 0 )
@@ -535,13 +517,13 @@ int S4FUNCTION report4deleteCalc( PREPORT4 report, EXPR4CALC S4PTR *del_calc )
    }
 
    l4add( &codeBase->calcList, del_calc ) ;
-   expr4calcDelete( codeBase, del_calc ) ;
+   expr4calcDelete( del_calc ) ;
 
    calc_on = (EXPR4CALC *)l4pop( &temp_calcList ) ;
    while( calc_on )
    {
       l4add( &codeBase->calcList, calc_on ) ;
-      expr4calcDelete( codeBase, calc_on ) ;
+      expr4calcDelete( calc_on ) ;
       calc_on = (EXPR4CALC *)l4pop( &temp_calcList ) ;
    }
 

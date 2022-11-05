@@ -12,14 +12,12 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/* s4initfr.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* revisited by altomaltes@gmail.com
+ */
+
+/* s4initfr.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifndef S4CLIENT
 void relate4freeBitmaps( RELATE4 *relate )
@@ -40,7 +38,7 @@ void relate4freeBitmaps( RELATE4 *relate )
    }
 
    u4free( relate->set.flags ) ;
-   c4memset( (void *)&relate->set, 0, sizeof ( F4FLAG ) ) ;
+   memset( (void *)&relate->set, 0, sizeof ( F4FLAG ) ) ;
 }
 #endif
 
@@ -114,7 +112,7 @@ int S4FUNCTION sort4getInitFree( SORT4 *s4, RELATE4 *relate )
          mem4release( s4->poolMemory ) ;
          s4->poolMemory =  mem4create( s4->codeBase, 1, (unsigned) s4->poolEntries*s4->totLen+sizeof(LINK4), 1, 1 ) ;
          for ( s4->poolN = 0 ; oldPoolN ; oldPoolN-- )
-            if ( mem4allocNoZero( s4->poolMemory ) )
+            if ( mem4alloc( s4->poolMemory ) )
                s4->poolN++ ;
          rc = sort4spoolsInit( s4, prev ) ;
       }

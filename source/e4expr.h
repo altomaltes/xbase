@@ -1,23 +1,8 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
+/* e4expr.h   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
-/* e4expr.h   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
-
-// AS Mar 10/03 - ms support in datetime - support optional millisecond paramter means 1 more paramater required
-#define   E4MAX_PARMS          4
-#define   E4MAX_STACK_ENTRIES 65
-#define   E4MAX_CALC_NAME     65
+#define   E4MAX_PARMS          3
+#define   E4MAX_STACK_ENTRIES 20
+#define   E4MAX_CALC_NAME     20
 
 struct EXPR4CALCSt;
 
@@ -78,7 +63,7 @@ typedef struct
    unsigned char   nameLen ;
    char   priority ;
    char   returnType ;
-   #ifdef __unix__
+   #ifdef S4UNIX
       signed char  numParms ;  /* -1 means that the number is flexible */
    #else
       S4CONV( signed char numParms, signed char num_parms ) ;  /* -1 means that the number is flexible */
@@ -92,19 +77,11 @@ typedef struct
    int pos, len ;      /* Source expression position and length */
 } S4SCAN ;
 
-
-#define EXTEND4OFF        0
-#define EXTEND4AVAIL      1
-#define EXTEND4ALLOCATED  2
-
 typedef struct
 {
    char S4PTR *ptr ;
    unsigned int pos, len ;
-   // by default, use a fixed stack buffer for constants.  If this buffer is exceded and
-   // doExtend is set to EXTEND4AVAIL (current default), then allocate memory for buffer
-   // and set doExtend to EXTEND4ALLOCATED
-   int doExtend ;           // set to EXTEND4OFF, EXTEND4AVAIL, OR EXTEND4ALLOCATED
+   int doExtend ;
    CODE4 S4PTR *codeBase ;
 } S4STACK ;
 
@@ -135,34 +112,60 @@ extern EXPR4  S4PTR *expr4ptr ;     /* Points to expression being evaluated */
 extern E4INFO S4PTR *expr4infoPtr ;
 extern char   S4PTR *expr4constants ; /* Points to constant info */
 
-// AS Jun 27/03 - Added EMPTY() function - for now for r4str types only
-// AS Apr 22/04 - support for TTOC ( changed from 176 to 179)
-// AS Jan 6/05 - Added support for a new KEYEQUAL function
-// AS Jul 21/05 - Support for new field type binary float
-#define EXPR4NUM_FUNCTIONS 193
-#if !defined( OLEDB5BUILD ) || defined( S4SERVER ) || defined( S4JOINT_OLEDB_DLL )
-   extern const E4FUNCTIONS v4functions[EXPR4NUM_FUNCTIONS] ;
-#endif
+#define EXPR4NUM_FUNCTIONS 134
+extern const E4FUNCTIONS v4functions[EXPR4NUM_FUNCTIONS] ;
 
-/* AS Aug 22/01 - Moved these to d4defs.h since they are exposed to user, and need for dual dlls */
+/* Types normally used for Function/Operator parameters and returns */
+/* all r5... are CodeBase specific, for OLE-DB types */
+/* r4charBin and r4memoBin get converted to 'C' and 'M' respectively.
+   the bin part affects another area of the field information */
+
+#define  r4system   '0'
+#define  r4bin      'B'
+#define  r4double   'B'
+#define  r4str      'C'
+#define  r4dateDoub 'd'
+#define  r4date     'D'
+#define  r4float    'F'
+#define  r4gen      'G'
+#define  r4int      'I'
+#define  r4log      'L'
+#define  r4memo     'M'
+#define  r4numDoub  'n'
+#define  r4num      'N'
+/*
+#define S5USE_EXTENDED_TYPES
+#define  r5ui4      'P'
+#define  r5i2       'Q'
+#define  r5ui2      'R'
+*/
+#define  r5ui4      r4int
+#define  r5i2       r4int
+#define  r5ui2      r4int
+#define  r4dateTime 'T'
+#define  r5wstr     'W'
+#define  r4memoBin  'X'
+#define  r4currency 'Y'
+#define  r4charBin  'Z'
+
+#define r4num_doub        r4numDoub
+#define r4date_doub       r4dateDoub
 
 /* POSITIONAL CODES FOR EXPRESSION FUNCTIONS */
-#define  E4LAST_FIELD       E4FIELD_MEMO        /* #27 */
-#define  E4FIRST_LOG        (E4LAST_FIELD + 4)  /* Range of Logical Operators #31 (TRUE) */
-#define  E4LAST_LOG         (E4FIRST_LOG + 5)   /* #36 (!) */
-#define  E4FIRST_OPERATOR   (E4LAST_LOG + 1)  /* #37 Range of Other Operators #36 (e4contain) */
-#define  E4LAST_OPERATOR    (E4FIRST_OPERATOR + 70)  /* e4or (37) to e4contain (107) - we == last+1 for ranging */
-#define  E4COMPARE_START    (E4FIRST_OPERATOR + 15)  /* #52  - e4notEqual */
-#define  E4COMPARE_END      (E4COMPARE_START + 46)   /* #98 */
-#define  E4FIRST_FUNCTION   (E4COMPARE_END + 8)  /* Start of the List of Functions # 107 - e4chr */
+#define  E4LAST_FIELD       E4FIELD_MEMO
+#define  E4FIRST_LOG        (E4LAST_FIELD + 3)  /* Range of Logical Operators */
+#define  E4LAST_LOG         (E4FIRST_LOG + 4)
+#define  E4FIRST_OPERATOR   (E4LAST_LOG + 1)  /* Range of Other Operators */
+#define  E4LAST_OPERATOR    (E4FIRST_OPERATOR + 51)
+#define  E4COMPARE_START    (E4FIRST_OPERATOR + 11)
+#define  E4COMPARE_END      (E4COMPARE_START + 35)
+#define  E4FIRST_FUNCTION   (E4COMPARE_END + 6)  /* Start of the List of Functions */
 
 /* Codes for Immediate Data in Compile String */
 #define E4FIELD_STR        0
 #define E4FIELD_WSTR       (E4FIELD_STR + 1)
-#define E4FIELD_WSTR_LEN   (E4FIELD_WSTR + 1)
-#define E4FIELD_STR_CAT    (E4FIELD_WSTR_LEN + 1)
-#define E4FIELD_WSTR_CAT   (E4FIELD_STR_CAT + 1)
-#define E4FIELD_LOG        (E4FIELD_WSTR_CAT + 1)
+#define E4FIELD_STR_CAT    (E4FIELD_WSTR + 1)
+#define E4FIELD_LOG        (E4FIELD_STR_CAT + 2)
 #define E4FIELD_DATE_D     (E4FIELD_LOG + 1)
 #define E4FIELD_DATE_S     (E4FIELD_DATE_D + 1)
 #define E4FIELD_NUM_D      (E4FIELD_DATE_S + 1)
@@ -174,128 +177,67 @@ extern char   S4PTR *expr4constants ; /* Points to constant info */
 #define E4FIELD_SHORT      (E4FIELD_UNS_INT + 1)
 #define E4FIELD_UNS_SHORT  (E4FIELD_SHORT + 1)
 #define E4FIELD_DTTIME     (E4FIELD_UNS_SHORT + 1)
-#define E4FIELD_DTTIME_MILLI  (E4FIELD_DTTIME + 1)  // AS Mar 10/03 - ms support in datetime
-#define E4FIELD_INT_D      (E4FIELD_DTTIME_MILLI + 1)
+#define E4FIELD_INT_D      (E4FIELD_DTTIME + 1)
 #define E4FIELD_CUR_D      (E4FIELD_INT_D + 1)
-#define E4FIELD_I8         (E4FIELD_CUR_D + 1)
-#define E4FIELD_DBDATE     (E4FIELD_I8 + 1)
-#define E4FIELD_DBTIME     (E4FIELD_DBDATE + 1)
-#define E4FIELD_DBTIMESTAMP (E4FIELD_DBTIME + 1)
-// AS Jul 21/05 - Support for new field type binary float
-#define E4FIELD_BINFLOAT (E4FIELD_DBTIMESTAMP + 1)
-#define E4FIELD_INT_F (E4FIELD_BINFLOAT + 1)
 
-// AS Jul 21/05 - Support for new field type binary float
-#define E4FIELD_MEMO       (26)         /* HPUX aCC support */  // AS Mar 10/03 - ms support in datetime
-#if E4FIELD_MEMO != E4FIELD_INT_F + 1
+#define E4FIELD_MEMO       (18)          /* HPUX aCC support */
+/*#define E4FIELD_MEMO     (E4FIELD_CUR_D + 1)*/
+#if E4FIELD_MEMO != E4FIELD_CUR_D + 1
    #error number functions in array mismatch(1)
 #endif
 
 #define E4DOUBLE           (E4FIELD_MEMO + 1)
 #define E4STRING           (E4DOUBLE + 1)
-#define E4FLOAT            (E4STRING + 1)
-// AS 04/20/00 needed to examine these directly somneimes
-//#define E4LOG_LOW          (E4STRING + 1)
-//#define E4LOG_HIGH         (E4LOG_LOW + 3)
-#define E4TRUE             (E4FLOAT + 1)
-#define E4FALSE            (E4TRUE + 2)
-#define E4NOT              (E4FALSE + 2)
-#define E4OR               (E4NOT + 2)
+#define E4LOG_LOW          (E4STRING + 1)
+#define E4LOG_HIGH         (E4LOG_LOW + 3)
+#define E4OR               (E4LOG_HIGH + 2)
 #define E4AND              (E4OR + 1)
 #define E4CONCATENATE      (E4AND + 1)
-// AS May 17/05 - need to identify wstr concatenate as well
-#define E4WSTR_CONCATENATE (E4CONCATENATE + 1)
-#define E4CONCAT_TRIM      (E4WSTR_CONCATENATE + 2)
+#define E4CONCAT_TRIM      (E4CONCATENATE + 2)
+#define E4CONCAT_TWO       (E4CONCAT_TRIM + 4)
+#define E4NOT_EQUAL        (E4CONCAT_TWO + 4)
+#define E4GREATER_EQ       (E4NOT_EQUAL + 7)
+#define E4LESS_EQ          (E4GREATER_EQ + 6)
+#define E4EQUAL            (E4LESS_EQ + 6)
+#define E4GREATER          (E4EQUAL + 6)
+#define E4LESS             (E4GREATER + 5)
 
-#define E4CONCAT_TWO       (E4CONCAT_TRIM + 5)
-#define E4NOT_EQUAL        (E4CONCAT_TWO + 5)
-#if E4NOT_EQUAL != 51
-   #error number functions in array mismatch(2)
-#endif
-#define E4GREATER_EQ       (E4NOT_EQUAL + 9)
-#define E4LESS_EQ          (E4GREATER_EQ + 8)
-#define E4EQUAL            (E4LESS_EQ + 8)
-#define E4GREATER          (E4EQUAL + 8)
-#define E4LESS             (E4GREATER + 7)
-#if E4LESS != 91
-   #error number functions in array mismatch(2)
-#endif
-
-#define E4CHR              (E4FIELD_MEMO + 79)   // AS Mar 10/03 - ms support in datetime
+#define E4CHR              (E4FIELD_MEMO + 60)
 /*#define E4CHR            (E4LESS + 10)*/
-// AS Jul 21/05 - Support for new field type binary float
-#if E4CHR != 105
-   #error number functions in array mismatch(2)
-#endif
-#if E4CHR != E4LESS + 14
+#if E4CHR != E4LESS + 10
    #error number functions in array mismatch(2)
 #endif
 
 #define E4DEL              (E4CHR + 1)
 #define E4STR              (E4DEL + 1)
-#define E4STRZERO          (E4STR + 2)
-#define E4SUBSTR           (E4STRZERO + 1)
+#define E4SUBSTR           (E4STR + 2)
 #define E4TIME             (E4SUBSTR + 1)
 #define E4UPPER            (E4TIME + 1)
-// AS Apr 22/04 - support for TTOC
 #define E4DTOS             (E4UPPER + 1)
 #define E4DTOC             (E4DTOS + 2)
-#define E4TTOC             (E4DTOC + 2)
-#define E4SPACE            (E4TTOC + 3)
-#define E4TRIM             (E4SPACE + 1)
+#define E4TRIM             (E4DTOC + 2)
 #define E4LTRIM            (E4TRIM + 1)
 #define E4ALLTRIM          (E4LTRIM + 1)
 #define E4LEFT             (E4ALLTRIM + 1)
 #define E4RIGHT            (E4LEFT + 1)
-#define E4PADL             (E4RIGHT + 1)
-#define E4PADR             (E4PADL + 1)
-#define E4IIF              (E4PADR + 1)
+#define E4IIF              (E4RIGHT + 1)
 
-// AS Apr 22/04 - support for TTOC ( changed from 24 to 27)
-#define E4DATETIME         E4CHR + 27
-#if E4DATETIME != E4IIF + 4
-   #error number functions in array mismatch(3)
-#endif
-// AS Apr 22/04 - support for TTOC ( changed from 116 to 119
-// AS Jul 21/05 - Support for new field type binary float
-#if E4DATETIME != 132
-   #error number functions in array mismatch(3)
-#endif
-#define E4STOD             E4DATETIME + 2
+#define E4STOD             E4CHR + 20
 /*#define E4STOD           (E4IIF + 4)*/
+#if E4STOD != E4IIF + 4
+   #error number functions in array mismatch(3)
+#endif
 
 #define E4CTOD             (E4STOD + 1)
 #define E4DELETED          (E4CTOD + 8)
-//#define E4NOT_DELETED      (E4DELETED + 1)
 #define E4RECCOUNT         (E4DELETED + 1)
 #define E4RECNO            (E4RECCOUNT + 1)
-#define E4L2BIN            (E4RECNO + 2)
-#define E4CALC_FUNCTION    (E4L2BIN + 1)
+#define E4CALC_FUNCTION    (E4RECNO + 2)
 #define E4TOTAL            (E4CALC_FUNCTION + 1)
-// AS Jun 27/03 - Added EMPTY() function - for now for r4str types only
-#define E4EMPTY            (E4TOTAL + 2)
-#define E4DESCEND          (E4EMPTY + 5)
-// AS May 10/07 - need to track some of the ascend and descend functions
-#define E4DESCEND_STR      E4DESCEND
-#define E4DESCEND_NUM      E4DESCEND+1
-#define E4DESCEND_DATE_D   E4DESCEND+2
-#define E4DESCEND_LOG      E4DESCEND+3
+#define E4DESCEND          (E4TOTAL + 2)
+#define E4ASCEND           (E4DESCEND + 9)
 
-#define E4NUM_DESCEND_FUNCTIONS 17
-#define E4NUM_ASCEND_FUNCTIONS 18
-
-#define E4ASCEND           (E4DESCEND + E4NUM_DESCEND_FUNCTIONS)
-// AS May 10/07 - need to track some of the ascend and descend functions
-#define E4ASCEND_STR      E4ASCEND
-#define E4ASCEND_NUM      E4ASCEND + 3
-#define E4ASCEND_DATE     E4ASCEND + 4
-#define E4ASCEND_DATE_D   E4ASCEND + 5
-#define E4ASCEND_LOG      E4ASCEND + 6
-
-// AS Jan 6/05 - Added support for a new KEYEQUAL function
-#define E4KEYEQUAL       (E4ASCEND+E4NUM_ASCEND_FUNCTIONS)
-
-#if EXPR4NUM_FUNCTIONS != E4KEYEQUAL + 2
+#if EXPR4NUM_FUNCTIONS != E4ASCEND + 11
    #error number functions in array mismatch(4)
 #endif
 
@@ -309,25 +251,23 @@ extern char   S4PTR *expr4constants ; /* Points to constant info */
 #ifdef __cplusplus
    extern "C" {
 #endif
+#ifndef S4CLIENT
    S4EXPORT int S4FUNCTION expr4context( EXPR4 *, DATA4 * ) ;
+#endif
 
 /* EXTERNAL FUNCTIONS : */
 
 #define expr4data( e4 ) ( (e4)->data )
-S4EXPORT DATA4 S4PTR* S4FUNCTION expr4dataCB( EXPR4 * ) ;
-S4EXPORT double S4FUNCTION expr4double( EXPR4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION expr4double2( EXPR4 S4PTR *, double * ) ;
-#define expr4free( e4 ) ( u4free( (e4)->exprWorkBuf ), ((e4)->exprWorkBuf = 0), u4free( e4 ), (e4) = 0 )
-S4EXPORT void S4FUNCTION expr4freeCB( EXPR4 * ) ;
+S4EXPORT double  S4FUNCTION expr4double( EXPR4 S4PTR * ) ;
+S4EXPORT int     S4FUNCTION expr4double2( EXPR4 S4PTR *, double * ) ;
+#define expr4free( e4 ) ( u4free( e4 ), (e4) = 0 )
 #define expr4len( e4 ) ( (e4)->len )
-S4EXPORT long S4FUNCTION expr4lenCB( EXPR4 * ) ;  /* LY 99/08/12 : updated for Sandage fix */
 S4EXPORT EXPR4 S4PTR *S4FUNCTION expr4parseLow( DATA4 S4PTR *, const char S4PTR *, TAG4FILE * ) ;
 S4EXPORT S4CONST char S4PTR *S4FUNCTION expr4source( const EXPR4 S4PTR * ) ;
 S4EXPORT const char S4PTR *S4FUNCTION expr4str( EXPR4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION expr4true( EXPR4 S4PTR * ) ;
+S4EXPORT int     S4FUNCTION expr4true( EXPR4 S4PTR * ) ;
 #define expr4type( e4 ) ( (e4)->type )
-S4EXPORT short S4FUNCTION expr4typeCB( EXPR4 * ) ;
-S4EXPORT int S4FUNCTION expr4vary( EXPR4 S4PTR *, char S4PTR * S4PTR * ) ;
+S4EXPORT int     S4FUNCTION expr4vary( EXPR4 S4PTR *, char S4PTR * S4PTR * ) ;
 #ifndef S4INLINE
    S4EXPORT EXPR4 S4PTR *S4FUNCTION expr4parse( DATA4 S4PTR *, char S4PTR * ) ;
 #endif
@@ -339,30 +279,22 @@ S4EXPORT void S4FUNCTION code4calcReset( CODE4 S4PTR * ) ;
 S4EXPORT int S4FUNCTION expr4execute( EXPR4 S4PTR *, const int, void S4PTR * S4PTR * ) ;
 S4EXPORT void S4FUNCTION expr4functions( const E4FUNCTIONS S4PTR * S4PTR *) ;
 S4EXPORT EXPR4 S4PTR *S4FUNCTION expr4calcParse( DATA4 S4PTR *, const char S4PTR * ) ;
-S4EXPORT void S4FUNCTION expr4calcDelete( CODE4 *c4, EXPR4CALC S4PTR * ) ;
+S4EXPORT void S4FUNCTION expr4calcDelete( EXPR4CALC S4PTR * ) ;
 S4EXPORT void S4FUNCTION expr4calcMassage( EXPR4CALC S4PTR * );
-S4EXPORT EXPR4CALC *S4FUNCTION expr4calcLookup( CODE4 S4PTR *, DATA4 *d4, const char S4PTR *, const unsigned ) ;
+S4EXPORT EXPR4CALC *S4FUNCTION expr4calcLookup( CODE4 S4PTR *, const char S4PTR *, const unsigned ) ;
 S4EXPORT int S4FUNCTION expr4calcNameChange( EXPR4 S4PTR * S4PTR *, const char S4PTR *, const char S4PTR * ) ;
-// AS May 31/04 - may return an out of memory failure now...
-S4EXPORT int S4FUNCTION expr4calcResultPos( EXPR4CALC S4PTR *, const int ) ;
-// AS Oct 10/01 - e4lookup() must be exported always since it is available externally and reqd. for build with def file
-// #ifndef S4OFF_REPORT
-S4EXPORT int S4FUNCTION e4lookup( const unsigned char S4PTR *, const int, const int, const int ) ;
-// #endif
+S4EXPORT void S4FUNCTION expr4calcResultPos( EXPR4CALC S4PTR *, const int ) ;
+int S4FUNCTION e4lookup( const unsigned char S4PTR *, const int, const int, const int ) ;
 
 /* INTERNAL FUNCTIONS : */
 int expr4start( EXPR4 * ) ;
-int expr4reset( EXPR4 * ) ;
-int expr4reset( EXPR4 * ) ;
 S4EXPORT int S4FUNCTION expr4keyLen( EXPR4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION expr4keyLenFromType( int, int, CODE4 S4PTR * ) ;
+#ifndef S4CLIENT
    S4EXPORT int S4FUNCTION expr4key( EXPR4 S4PTR *, char S4PTR * S4PTR *, TAG4FILE * ) ;
    int expr4keyConvert( EXPR4 *, char **, const int, const int, TAG4FILE * ) ;
-S4EXPORT short S4FUNCTION expr4nullLow( const EXPR4 S4PTR *, const short ) ;
+#endif
+S4EXPORT int S4FUNCTION expr4nullLow( const EXPR4 S4PTR *, const int ) ;
 #define expr4null( e4 ) ( expr4nullLow( (e4), 1 ) )
-
-/* terminator to indicate last entry of function array */
-#define E4TERMINATOR -1
 
 /* Parsing Functions */
 int e4addConstant( E4PARSE *, const int, const void *, const unsigned int ) ;
@@ -373,13 +305,22 @@ int expr4parseFunction( E4PARSE *, const char *, const int ) ;
 int expr4parseValue( E4PARSE * ) ;
 int expr4trueCheck( E4PARSE * ) ;
 
+unsigned char s4scanChar( S4SCAN * ) ;
+void s4scanInit( S4SCAN *, const unsigned char * ) ;
+char s4scanPop( S4SCAN * ) ; /* Returns current char and goes to the next */
+int s4scanSearch( S4SCAN *, const char ) ; /* Returns # of characters scanned */
+int s4scanRange( S4SCAN *, const int, const int ) ;
+
+int s4stackCur( S4STACK * ) ;
+int s4stackPop( S4STACK * ) ;
+int s4stackPushInt( S4STACK *, const int ) ;
+int s4stackPushStr( S4STACK *, const void *, const int ) ;
 #ifdef __cplusplus
    }
 #endif
 
 /* Execute Functions */
 void e4add( void ) ;
-void e4addFloat( void ) ;
 void e4addDate( void ) ;
 void e4alltrim( void ) ;
 void e4and( void ) ;
@@ -391,7 +332,6 @@ void e4concatTrim( void ) ;
 void e4concatTwo( void ) ;
 void e4contain( void ) ;
 void e4copyConstant( void ) ;
-void e4copyToFloat( void ) ;
 void e4copyParm( void ) ;
 void e4ctod( void ) ;
 void e4date( void ) ;
@@ -399,87 +339,58 @@ void e4day( void ) ;
 void e4dayDoub( void ) ;
 void e4del( void ) ;
 void e4deleted( void ) ;
-// void e4notDeleted( void ) ;
 void e4divide( void ) ;
-void e4divideFlt( void ) ;
-// AS Apr 22/04 - support for TTOC
-void e4ttoc( void ) ;
-void e4ttocDateTime( void ) ;
-void e4ttocDoub( void ) ;
 void e4dtoc( void ) ;
 void e4dtocDoub( void ) ;
 void e4dtosDoub( void ) ;
-void e4dateTime( void ) ;
 void e4equal( void ) ;
 void e4equalCur( void ) ;
 void e4equalDtTime( void ) ;
-// void e4equalFloat( void ) ;
 void e4false( void ) ;
 void e4fieldCopy( void ) ;
-// AS July 27/01 - field value is stored in intel ordering always, so need a special function to extract
-// the value in local double ordering format
-void e4fieldDoubD( void ) ;
 void e4fieldDateD( void ) ;
 void e4fieldLog( void ) ;
 void e4fieldMemo( void ) ;
 void e4fieldCurD( void ) ;
-// AS Jul 21/05 - Support for new field type binary float
-// void e4fieldFloatD( void ) ;
 void e4fieldIntD( void ) ;
-void e4fieldIntF( void ) ;
 void e4fieldNumD( void ) ;
 void e4greater( void ) ;
 void e4greaterCur( void ) ;
 void e4greaterDtTime( void ) ;
 void e4greaterDoub( void ) ;
-void e4greaterFloat( void ) ;
 void e4greaterEq( void ) ;
 void e4greaterEqCur( void ) ;
 void e4greaterEqDtTime( void ) ;
 void e4greaterEqDoub( void ) ;
-void e4greaterEqFloat( void ) ;
 void e4iif( void ) ;
-void e4iifStr( void ) ;
-// AS Jan 6/05 - Added support for a new KEYEQUAL function
-void e4keyEqual( void ) ;
 void e4less( void ) ;
 void e4lessCur( void ) ;
 void e4lessDtTime( void ) ;
 void e4lessDoub( void ) ;
-void e4lessFloat( void ) ;
 void e4lessEq( void ) ;
 void e4lessEqCur( void ) ;
 void e4lessEqDtTime( void ) ;
 void e4lessEqDoub( void ) ;
-void e4lessEqFloat( void ) ;
 void e4ltrim( void ) ;
 void e4month( void ) ;
 void e4monthDoub( void ) ;
 void e4multiply( void ) ;
-void e4multiplyFlt( void ) ;
 void e4newFunction( void ) ;
 void e4nop( void ) ;
 void e4not( void ) ;
 void e4notEqual( void ) ;
 void e4notEqualCur( void ) ;
 void e4notEqualDtTime( void ) ;
-//void e4notEqualFloat( void ) ;
 void e4or( void ) ;
 void e4fieldAdd( void ) ;
 void e4parmRemove( void ) ;
-void e4wstrLenCon( void ) ;
-void e4padLeft( void ) ;
-void e4padRight( void ) ;
 void e4power( void ) ;
 void e4recCount( void ) ;
 void e4recno( void ) ;
 void e4stod( void ) ;
 void e4str( void ) ;
-void e4strZero( void ) ;
 void e4wideToStr( void ) ;
-void e4space( void ) ;
 void e4sub( void ) ;
-void e4subFloat( void ) ;
 void e4subDate( void ) ;
 void e4substr( void ) ;
 void e4time( void ) ;
@@ -487,18 +398,10 @@ void e4trim( void ) ;
 void expr4trueFunction( void ) ;
 void e4upper( void ) ;
 void e4val( void ) ;
-#ifndef __unix__
-   void e4l2bin( void ) ;
-#endif
 void e4year( void ) ;
 void e4yearDoub( void ) ;
 void e4pageno( void ) ;
 void e4descend( void ) ;
-// AS Jun 27/03 - Added EMPTY() function - for now for r4str types only
-void e4empty( void ) ;
-void e4emptyNum( void ) ;
-void e4emptyDtTm( void ) ;
-void e4emptyLog( void ) ;
 #ifdef S4CLIPPER
    void e4descendBinary( void ) ;
 #else

@@ -1,20 +1,11 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* f4ass_f.c (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* f4ass_f.c (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
+#ifndef S4UNIX
+   #ifdef __TURBOC__
+      #pragma hdrstop
+   #endif
+#endif
 
 #ifndef S4OFF_WRITE
 void S4FUNCTION f4assignField( FIELD4 *fieldTo, const FIELD4 *fieldFrom )
@@ -33,7 +24,7 @@ void S4FUNCTION f4assignField( FIELD4 *fieldTo, const FIELD4 *fieldFrom )
    #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( fieldTo->data->codeBase->lockEnforce && fieldTo->data->recNum > 0L )
-            if ( d4lockTest( fieldTo->data, fieldTo->data->recNum, lock4write ) != 1 )
+            if ( d4lockTest( fieldTo->data, fieldTo->data->recNum ) != 1 )
             {
                error4( fieldTo->data->codeBase, e4lock, E90501 ) ;
                return ;
@@ -53,29 +44,11 @@ void S4FUNCTION f4assignField( FIELD4 *fieldTo, const FIELD4 *fieldFrom )
          case r5wstr:
             f4assignN( fieldTo, f4ptr( fieldFrom ), fieldFrom->len ) ;
             break ;
-         case r5wstrLen:
-            if ( fieldTo->len != fieldFrom->len || fieldTo->type != fieldFrom->type )  // lens must match or it too complicated...
-               error4( fieldTo->data->codeBase, e4notSupported, E90501 ) ;
-            f4assignN( fieldTo, f4ptr( fieldFrom ), fieldFrom->len ) ;
-            break ;
-         case r5i8:
-         case r5ui8:
-         case r5dbDate:
-         case r5dbTime:
-         case r5dbTimeStamp:
-         case r5ui4:
-         case r5i2:
-         case r5ui2:
-         case r5guid:
-            if ( fieldTo->type != fieldFrom->type )  // too complicated - don't bother for now, can if add later if desired
-               error4( fieldTo->data->codeBase, e4notSupported, E90501 ) ;
-            f4assignN( fieldTo, f4ptr( fieldFrom ), fieldFrom->len ) ;
-            break ;
          case r4num:
          case r4float:
             if( fieldFrom->len == fieldTo->len && fieldFrom->dec == fieldTo->dec &&
                 (fieldFrom->type == r4num || fieldFrom->type == r4float) )
-               c4memcpy( f4assignPtr( fieldTo ), f4ptr( fieldFrom ), fieldTo->len ) ;
+               memcpy( f4assignPtr( fieldTo ), f4ptr( fieldFrom ), fieldTo->len ) ;
             else
                f4assignDouble( fieldTo, f4double( fieldFrom ) ) ;
             break ;
@@ -87,17 +60,14 @@ void S4FUNCTION f4assignField( FIELD4 *fieldTo, const FIELD4 *fieldFrom )
          #ifdef S4CLIENT_OR_FOX
             case r4currency:
             case r4dateTime:
-            case r4dateTimeMilli:  // AS Mar 10/03 - ms support in datetime
             case r4int:
             case r4double:
-            // AS Jul 21/05 - Support for new field type binary float
-            case r4floatBin:
          #endif
             if( fieldFrom->type == fieldTo->type )
-               c4memcpy( f4assignPtr( fieldTo ), f4ptr( fieldFrom ), fieldTo->len ) ;
+               memcpy( f4assignPtr( fieldTo ), f4ptr( fieldFrom ), fieldTo->len ) ;
             break ;
-         default:  // probably memo
-            error4( fieldTo->data->codeBase, e4parm, E80501 ) ;
+         default:
+            error4( fieldTo->data->codeBase, e4info, E80501 ) ;
       }
 }
 #endif  /* S4OFF_WRITE */

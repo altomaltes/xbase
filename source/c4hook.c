@@ -12,14 +12,12 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/* c4hook.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* revisited by altomaltes@gmail.com
+ */
+
+/* c4hook.c   */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif  /* __TUROBC__ */
-#endif  /* S4UNIX */
 
 
 #ifdef S4TIMEOUT_HOOK
@@ -29,16 +27,12 @@ int code4timeoutHook( CODE4 *c4, int numAttempts, long elapsedTime )
 }
 #endif
 
-
-
 #ifdef S4LOCK_HOOK
 int code4lockHook( CODE4 *c4, const char *fileName, const char *userId, const char *networkId, long item, int numAttempts )
 {
    return 0 ;
 }
 #endif
-
-
 
 #ifndef S4TEST
 #ifdef E4HOOK

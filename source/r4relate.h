@@ -1,23 +1,4 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* r4relate.h   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
-
-// AS Apr 18/05 - new callback functionality - currently only for windows 32 bit...
-#ifndef __WIN32
-   #include <sys/timeb.h>
-#endif
+/* r4relate.h   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #define relate4filterRecord 101
 #define relate4doRemove 102
@@ -54,7 +35,6 @@ typedef struct
    unsigned bufPos, bufLen ;
 } L4LOGICAL ;
 
-
 typedef struct DATA4LISTSt
 {
     struct RELATE4St S4PTR * S4PTR *pointers ;
@@ -63,43 +43,6 @@ typedef struct DATA4LISTSt
     int pointersUsed ;
 } DATA4LIST ;
 
-
-
-// AS Apr 18/05 - new callback functionality - currently only for windows 32 bit...
-typedef struct
-{
-   // AS Jan 23/04 - Support a suspension of performing the relate so other clients can perform actions
-   long relCnt, relCntVal, relCntStart ;
-   Bool5 relCntSet ;
-   #ifdef __WIN32
-                // CS 2010/05/18 timeb not supported in WinCE
-                DWORD relStartTime ;
-   #else
-                struct timeb relStartTime ;
-        #endif
-   short numInitCountAttempts ;  // increment when we attempt the counts, so we don't try too many times
-   Bool5 isInit ;
-   #ifdef S4SERVER
-      SERVER4CLIENT *client ;
-   #else
-                #ifdef __WIN32
-                        // CS 2010/05/18 timeb not supported in WinCE
-                        DWORD relLastCallTime ;
-                #else
-              struct timeb relLastCallTime ;
-           #endif
-      struct RELATE4St *relate ;
-   #endif
-} RELATE4SUSPEND ;
-
-
-
-// AS Apr 18/05 - new callback functionality - currently only for windows 32 bit...
-#ifdef __WIN32
-   typedef short (CALLBACK* QUERY_CALLBACK)(long) ;
-   // AS Nov 2/05 - new callback functionality - to adjust the query prior to it actually being
-   typedef const char * (CALLBACK* QUERY_SET_CALLBACK)(struct RELATE4St *, const char *) ;
-#endif
 typedef struct RELATE4St
 {
    LINK4 link ;
@@ -127,7 +70,6 @@ typedef struct RELATE4St
 
    #ifndef S4CLIENT
       int scanValueLen ;
-      int scanValueAllocLen ;
       int isRead ;
       F4FLAG  set ;  /* Specify records for bitmap optimizable sub-expression. */
       #ifndef S4STAND_ALONE
@@ -146,23 +88,7 @@ typedef struct RELATE4St
       HWND hWnd;
       S4CONV( int totalChildren, int total_children ) ;
    #endif
-   // AS Jul 1/02 - for relate4count, need to reposition back to start point...
-   long preCountRecno ;
-   int preCountBofFlag ;
-   int preCountEofFlag ;
-   #ifdef __WIN32
-      // AS Apr 18/05 - new callback functionality - currently only for windows 32 bit...
-      QUERY_CALLBACK callback ;
-      QUERY_SET_CALLBACK querySetCallback ;
-      long callbackMicroseconds ;
-      RELATE4SUSPEND suspend ;
-   #endif
-
-   // AS Oct 27/05 - ability to include tag-related sort orders... (e.g. general collating sequence)
-   TAG4 *sortTag ;
 } RELATE4 ;
-
-
 
 typedef struct
 {
@@ -170,16 +96,12 @@ typedef struct
    RELATE4 S4PTR *ptr ;
 } RELATE4LIST ;
 
-
-
 typedef struct
 {
    LINK4 link ;
    DATA4 S4PTR *data ;
    RELATE4 S4PTR *relate ;
 } R4DATA_LIST ;
-
-
 
 typedef struct RELATION4St
 {
@@ -219,51 +141,10 @@ typedef struct RELATION4St
       unsigned short int relateIdCount ;
    #endif
 
-   // AS Apr 5/02 - added support for leaving the relation status unchanged, to allow positioning within relat4edoAll
-   Bool5 retainRelation ;
-   #ifndef S4CLIENT
-      int sortKeyLen ;        // we also need to store and track the sorted key for retaining the relation
-      // char *sortedKeyBuffer ;  // need a buffer to contain the key for lookups
-      char *sortedKeyBuffer2 ;  // need a buffer to contain the key for lookups
-      long sortedKeyBufferLen ;
-      EXPR4 *sortExpr ;
-   #endif
-
-   // AS Jun 24/02 - To enable an optimized relate4count(), we now track a condition whereby there is
-   // a flag that indicates whether or not the bitmap entirely defines the scope of the relation (i.e.
-   // in this case no actual evaluation is required as the bitmap maps 1 to 1 with the # of records
-   // meeting the query condition).
-   Bool5 countOnly ;     // if set to true, means we are skipping through the relation only for counting purposes, so can reduce database movement
-   Bool5 countAccurate ;   // if true, the count value below will be correct (if relate4changed call, this changes)
-   unsigned long count ;  // we save this value once calculated...
-   // AS Jun 24/02 - New functionality to skip forward in the master table only
-   // short masterSkipStatus ;   // 0 means not inited, r4skip means optimized, r4noSkip means not optimized
-
-   #ifdef S4CLIENT
-      /* AS Apr 10/02 - New function for advance-reading client/server */
-      long readRecsToBuf ;        // maximum number to buffer
-
-      // buffer is set out as follows:
-      //   <relate rc> plus for each DATA4:
-      //       <bof marker><eof marker><rec num><record>
-      char *readAdvanceBuf ;      // stores rc, bof/eof/recno / record pairs
-      long readBufNum ;           // number records currently in buffer (may differ from max size)
-      int readBufPos ;            // current position in buf
-//      long readBufRecNoOn ;       // current rec # fetch (to see if bufPos accurately reflects current position)
-      short readBufDirection ;    // -1 if backwards, 1 if forwards
-      // char *recordExtra ;         // an extra record buffer used for copying
-      long readRecLen ;           // the length of the record stored in the buffer (combines all records for the relation)
-      MEMO4BATCH *memos ;         // pointer to an array of memo entries (1 for each record)
-      int numMemos ;
-      MEMO4BATCH_ENTRY *memoBatchEntry ;   // single allocation for all memos
-      Bool5 doMemos ;             // true if advance read bufferring memo fields as well
-      Bool5 includeMemos ;   // if true, memos are transferred on non-batch reading (d4go/d4seek/d4positionSet/etc.)
-   #else
-      Bool5 fullyMapped ;   // set to true if the bitmap corresponds 1 to 1 with the expression.
-   #endif
+/*   MEM4 S4PTR *relateMemory ;                  */
+/*   MEM4 S4PTR *relateListMemory ;              */
+/*   MEM4 S4PTR *relateDataListMemory ; */
 } RELATION4 ;
-
-
 
 #define BITMAP4LEAF 0x40
 #define BITMAP4AND  0x20
@@ -313,7 +194,6 @@ typedef struct BITMAP4St
 /* exported functions */
 S4EXPORT int S4FUNCTION relate4bottom( RELATE4 S4PTR * ) ;
 S4EXPORT int S4FUNCTION relate4changed( RELATE4 S4PTR * ) ;  /* Slave has been added or freed */
-S4EXPORT unsigned long S4FUNCTION relate4count( RELATE4 S4PTR * ) ;
 S4EXPORT RELATE4 S4PTR * S4FUNCTION relate4createSlave( RELATE4 S4PTR *, DATA4 S4PTR *, const char S4PTR *, TAG4 S4PTR * ) ;
 S4EXPORT int S4FUNCTION relate4doAll( RELATE4 S4PTR * ) ;
 S4EXPORT int S4FUNCTION relate4doOne( RELATE4 S4PTR * ) ;
@@ -327,28 +207,10 @@ S4EXPORT RELATE4 S4PTR * S4FUNCTION relate4init( DATA4 S4PTR * ) ;
 #endif
 S4EXPORT int S4FUNCTION relate4matchLen( RELATE4 S4PTR *, const int ) ;
 S4EXPORT int S4FUNCTION relate4next( RELATE4 S4PTR * S4PTR * ) ;
-// AS Apr 18/05 - new callback functionality - currently only for windows 32 bit...
-#ifdef __WIN32
-   S4EXPORT int S4FUNCTION relate4callbackInit( RELATE4 S4PTR *, QUERY_CALLBACK, long ) ;
-   S4EXPORT int S4FUNCTION relate4callbackInitUndo( RELATE4 S4PTR * ) ;
-#endif
 S4EXPORT int S4FUNCTION relate4querySet( RELATE4 S4PTR *, const char S4PTR * ) ;
-// AS Nov 2/05 - new callback functionality - to adjust the query prior to it actually being
-#ifdef __WIN32
-   S4EXPORT int S4FUNCTION relate4querySetCallbackInit( RELATE4 S4PTR *, QUERY_SET_CALLBACK ) ;
-   S4EXPORT int S4FUNCTION relate4querySetCallbackInitUndo( RELATE4 S4PTR * ) ;
-#endif
-// AS Apr 5/02 - added support for leaving the relation status unchanged, to allow positioning within relat4edoAll
-S4EXPORT int S4FUNCTION relate4retain( RELATE4 S4PTR *, int ) ;
-/* AS Apr 11/02 - New function for advance-reading client/server */
-S4EXPORT long S4FUNCTION relate4readBuffer( RELATE4 S4PTR *, long, short ) ;
 S4EXPORT int S4FUNCTION relate4skip( RELATE4 S4PTR *, const long ) ;        /* Extended record skip */
-// AS Jun 28/02 - New function to skip forward based on the master record
-S4EXPORT int S4FUNCTION relate4skipMaster( RELATE4 *relate, long numSkip ) ;
 S4EXPORT int S4FUNCTION relate4skipEnable( RELATE4 S4PTR *, const int ) ;
 S4EXPORT int S4FUNCTION relate4sortSet( RELATE4 S4PTR *, const char S4PTR * ) ;
-// AS Oct 28/05 - support for foreign languages...
-S4EXPORT int S4FUNCTION relate4sortSetTag( RELATE4 S4PTR *, TAG4 S4PTR * ) ;
 S4EXPORT int S4FUNCTION relate4top( RELATE4 S4PTR * ) ;
 S4EXPORT int S4FUNCTION relate4type( RELATE4 S4PTR *, int ) ;          /* Set the relate type */
 /* used by codeReporter */
@@ -371,19 +233,14 @@ S4EXPORT int   S4FUNCTION relate4unlock( RELATE4 S4PTR * ) ;
 S4EXPORT int S4FUNCTION relate4optimizeable( RELATE4 S4PTR * ) ;
 
 /* internally used functions */
-// AS Aug 25/03 - allow for printing out of bitmap for debugging
-#ifdef RELATE4PRINT
-   void bitmap4print( BITMAP4 *map, int level ) ;
-#endif
 int bitmap4evaluate( L4LOGICAL *, const int ) ;
-BITMAP4 *bitmap4reduce( BITMAP4 *, BITMAP4 * ) ;
 BITMAP4 * bitmap4redistribute( BITMAP4 *, BITMAP4 *, const char ) ;
 BITMAP4 * bitmap4redistributeLeaf( BITMAP4 *, BITMAP4 *, BITMAP4 * ) ;
 BITMAP4 * bitmap4redistributeBranch( BITMAP4 *, BITMAP4 * ) ;
 BITMAP4 * bitmap4create( L4LOGICAL *, RELATE4 *, const char, const char ) ;
 int  bitmap4destroy( BITMAP4 * ) ;
 BITMAP4 * bitmap4combineLeafs( BITMAP4 *, BITMAP4 *, BITMAP4 * ) ;
-unsigned long bitmap4seek( BITMAP4 *, const CONST4 *, const char, const unsigned long, const int ) ;
+long bitmap4seek( BITMAP4 *, const CONST4 *, const char, const long, const int ) ;
 int  bitmap4copy( BITMAP4 *, const BITMAP4 * ) ;
 
 void * const4return( L4LOGICAL *, const CONST4 * ) ;
@@ -412,7 +269,6 @@ int r4dataListBuild( LIST4 *, RELATE4 *, EXPR4 *, int ) ;
 
 void relate4freeBitmaps( RELATE4 * ) ;
 RELATE4 *relate4lookupRelate( RELATE4 *, const DATA4 * ) ;
-void relation4readBufferReset( RELATION4 *, Bool5 ) ;
 int relate4readIn( RELATE4 * ) ;   /* Read a record for this specific data file. */
 #ifndef S4STAND_ALONE
    int relate4unpack( RELATION4 *, CONNECTION4 * ) ;
@@ -420,10 +276,6 @@ int relate4readIn( RELATE4 * ) ;   /* Read a record for this specific data file.
 
 #ifdef S4CLIENT
    int relate4clientInit( RELATE4 * ) ;
-#endif
-
-#ifdef S4FLAT_THUNK
-   S4EXPORT short S4FUNCTION relatethunk4getMasterExprCB(RELATE4 *relate, char *str) ;
 #endif
 
 #ifdef __cplusplus

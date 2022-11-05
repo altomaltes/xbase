@@ -12,7 +12,10 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/* r4reindx.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* revisited by altomaltes@gmail.com
+ */
+
+/* r4reindx.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
 
@@ -20,11 +23,6 @@
 #ifndef S4INDEX_OFF
 #ifdef S4CLIPPER
 
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif  /* __TURBOC__ */
-#endif  /* S4UNIX */
 
 #include "r4reinde.h"
 
@@ -47,7 +45,7 @@ int S4FUNCTION i4reindex( INDEX4 *i4 )
       #endif
    #endif
 
-   #ifdef E4VBASIC
+   #ifdef S4VBASIC
       if ( c4parm_check( i4, 0, E92101 ) )
          return -1 ;
    #endif
@@ -71,7 +69,7 @@ int S4FUNCTION i4reindex( INDEX4 *i4 )
    #endif
 
    #ifndef S4SINGLE
-      rc = d4lockAllInternal( data, 1 ) ;
+      rc = d4lockAll( data ) ;
       if ( rc )
          return rc ;
    #endif
@@ -81,19 +79,6 @@ int S4FUNCTION i4reindex( INDEX4 *i4 )
       i4deleteRemoveKeys( i4 ) ;
    #endif
 
-   // AS Feb 9/06 - added clipper support for packwithstatus
-   #ifdef TIME4STATUS
-      // AS Jun 30/03 - test d4reindexWithProgress
-      REINDEX4STATUS reindexStatus, *reindexStatusPtr ;
-      reindexStatusPtr = r4reindexStatusInit( &reindexStatus, i4 ) ;
-   #endif
-
-   #ifdef TIME4STATUS
-      r4reindexStatusInitDone( reindexStatusPtr ) ;
-   #endif
-
-   // AS Mar 29/04 - r4uniqueContinue handling
-   int saveRc = 0 ;
    for( tagOn = 0 ;; )
    {
       tagOn = (TAG4 *)l4next( &i4->tags, tagOn ) ;
@@ -111,23 +96,9 @@ int S4FUNCTION i4reindex( INDEX4 *i4 )
       }
 
       rc = t4reindex( tagOn ) ;
-      // AS Mar 29/04 - r4uniqueContinue is a special case and is ok
-      if ( rc == r4uniqueContinue )
-      {
-         saveRc = r4uniqueContinue ;
-         rc = 0 ;
-      }
       if ( rc )
          return rc ;
-      #ifdef TIME4STATUS
-         r4reindexStatusNextTag( reindexStatusPtr ) ;
-      #endif
    }
-
-   #ifdef TIME4STATUS
-      r4reindexStatusFinalSet( reindexStatusPtr, .955 ) ;
-   #endif
-
    #ifndef S4OPTIMIZE_OFF
       #ifdef S4LOW_MEMORY
          if ( hasOpt )
@@ -137,87 +108,73 @@ int S4FUNCTION i4reindex( INDEX4 *i4 )
    data->recNum = -1 ;
    data->recNumOld = -1 ;
    d4blankLow( data, data->record ) ;
-   #ifdef TIME4STATUS
-      r4reindexStatusInitUndo( reindexStatusPtr ) ;
-   #endif
-   return saveRc ;    // AS Mar 29/04 - r4uniqueContinue handling
+   return 0 ;
 }
 
-
-
-int S4FUNCTION t4reindex( TAG4 *t4 )
+int t4reindex( TAG4 *t4 )
 {
    R4REINDEX reindex ;
    INDEX4 *i4 ;
    int rc ;
-   #if !defined( S4OPTIMIZE_OFF ) && !defined( S4LOW_MEMORY )
-      int hasOpt ;
+   #ifndef S4OPTIMIZE_OFF
+      #ifdef S4LOW_MEMORY
+         int hasOpt ;
+      #endif
    #endif
    B4KEY_DATA *bdata ;
    int i ;
-   #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4seek.cpp for HP */
-      S4LONG tempNum ;
-   #endif
 
    if ( error4code( t4->tagFile->codeBase ) < 0 )
       return -1 ;
 
    i4 = t4->index ;
 
-   #if !defined( S4OPTIMIZE_OFF ) && !defined( S4LOW_MEMORY )
-      hasOpt = i4->codeBase->hasOpt && i4->codeBase->opt.numBuffers ;
-      if ( hasOpt )
-         code4optSuspend( i4->codeBase ) ;
+   #ifndef S4OPTIMIZE_OFF
+      #ifdef S4LOW_MEMORY
+         hasOpt = i4->codeBase->hasOpt && i4->codeBase->opt.numBuffers ;
+         if ( hasOpt )
+            code4optSuspend( i4->codeBase ) ;
+      #endif
    #endif
 
    #ifndef S4SINGLE
-      rc = d4lockIndex( i4->data ) ;
-      if ( rc )
-         return rc  ;
+      {
+         rc = d4lockIndex( i4->data ) ;
+         if ( rc )
+            return rc  ;
+      }
    #endif
 
-   rc = r4reindexInit( &reindex, t4 ) ;
-   if ( rc < 0 )
-      return rc ;
-   rc = r4reindexTagHeadersCalc( &reindex, t4->tagFile ) ;
-   if ( rc == 0 )
-      rc = r4reindexBlocksAlloc( &reindex ) ;
+   if ( r4reindexInit( &reindex, t4 ) < 0 )
+      return -1 ;
+   if ( r4reindexTagHeadersCalc( &reindex, t4->tagFile ) < 0 )
+      return -1 ;
+   if ( r4reindexBlocksAlloc( &reindex ) < 0 )
+      return -1 ;
 
    reindex.nBlocksUsed = 0 ;
 
-   if ( rc == 0 )
-      rc = r4reindexSupplyKeys( &reindex, t4->tagFile ) ;
-
+   rc = r4reindexSupplyKeys( &reindex, t4->tagFile ) ;
    if ( rc < 0 )
    {
       r4reindexFree( &reindex ) ;
       return rc ;
    }
 
-   // AS Mar 26/04 - r4uniqueContinue is ok here
-   int saveRc = 0 ;
-   if ( rc == 0 )
-   {
-      rc = r4reindexWriteKeys( &reindex, t4->tagFile, t4unique( t4 ) ) ;
-      if ( rc == r4uniqueContinue )
-      {
-         saveRc = r4uniqueContinue ;
-         rc = 0 ;
-      }
-   }
-
-   if ( rc == 0 )
-      rc = r4reindexTagHeadersWrite( &reindex, t4->tagFile ) ;
-
+   rc = r4reindexWriteKeys( &reindex, t4->tagFile, t4unique( t4 ) ) ;
    if ( rc )
    {
       r4reindexFree( &reindex ) ;
       return rc ;
    }
 
-   // AS Nov 27/03 - turns out to be invalid in multi-user since another user may be shrinking the file
-   #if defined( E4MISC ) && defined( S4SINGLE )
-      t4->tagFile->checkEof = file4longGetLo( file4lenLow( &t4->tagFile->file ) ) - B4BLOCK_SIZE_INTERNAL ;  /* reset verify eof variable */
+   rc = r4reindexTagHeadersWrite( &reindex, t4->tagFile ) ;
+
+   if ( rc )
+      return rc ;
+
+   #ifdef E4MISC
+      t4->tagFile->checkEof = file4longGetLo( file4lenLow( &t4->tagFile->file ) ) - B4BLOCK_SIZE ;  /* reset verify eof variable */
    #endif
 
    t4->index->codeBase->doIndexVerify = 0 ;  /* avoid verify errors due to our partial removal */
@@ -226,14 +183,7 @@ int S4FUNCTION t4reindex( TAG4 *t4 )
    t4->index->codeBase->doIndexVerify = 1 ;
 
    if ( reindex.stranded )   /* add stranded entry */
-   {
-      #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4seek.cpp for HP */
-         memcpy( &tempNum, &reindex.stranded->num, sizeof(S4LONG) ) ;
-         tfile4add( t4->tagFile, (unsigned char *)reindex.stranded->value, tempNum, t4unique( t4 ) ) ;
-      #else
-         tfile4add( t4->tagFile, (unsigned char *)reindex.stranded->value, reindex.stranded->num, t4unique( t4 ) ) ;
-      #endif
-   }
+      tfile4add( t4->tagFile, (unsigned char *)reindex.stranded->value, reindex.stranded->num, t4unique( t4 ) ) ;
 
    /* and also add any extra block members */
    if ( reindex.startBlock->nKeys < t4->tagFile->header.keysHalf && reindex.nBlocksUsed > 1 )
@@ -241,23 +191,20 @@ int S4FUNCTION t4reindex( TAG4 *t4 )
       for ( i = 0 ; i < reindex.startBlock->nKeys ; i++ )
       {
          bdata = r4key( reindex.startBlock, i, t4->tagFile->header.keyLen ) ;
-         #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4seek.cpp for HP */
-            memcpy( &tempNum, &bdata->num, sizeof(S4LONG) ) ;
-            tfile4add( t4->tagFile, (unsigned char *)bdata->value, tempNum, t4unique( t4 ) ) ;
-         #else
-            tfile4add( t4->tagFile, (unsigned char *)bdata->value, bdata->num, t4unique( t4 ) ) ;
-         #endif
+         tfile4add( t4->tagFile, (unsigned char *)bdata->value, bdata->num, t4unique( t4 ) ) ;
       }
    }
 
    tfile4update( t4->tagFile ) ;
 
    r4reindexFree( &reindex ) ;
-   #if !defined( S4OPTIMIZE_OFF ) && !defined( S4LOW_MEMORY )
-      if ( hasOpt )
-         code4optRestart( i4->codeBase ) ;
+   #ifndef S4OPTIMIZE_OFF
+      #ifdef S4LOW_MEMORY
+         if ( hasOpt )
+            code4optRestart( i4->codeBase ) ;
+      #endif
    #endif
-   return saveRc ;
+   return rc ;
 }
 
 int r4reindexInit( R4REINDEX *r4, TAG4 *t4 )
@@ -266,7 +213,7 @@ int r4reindexInit( R4REINDEX *r4, TAG4 *t4 )
 
    i4 = t4->index ;
 
-   c4memset( r4, 0, sizeof( R4REINDEX ) ) ;
+   memset( r4, 0, sizeof( R4REINDEX ) ) ;
 
    r4->data = t4->index->data ;
    r4->codeBase = t4->tagFile->codeBase ;
@@ -288,26 +235,12 @@ int r4reindexInit( R4REINDEX *r4, TAG4 *t4 )
    return 0 ;
 }
 
-
-
 void r4reindexFree( R4REINDEX *r4 )
 {
-   // AS Apr 7/04 - need to ensure that the seqwrite is flushed to disk before freeing up the used buffer
-   file4seqWriteFlush( &r4->seqwrite ) ;
-   if ( r4->buffer != 0 )
-   {
-      u4free( r4->buffer ) ;
-      r4->buffer = 0 ;
-   }
-   if ( r4->startBlock != 0 )
-   {
-      u4free( r4->startBlock ) ;
-      r4->startBlock = 0 ;
-   }
+   u4free( r4->buffer ) ;
+   u4free( r4->startBlock ) ;
    sort4free( &r4->sort ) ;
 }
-
-
 
 int r4reindexBlocksAlloc( R4REINDEX *r4 )
 {
@@ -336,7 +269,7 @@ int r4reindexBlocksAlloc( R4REINDEX *r4 )
    r4->nBlocks ++ ;
    if( r4->nBlocks < 2 )
       r4->nBlocks = 2 ;
-   r4->startBlock = (R4BLOCK_DATA *) u4alloc( (long) ( B4BLOCK_SIZE_INTERNAL + 2 * sizeof( void *) ) * r4->nBlocks ) ;
+   r4->startBlock = (R4BLOCK_DATA *) u4alloc( (long) ( B4BLOCK_SIZE + 2 * sizeof( void *) ) * r4->nBlocks ) ;
 
    if ( r4->startBlock == 0 )
       return error4( r4->codeBase, e4memory, E82105 ) ;
@@ -434,10 +367,6 @@ int r4reindexSupplyKeys( R4REINDEX *r4, TAG4FILE *t4 )
       #ifdef E4MISC
          r4->keyCount++ ;
       #endif
-      // AS Feb 9/06 - added clipper support for packwithstatus
-      #if defined( TIME4STATUS ) && !defined( S4OFF_THREAD )
-         InterlockedIncrement( &(r4->codeBase->incrementVal) ) ;
-      #endif
    }
 
    #ifdef S4ADVANCE_READ
@@ -449,7 +378,7 @@ int r4reindexSupplyKeys( R4REINDEX *r4, TAG4FILE *t4 )
 
 int  r4reindexTagHeadersCalc( R4REINDEX *r4, TAG4FILE *t4 )
 {
-   int rc, exprType ;
+   int exprType ;
 
    if ( tfile4freeAll( t4 ) < 0 )
       return -1 ;
@@ -463,37 +392,18 @@ int  r4reindexTagHeadersCalc( R4REINDEX *r4, TAG4FILE *t4 )
    exprType = expr4type( t4->expr ) ;
    if ( exprType < 0 )
       return exprType ;
-   rc = tfile4initSeekConv( t4, exprType ) ;
-   if ( rc < 0 )
-      return rc ;
-
-   t4->header.groupLen = t4->header.keyLen + 8 ;
-
-   /* FOR S4CLIPPER compatibility:  if keyLen = 194, groupLen = 202, and keysHalf = 2, keyLen
-      > 194, keysHalf = 1.
-
-      S4CLIPPER keyLen ranges:  (groupLen = keyLen+8)
-      195-338 : keysHalf = 1, keysMax = 2
-      136-194 : keysHalf = 2, keysMax = 4
-         -135 : keysHalf = 3, keysMax = 6
-
-   */
-   r4->keysHalf = t4->header.keysHalf = ( 1020 / ( t4->header.groupLen + 2 ) - 1)/ 2;
-   if ( r4->keysHalf == 0 && t4->header.groupLen <= (I4MAX_KEY_SIZE + 8))  /* formula doesn't work for large key sizes, work around... for valid group len <= 346) */
-      r4->keysHalf = t4->header.keysHalf = 1 ;
-   // AS 05/12/99 -> if there is a filter included, the sign should be set to 7...(clipper compatibility issue)
-   if ( t4->filter != 0 )
-      t4->header.sign = 7 ;
-   else
-      t4->header.sign = 6 ;
+   tfile4initSeekConv( t4, exprType ) ;
+   t4->header.groupLen = t4->header.keyLen+8 ;
+   r4->keysHalf = t4->header.keysHalf = (1020/ (t4->header.groupLen+2) - 1)/ 2;
+   t4->header.sign   = 6 ;
    t4->header.keysMax = t4->header.keysHalf * 2 ;
    if ( t4->header.keysMax < 2 )
-      return error4( t4->codeBase, e4index, E82102 ) ;   // probably key size just not large enough... (82102)
+      return error4( t4->codeBase, e4info, E81601 ) ;
 
    if ( t4->header.keysMax < r4->minKeysmax )
       r4->minKeysmax = t4->header.keysMax ;
 
-   r4->lastblockInc = B4BLOCK_SIZE_INTERNAL / 512 ;
+   r4->lastblockInc = B4BLOCK_SIZE / 512 ;
    r4->lastblock = 0 ;
 
    return 0 ;
@@ -501,11 +411,91 @@ int  r4reindexTagHeadersCalc( R4REINDEX *r4, TAG4FILE *t4 )
 
 int r4reindexTagHeadersWrite( R4REINDEX *r4, TAG4FILE *t4 )
 {
+   int len ;
+   const char *ptr ;
    FILE4LONG pos ;
+   #ifdef S4BYTE_SWAP
+      I4IND_HEAD_WRITE *swap ;
+   #endif
+
+   /* Now write the headers */
+   file4longAssign( pos, 0, 0 ) ;
+   file4seqWriteInitLow( &r4->seqwrite, &t4->file, pos, r4->buffer, r4->bufferLen ) ;
 
    t4->header.eof = 0 ;
 
-   if ( tfile4writeHeader( t4, writeEntireHeader ) < 0 )
+   #ifdef S4BYTE_SWAP
+      /* swap = (I4IND_HEAD_WRITE *) t4->codeBase, u4allocEr( sizeof(I4IND_HEAD_WRITE ) ) ;*/
+      swap = (I4IND_HEAD_WRITE *)u4allocEr( t4->codeBase, sizeof(I4IND_HEAD_WRITE ) ) ;
+      if ( swap == 0 )
+         return -1 ;
+      swap->sign = x4reverseShort( (void *)&t4->header.sign ) ;
+      swap->version = x4reverseShort( (void *)&t4->header.version ) ;
+      swap->root = x4reverseLong( (void *)&t4->header.root ) ;
+      swap->eof = x4reverseLong( (void *)&t4->header.eof ) ;
+      swap->groupLen = x4reverseShort( (void *)&t4->header.groupLen ) ;
+      swap->keyLen = x4reverseShort( (void *)&t4->header.keyLen ) ;
+      swap->keyDec = x4reverseShort( (void *)&t4->header.keyDec ) ;
+      swap->keysMax = x4reverseShort( (void *)&t4->header.keysMax ) ;
+      swap->keysHalf = x4reverseShort( (void *)&t4->header.keysHalf ) ;
+
+      #ifdef S4STRUCT_PAD
+         file4seqWrite( &r4->seqwrite, swap, sizeof(I4IND_HEAD_WRITE) - 2 ) ;
+      #else
+         file4seqWrite( &r4->seqwrite, swap, sizeof(I4IND_HEAD_WRITE) ) ;
+      #endif
+      u4free( swap ) ;
+   #else
+      #ifdef S4STRUCT_PAD
+         file4seqWrite( &r4->seqwrite, &t4->header.sign, sizeof(I4IND_HEAD_WRITE) - 2 ) ;
+      #else
+         file4seqWrite( &r4->seqwrite, &t4->header.sign, sizeof(I4IND_HEAD_WRITE) ) ;
+      #endif
+   #endif
+
+   ptr = t4->expr->source ;
+   len = strlen(ptr) ;
+   if ( len > I4MAX_EXPR_SIZE )
+      return error4( r4->codeBase, e4index, E82106 ) ;
+
+   file4seqWrite( &r4->seqwrite, ptr, len) ;
+   file4seqWriteRepeat( &r4->seqwrite, I4MAX_EXPR_SIZE - len + 1, 0 ) ;
+   #ifdef S4BYTE_SWAP
+      t4->header.unique = x4reverseLong( (void *)&t4->header.unique ) ;
+      file4seqWrite( &r4->seqwrite, &t4->header.unique, sizeof( t4->header.unique ) ) ;
+      t4->header.unique = x4reverseLong( (void *)&t4->header.unique ) ;
+   #else
+      file4seqWrite( &r4->seqwrite, &t4->header.unique, sizeof( t4->header.unique ) ) ;
+   #endif
+
+   file4seqWriteRepeat( &r4->seqwrite, 1, (char)0 ) ;
+
+   #ifdef S4BYTE_SWAP
+      t4->header.descending = x4reverseLong( (void *)&t4->header.descending ) ;
+      file4seqWrite( &r4->seqwrite, &t4->header.descending, sizeof( t4->header.descending ) ) ;
+      t4->header.descending = x4reverseLong( (void *)&t4->header.descending ) ;
+   #else
+      file4seqWrite( &r4->seqwrite, &t4->header.descending, sizeof( t4->header.descending ) ) ;
+   #endif
+
+   if ( t4->filter != 0 )
+   {
+      ptr = t4->filter->source ;
+      len = strlen(ptr) ;
+
+      file4seqWrite( &r4->seqwrite, ptr, len ) ;
+      file4seqWriteRepeat( &r4->seqwrite, I4MAX_EXPR_SIZE - len + 1, 0 ) ;
+   }
+   else
+      file4seqWriteRepeat( &r4->seqwrite, I4MAX_EXPR_SIZE + 1, 0 ) ;
+
+   #ifdef E4ANALYZE
+      if ( B4BLOCK_SIZE - (r4->seqwrite.working - r4->seqwrite.avail ) < 0 )
+         return error4( r4->codeBase, e4index, E82103 ) ;
+   #endif
+   file4seqWriteRepeat( &r4->seqwrite, B4BLOCK_SIZE - (r4->seqwrite.working - r4->seqwrite.avail) , 0 ) ;
+
+   if ( file4seqWriteFlush(&r4->seqwrite) < 0 )
       return -1 ;
 
    file4longAssign( pos, (r4->lastblock + r4->lastblockInc) * 512, 0 ) ;
@@ -519,14 +509,14 @@ int r4reindexWriteKeys( R4REINDEX *r4, TAG4FILE *t4, short int errUnique )
    unsigned char *keyData ;
    int   isUnique, rc, isFirst ;
    void *dummyPtr ;
-   S4LONG keyRec ;  /* LY 00/04/13 : 64-bit HP-UX */
+   long  keyRec ;
    FILE4LONG pos ;
 
    r4->grouplen = t4->header.groupLen ;
    r4->valuelen = t4->header.keyLen ;
-   r4->keysmax = t4->header.keysMax ;
+   r4->keysmax  = t4->header.keysMax ;
 
-   c4memset( r4->startBlock, 0, (int)(( (long)B4BLOCK_SIZE_INTERNAL + 2 * sizeof( void *) ) * r4->nBlocks) ) ;
+   memset( r4->startBlock, 0, (int)(( (long)B4BLOCK_SIZE + 2 * sizeof( void *) ) * r4->nBlocks) ) ;
 
    if ( sort4getInit( &r4->sort ) < 0 )
       return -1 ;
@@ -536,23 +526,16 @@ int r4reindexWriteKeys( R4REINDEX *r4, TAG4FILE *t4, short int errUnique )
 
    #ifdef E4MISC
       if ( I4MAX_KEY_SIZE < r4->sort.sortLen )
-         return error4( r4->codeBase, e4index, E82102 ) ;
+         return error4( r4->codeBase, e4info, E82102 ) ;
    #endif
 
-   c4memset( lastKey, 0, sizeof(lastKey) ) ;
+   memset( lastKey, 0, sizeof(lastKey) ) ;
    isUnique = t4->header.unique ;
 
    isFirst = 1 ;
 
-   // AS Mar 26/04 - improved return code handling
-   int rcSave = 0 ;
-
    for(;;)  /* For each key to write */
    {
-      // AS Feb 9/06 - added clipper support for packwithstatus
-      #ifdef TIME4STATUS
-         InterlockedIncrement( &(r4->codeBase->incrementVal) ) ;
-      #endif
       if ( (rc = sort4get( &r4->sort, &keyRec, (void **) &keyData, &dummyPtr)) < 0)
          return -1 ;
 
@@ -582,73 +565,83 @@ int r4reindexWriteKeys( R4REINDEX *r4, TAG4FILE *t4, short int errUnique )
                {
                   case e4unique:
                      return error4describe( r4->codeBase, e4unique, E82103, t4->alias, (char *)0, 0 ) ;
+
                   case r4unique:
                      return r4unique ;
-                  // AS Mar 26/04 - need to ensure r4uniqueContinue eventually returned in this case
-                  case r4uniqueContinue:
-                     rcSave = r4uniqueContinue ;
-                     continue ;
+
                   default:
                      continue ;
                }
             }
 
-         c4memcpy( lastKey, keyData, r4->sort.sortLen ) ;
+         memcpy( lastKey, keyData, r4->sort.sortLen ) ;
       }
 
       /* Add the key */
-      rc = r4reindexAdd( r4, keyRec, keyData) ;  // AS Mar 29/04 - clean up error and return handling
-      if ( rc < 0 )
-         return rc ;
+      if ( r4reindexAdd( r4, keyRec, keyData) < 0 )
+         return -1 ;
    }
 
    /* Now complete the tag header info. */
    t4->header.root = r4->lastblock * 512 ;
 
-   return rcSave ;  // AS Mar 29/04 - clean up error and return handling
+   return 0 ;
 }
-
-
 
 static int r4reindexToDisk( R4REINDEX *r4, long rec, const char *keyValue )
 {
-   /* Writes out the current block and adds references to higher blocks */
-   R4BLOCK_DATA *block = r4->startBlock ;
-   int iBlock= 0 ;
-   #ifdef S4DATA_ALIGN
-      S4LONG tempLong ;  /* LY 00/02/17 : t4seek.cpp for HP */
+   R4BLOCK_DATA *block ;
+   int tnUsed, iBlock, i ;
+   B4KEY_DATA *keyTo ;
+   short offset ;
+   #ifdef E4MISC
+      long dif ;
+      B4KEY_DATA *keyOn ;
+   #endif
+   #ifdef S4BYTE_SWAP
+      char *swap, *swapPtr ;
+      int j ;
+      long longVal ;
+      short shortVal ;
    #endif
 
+   tnUsed = 1 ;
+
+   /* Writes out the current block and adds references to higher blocks */
+   block  = r4->startBlock ;
+   iBlock= 0 ;
+
    #ifdef E4MISC
-      B4KEY_DATA *keyOn = r4key( block, block->nKeys, r4->grouplen ) ;
-      long dif = (char *) keyOn -  (char *) &block->nKeys ;
-      if ( dif+ r4->grouplen > B4BLOCK_SIZE_INTERNAL || dif < 0 )
+      keyOn = r4key( block, block->nKeys, r4->grouplen ) ;
+      dif = (char *) keyOn -  (char *) &block->nKeys ;
+      if ( dif+ r4->grouplen > B4BLOCK_SIZE || dif < 0 )
          return error4( r4->codeBase, e4result, E92102 ) ;
    #endif
 
-   for( unsigned long tnUsed = 2 ;; tnUsed++ )
+   for(;;)
    {
+      tnUsed++ ;
       #ifdef S4BYTE_SWAP
-         char *swap = (char *)u4allocEr( r4->codeBase, B4BLOCK_SIZE_INTERNAL ) ;
+         swap = (char *)u4allocEr( r4->codeBase, B4BLOCK_SIZE ) ;
          if ( swap == 0 )
             return -1 ;
 
-         memcpy( (void *)swap, (void *)&block->nKeys, B4BLOCK_SIZE_INTERNAL ) ;
+         memcpy( (void *)swap, (void *)&block->nKeys, B4BLOCK_SIZE ) ;
 
          index4swapBlockClipper( swap, r4->keysmax, r4->grouplen) ;
 
-         if ( file4seqWrite( &r4->seqwrite, swap, B4BLOCK_SIZE_INTERNAL) < 0 )
+         if ( file4seqWrite( &r4->seqwrite, swap, B4BLOCK_SIZE) < 0 )
             return -1 ;
          u4free( swap ) ;
       #else
-         if ( file4seqWrite( &r4->seqwrite, &block->nKeys, B4BLOCK_SIZE_INTERNAL) < 0 )
+         if ( file4seqWrite( &r4->seqwrite, &block->nKeys, B4BLOCK_SIZE) < 0 )
             return -1 ;
       #endif
       if ( iBlock )
-         c4memset( block, 0, B4BLOCK_SIZE_INTERNAL ) ;
+         memset( block, 0, B4BLOCK_SIZE ) ;
       r4->lastblock += r4->lastblockInc ;
 
-      block = (R4BLOCK_DATA *) ((char *)block + B4BLOCK_SIZE_INTERNAL + 2*sizeof(void *) ) ;
+      block = (R4BLOCK_DATA *) ((char *)block + B4BLOCK_SIZE + 2*sizeof(void *) ) ;
       iBlock++ ;
       #ifdef E4MISC
          if ( iBlock >= r4->nBlocks )
@@ -657,36 +650,31 @@ static int r4reindexToDisk( R4REINDEX *r4, long rec, const char *keyValue )
 
       if ( block->nKeys == 0 )   /* set up the branch block... */
       {
-         short offset = ( r4->keysmax + 2 + ( ( r4->keysmax / 2 ) * 2 != r4->keysmax ) ) * sizeof(short) ;
+         offset = ( r4->keysmax + 2 + ( ( r4->keysmax / 2 ) * 2 != r4->keysmax ) ) * sizeof(short) ;
          block->blockIndex = &block->nKeys + 1 ;
-         for ( int i = 0 ; i <= r4->keysmax ; i++ )
+         for ( i = 0 ; i <= r4->keysmax ; i++ )
             block->blockIndex[i] = r4->grouplen * i + offset ;
          block->data = (char *) &block->nKeys + block->blockIndex[ 0 ] ;
       }
 
-      B4KEY_DATA *keyTo = r4key( block, block->nKeys, r4->grouplen ) ;
+      keyTo = r4key( block, block->nKeys, r4->grouplen ) ;
       #ifdef E4MISC
          dif = (char *) keyTo -  (char *) block  ;
-         if ( dif+sizeof(long) > B4BLOCK_SIZE_INTERNAL || dif < 0 )
+         if ( dif+sizeof(long) > B4BLOCK_SIZE || dif < 0 )
             return error4( r4->codeBase, e4result, E92102 ) ;
       #endif
-      #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4seek.cpp for HP */
-         tempLong = r4->lastblock * 512 ;
-         memcpy( &keyTo->pointer, &tempLong, sizeof(S4LONG) ) ;
-      #else
-         keyTo->pointer = r4->lastblock * 512 ;
-      #endif
+      keyTo->pointer = r4->lastblock * 512 ;
 
       if ( block->nKeys < r4->keysmax )
       {
          if ( tnUsed > r4->nBlocksUsed )
             r4->nBlocksUsed = tnUsed ;
          #ifdef E4MISC
-            if ( dif+r4->grouplen > B4BLOCK_SIZE_INTERNAL )
+            if ( dif+r4->grouplen > B4BLOCK_SIZE )
                return error4( r4->codeBase, e4result, E92102 ) ;
          #endif
          keyTo->num = rec ;
-         c4memcpy( keyTo->value, keyValue, r4->valuelen ) ;
+         memcpy( keyTo->value, keyValue, r4->valuelen ) ;
          block->nKeys++ ;
          return 0 ;
       }
@@ -697,10 +685,7 @@ static int r4reindexToDisk( R4REINDEX *r4, long rec, const char *keyValue )
    }
 }
 
-
-
-/* LY 00/04/13 : long rec to S4LONG for 64-bit HP-UX */
-int r4reindexAdd( R4REINDEX *r4, const S4LONG rec, const unsigned char *keyValue )
+int r4reindexAdd( R4REINDEX *r4, const long rec, const unsigned char *keyValue )
 {
    B4KEY_DATA *keyTo ;
    R4BLOCK_DATA *startBlock ;
@@ -726,7 +711,7 @@ int r4reindexAdd( R4REINDEX *r4, const S4LONG rec, const unsigned char *keyValue
    {
       if ( r4reindexToDisk( r4, rec, (const char*)keyValue ) < 0 )
          return -1 ;
-      c4memset( startBlock, 0, B4BLOCK_SIZE_INTERNAL + 2 * sizeof( void *) ) ;
+      memset( startBlock, 0, B4BLOCK_SIZE + 2 * sizeof( void *) ) ;
       return 0 ;
    }
 
@@ -734,11 +719,11 @@ int r4reindexAdd( R4REINDEX *r4, const S4LONG rec, const unsigned char *keyValue
 
    #ifdef E4MISC
       dif = (char *)keyTo -  (char *)startBlock ;
-      if ( dif + r4->grouplen > B4BLOCK_SIZE_INTERNAL || dif < 0 )
+      if ( dif + r4->grouplen > B4BLOCK_SIZE || dif < 0 )
          return error4( r4->codeBase, e4result, E92102 ) ;
    #endif
    keyTo->num = rec ;
-   c4memcpy( keyTo->value, keyValue, r4->valuelen ) ;
+   memcpy( keyTo->value, keyValue, r4->valuelen ) ;
 
    return 0 ;
 }
@@ -749,8 +734,7 @@ int r4reindexFinish( R4REINDEX *r4 )
    #ifdef E4MISC
       long dif ;
    #endif
-   unsigned long iBlock = 0 ;
-   unsigned long tBlock ;
+   int iBlock = 0, tBlock ;
 
    #ifdef S4BYTE_SWAP
       char *swap, *swapPtr ;
@@ -758,15 +742,12 @@ int r4reindexFinish( R4REINDEX *r4 )
       long longVal ;
       short shortVal ;
    #endif
-   #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4seek.cpp for HP */
-      S4LONG tempLong ;
-   #endif
 
    R4BLOCK_DATA *block = r4->startBlock, *temp_block ;
 
    short offset ;
    int i ;
-   unsigned long pointer ;
+   long pointer ;
 
    if ( r4->nBlocksUsed <= 1 )  /* empty database if nKeys = 0 */
    {
@@ -783,20 +764,20 @@ int r4reindexFinish( R4REINDEX *r4 )
       pointer = 0 ;
 
       #ifdef S4BYTE_SWAP
-         swap = (char *)u4allocEr( r4->codeBase, B4BLOCK_SIZE_INTERNAL ) ;
+         swap = (char *)u4allocEr( r4->codeBase, B4BLOCK_SIZE ) ;
          if ( swap == 0 )
             return error4describe( r4->codeBase, e4memory, 0, 0, 0, 0 ) ;
 
-         memcpy( (void *)swap, (void *)&r4->startBlock->nKeys, B4BLOCK_SIZE_INTERNAL ) ;
+         memcpy( (void *)swap, (void *)&r4->startBlock->nKeys, B4BLOCK_SIZE ) ;
                           /* position swapPtr at beginning of pointers */
 
          index4swapBlockClipper(swap, r4->keysmax, r4->grouplen) ;
 
-         if ( file4seqWrite( &r4->seqwrite, swap, B4BLOCK_SIZE_INTERNAL) < 0 )
+         if ( file4seqWrite( &r4->seqwrite, swap, B4BLOCK_SIZE) < 0 )
             return -1 ;
          u4free( swap ) ;
       #else
-         if ( file4seqWrite( &r4->seqwrite, &r4->startBlock->nKeys, B4BLOCK_SIZE_INTERNAL) < 0 )
+         if ( file4seqWrite( &r4->seqwrite, &r4->startBlock->nKeys, B4BLOCK_SIZE) < 0 )
             return -1 ;
       #endif
 
@@ -808,35 +789,35 @@ int r4reindexFinish( R4REINDEX *r4 )
       r4->stranded = 0 ;
 
       #ifdef S4BYTE_SWAP
-         swap = (char *) u4allocEr( r4->codeBase, B4BLOCK_SIZE_INTERNAL ) ;
+         swap = (char *) u4allocEr( r4->codeBase, B4BLOCK_SIZE ) ;
          if ( swap == 0 )
             return -1 ;
 
-         memcpy( (void *)swap, (void *)&r4->startBlock->nKeys, B4BLOCK_SIZE_INTERNAL ) ;
+         memcpy( (void *)swap, (void *)&r4->startBlock->nKeys, B4BLOCK_SIZE ) ;
 
          index4swapBlockClipper(swap, r4->keysmax, r4->grouplen) ;
 
-         if ( file4seqWrite( &r4->seqwrite, swap, B4BLOCK_SIZE_INTERNAL) < 0 )
+         if ( file4seqWrite( &r4->seqwrite, swap, B4BLOCK_SIZE) < 0 )
             return -1 ;
          u4free( swap ) ;
       #else
-         if ( file4seqWrite( &r4->seqwrite, &r4->startBlock->nKeys, B4BLOCK_SIZE_INTERNAL) < 0 )
+         if ( file4seqWrite( &r4->seqwrite, &r4->startBlock->nKeys, B4BLOCK_SIZE) < 0 )
             return -1 ;
       #endif
 
       r4->lastblock += r4->lastblockInc ;
       pointer = r4->lastblock*512 ;
-      block = (R4BLOCK_DATA *) ((char *)block + B4BLOCK_SIZE_INTERNAL + 2*sizeof(void *) ) ;
+      block = (R4BLOCK_DATA *) ((char *)block + B4BLOCK_SIZE + 2*sizeof(void *) ) ;
       iBlock++ ;
    }
    else       /* stranded entry, so add after */
    {
       /* if less than 1/2 entries, will re-add the required keys later... */
-      block = (R4BLOCK_DATA *) ((char *)block + B4BLOCK_SIZE_INTERNAL + 2*sizeof(void *) ) ;
+      block = (R4BLOCK_DATA *) ((char *)block + B4BLOCK_SIZE + 2*sizeof(void *) ) ;
       iBlock++ ;
       while( block->nKeys == 0 && iBlock < r4->nBlocksUsed )
       {
-         block = (R4BLOCK_DATA *) ((char *)block + B4BLOCK_SIZE_INTERNAL + 2*sizeof(void *) ) ;
+         block = (R4BLOCK_DATA *) ((char *)block + B4BLOCK_SIZE + 2*sizeof(void *) ) ;
          iBlock++ ;
       }
 
@@ -845,19 +826,19 @@ int r4reindexFinish( R4REINDEX *r4 )
       if( block->nKeys > 0 )
       {
          #ifdef S4BYTE_SWAP
-            swap = (char *)u4allocEr( r4->codeBase, B4BLOCK_SIZE_INTERNAL ) ;
+            swap = (char *)u4allocEr( r4->codeBase, B4BLOCK_SIZE ) ;
             if ( swap == 0 )
                return -1 ;
 
-            memcpy( (void *)swap, (void *)&block->nKeys, B4BLOCK_SIZE_INTERNAL ) ;
+            memcpy( (void *)swap, (void *)&block->nKeys, B4BLOCK_SIZE ) ;
 
             index4swapBlockClipper(swap, r4->keysmax, r4->grouplen ) ;
 
-            if ( file4seqWrite( &r4->seqwrite, swap, B4BLOCK_SIZE_INTERNAL) < 0 )
+            if ( file4seqWrite( &r4->seqwrite, swap, B4BLOCK_SIZE) < 0 )
                return -1 ;
             u4free( swap ) ;
          #else
-            if ( file4seqWrite( &r4->seqwrite, &block->nKeys, B4BLOCK_SIZE_INTERNAL) < 0 )
+            if ( file4seqWrite( &r4->seqwrite, &block->nKeys, B4BLOCK_SIZE) < 0 )
                return -1 ;
          #endif
 
@@ -866,7 +847,7 @@ int r4reindexFinish( R4REINDEX *r4 )
       }
       else
          pointer = r4key( block, block->nKeys, 0 )->pointer ;
-      block = (R4BLOCK_DATA *) ((char *)block + B4BLOCK_SIZE_INTERNAL + 2*sizeof(void *) ) ;
+      block = (R4BLOCK_DATA *) ((char *)block + B4BLOCK_SIZE + 2*sizeof(void *) ) ;
       iBlock++ ;
    }
 
@@ -884,7 +865,7 @@ int r4reindexFinish( R4REINDEX *r4 )
             for ( i = 0 ; i <= r4->keysmax ; i++ )
                temp_block->blockIndex[i] = r4->grouplen * i + offset ;
             temp_block->data = (char *)&temp_block->nKeys + temp_block->blockIndex[0] ;
-            temp_block = (R4BLOCK_DATA *)((char *)temp_block + B4BLOCK_SIZE_INTERNAL + 2 * sizeof(void *) ) ;
+            temp_block = (R4BLOCK_DATA *)((char *)temp_block + B4BLOCK_SIZE + 2 * sizeof(void *) ) ;
             tBlock++ ;
          }
 
@@ -894,23 +875,23 @@ int r4reindexFinish( R4REINDEX *r4 )
          pointer = 0 ;
 
          #ifdef S4BYTE_SWAP
-            swap = (char *) u4allocEr( r4->codeBase, B4BLOCK_SIZE_INTERNAL ) ;
+            swap = (char *) u4allocEr( r4->codeBase, B4BLOCK_SIZE ) ;
             if ( swap == 0 )
                return -1 ;
 
-            memcpy( (void *)swap, (void *)&block->nKeys, B4BLOCK_SIZE_INTERNAL ) ;
+            memcpy( (void *)swap, (void *)&block->nKeys, B4BLOCK_SIZE ) ;
 
             index4swapBlockClipper(swap, r4->keysmax, r4->grouplen) ;
 
-            if ( file4seqWrite( &r4->seqwrite, swap, B4BLOCK_SIZE_INTERNAL) < 0 )
+            if ( file4seqWrite( &r4->seqwrite, swap, B4BLOCK_SIZE) < 0 )
                return -1 ;
             u4free( swap ) ;
          #else
-            if ( file4seqWrite( &r4->seqwrite, &block->nKeys, B4BLOCK_SIZE_INTERNAL) < 0 ) return -1 ;
+            if ( file4seqWrite( &r4->seqwrite, &block->nKeys, B4BLOCK_SIZE) < 0 ) return -1 ;
          #endif
 
          r4->lastblock += r4->lastblockInc ;
-         block = (R4BLOCK_DATA *) ((char *)block + B4BLOCK_SIZE_INTERNAL + 2*sizeof(void *) ) ;
+         block = (R4BLOCK_DATA *) ((char *)block + B4BLOCK_SIZE + 2*sizeof(void *) ) ;
          iBlock++ ;
       }
    }
@@ -927,50 +908,35 @@ int r4reindexFinish( R4REINDEX *r4 )
       keyTo = r4key( block, block->nKeys, r4->grouplen ) ;
       #ifdef E4MISC
          dif = (char *)keyTo  -  (char *) block ;
-         if ( dif + sizeof( long ) > B4BLOCK_SIZE_INTERNAL  ||  dif < 0 )
+         if ( dif + sizeof( long ) > B4BLOCK_SIZE  ||  dif < 0 )
             return error4( r4->codeBase, e4result, E92102 ) ;
       #endif
-      #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4seek.cpp for HP */
-         tempLong = r4->lastblock * 512 ;
-         memcpy( &keyTo->pointer, &tempLong, sizeof(S4LONG) ) ;
-      #else
-         keyTo->pointer = r4->lastblock * 512 ;
-      #endif
+      keyTo->pointer = r4->lastblock * 512 ;
 
       #ifdef S4BYTE_SWAP
-         swap = (char *)u4allocEr( r4->codeBase, B4BLOCK_SIZE_INTERNAL ) ;
+         swap = (char *)u4allocEr( r4->codeBase, B4BLOCK_SIZE ) ;
          if ( swap == 0 )
             return -1 ;
 
-         memcpy( (void *)swap, (void *)&block->nKeys, B4BLOCK_SIZE_INTERNAL ) ;
+         memcpy( (void *)swap, (void *)&block->nKeys, B4BLOCK_SIZE ) ;
 
          index4swapBlockClipper(swap, r4->keysmax, r4->grouplen) ;
 
-         if ( file4seqWrite( &r4->seqwrite, swap, B4BLOCK_SIZE_INTERNAL) < 0 )
+         if ( file4seqWrite( &r4->seqwrite, swap, B4BLOCK_SIZE) < 0 )
             return -1 ;
          u4free( swap ) ;
       #else
-         if ( file4seqWrite( &r4->seqwrite, &block->nKeys, B4BLOCK_SIZE_INTERNAL) < 0)
+         if ( file4seqWrite( &r4->seqwrite, &block->nKeys, B4BLOCK_SIZE) < 0)
             return -1;
       #endif
 
       r4->lastblock += r4->lastblockInc ;
-      block = (R4BLOCK_DATA *)( (char *)block + B4BLOCK_SIZE_INTERNAL + 2 * sizeof(void *) ) ;
+      block = (R4BLOCK_DATA *)( (char *)block + B4BLOCK_SIZE + 2 * sizeof(void *) ) ;
    }
 
    return 0 ;
 }
 
-#else  /* S4CLIPPER */
-
-// used in index independent ole-db, so must always exist...
-int S4FUNCTION t4reindex( TAG4 *t4 )
-{
-   return error4( 0, e4notSupported, E92102 ) ;
-}
-
-
 #endif  /* S4CLIPPER */
-
 #endif  /* S4INDEX_OFF */
 #endif  /* S4WRITE_OFF */

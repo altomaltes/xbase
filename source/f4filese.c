@@ -1,222 +1,189 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* f4filese.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* f4filese.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
+#ifndef S4UNIX
+   #ifdef __TURBOC__
+      #pragma hdrstop
+   #endif
+#endif
 
 #ifdef S4ADVANCE_READ
-   // S4ADVANCE_READ
-   void S4CALL file4seqReadCompletionRoutine( void *advance )
+void S4CALL file4seqReadCompletionRoutine( void *advance )
+{
+   FILE4SEQ_READ *seqRead ;
+
+   /* the completion data points to the entire FILE4SEQ_READ structure */
+   seqRead = ((FILE4SEQ_READ *)((FILE4ADVANCE_READ *)(advance))->completionData) ;
+
+   if ( seqRead->buffer == seqRead->buf1 )  /* then this pre-read is the 2nd buffer */
    {
-      FILE4SEQ_READ *seqRead ;
-
-      /* the completion data points to the entire FILE4SEQ_READ structure */
-      seqRead = ((FILE4SEQ_READ *)((FILE4ADVANCE_READ *)(advance))->completionData) ;
-
-      if ( seqRead->buffer == seqRead->buf1 )  /* then this pre-read is the 2nd buffer */
-      {
-         seqRead->buf2status = ((FILE4ADVANCE_READ *)advance)->status ;
-         seqRead->buf2avail = AR4FULL ;
-      }
-      else
-      {
-         seqRead->buf1status = ((FILE4ADVANCE_READ *)advance)->status ;
-         seqRead->buf1avail = AR4FULL ;
-      }
+      seqRead->buf2status = ((FILE4ADVANCE_READ *)advance)->status ;
+      seqRead->buf2avail = AR4FULL ;
    }
-
-
-
-   // S4ADVANCE_READ
-   unsigned S4FUNCTION file4seqReadAdvance( FILE4SEQ_READ *seqRead, void *ptr, const unsigned len )
+   else
    {
-      unsigned int urc ;
-      CODE4 *c4 ;
+      seqRead->buf1status = ((FILE4ADVANCE_READ *)advance)->status ;
+      seqRead->buf1avail = AR4FULL ;
+   }
+}
 
-      /* avail is zero if here, so get the other, pre-read buffer (if/when
-         available).  Then set the next one to read-ahead.  Actually, set the
-         first one to pre-read first (since more optimized).  If neither are
-         set up for advance-reading (i.e., is empty and not pre-read-set), then
-         read the first one, and set the 2nd up for pre-reading */
+unsigned S4FUNCTION file4seqReadAdvance( FILE4SEQ_READ *seqRead, void *ptr, const unsigned len )
+{
+   unsigned int urc ;
+   CODE4 *c4 ;
 
-      c4 = seqRead->file->codeBase ;
+   /* avail is zero if here, so get the other, pre-read buffer (if/when
+      available).  Then set the next one to read-ahead.  Actually, set the
+      first one to pre-read first (since more optimized).  If neither are
+      set up for advance-reading (i.e., is empty and not pre-read-set), then
+      read the first one, and set the 2nd up for pre-reading */
 
-      #ifdef E4PARM_LOW
-         if ( seqRead->avail != 0 )
-         {
-            error4( c4, e4parm_null, E90701 ) ;
-            return 0 ;
-         }
-         // AS Apr 13/04 - support for optimizing loarge files
-         // #ifdef S4FILE_EXTENDED
-         //    if ( seqRead->file->isLong != 0 )  /* should never get here then */
-         //    {
-         //       error4( c4, e4parm, E90701 ) ;
-         //       return 0 ;
-         //    }
-         // #endif
-      #endif
+   c4 = seqRead->file->codeBase ;
 
-      #ifdef E4ANALYZE
-         if ( seqRead->doAdvance == 0 )
-         {
-            error4( c4, e4struct, E90701 ) ;
-            return 0 ;
-         }
-      #endif
-
-      if ( seqRead->buffer == seqRead->buf1 )
+   #ifdef E4PARM_LOW
+      if ( seqRead->avail != 0 )
       {
-         while ( seqRead->buf2avail == AR4SET )  /* wait for it to finish read */
+         error4( c4, e4parm_null, E90701 ) ;
+         return 0 ;
+      }
+      #ifdef S4FILE_EXTENDED
+         if ( seqRead->file->isLong != 0 )  /* should never get here then */
          {
-            // AS Jan 19/07 - create a u4sleep() which will delay a short period (fix problem when CodeBase run as a high-priority thread)
-            // AS Apr 5/07 - adjust...don't sleep unless the code4 is running as high priority
-            u4sleep( c4 ) ;
-         }
-         seqRead->buffer = seqRead->buf2 ;
-
-         if ( seqRead->buf2avail == AR4EMPTY )  /* read current one now, advance-read other (after) */
-         {
-            urc = file4readLow( seqRead->file, seqRead->pos, seqRead->buffer, seqRead->nextReadLen ) ;
-         }
-         else
-         {
-            #ifdef E4ANALYZE
-               if ( seqRead->buf2avail != AR4FULL )  /* invalid setting */
-               {
-                  error4( c4, e4struct, E90701 ) ;
-                  return 0 ;
-               }
-            #endif
-            urc = seqRead->buf2status ;
-         }
-
-         seqRead->avail = seqRead->working = urc ;
-
-         if ( seqRead->working == UINT_MAX )
-         {
-            file4readError( seqRead->file, seqRead->pos, seqRead->nextReadLen, "file4seqRead" ) ;
+            error4( c4, e4parm, E90701 ) ;
             return 0 ;
          }
+      #endif
+   #endif
 
-         #ifdef E4ANALYZE
-            /* Make sure reading is aligned correctly for maximum speed */
-            if ( ( file4longGetLo( seqRead->pos ) + seqRead->nextReadLen ) % 0x400 && seqRead->avail )
-            {
-               error4( c4, e4result, E90701 ) ;
-               return 0 ;
-            }
-         #endif
-         file4longAdd( &seqRead->pos, seqRead->working ) ;
-         seqRead->nextReadLen = seqRead->total ;
+   #ifdef E4ANALYZE
+      if ( seqRead->doAdvance == 0 )
+      {
+         error4( c4, e4struct, E90701 ) ;
+         return 0 ;
+      }
+   #endif
 
-         /* now pre-read the first one */
-         if ( (long)urc == (long)seqRead->nextReadLen )  /* ensure that it is available for reading */
-         {
-            seqRead->buf1avail = AR4SET ;
-            // AS Apr 13/04 - support for optimizing loarge files
-            file4advanceRead( seqRead->file, seqRead->pos, seqRead->buf1, seqRead->nextReadLen, file4seqReadCompletionRoutine, seqRead ) ;
-         }
+   if ( seqRead->buffer == seqRead->buf1 )
+   {
+      while ( seqRead->buf2avail == AR4SET )  /* wait for it to finish read */
+         Sleep( 0 ) ;
+
+      seqRead->buffer = seqRead->buf2 ;
+
+      if ( seqRead->buf2avail == AR4EMPTY )  /* read current one now, advance-read other (after) */
+      {
+         urc = file4readLow( seqRead->file, seqRead->pos, seqRead->buffer, seqRead->nextReadLen ) ;
       }
       else
       {
          #ifdef E4ANALYZE
-            if ( seqRead->buffer != seqRead->buf2 )
+            if ( seqRead->buf2avail != AR4FULL )  /* invalid setting */
             {
                error4( c4, e4struct, E90701 ) ;
                return 0 ;
             }
          #endif
-         while ( seqRead->buf1avail == AR4SET )  /* wait for it to finish read */
-         {
-            // AS Apr 5/07 - adjust...don't sleep unless the code4 is running as high priority
-            u4sleep( c4 ) ;
-         }
+         urc = seqRead->buf2status ;
+      }
 
-         seqRead->buffer = seqRead->buf1 ;
+      seqRead->avail = seqRead->working = urc ;
 
-         if ( seqRead->buf1avail == AR4EMPTY )  /* read current one now, advance-read other (after) */
-         {
-            urc = file4readLow( seqRead->file, seqRead->pos, seqRead->buffer, seqRead->nextReadLen ) ;
-         }
-         else
-         {
-            #ifdef E4ANALYZE
-               if ( seqRead->buf1avail != AR4FULL )  /* invalid setting */
-               {
-                  error4( c4, e4struct, E90701 ) ;
-                  return 0 ;
-               }
-            #endif
-            urc = seqRead->buf1status ;
-         }
+      if ( seqRead->working == UINT_MAX )
+      {
+         file4readError( seqRead->file, seqRead->pos, seqRead->nextReadLen, "file4seqRead" ) ;
+         return 0 ;
+      }
 
-         seqRead->avail = seqRead->working = urc ;
-
-         if ( seqRead->working == UINT_MAX )
+      #ifdef E4ANALYZE
+         /* Make sure reading is aligned correctly for maximum speed */
+         if ( ( file4longGetLo( seqRead->pos ) + seqRead->nextReadLen ) % 0x400 && seqRead->avail )
          {
-            file4readError( seqRead->file, seqRead->pos, seqRead->nextReadLen, "file4seqRead" ) ;
+            error4( c4, e4result, E90701 ) ;
             return 0 ;
          }
+      #endif
+      file4longAdd( &seqRead->pos, seqRead->working ) ;
+      seqRead->nextReadLen = seqRead->total ;
 
+      /* now pre-read the first one */
+      if ( (long)urc == (long)seqRead->nextReadLen )  /* ensure that it is available for reading */
+      {
+         seqRead->buf1avail = AR4SET ;
+         file4advanceRead( seqRead->file, file4longGetLo( seqRead->pos ), seqRead->buf1, seqRead->nextReadLen, file4seqReadCompletionRoutine, seqRead ) ;
+      }
+   }
+   else
+   {
+      #ifdef E4ANALYZE
+         if ( seqRead->buffer != seqRead->buf2 )
+         {
+            error4( c4, e4struct, E90701 ) ;
+            return 0 ;
+         }
+      #endif
+      while ( seqRead->buf1avail == AR4SET )  /* wait for it to finish read */
+         Sleep( 0 ) ;
+
+      seqRead->buffer = seqRead->buf1 ;
+
+      if ( seqRead->buf1avail == AR4EMPTY )  /* read current one now, advance-read other (after) */
+      {
+         urc = file4readLow( seqRead->file, seqRead->pos, seqRead->buffer, seqRead->nextReadLen ) ;
+      }
+      else
+      {
          #ifdef E4ANALYZE
-            /* Make sure reading is aligned correctly for maximum speed */
-            if ( ( file4longGetLo( seqRead->pos ) + seqRead->nextReadLen ) % 0x400 && seqRead->avail )
+            if ( seqRead->buf1avail != AR4FULL )  /* invalid setting */
             {
-               error4( c4, e4result, E90701 ) ;
+               error4( c4, e4struct, E90701 ) ;
                return 0 ;
             }
          #endif
-         file4longAdd( &seqRead->pos, seqRead->working ) ;
-         seqRead->nextReadLen = seqRead->total ;
-
-         /* now pre-read the first one */
-         if ( (long)urc == (long)seqRead->nextReadLen )  /* ensure that it is available for reading */
-         {
-            seqRead->buf2avail = AR4SET ;
-            // AS Apr 13/04 - support for optimizing loarge files
-            file4advanceRead( seqRead->file, seqRead->pos, seqRead->buf2, seqRead->nextReadLen, file4seqReadCompletionRoutine, seqRead ) ;
-         }
+         urc = seqRead->buf1status ;
       }
 
-      return urc ;
-   }
+      seqRead->avail = seqRead->working = urc ;
 
-
-
-   // S4ADVANCE_READ
-   void file4seqReadInitUndo( const FILE4SEQ_READ *seqRead )
-   {
-      /* ensures that any advance-reads are complete */
-      if ( seqRead->doAdvance == 1 )
+      if ( seqRead->working == UINT_MAX )
       {
-         while ( seqRead->buf1avail == AR4SET )  /* wait for it to finish read */
+         file4readError( seqRead->file, seqRead->pos, seqRead->nextReadLen, "file4seqRead" ) ;
+         return 0 ;
+      }
+
+      #ifdef E4ANALYZE
+         /* Make sure reading is aligned correctly for maximum speed */
+         if ( ( file4longGetLo( seqRead->pos ) + seqRead->nextReadLen ) % 0x400 && seqRead->avail )
          {
-            // AS Apr 5/07 - adjust...don't sleep unless the code4 is running as high priority
-            u4sleep( seqRead->file->codeBase ) ;
+            error4( c4, e4result, E90701 ) ;
+            return 0 ;
          }
-         while ( seqRead->buf2avail == AR4SET )  /* wait for it to finish read */
-         {
-            // AS Apr 5/07 - adjust...don't sleep unless the code4 is running as high priority
-            u4sleep( seqRead->file->codeBase ) ;
-         }
+      #endif
+      file4longAdd( &seqRead->pos, seqRead->working ) ;
+      seqRead->nextReadLen = seqRead->total ;
+
+      /* now pre-read the first one */
+      if ( (long)urc == (long)seqRead->nextReadLen )  /* ensure that it is available for reading */
+      {
+         seqRead->buf2avail = AR4SET ;
+         file4advanceRead( seqRead->file, file4longGetLo( seqRead->pos ), seqRead->buf2, seqRead->nextReadLen, file4seqReadCompletionRoutine, seqRead ) ;
       }
    }
+
+   return urc ;
+}
+
+/* ensures that any advance-reads are complete */
+void file4seqReadInitUndo( const FILE4SEQ_READ *seqRead )
+{
+   if ( seqRead->doAdvance == 1 )
+   {
+      while ( seqRead->buf1avail == AR4SET )  /* wait for it to finish read */
+         Sleep( 0 ) ;
+      while ( seqRead->buf2avail == AR4SET )  /* wait for it to finish read */
+         Sleep( 0 ) ;
+   }
+}
 #endif  /* S4ADVANCE_READ */
-
-
 
 unsigned S4FUNCTION file4seqRead( FILE4SEQ_READ *seqRead, void *ptr, unsigned len )
 {
@@ -263,10 +230,9 @@ unsigned S4FUNCTION file4seqRead( FILE4SEQ_READ *seqRead, void *ptr, unsigned le
 
       #ifdef S4ADVANCE_READ
          if ( seqRead->doAdvance == 1
-            // AS Apr 13/04 - support for optimizing loarge files
-            // #ifdef S4FILE_EXTENDED
-            //    && seqRead->file->isLong == 0
-            // #endif
+            #ifdef S4FILE_EXTENDED
+               && seqRead->file->isLong == 0
+            #endif
          )
             file4seqReadAdvance( seqRead, ptr, len ) ;
          else
@@ -300,7 +266,7 @@ unsigned S4FUNCTION file4seqRead( FILE4SEQ_READ *seqRead, void *ptr, unsigned le
    if ( len <= seqRead->avail )
    {
       bufferI = seqRead->working - seqRead->avail ;
-      c4memcpy( ptr, seqRead->buffer + bufferI, len ) ;
+      memcpy( ptr, seqRead->buffer + bufferI, len ) ;
       seqRead->avail -= len ;
       return len ;
    }
@@ -310,7 +276,7 @@ unsigned S4FUNCTION file4seqRead( FILE4SEQ_READ *seqRead, void *ptr, unsigned le
          return 0 ;
 
       bufferI = seqRead->working - seqRead->avail ;
-      c4memcpy( ptr, seqRead->buffer + bufferI, seqRead->avail ) ;
+      memcpy( ptr, seqRead->buffer + bufferI, seqRead->avail ) ;
 
       copyBytes = seqRead->avail ;
       seqRead->avail = 0 ;
@@ -350,8 +316,7 @@ int S4FUNCTION file4seqReadAll( FILE4SEQ_READ *seqRead, void *ptr, const unsigne
 int S4FUNCTION file4seqReadInit( FILE4SEQ_READ *seqRead, FILE4 *file, long startPos, void *ptr, const unsigned ptrLen )
 {
    FILE4LONG pos ;
-   /* LY July 7/03 : changed from 0 to 0L for Linux compiler */
-   file4longAssign( pos, startPos, 0L ) ;
+   file4longAssign( pos, startPos, 0 ) ;
    return file4seqReadInitDo( seqRead, file, pos, ptr, ptrLen, 0 ) ;
 }
 #endif
@@ -361,18 +326,16 @@ int S4FUNCTION file4seqReadInit( FILE4SEQ_READ *seqRead, FILE4 *file, long start
 S4EXPORT int S4FUNCTION file4seqReadInitDo( FILE4SEQ_READ *seqRead, FILE4 *file, FILE4LONG startPos, void *ptr, const unsigned ptrLen, const int doAdvance )
 {
    #ifdef E4PARM_HIGH
-      // AS Jan 16/03 - Minimum ptr len size of 1024
-      // AS Apr 19/06 - undocumented support... ptrLen can be zero (seqread just skipped)...done by pack
-      if ( file4longError( startPos ) < 0 || seqRead == 0 || file == 0 || (ptrLen < 1024 && ptrLen != 0 ) ) /* Don't check ptr. It can be null. */
+      if ( file4longError( startPos ) < 0 || seqRead == 0 || file == 0 || ( ptrLen == 0 && ptr == 0 ) )
          return error4( 0, e4parm, E90703 ) ;
    #endif
 
-   c4memset( (void *)seqRead, 0, sizeof( FILE4SEQ_READ ) ) ;
+   memset( (void *)seqRead, 0, sizeof( FILE4SEQ_READ ) ) ;
 
    #ifndef S4OFF_OPTIMIZE
       opt4fileFlush( file, 1 ) ;
    #endif
-   if ( ptr != 0 && ptrLen > 0 )
+   if ( ptrLen > 0 )
    {
       FILE4LONG compare ;
       #ifdef S4ADVANCE_READ
@@ -413,30 +376,11 @@ S4EXPORT int S4FUNCTION file4seqReadInitDo( FILE4SEQ_READ *seqRead, FILE4 *file,
    return 0 ;
 }
 
-int S4FUNCTION file4seqReadAlloc( FILE4SEQ_READ S4PTR * S4PTR *f4 )
-{
-   *f4 = 0 ;
-   *f4 = (FILE4SEQ_READ *) malloc( sizeof(FILE4SEQ_READ) ) ;
-   if ( *f4 == 0 )
-      return -1 ;
-   return 0 ;
-}
-
-void S4FUNCTION file4seqReadFree( FILE4SEQ_READ S4PTR * S4PTR *f4 )
-{
-   free( *f4 ) ;
-}
-
 #ifdef S4WRITE_DELAY
 void S4CALL file4seqWriteCompletionRoutine( void *delay )
 {
    /* just resets the avail flag */
-   #ifdef S4WIN64 /* LY 00/10/17 */
-      memset( ((FILE4WRITE_DELAY *)delay)->completionData, 0, sizeof(int) ) ;
-      memset( ((FILE4WRITE_DELAY *)delay)->completionData, 1, 1 ) ;
-   #else
-      *((int *)(((FILE4WRITE_DELAY *)(delay))->completionData)) = 1 ;
-   #endif
+   *((int *)(((FILE4WRITE_DELAY *)(delay))->completionData)) = 1 ;
 }
 
 int S4FUNCTION file4seqWriteDelay( FILE4SEQ_WRITE *seqWrite )   /* not static due to testing exportation */
@@ -466,14 +410,12 @@ int S4FUNCTION file4seqWriteDelay( FILE4SEQ_WRITE *seqWrite )   /* not static du
       return 0 ;
 
    #ifdef E4ANALYZE
-      if ( file4longError( seqWrite->pos ) < 0 )
+      if ( file4longError( seqWrite->pos ) < 0
+         #ifdef S4FILE_EXTENDED
+            || file4longGetHi( seqWrite->pos ) != 0 || seqWrite->file->isLong != 0
+         #endif
+      )
          return error4( c4, e4result, E90705 ) ;
-
-      // AS 10/16/00 write-delay does support large files now
-      //    #ifdef S4FILE_EXTENDED
-      //       || file4longGetHi( seqWrite->pos ) != 0 || seqWrite->file->isLong != 0
-      //    #endif
-      // )
    #endif
 
    toWrite = seqWrite->working - seqWrite->avail ;
@@ -501,25 +443,17 @@ int S4FUNCTION file4seqWriteDelay( FILE4SEQ_WRITE *seqWrite )   /* not static du
             if ( seqWrite->buffer == seqWrite->buf1 )
             {
                seqWrite->buf1avail = 0 ;
-               /* LY 4/28/99 : removed file4longGetLo from second param */
-               file4writeDelay( seqWrite->file, seqWrite->pos, seqWrite->buffer, toWrite, file4seqWriteCompletionRoutine, &seqWrite->buf1avail ) ;
+               file4writeDelay( seqWrite->file, file4longGetLo( seqWrite->pos ), seqWrite->buffer, toWrite, file4seqWriteCompletionRoutine, &seqWrite->buf1avail ) ;
                while( seqWrite->buf2avail != 1 )  /* wait for write on other buffer piece to finish */
-               {
-                  // AS Apr 5/07 - adjust...don't sleep unless the code4 is running as high priority
-                  u4sleep( c4 ) ;
-               }
+                  Sleep( 0 ) ;
                seqWrite->buffer = seqWrite->buf2 ;
             }
             else
             {
                seqWrite->buf2avail = 0 ;
-               /* LY 4/28/99 : removed file4longGetLo from second param */
-               file4writeDelay( seqWrite->file, seqWrite->pos, seqWrite->buffer, toWrite, file4seqWriteCompletionRoutine, &seqWrite->buf2avail ) ;
+               file4writeDelay( seqWrite->file, file4longGetLo( seqWrite->pos ), seqWrite->buffer, toWrite, file4seqWriteCompletionRoutine, &seqWrite->buf2avail ) ;
                while( seqWrite->buf1avail != 1 )  /* wait for write on other buffer piece to finish */
-               {
-                  // AS Apr 5/07 - adjust...don't sleep unless the code4 is running as high priority
-                  u4sleep( c4 ) ;
-               }
+                  Sleep( 0 ) ;
                seqWrite->buffer = seqWrite->buf1 ;
             }
          }   /* needed for else above */
@@ -544,22 +478,10 @@ int S4FUNCTION file4seqWriteFlush( FILE4SEQ_WRITE *seqWrite )
 
    /* and now, absolutely ensure that any delayed writes get to finish their
       completion routine before continuing (i.e. avoid memory corruption) */
-   if ( seqWrite->buf2 != 0 )
-   {
-      while( seqWrite->buf2avail != 1 )  /* wait for write on other buffer piece to finish */
-      {
-         // AS Apr 5/07 - adjust...don't sleep unless the code4 is running as high priority
-         u4sleep( seqWrite->file->codeBase ) ;
-      }
-   }
-   if ( seqWrite->buf1 != 0 )
-   {
-      while( seqWrite->buf1avail != 1 )  /* wait for write on other buffer piece to finish */
-      {
-         // AS Apr 5/07 - adjust...don't sleep unless the code4 is running as high priority
-         u4sleep( seqWrite->file->codeBase ) ;
-      }
-   }
+   while( seqWrite->buf2avail != 1 )  /* wait for write on other buffer piece to finish */
+      Sleep( 0 ) ;
+   while( seqWrite->buf1avail != 1 )  /* wait for write on other buffer piece to finish */
+      Sleep( 0 ) ;
 
    /* ensure that any optimized reads are dumped in order that new delayed
       writes will get recognized properly */
@@ -627,9 +549,6 @@ int S4FUNCTION file4seqWriteFlush( FILE4SEQ_WRITE *seqWrite )
    }
 
    seqWrite->avail = seqWrite->working = seqWrite->total ;
-   #ifndef S4OFF_OPTIMIZE /* LY Aug 1/03 : not flushing buffered index contents causing gentest index check in t4indx3.c to fail */
-      opt4fileFlush( seqWrite->file, 1 ) ;
-   #endif
    return 0 ;
 }
 #endif /* S4WRITE_DELAY */
@@ -683,7 +602,7 @@ int S4FUNCTION file4seqWrite( FILE4SEQ_WRITE *seqWrite, const void *buffer, cons
          if ( seqWrite->working < seqWrite->avail || ( seqWrite->working - seqWrite->avail + ptrLen ) > seqWrite->total )
             return error4( c4, e4result, E90704 ) ;
       #endif
-      c4memcpy( seqWrite->buffer + ( seqWrite->working - seqWrite->avail ), buffer, ptrLen ) ;
+      memcpy( seqWrite->buffer + ( seqWrite->working - seqWrite->avail ), buffer, ptrLen ) ;
       seqWrite->avail -= ptrLen ;
       return 0 ;
    }
@@ -695,7 +614,7 @@ int S4FUNCTION file4seqWrite( FILE4SEQ_WRITE *seqWrite, const void *buffer, cons
          if ( seqWrite->working < seqWrite->avail || seqWrite->working > seqWrite->total )
             return error4( c4, e4result, E90704 ) ;
       #endif
-      c4memcpy( seqWrite->buffer + ( seqWrite->working - seqWrite->avail ), buffer, seqWrite->avail ) ;
+      memcpy( seqWrite->buffer + ( seqWrite->working - seqWrite->avail ), buffer, seqWrite->avail ) ;
 
       seqWrite->avail = 0 ;
 
@@ -709,12 +628,11 @@ int S4FUNCTION file4seqWriteInit( FILE4SEQ_WRITE *seqWrite, FILE4 *file, const l
    FILE4LONG pos ;
 
    #ifdef E4PARM_HIGH
-      if ( seqWrite == 0 || file == 0 || startOffset < 0 ) /* CS 1999/10/08 Don't check ptr. It can be null. */
+      if ( seqWrite == 0 || file == 0 || startOffset < 0 || ( ptr == 0 && ptrLen == 0 ) )
          return error4( 0, e4parm, E90706 ) ;
    #endif
 
-   /* LY July 7/03 : changed from 0 to 0L for Linux compiler */
-   file4longAssign( pos, startOffset, 0L ) ;
+   file4longAssign( pos, startOffset, 0 ) ;
    return file4seqWriteInitLow( seqWrite, file, pos, ptr, ptrLen ) ;
 }
 #endif
@@ -723,7 +641,7 @@ int S4FUNCTION file4seqWriteInit( FILE4SEQ_WRITE *seqWrite, FILE4 *file, const l
 int file4seqWriteInitLow( FILE4SEQ_WRITE *seqWrite, FILE4 *file, FILE4LONG startOffset, void *ptr, const unsigned ptrLen )
 {
    FILE4LONG compare ;
-   c4memset( (void *)seqWrite, 0, sizeof( FILE4SEQ_WRITE ) ) ;
+   memset( (void *)seqWrite, 0, sizeof( FILE4SEQ_WRITE ) ) ;
 
    #ifndef S4OFF_OPTIMIZE
       opt4fileFlush( file, 1 ) ;
@@ -773,9 +691,9 @@ int S4FUNCTION file4seqWriteRepeat( FILE4SEQ_WRITE *seqWrite, const long nRepeat
    #endif
 
    numRepeat = nRepeat ;
-   c4memset( (void *)buf, ch, sizeof(buf) ) ;
+   memset( (void *)buf, ch, sizeof(buf) ) ;
 
-   while ( (size_t)numRepeat > sizeof(buf) )  // CS 2000/12/01
+   while ( numRepeat > sizeof(buf) )
    {
       rc = file4seqWrite( seqWrite, buf, (unsigned)sizeof( buf ) ) ;
       if ( rc < 0 )
@@ -786,16 +704,3 @@ int S4FUNCTION file4seqWriteRepeat( FILE4SEQ_WRITE *seqWrite, const long nRepeat
    return file4seqWrite( seqWrite, buf, (unsigned)numRepeat ) ;
 }
 
-int S4FUNCTION file4seqWriteAlloc( FILE4SEQ_WRITE S4PTR * S4PTR *f4 )
-{
-   *f4 = 0 ;
-   *f4 = (FILE4SEQ_WRITE*) malloc( sizeof(FILE4SEQ_WRITE) ) ;
-   if ( *f4 == 0 )
-      return -1 ;
-   return 0 ;
-}
-
-void S4FUNCTION file4seqWriteFree( FILE4SEQ_WRITE S4PTR * S4PTR *f4 )
-{
-   free( *f4 ) ;
-}

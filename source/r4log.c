@@ -12,9 +12,15 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/* r4log.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* revisited by altomaltes@gmail.com
+ */
+
+/* r4log.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
+
+
+#ifndef S4CLIENT
 
 static int dataList4isIn( DATA4LIST *, const RELATE4 * ) ;
 static int log4swapEntries( L4LOGICAL *, const int, const int ) ;
@@ -23,70 +29,53 @@ int e4isConstant( E4INFO *infoPtr )
 {
    int pos ;
 
-   // AS 04/20/00 changed, changed the E4 values available
-   switch( infoPtr->functionI )
+   if ( infoPtr->functionI == E4DOUBLE || infoPtr->functionI == E4STRING ||
+        ( infoPtr->functionI >= E4LOG_LOW && infoPtr->functionI <= E4LOG_HIGH )  )
+      return 1 ;
+
+   if ( infoPtr->functionI == E4STOD || infoPtr->functionI == E4CTOD )   /* might be a constant */
    {
-      case E4DOUBLE:
-      case E4STRING:
-      case E4TRUE:
-      case E4TRUE+1:
-      case E4FALSE:
-      case E4FALSE+1:
-         return 1 ;
-      case E4STOD:
-      case E4CTOD:
-         for ( pos = infoPtr->numEntries - 1 ; pos >= 0 ; pos -- )
-         {
-            if ( (infoPtr-pos)->fieldPtr != 0 || (infoPtr-pos)->functionI >= E4CALC_FUNCTION )
-               return 0 ;
-         }
-         return 1 ;
-      default:
-         break ;
+      for ( pos = infoPtr->numEntries - 1 ; pos >= 0 ; pos -- )
+         if ( (infoPtr-pos)->fieldPtr != 0 || (infoPtr-pos)->functionI >= E4CALC_FUNCTION )
+            return 0 ;
+      return 1 ;
    }
 
    return 0 ;
 }
 
+/* returns true if there is a tag that matches the desired condition type,
+   AND if there is no filter on that tag */
+/*
+   02/10/98 AS
+   -----------
+   CodeBase is also not able to optimize on tags in the new FoxPro fields
+   formats.  This is because we only have simple field support, so, eg:
+   "INT_FIELD = 6"  INT_FIELD can be converted to a double as an expression
+   check, but the constant '6' cannot be converted to an int which would
+   be able to be looked up in the index file.  Possibly in the future we
+   will add support for these field types, for now any index tags in the
+   new field type returning e4isTag failure here.  Types are:
+
+   Allowed:
+   -------
+   r4double
+   r4charBin
+   r4memoBin
+
+   Disallowed:
+   ----------
+   r4int
+   r4currency
+   r4dateTime
 
 
+*/
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
 int e4isTag( E4INFO_REPORT *reportPtr, EXPR4 *expr, E4INFO *infoPtr, DATA4 *data )
 {
-   /* returns true if there is a tag that matches the desired condition type,
-      AND if there is no filter on that tag */
-   /*
-      02/10/98 AS
-      -----------
-      CodeBase is also not able to optimize on tags in the new FoxPro fields
-      formats.  This is because we only have simple field support, so, eg:
-      "INT_FIELD = 6"  INT_FIELD can be converted to a double as an expression
-      check, but the constant '6' cannot be converted to an int which would
-      be able to be looked up in the index file.  Possibly in the future we
-      will add support for these field types, for now any index tags in the
-      new field type returning e4isTag failure here.  Types are:
-
-      Allowed:
-      -------
-      r4double
-      r4charBin
-      r4memoBin
-
-      Disallowed:
-      ----------
-      r4int
-      r4currency
-      r4dateTime
-      case r4dateTimeMilli:  // AS Mar 10/03 - ms support in datetime
-
-      AS 04/26/00 Found inconsistency ... the relate module does not use collating sequence, but if a tag is in a collating
-      sequence then it was being used anyway (eg. with bitmap optimization it was using the tag possibly but if it later
-      decided not to use it, the results could differ because it would use machine collation)
-
-
-   */
    #ifndef S4INDEX_OFF
       TAG4 *tagOn ;
       int isSame, i ;
@@ -101,21 +90,6 @@ int e4isTag( E4INFO_REPORT *reportPtr, EXPR4 *expr, E4INFO *infoPtr, DATA4 *data
          if ( tagOn == 0 )
             break ;
 
-         // AS 04/26/00 - problem was using general tags in relation but the relate module normally uses machine collation
-         // so results could differ depending on if a tag was available.  Disabled in general, but can re-enable to old
-         // way by setting useGeneralTagsInRelate
-         #ifdef S4FOX
-            // if USE... is defined, always use no matter what, else dependent on CODE4 setting
-            #if !defined( S4USE_GENERAL_TAGS_IN_RELATE )
-               if ( data->codeBase->useGeneralTagsInRelate == 0 )
-                  if ( tagOn->tagFile->collateName != collate4none && tagOn->tagFile->collateName != collate4machine )
-                  {
-                     // can't use because we are disabling their use and it is not machine or none
-                     continue ;
-                  }
-            #endif
-         #endif
-
          /* see above function header for reasons for code here */
          #ifdef S4FOX
             doContinue = 0 ;
@@ -124,7 +98,6 @@ int e4isTag( E4INFO_REPORT *reportPtr, EXPR4 *expr, E4INFO *infoPtr, DATA4 *data
                case r4currency:
                case r4int:
                case r4dateTime:
-               case r4dateTimeMilli:  // AS Mar 10/03 - ms support in datetime
                   doContinue = 1 ;
                   break ;
                default:
@@ -134,7 +107,7 @@ int e4isTag( E4INFO_REPORT *reportPtr, EXPR4 *expr, E4INFO *infoPtr, DATA4 *data
                continue ;
          #endif
 
-         expr4context( tagOn->tagFile->expr, data ) ;  // tag must be set to correspond to the data file being used
+         expr4context( tagOn->tagFile->expr, data ) ;  /* tag must be set to correspond to the data file being used */
 
          if ( tagOn->tagFile->filter == 0 && ( t4unique( tagOn ) != r4uniqueContinue ) )  /* if unique a filter, than cannot bitmap optimize */
          {
@@ -168,50 +141,13 @@ int e4isTag( E4INFO_REPORT *reportPtr, EXPR4 *expr, E4INFO *infoPtr, DATA4 *data
                         isSame = 0 ;
                         break ;
                      }
-                     /* AS 03/30/99 -- ensure that the DATA4 pointer from the field matches
-                        that from the expression.  t4rlate5.c - problem was that if the same
-                        DATA4 used twice and the slave was referred to in a relate query
-                        it may have used the slave's tag (same TAG4FILE) instead of its
-                        own (i.e. no tag should be used off of a slaves DATA4) */
-                     if ( infoOn->fieldPtr->data != data )
+                     if ( c4memcmp( infoOn->fieldPtr, tagInfo->fieldPtr, sizeof( tagInfo->fieldPtr->name )
+                          + sizeof( tagInfo->fieldPtr->len ) + sizeof( tagInfo->fieldPtr->dec )
+                          + sizeof( tagInfo->fieldPtr->type ) + sizeof( tagInfo->fieldPtr->offset ) )
+                          || ( infoOn->fieldPtr->data->dataFile != tagInfo->fieldPtr->data->dataFile ) )
                      {
-                        #ifdef E4DEBUG
-                           // AS make sure it does not discount data4's because of relation server cloning (i.e. same aliases)
-                           if ( strcmp( infoOn->fieldPtr->data->alias, data->alias ) == 0 )
-                              return error4( data->codeBase, e4result, E96001 ) ;
-                        #endif
                         isSame = 0 ;
                         break ;
-                     }
-                     // AS Nov 24/03 - Long field name support only available in fox
-                     #ifdef S4CLIENT_OR_FOX
-                        if ( tagInfo->fieldPtr->data->dataFile->longFieldNamesSupported == 1 )
-                        {
-                           short compareLen = sizeof( tagInfo->fieldPtr->len )
-                                            + sizeof( tagInfo->fieldPtr->dec ) + sizeof( tagInfo->fieldPtr->type )
-                                            + sizeof( tagInfo->fieldPtr->offset ) ;
-                           if ( c4memcmp( infoOn->fieldPtr+11, tagInfo->fieldPtr+11, compareLen ) || ( infoOn->fieldPtr->data->dataFile != tagInfo->fieldPtr->data->dataFile ) )
-                           {
-                              isSame = 0 ;
-                              break ;
-                           }
-                           if ( strcmp( infoOn->fieldPtr->longName, tagInfo->fieldPtr->longName ) != 0 )
-                           {
-                              isSame = 0 ;
-                              break ;
-                           }
-                        }
-                        else
-                     #endif
-                     {
-                        short compareLen = sizeof( tagInfo->fieldPtr->shortName ) + sizeof( tagInfo->fieldPtr->len )
-                                         + sizeof( tagInfo->fieldPtr->dec ) + sizeof( tagInfo->fieldPtr->type )
-                                         + sizeof( tagInfo->fieldPtr->offset ) ;
-                        if ( c4memcmp( infoOn->fieldPtr, tagInfo->fieldPtr, compareLen ) || ( infoOn->fieldPtr->data->dataFile != tagInfo->fieldPtr->data->dataFile ) )
-                        {
-                           isSame = 0 ;
-                           break ;
-                        }
                      }
                   }
 
@@ -232,7 +168,8 @@ int e4isTag( E4INFO_REPORT *reportPtr, EXPR4 *expr, E4INFO *infoPtr, DATA4 *data
                         break ;
                   }
                   if( infoOn->functionI != tagInfo->functionI )
-                     if( infoOn->functionI > E4LAST_FIELD || tagInfo->functionI > E4LAST_FIELD )
+                     if( infoOn->functionI > E4LAST_FIELD
+                                     || tagInfo->functionI > E4LAST_FIELD )
                         isSame = 0 ;
                }
                if( isSame )
@@ -249,70 +186,52 @@ int e4isTag( E4INFO_REPORT *reportPtr, EXPR4 *expr, E4INFO *infoPtr, DATA4 *data
    return 0 ;
 }
 
-
-
-static int dataList4add( DATA4LIST *listIn, CODE4 *codeBase, RELATE4 *newPointer )
+static int dataList4add( DATA4LIST *list, CODE4 *codeBase, RELATE4 *newPointer )
 {
    if ( error4code( codeBase ) < 0 )
       return -1 ;
    if ( newPointer == 0 )
       return 0 ;
-   if ( dataList4isIn( listIn, newPointer ) )
+   if ( dataList4isIn( list, newPointer ) )
       return 0 ;
-   if( listIn->pointersTot <= listIn->pointersUsed )
+   if( list->pointersTot <= list->pointersUsed )
    {
-      listIn->pointersTot += 5 ;
-      if ( u4allocAgain( codeBase, (char **)&listIn->pointers, &listIn->memAllocated, listIn->pointersTot * sizeof(RELATE4 *)) < 0 )
+      list->pointersTot += 5 ;
+      if ( u4allocAgain( codeBase, (char **)&list->pointers, &list->memAllocated, list->pointersTot * sizeof(RELATE4 *)) < 0 )
          return -1 ;
    }
-   listIn->pointers[listIn->pointersUsed++] = newPointer ;
+   list->pointers[list->pointersUsed++] = newPointer ;
    return 0 ;
 }
 
-
-
-static int dataList4expandFromDbTree( DATA4LIST *listIn, CODE4 *codeBase )
+static int dataList4expandFromDbTree( DATA4LIST *list, CODE4 *codeBase )
 {
    int i ;
    RELATE4 *relateParent ;
 
-   // AS if listIn is invalid, return an error - was happening in intuit case on server
-   if ( listIn == 0 )
-      return error4( codeBase, e4relate, E96001 ) ;
-
-   for( i = listIn->pointersUsed - 1 ; i >= 0 ; i-- )
+   for( i = list->pointersUsed-1; i >= 0; i-- )
    {
-      relateParent = listIn->pointers[i]->master ;
+      relateParent = list->pointers[i]->master ;
       while( relateParent != 0 )
       {
-         int rc = dataList4add( listIn, codeBase, relateParent ) ;
-         if ( rc < 0 )
-            return rc ;
+         if ( dataList4add( list, codeBase, relateParent ) < 0 )
+            return -1 ;
          relateParent = relateParent->master ;
       }
    }
-
    if ( error4code( codeBase ) < 0 )
-      return error4code( codeBase ) ;
-
+      return -1 ;
    return 0 ;
 }
 
-
-
-static int dataList4isIn( DATA4LIST *listIn, const RELATE4 *newPointer )
+static int dataList4isIn( DATA4LIST *list, const RELATE4 *newPointer )
 {
    int i ;
-   for( i = 0 ; i < listIn->pointersTot ; i++ )
-   {
-      if ( listIn->pointers[i] == newPointer )
+   for( i = 0 ; i < list->pointersTot ; i++ )
+      if ( list->pointers[i] == newPointer )
          return 1 ;
-   }
-
    return 0 ;
 }
-
-
 
 static int dataList4readRecords( DATA4LIST *dList )
 {
@@ -334,8 +253,6 @@ static int dataList4readRecords( DATA4LIST *dList )
    return 0 ;
 }
 
-
-
 static int dataList4remove( DATA4LIST *thisList, DATA4LIST *removeList )
 {
    int i ;
@@ -352,18 +269,13 @@ static int dataList4remove( DATA4LIST *thisList, DATA4LIST *removeList )
    return 0 ;
 }
 
-
-
-static int log4addToList( L4LOGICAL *log, E4INFO *infoPtr, DATA4LIST *listIn )
+static int log4addToList( L4LOGICAL *log, E4INFO *infoPtr, DATA4LIST *list )
 {
    int numParms, i ;
 
    if ( infoPtr->functionI <= E4LAST_FIELD )
-   {
-      int rc = dataList4add( listIn, log->codeBase, relate4lookupRelate( (RELATE4 *)&log->relation->relate, f4data(infoPtr->fieldPtr)) ) ;
-      if ( rc < 0 )
-         return rc ;
-   }
+      if ( dataList4add( list, log->codeBase, relate4lookupRelate( (RELATE4 *)&log->relation->relate, f4data(infoPtr->fieldPtr)) ) < 0 )
+         return -1 ;
 
    if ( infoPtr->numEntries == 1 )
       return 0 ;
@@ -373,76 +285,42 @@ static int log4addToList( L4LOGICAL *log, E4INFO *infoPtr, DATA4LIST *listIn )
 
    for ( i = 0; i < numParms; i++ )
    {
-      int rc = log4addToList( log, infoPtr, listIn ) ;
-      if ( rc < 0 )
-         return rc ;
+      if ( log4addToList( log, infoPtr, list ) < 0 )
+         return -1 ;
       infoPtr -= infoPtr->numEntries ;
    }
    if ( error4code( log->codeBase ) < 0 )
-      return error4code( log->codeBase ) ;
+      return -1 ;
    return 0 ;
 }
 
-
-
 int log4buildDatabaseLists( L4LOGICAL *log )
 {
-   int lastPos, i ;
+   int lastPos, pos, i ;
    E4INFO *infoLast ;
 
    log->infoReport = (E4INFO_REPORT *)u4allocEr( log->codeBase, (long)sizeof(E4INFO_REPORT) * log->expr->infoN ) ;
    if ( log->infoReport == 0 )
-      return e4memory ;
+      return -1 ;
 
    lastPos = log->expr->infoN - 1 ;
    infoLast = (E4INFO *)log->expr->info + lastPos ;
 
    if ( infoLast->functionI == E4AND )
    {
-      int pos = lastPos - 1 ;
+      pos = lastPos - 1 ;
 
-      for ( i = 0 ; i < infoLast->numParms ; i++ )
+      for ( i = 0; i < infoLast->numParms; i++ )
       {
          if ( log->infoReport[pos].relateDataList == 0 )
          {
-            log->infoReport[pos].relateDataList = (DATA4LIST *)mem4createAllocZero( log->codeBase,
+            log->infoReport[pos].relateDataList = (DATA4LIST *)mem4createAlloc( log->codeBase,
                    &log->codeBase->dataListMemory, 5, sizeof(DATA4LIST), 5, 0 ) ;
             if ( log->infoReport[pos].relateDataList == 0 )
-               return e4memory ;
+               return -1 ;
          }
-         int rc = log4addToList( log, log->expr->info+pos, log->infoReport[pos].relateDataList ) ;
-         if ( rc < 0 )
-            return rc ;
-
-         // AS Aug 25/03 - if in count, we may not be fully mapped if there are more expression pieces
-         if ( log->relation->countOnly == 1 && log->relation->fullyMapped == 1 )
-         {
-            short loopEntries = log->expr->info[pos].numEntries ;
-            // look for other non-simple values
-            Bool5 isDone = 0 ;
-            short minEntryNum = pos - log->expr->info[pos].numEntries ;
-            if ( minEntryNum < 0 )
-               minEntryNum = 0 ;
-            while ( loopEntries-- > 0 && isDone == 0 )
-            {
-               short functionI = log->expr->info[loopEntries].functionI ;
-               // these cases are ok as part of the and
-               if ( ( functionI < E4COMPARE_START || functionI > E4COMPARE_END ) && ( functionI > E4LAST_FIELD ) )  // compare functions are ok
-               {
-                  switch( functionI )
-                  {
-                     case E4DOUBLE:
-                     case E4STRING:
-                        break ;
-                     default:
-                        log->relation->fullyMapped = 0 ;
-                        isDone = 1 ;
-                        break ;
-                  }
-               }
-            }
-         }
-
+         if ( log4addToList( log, log->expr->info+pos, log->infoReport[pos].relateDataList ) < 0 )
+            return -1 ;
          pos -= log->expr->info[pos].numEntries ;
       }
    }
@@ -450,81 +328,33 @@ int log4buildDatabaseLists( L4LOGICAL *log )
    {
       if ( log->infoReport[lastPos].relateDataList == 0 )
       {
-         log->infoReport[lastPos].relateDataList = (DATA4LIST *)mem4createAllocZero( log->codeBase,
+         log->infoReport[lastPos].relateDataList = (DATA4LIST *)mem4createAlloc( log->codeBase,
             &log->codeBase->dataListMemory, 5, sizeof( DATA4LIST ), 5, 0 ) ;
          if ( log->infoReport[lastPos].relateDataList == 0 )
-            return e4memory ;
+            return -1 ;
       }
-
-      // AS Aug 25/03 - if in count, we may not be fully mapped if there are more expression pieces
-      int rc = log4addToList( log, infoLast, log->infoReport[lastPos].relateDataList ) ;
-      if ( rc < 0 )
-         return rc ;
-
-      if ( infoLast->functionI == E4OR && log->relation->countOnly == 1 && log->relation->fullyMapped == 1 )
-      {
-         short loopEntries = log->expr->info[lastPos].numEntries - 1 ;
-         // look for other non-simple values
-         Bool5 isDone = 0 ;
-         short minEntryNum = 0 ;
-         while ( loopEntries-- > 0 && isDone == 0 )
-         {
-            short functionI = log->expr->info[loopEntries].functionI ;
-            // these cases are ok as part of the and
-            if ( ( functionI < E4COMPARE_START || functionI > E4COMPARE_END ) && ( functionI > E4LAST_FIELD ) )  // compare functions are ok
-            {
-               switch( functionI )
-               {
-                  case E4DOUBLE:
-                  case E4STRING:
-                     break ;
-                  default:
-                     log->relation->fullyMapped = 0 ;
-                     isDone = 1 ;
-                     break ;
-               }
-            }
-         }
-      }
+      log4addToList( log, infoLast, log->infoReport[lastPos].relateDataList ) ;
    }
 
    if ( error4code( log->codeBase ) < 0 )
-      return error4code( log->codeBase ) ;
+      return -1 ;
    return 0 ;
 }
-
-
 
 int log4bitmapDo( L4LOGICAL *log )
 {
    if ( error4code( log->codeBase ) < 0 )
-      return e4codeBase ;
+      return -1 ;
 
-   // AS Aug 25/03 - if in count, we may not be fully mapped if there are more expression pieces, moved fullyMapped marker
-   // AS May 11/05 - if there is a tag on the master that contains a filter expression, that needs to be taken into account that
-   // it may reduce the number of matching records.
-   if ( log->relation->relate.dataTag != 0 && t4filter(log->relation->relate.dataTag) != 0 )
-      log->relation->fullyMapped = 0 ;
-   else
-      log->relation->fullyMapped = 1 ;
-
-   int rc = log4buildDatabaseLists( log ) ;
-   if ( rc < 0 )
-      return rc ;
-
+   log4buildDatabaseLists( log ) ;
    #ifndef S4INDEX_OFF
-      rc = bitmap4evaluate( log, log->expr->infoN - 1 ) ;
-      if ( rc < 0 )
-         return rc ;
+      if ( bitmap4evaluate( log, log->expr->infoN - 1 ) < 0 )
+         return -1 ;
    #endif
-
    if ( error4code( log->codeBase ) < 0 )
-      return error4code( log->codeBase ) ;
-
+      return -1 ;
    return 0 ;
 }
-
-
 
 int log4determineEvaluationOrder( L4LOGICAL *log )
 {
@@ -544,16 +374,15 @@ int log4determineEvaluationOrder( L4LOGICAL *log )
    report = reportLast-1 ;
    for ( i = 0; i < infoLast->numParms; i++ )
    {
-      int rc = dataList4expandFromDbTree( report->relateDataList, log->codeBase ) ;
-      if ( rc < 0 )
-         return rc ;
+      if ( dataList4expandFromDbTree(report->relateDataList, log->codeBase) < 0 )
+         return -1 ;
 
       report -= infoPtr->numEntries ;
       infoPtr -= infoPtr->numEntries ;
    }
 
    /* Change the evaluation orders by repeatedly determining the
-      listIn with the smallest number of entries and puting it at the end.
+      list with the smallest number of entries and puting it at the end.
       The idea is that we want the conditions which causes the fewest
       additional database records to be read in, to be evaluated first.
    */
@@ -586,8 +415,8 @@ int log4determineEvaluationOrder( L4LOGICAL *log )
           if ( log4swapEntries( log, pos, curSmallestPos ) < 0 )
              return -1 ;
 
-      /* The next step is to remove the data listIn for the first evaluated
-         condition from the data listIn of the rest of the conditions. */
+      /* The next step is to remove the data list for the first evaluated
+         condition from the data list of the rest of the conditions. */
       curPos = pos - infoPtr->numEntries ;
       for( i = numLeft-1; i > 0; i-- )
       {
@@ -602,8 +431,6 @@ int log4determineEvaluationOrder( L4LOGICAL *log )
       return -1 ;
    return 0 ;
 }
-
-
 
 static int log4swapEntries( L4LOGICAL *log, const int a, const int b )
 {
@@ -656,40 +483,40 @@ static int log4swapEntries( L4LOGICAL *log, const int a, const int b )
    }
    middle1= log->expr->info + middlePos ;
 
-   c4memcpy( saveBuf, (void *)(large1- largeEntries + 1), sizeof(E4INFO) * largeEntries ) ;
+   memcpy( saveBuf, (void *)(large1- largeEntries + 1), sizeof(E4INFO) * largeEntries ) ;
    if ( largePos > smallPos )  /* want to move small to end of large pos... */
    {
-      c4memcpy( (void *)(large1- smallEntries + 1 ), (void *)(small1- smallEntries + 1),
+      memcpy( (void *)(large1- smallEntries + 1 ), (void *)(small1- smallEntries + 1),
                   sizeof(E4INFO) *smallEntries ) ;
       c4memmove( (void *)(middle1+ movePositions), middle1, sizeof(E4INFO) * middleEntries ) ;
-      c4memcpy( (void *)(small1- smallEntries + 1), saveBuf, sizeof(E4INFO) * largeEntries ) ;
+      memcpy( (void *)(small1- smallEntries + 1), saveBuf, sizeof(E4INFO) * largeEntries ) ;
    }
    else  /* want to move small to start of large pos... */
    {
-      c4memcpy( (void *)(large1- largeEntries + 1 ), (void *)(small1- smallEntries + 1),
+      memcpy( (void *)(large1- largeEntries + 1 ), (void *)(small1- smallEntries + 1),
                   sizeof(E4INFO) *smallEntries ) ;
       c4memmove( (void *)(middle1+ movePositions), middle1, sizeof(E4INFO) * middleEntries ) ;
-      c4memcpy( (void *)(small1- largeEntries + 1), saveBuf, sizeof(E4INFO) * largeEntries ) ;
+      memcpy( (void *)(small1- largeEntries + 1), saveBuf, sizeof(E4INFO) * largeEntries ) ;
    }
 
    large2  = log->infoReport + largePos ;
    small2  = log->infoReport + smallPos ;
    middle2 = log->infoReport + middlePos ;
 
-   c4memcpy( saveBuf, (void *)(large2 - largeEntries + 1), sizeof(E4INFO_REPORT) * largeEntries ) ;
+   memcpy( saveBuf, (void *)(large2 - largeEntries + 1), sizeof(E4INFO_REPORT) * largeEntries ) ;
    if ( largePos > smallPos )  /* want to move small to end of large pos... */
    {
-      c4memcpy( (void *)(large2 - smallEntries + 1), (void *)(small2 - smallEntries + 1),
+      memcpy( (void *)(large2 - smallEntries + 1), (void *)(small2 - smallEntries + 1),
                   sizeof(E4INFO_REPORT) *smallEntries ) ;
       c4memmove( middle2 + movePositions, middle2, sizeof(E4INFO_REPORT) * middleEntries ) ;
-      c4memcpy( (void *)(small2 - smallEntries + 1), saveBuf, sizeof(E4INFO_REPORT) * largeEntries ) ;
+      memcpy( (void *)(small2 - smallEntries + 1), saveBuf, sizeof(E4INFO_REPORT) * largeEntries ) ;
    }
    else  /* want to move small to start of large pos... */
    {
-      c4memcpy( (void *)(large2 - largeEntries + 1), (void *)(small2 - smallEntries + 1),
+      memcpy( (void *)(large2 - largeEntries + 1), (void *)(small2 - smallEntries + 1),
                   sizeof(E4INFO_REPORT) *smallEntries ) ;
       c4memmove( middle2 + movePositions, middle2, sizeof(E4INFO_REPORT) * middleEntries ) ;
-      c4memcpy( (void *)(small2 - largeEntries + 1), saveBuf, sizeof(E4INFO_REPORT) * largeEntries ) ;
+      memcpy( (void *)(small2 - largeEntries + 1), saveBuf, sizeof(E4INFO_REPORT) * largeEntries ) ;
    }
 
    u4free( saveBuf ) ;
@@ -697,21 +524,14 @@ static int log4swapEntries( L4LOGICAL *log, const int a, const int b )
    return 0 ;
 }
 
-
-
+/* Must read in records, as appropriate, to evaluate the different parts of */
+/* the expression. */
 int log4true( L4LOGICAL *log )
 {
-   /* Must read in records, as appropriate, to evaluate the different parts of */
-   /* the expression. */
    int curPos, rc, i, *resultPtr ;
    E4INFO *infoPtr ;
    E4INFO_REPORT *infoReportPtr ;
    int nParms = 1 ;
-
-   // AS Aug 6/02 - avoid gpf if log->expr is null  - indicates the relate4 has gone bad...
-   if ( log->expr == 0 )
-      return error4( 0, e4relate, E96002 ) ;
-
    curPos = log->expr->infoN - 1 ;
 
    if( log->expr->info[curPos].functionI == E4AND )
@@ -777,3 +597,4 @@ int log4true( L4LOGICAL *log )
    return 1 ;
 }
 
+#endif /* S4CLIENT */

@@ -1,20 +1,10 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* f4create.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* f4create.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
+
+#ifdef __TURBOC__
+   #pragma hdrstop
+#endif
 
 #ifdef S4TEMP
    #include "t4test.h"
@@ -27,32 +17,25 @@
    #endif
 #endif
 
-#ifdef __unix__
-   #include <sys/wait.h>  /* CS 2000/02/04 */
-   /* LY July 7/03 : for fchmod() */
-   #include <sys/stat.h>
-   #include <sys/types.h>
-#endif
-
 #ifdef S4WINTEL
-   #ifndef S4WINCE   /* LY 2002/11/12 : moved from #include <sys\stat.h> below */
-      #ifndef S4IBMOS2
-         #ifndef S4SINGLE
-            #ifndef __TURBOC__
-               #include <sys\locking.h>
-               #define S4LOCKING
-            #endif
-            #ifdef _MSC_VER
-               #include <sys\types.h>
-               #include <sys\locking.h>
-            #endif
+   #ifndef S4IBMOS2
+      #ifndef S4SINGLE
+         #ifndef __TURBOC__
+            #include <sys\locking.h>
+            #define S4LOCKING
          #endif
-         #ifdef __ZTC__
-            #ifndef S4WINDOWS
-               extern int  errno ;
-            #endif
+         #ifdef _MSC_VER
+            #include <sys\types.h>
+            #include <sys\locking.h>
          #endif
       #endif
+      #ifdef __ZTC__
+         #ifndef S4WINDOWS
+            extern int  errno ;
+         #endif
+      #endif
+   #endif
+   #ifndef S4WINCE
       #include <sys\stat.h>
       #include <share.h>
    #endif
@@ -61,10 +44,10 @@
 #ifdef S4MACINTOSH
 /*   #include <unix.h>*/
 #endif
-#if !defined(S4WINCE) && !defined(S4PALM)
+#ifndef S4WINCE
    #include <fcntl.h>
 #endif
-#if !defined(S4WINDOWS) && !defined(S4WINCE) && !defined(S4PALM)
+#ifndef S4WINDOWS
    #include <errno.h>
    #ifdef S4ERRNO
       extern int errno ;
@@ -101,18 +84,12 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
    HParamBlockRec MACblock ;
    OSErr err ;
    short tempHand ;
-   SInt8 permFSpOpenDF = fsRdWrShPerm ;   // LY Sep 21/04 : for setting correct permissions to FSpOpenDF()
 
    file->hand = INVALID4HANDLE ;
    error4set( c4, 0 ) ;  /* clear positive error values */
 
-   #if TARGET_API_MAC_CARBON
-      CopyCStringToPascal( name, MACname ) ;
-   #else
-      memcpy( MACname, name, sizeof(MACname) ) ;
-      /* LY 00/01/26 : macro definition of function for newer CodeWarrior */
-      S4CTOPSTR( (char *)MACname ) ;  /* convert C string to Pascal string */
-   #endif
+   memcpy( MACname, name, sizeof(MACname) ) ;
+   CtoPstr( (char *)MACname ) ;  /* convert C string to Pascal string */
 
    err = FSMakeFSSpec( c4->macVol, c4->macDir, MACname, &file->macSpec ) ;
    switch (err)
@@ -121,25 +98,8 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
          if (c4->safety)
             return r4noCreate ;
          else
-            #ifdef S4TESTING  // LY Aug 26/04 : avoid problem when recreating files rapidly
-               {
-                  int count = 0 ;
-                  err = FSpDelete( &file->macSpec) ;
-                  while ( err == fBsyErr && count < 1000 )
-                  {
-                     u4delayHundredth( 10 ) ;
-                     count++ ;
-                     err = FSpDelete( &file->macSpec) ;
-                  }
-
-                  if ( err == 0 )
-                     break ;
-            #endif
             if(FSpDelete(&file->macSpec) < 0 )
                return r4noCreate ;
-            #ifdef S4TESTING
-               }
-            #endif
       case fnfErr:
          break ;
       default:
@@ -152,11 +112,9 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
          break ;
       case OPEN4DENY_WRITE:
          perm |= 0x0020 ;
-         permFSpOpenDF = fsWrPerm ;  // LY Sep 21/04 : under AFP on remote volumes, no way of getting R/W/deny-W, so open exclusively anyway
          break ;
       case OPEN4DENY_RW:
          perm |= 0x0030 ;
-         permFSpOpenDF = fsWrPerm ;  // LY Sep 21/04 : under AFP on remote volumes, open will fail if R/W/deny-R/deny-W not possible
          break ;
       default:
          return r4noCreate ;
@@ -189,10 +147,7 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
    /*We now have to use functions with less control.*/
    /*Use fsWrPerm because range locking won't work anyway. Failures happen if not exclusive open */
 
-      if ( c4->readOnly )  // LY Sep 21/04 : set permission for read access only to data fork
-         permFSpOpenDF = fsRdPerm ;
-
-      err = FSpOpenDF(&file->macSpec, permFSpOpenDF, &tempHand ) ; // LY Aug 30/04 : changed from fsWrPerm to fsRdWrShPerm for file sharing
+      err = FSpOpenDF(&file->macSpec, fsWrPerm, &tempHand ) ;
       if (err==noErr)
       {
          file->hand = tempHand ;
@@ -206,184 +161,13 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
    }
 }
 #endif /*S4MACINTOSH*/
-
-#ifdef S4PALM
-   int S4FUNCTION file4exists( const char *fileName )
-   {
-      /* existHandle will be >= 0 if the file exists and is allowed access
-
-         -1 means file does not exist
-       */
-
-      FileHand hand ;
-      Err e;
-      hand = FileOpen(0,(char *)fileName,0,0,fileModeReadOnly | fileModeExclusive | fileModeAnyTypeCreator,&e);
-
-      if ( e != 0 )
-         return -1;
-
-      FileClose( hand ) ;
-      return 0 ;
-   }
-#endif
-
-#ifdef __unix__
-int S4FUNCTION file4exists( const char *fileName )
-{
-   /* existHandle will be >= 0 if the file exists and is allowed access
-
-      -1 means file does not exist
-    */
-
-   int existHandle, hand ;
-
-   hand = open(fileName, O_RDWR) ;
-
-   if ( hand != INVALID4HANDLE )
-      existHandle = 0 ;
-   else
-      existHandle = -1 ;
-   close( hand ) ;
-
-   return existHandle ;
-}
-
-#if 1
-
-static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
-{
-   int pid, rc, status ;
-   struct flock lck ;
-
-   error4set( c4, 0 ) ;  /* clear positive error values */
-
-   /* set to invalid by default, since not created yet. */
-   file->hand = INVALID4HANDLE ;
-
-   lck.l_whence = SEEK_SET;
-   lck.l_start = 0;
-   lck.l_len = 1000000000 ;
-   lck.l_type = F_WRLCK ;
-
-   if ( c4->safety )
-   {
-      /* Do not overwrite any existing files. */
-      file->hand = open( name, O_CREAT | O_RDWR | O_EXCL, 0666 ) ;
-      if ( file->hand == INVALID4HANDLE )
-      {
-         if ( errno == EMFILE )
-            return e4numFiles ;     /* Perhaps close some and retry */
-         return r4noCreate ;        /* no access or file already exists */
-      }
-   }
-   else
-   {
-      /* We can overwrite a file if it is not locked by us or someone else. */
-      if ( access( name, O_RDWR ) == 0 )
-      {
-         #ifndef S4OFF_MULTI
-            /* File exists, and we can access it. Is it locked? We must make
-               this test from another process to see if *we* have it locked. */
-            pid = fork();
-            if ( pid < 0 )
-               return e4lock ;      /* Can't create child process */
-            if ( pid == 0 )
-            {
-               /* Child process - see if file is locked. */
-               file->hand = open( name, O_RDWR ) ;
-               if (file->hand == INVALID4HANDLE )
-                  exit( 1 ) ;
-               rc = fcntl( file->hand, F_GETLK, &lck ) ;
-               close( file->hand ) ;
-               if ( rc == -1 || lck.l_type != F_UNLCK )
-                  exit( 1 ) ;
-               exit( 0 ) ;
-            }
-            while ( wait( &status ) != pid )
-               ;
-            if ( WIFEXITED( status ) == 0 )
-               return e4lock ;      /* Didn't exit properly */
-            if ( WEXITSTATUS( status ) != 0 )
-               return e4lock;       /* Someone has it locked */
-         #endif
-         file->hand = open( name, O_RDWR ) ;
-         if ( file->hand == INVALID4HANDLE )
-            return r4noCreate ;
-      }
-      else if ( errno == ENOENT )
-      {
-         /* The file does not exist - create it. */
-         file->hand = open(name, O_CREAT | O_RDWR | O_EXCL, 0666 );
-         if ( file->hand == INVALID4HANDLE )
-         {
-            if ( errno == EMFILE )
-               return e4numFiles ;
-            return r4noCreate ;
-         }
-      }
-      /* BCR 11/13/00 -- check for other potential errors before continuing */
-      else if (errno == EACCES)
-      {
-         return e4access;
-      }
-      else
-      {
-         return r4noCreate;
-      }
-   }
-
-   /* File exists, is not locked, and we have it open. Note that our later
-      attempt to lock the file can fail, because someone else can lock it
-      between our check for a lock and our actual lock. Note also, that
-      the 'close' calls here will remove any lock on the file put there by
-      this process. Since this is the code that is doing that (as well as
-      code in f4openLow), this shouldn't be an issue. */
-
-   #ifdef S4NO_CHSIZE
-      file4changeSize( file, 0 ) ;
-   #else
-      chsize( file->hand, 0 ) ;
-   #endif
-   #ifndef S4NO_FCHMOD
-      fchmod( file->hand, 0666 ) ;
-   #endif
-   #ifndef S4OFF_MULTI
-      switch ( c4->accessMode )
-      {
-         case OPEN4DENY_NONE:
-         case OPEN4DENY_WRITE:
-            lck.l_type = F_RDLCK ;
-            break ;
-         case OPEN4DENY_RW:
-            lck.l_type = F_WRLCK ;
-            break ;
-         default:
-            close( file->hand ) ;
-            file->hand = INVALID4HANDLE ;
-            return r4noCreate ;
-      }
-      rc = fcntl( file->hand, F_SETLK, &lck ) ;
-      if ( rc!=0 )
-      {
-         close( file->hand ) ;
-         file->hand = INVALID4HANDLE ;
-         return r4noCreate ;
-      }
-   #endif
-   return 0 ;
-}
-
-#else
-
+#ifdef S4UNIX
 static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
 {
    int oflag  ;
    int rc = 0 ;
    #ifndef S4OFF_MULTI
       struct flock lck ;
-      #ifdef S4MULTIC4
-         int pid, status;
-      #endif
 
       lck.l_whence = SEEK_SET ;
       lck.l_start  = 0 ;
@@ -414,55 +198,49 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
           file->hand = INVALID4HANDLE ;
           return r4noCreate ;
       }
-      /*file does exist*/
-      if ( !c4->safety ) /*overwrite file if no one else is using it*/
-      #ifndef S4OFF_MULTI
-         {
-            lck.l_type = F_WRLCK ;
-            #ifdef S4MULTIC4
-               if ( ( pid = fork() ) < 0 )
-                  return e4lock ;
-               if ( pid ==0 )               /* Child fork() */
-               {
+      else     /*file does exist*/
+         if ( !c4->safety ) /*overwrite file if no one else is using it*/
+         #ifndef S4OFF_MULTI
+            {
+               lck.l_type = F_WRLCK ;
+               #ifdef S4MULTIC4
+                  if ( ( pid = fork() ) < 0 )
+                     return e4lock ;
+                  if ( pid ==0 )               /* Child fork() */
+                  {
+                     rc = fcntl( file->hand, F_GETLK, &lck ) ;
+                     exit(rc) ;
+                  }
+                  while ( wait( &status ) != pid )    /* Parent fork() */
+                     ;
+                  if( ( WIFEXITED( status ) == 0 ) )   /* If it didn't exit properly */
+                     return e4lock ;
+                  rc = WEXITSTATUS( status )   /*IF it was able to lock*/
+               #else
                   rc = fcntl( file->hand, F_GETLK, &lck ) ;
-                  if (rc == -1 || lck.l_type != F_UNLCK)
-                     exit(1);
-                  exit(0);
+               #endif  /* !S4MULTIC4 */
+               if (rc<0)
+               {   /*someone else is using it*/
+                  close( file->hand ) ;
+                  file->hand = INVALID4HANDLE ;
+                  return r4noCreate ;
                }
-               while ( wait( &status ) != pid )    /* Parent fork() */
-                  ;
-               if( ( WIFEXITED( status ) == 0 ) )   /* If it didn't exit properly */
-                  return e4lock ;
-               rc = WEXITSTATUS( status ) ;  /*IF it was able to lock*/
-            #else
-               rc = fcntl( file->hand, F_GETLK, &lck ) ;
-               if (rc != -1 && lck.l_type == F_UNLCK)
-                  rc = 0;
-               else
-                  rc = 1;
-            #endif  /* !S4MULTIC4 */
-            if (rc!=0)
-            {   /*someone else is using it*/
-               close( file->hand ) ;
-               file->hand = INVALID4HANDLE ;
-               return r4noCreate ;
+               else  /*no one is using it so kill it*/
+         #endif
+         #ifdef S4NO_CHSIZE
+            file4changeSize( file, 0 ) ;
+         #else
+            chsize( file->hand, 0 ) ;
+         #endif
+         #ifndef S4OFF_MULTI
             }
-            else  /*no one is using it so kill it*/
-      #endif
-      #ifdef S4NO_CHSIZE
-         file4changeSize( file, 0 ) ;
-      #else
-         chsize( file->hand, 0 ) ;
-      #endif
-      #ifndef S4OFF_MULTI
+         #endif
+         else
+         {    /*Since the file exists, and we have safeties, we can't create*/
+            close( file->hand ) ;
+            file->hand = INVALID4HANDLE ;
+            return r4noCreate ;
          }
-      #endif
-      else
-      {    /*Since the file exists, and we have safeties, we can't create*/
-         close( file->hand ) ;
-         file->hand = INVALID4HANDLE ;
-         return r4noCreate ;
-      }
    }
    #ifndef S4NO_FCHMOD
       fchmod( file->hand, 0666 ) ;
@@ -512,324 +290,103 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
    #endif
    return 0 ;
 }
-#endif
-#endif /* __unix__ */
-
-#ifdef S4PALM
-   static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
-   {
-      const UInt16 cardNo = 0;
-      const UInt32 fileType = 0;
-      const UInt32 creator = 0;
-      UInt32 openMode;
-      if (c4getErrorCode(c4) < 0)
-         return -1;
-
-      c4setErrorCode(c4,0);
-
-      file->hand = INVALID4HANDLE;
-
-      openMode = fileModeReadWrite | fileModeAnyTypeCreator;
-      #ifdef S4OFF_MULTI
-         #ifndef E4DEBUG
-            /* open in shared mode for debugging to allow other programs to examine */
-            /* otherwise, if single-user, file should be opened exclusively */
-            openMode |= fileModeExclusive ;
-         #endif
-      #else
-         switch( c4->accessMode )
-         {
-            case OPEN4DENY_NONE:
-               break ;
-            case OPEN4DENY_WRITE:
-            case OPEN4DENY_RW:
-               openMode |= fileModeExclusive ;
-               break ;
-            default:
-               return r4noCreate ;
-         }
-      #endif  /* S4OFF_MULTI */
-
-      if (c4->safety)
-         openMode |= fileModeDontOverwrite;
-
-      file->hand = FileOpen(cardNo,(Char*)name,fileType,creator,openMode,0);
-
-      if (file->hand == INVALID4HANDLE)
-         return r4noCreate;
-      else
-         return r4success;
-   }
-#endif /* S4PALM */
-
+#endif /* S4UNIX */
 
 #ifdef __WIN32
-   int S4FUNCTION file4exists( const char *fileName )
-   {
-      /* existHandle will be >= 0 if the file exists and is allowed access
+static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
+{
+   int existHandle ;
+   DWORD fdwAccess, fdwShareMode, fdwCreate ;
+   #ifdef S4WINCE
+      unsigned short nameU[256] ;
+   #endif
 
-         -1 means file does not exist
-       */
+   error4set( c4, 0 ) ;  /* clear positive error values */
 
-      int existHandle ;
+   /* set to invalid by default, since not created yet */
+   file->hand = INVALID4HANDLE ;
 
-      #ifdef S4WINCE
-         WSTR5 nameU[256] ;
-         c4atou( fileName, nameU, 256 ) ;
-         HANDLE hand ;
-         WIN32_FIND_DATA dummy ;
-         short numTries ;  // CS 2011/05/09 Declare outside of for loop.
-
-         // AS Feb 17/06 - for Windows CE, it is possible to get errors if the card is not ready...retry if access denied error
-         // Microsoft knowledgebase article #811693
-         for ( numTries = 0 ;; numTries++ )
-         {
-            hand = FindFirstFile( nameU, &dummy ) ;
-            if ( hand == INVALID4HANDLE )
-            {
-               DWORD err = GetLastError() ;
-               if ( numTries > 10 )  // wait up to 5 seconds
-                  break ;
-               Bool5 doBreak = 0 ;
-               switch( err )  // only retry on certain errors which occur with this problem.
-               {
-                  case ERROR_ACCESS_DENIED:
-                  case ERROR_DEVICE_NOT_AVAILABLE:
-                  case ERROR_DEVICE_REMOVED:
-                  case ERROR_FILE_NOT_FOUND:
-                     break ;
-                  default:
-                     doBreak = 1 ;
-                     break ;
-               }
-               if ( doBreak )
-                  break ;
-               Sleep( 500 ) ;
-            }
-            else
-               break ;
-         }
-
-         if ( hand != INVALID4HANDLE )    /* LY 00/07/04 : removed file-> */
-            existHandle = 0 ;
-         else
-            existHandle = -1 ;
-         for ( numTries = 0 ;; numTries++ )
-         {
-            BOOL blres = FindClose(hand) ;
-            if ( blres == 0 )
-            {
-               DWORD err = GetLastError() ;
-               if ( numTries > 10 )  // wait up to 5 seconds
-                  break ;
-               Bool5 doBreak = 0 ;
-               switch( err )  // only retry on certain errors which occur with this problem.
-               {
-                  case ERROR_ACCESS_DENIED:
-                  case ERROR_DEVICE_NOT_AVAILABLE:
-                  case ERROR_DEVICE_REMOVED:
-                  case ERROR_FILE_NOT_FOUND:
-                     break ;
-                  default:
-                     doBreak = 1 ;
-                     break ;
-               }
-               if ( doBreak )
-                  break ;
-               Sleep( 500 ) ;
-            }
-            else
-               break ;
-         }
-
+   /* first determine the basic access values */
+   fdwAccess = GENERIC_WRITE | GENERIC_READ ;
+   #ifdef S4OFF_MULTI
+      #ifdef E4DEBUG
+         /* open in shared mode for debugging to allow other programs to examine */
+         fdwShareMode = FILE_SHARE_WRITE | FILE_SHARE_READ ;
       #else
-         #ifdef __BORLANDC__
-            existHandle = access( fileName, 0 ) ;
-         #else
-            existHandle = _access( fileName, 0 ) ;
-         #endif
+         /* otherwise, if single-user, file should be opened exclusively */
+         fdwShareMode = 0 ;
       #endif
-
-      return existHandle ;
-   }
-
-
-   // __WIN32
-   static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
-   {
-      int existHandle ;
-      DWORD fdwAccess, fdwShareMode, fdwCreate ;
-
-      error4set( c4, 0 ) ;  /* clear positive error values */
-
-      /* set to invalid by default, since not created yet */
-      file->hand = INVALID4HANDLE ;
-
-      /* first determine the basic access values */
-      fdwAccess = GENERIC_WRITE | GENERIC_READ ;
-
-      #ifdef S4OFF_MULTI
-         #ifdef E4DEBUG
-            /* open in shared mode for debugging to allow other programs to examine */
+   #else
+      switch( c4->accessMode )
+      {
+         case OPEN4DENY_NONE:
             fdwShareMode = FILE_SHARE_WRITE | FILE_SHARE_READ ;
-         #else
-            /* otherwise, if single-user, file should be opened exclusively */
+            break ;
+         case OPEN4DENY_WRITE:
+            fdwShareMode = FILE_SHARE_READ ;
+            break ;
+         case OPEN4DENY_RW:
             fdwShareMode = 0 ;
-         #endif
+            break ;
+         default:
+            return r4noCreate ;
+      }
+   #endif  /* S4OFF_MULTI */
+   if ( c4->safety )
+      fdwCreate = CREATE_NEW ;
+   else
+      fdwCreate = CREATE_ALWAYS ;
+
+   /* existHandle will be >= 0 if the file exists and is allowed access */
+   #ifdef S4WINCE
+      c4atou(name, (unsigned short *)nameU, 256) ;
+      file->hand = CreateFile( nameU, 0, FILE_SHARE_WRITE|FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 ) ;
+      if ( file->hand != INVALID4HANDLE )
+          existHandle = 0 ;
+      else
+          existHandle = -1 ;
+   #else
+      #ifdef __BORLANDC__
+         existHandle = access( name, 0 ) ;
       #else
-         switch( c4->accessMode )
-         {
-            case OPEN4DENY_NONE:
-               fdwShareMode = FILE_SHARE_WRITE | FILE_SHARE_READ ;
-               break ;
-            case OPEN4DENY_WRITE:
-               fdwShareMode = FILE_SHARE_READ ;
-               break ;
-            case OPEN4DENY_RW:
-               fdwShareMode = 0 ;
-               break ;
-            default:
-               return r4noCreate ;
-         }
-      #endif  /* S4OFF_MULTI */
-
-      if ( c4->safety )
-         fdwCreate = CREATE_NEW ;
-      else
-         fdwCreate = CREATE_ALWAYS ;
-
-      existHandle = file4exists( name ) ;
-      #if defined( E4ANALYZE ) && defined( S4SERVER )
-         // AS May 22/03 - only with debug-print
-         #ifdef S4OLEDEBUG_PRINT
-           // AS May 16/03 - Perform some logging to help solve a c/s open error
-            char buf[200] ;
-            SERVER4CLIENT *client = c4->currentClient ;
-            sprintf( buf, "file4createLow: name: %s, for clientId: %ld, existHandle (>=0 means exists): %ld\r\n", name, (long)((client == 0) ? -1 : client->id), (long)existHandle ) ;
-            log5( buf ) ;
-         #endif
+         existHandle = _access( name, 0 ) ;
       #endif
-      #ifdef S4UNICODE
-         WSTR5 nameU[256] ;
-         c4atou(name, nameU, 256) ;
-      #endif
-
-      /* 07/21/99 Added new support... if CODE4.fileFlush is true, do not allow lazy flushing of
-         writes.  This is useful in Windows 95/98 where file writes otherwise may get delayed
-         forever.
-      */
-
-      DWORD flagsAndAttributes ;
-
-      if ( c4->fileFlush )
-         flagsAndAttributes = FILE_FLAG_WRITE_THROUGH ;
-      else
-         flagsAndAttributes = FILE_ATTRIBUTE_NORMAL ;
-
-      if ( existHandle >= 0 )   /* file exists and is available */
+   #endif
+   if ( existHandle >= 0 )   /* file exists and is available */
+   {
+      /* if safety is != 0, function will fall through since file
+         already exists */
+      if ( c4->safety == 0 ) /* ensure exclusive access, otherwise problems ensue */
       {
-         /* if safety is != 0, function will fall through since file
-            already exists */
-         if ( c4->safety == 0 ) /* ensure exclusive access, otherwise problems ensue */
-         {
-            // AS Feb 17/06 - for Windows CE, it is possible to get errors if the card is not ready...retry if access denied error
-            // Microsoft knowledgebase article #811693
-            #ifdef S4WINCE
-               for ( short numTries = 0 ;; numTries++ )
-               {
-            #endif
-                  #ifdef S4UNICODE
-                     file->hand = CreateFile( nameU, GENERIC_WRITE | GENERIC_READ, 0, 0, OPEN_EXISTING, flagsAndAttributes, 0 ) ;
-                  #else
-                     file->hand = CreateFile( name, GENERIC_WRITE | GENERIC_READ, 0, 0, OPEN_EXISTING, flagsAndAttributes, 0 ) ;
-                  #endif
-            #ifdef S4WINCE
-                  if ( file->hand == INVALID4HANDLE )
-                  {
-                     DWORD err = GetLastError() ;
-                     if ( numTries > 10 )  // wait up to 5 seconds
-                        break ;
-                     Bool5 doBreak = 0 ;
-                     switch( err )  // only retry on certain errors which occur with this problem.
-                     {
-                        case ERROR_ACCESS_DENIED:
-                        case ERROR_DEVICE_NOT_AVAILABLE:
-                        case ERROR_DEVICE_REMOVED:
-                        case ERROR_FILE_NOT_FOUND:
-                           break ;
-                        default:
-                           doBreak = 1 ;
-                           break ;
-                     }
-                     if ( doBreak )
-                        break ;
-                     Sleep( 500 ) ;
-                  }
-                  else
-                     break ;
-               }
-            #endif
-            if ( file->hand == INVALID4HANDLE )
-               return r4noCreate ;
-            CloseHandle( file->hand ) ;
-            existHandle = -1 ;
-         }
-      }
-
-      if ( existHandle < 0 )  /* file doesn't exist, or exclusive access is available, so attempt create */
-      {
-         // AS Feb 17/06 - for Windows CE, it is possible to get errors if the card is not ready...retry if access denied error
-         // Microsoft knowledgebase article #811693
-         #ifdef S4WINCE
-            for ( short numTries = 0 ;; numTries++ )
-            {
+         #ifdef S4UNICODE
+            file->hand = CreateFile( nameU, GENERIC_WRITE | GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 ) ;
+         #else
+            file->hand = CreateFile( name, GENERIC_WRITE | GENERIC_READ, 0, 0, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, 0 ) ;
          #endif
-            #ifdef S4UNICODE
-               file->hand = CreateFile( nameU, fdwAccess, fdwShareMode, 0, fdwCreate, flagsAndAttributes, 0 ) ;
-            #else
-               file->hand = CreateFile( name, fdwAccess, fdwShareMode, 0, fdwCreate, flagsAndAttributes, 0 ) ;
-            #endif
-         #ifdef S4WINCE
-               if ( file->hand == INVALID4HANDLE )
-               {
-                  DWORD err = GetLastError() ;
-                  if ( numTries > 10 )  // wait up to 5 seconds
-                     break ;
-                  Bool5 doBreak = 0 ;
-                  switch( err )  // only retry on certain errors which occur with this problem.
-                  {
-                     case ERROR_ACCESS_DENIED:
-                     case ERROR_DEVICE_NOT_AVAILABLE:
-                     case ERROR_DEVICE_REMOVED:
-                     case ERROR_FILE_NOT_FOUND:
-                        break ;
-                     default:
-                        doBreak = 1 ;
-                        break ;
-                  }
-                  if ( doBreak )
-                     break ;
-                  Sleep( 500 ) ;
-               }
-               else
-                  break ;
-            }
-         #endif
+         if ( file->hand == INVALID4HANDLE )
+            return r4noCreate ;
+         CloseHandle( file->hand ) ;
+         existHandle = -1 ;
       }
-
-      if ( file->hand == INVALID4HANDLE )
-         return r4noCreate ;
-
-      // AS Dec 11/02 - Renamed for clarification
-      #ifdef S4DELAY_WRITE_MT
-         critical4sectionInit( &file->critical4file ) ;
-      #endif
-
-      return 0 ;
    }
+
+   if ( existHandle < 0 )  /* file doesn't exist, or exclusive access is available, so attempt create */
+      #ifdef S4UNICODE
+         file->hand = CreateFile( nameU, fdwAccess, fdwShareMode, 0, fdwCreate, FILE_ATTRIBUTE_NORMAL, 0 ) ;
+      #else
+         file->hand = CreateFile( name, fdwAccess, fdwShareMode, 0, fdwCreate, FILE_ATTRIBUTE_NORMAL, 0 ) ;
+      #endif
+
+   if ( file->hand == INVALID4HANDLE )
+      return r4noCreate ;
+
+   #ifdef S4MULTI_THREAD
+      InitializeCriticalSection( &file->critical4file ) ;
+   #endif
+
+   return 0 ;
+}
 #endif /* __WIN32 */
-
-
 
 #ifdef S4WIN16
 static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
@@ -947,8 +504,7 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
 #endif /* __WIN32 */
 #endif /* S4WIN16 */
 
-// AS Nov 3/05 - need to export...used by C++ module (File4 class)
-int S4FUNCTION file4createInternal( FILE4 *file, CODE4 *c4, S4CONST char *name, const int doAlloc, char fileType )
+int S4FUNCTION file4create( FILE4 *file, CODE4 *c4, S4CONST char *name, const int doAlloc )
 {
    int rc, len ;
 
@@ -958,11 +514,10 @@ int S4FUNCTION file4createInternal( FILE4 *file, CODE4 *c4, S4CONST char *name, 
    #endif
 
    #ifndef S4OPTIMIZE_OFF
-      // AS 04/20/01 - changed how optimization gets going
-      // code4memStartMaxSet( c4, c4->memMaxPercent ) ;  /* start optimization if not enabled and not suspended */
+      code4memStartMaxSet( c4, c4->memMaxPercent ) ;  /* start optimization if not enabled and not suspended */
    #endif
 
-   c4memset( (void *)file, 0, sizeof( FILE4 ) ) ;
+   memset( (void *)file, 0, sizeof( FILE4 ) ) ;
    file->codeBase = c4 ;
    file->hand = INVALID4HANDLE ;
    if ( error4code( c4 ) < 0 )
@@ -970,8 +525,7 @@ int S4FUNCTION file4createInternal( FILE4 *file, CODE4 *c4, S4CONST char *name, 
 
    if ( name == 0 )
    {
-      // AS May 24/02 - created file4createInternal for internal use to indicate file types
-      rc = file4tempLow( file, c4, c4->createTemp, c4->createTemp, NULL, fileType ) ;
+      rc = file4tempLow( file, c4, c4->createTemp, c4->createTemp, NULL ) ;
       if ( rc == 0 )
          return 0 ;
    }
@@ -986,7 +540,7 @@ int S4FUNCTION file4createInternal( FILE4 *file, CODE4 *c4, S4CONST char *name, 
          if ( rc < 0 )
             return rc ;
          if ( name == 0 )
-            return file4tempLow( file, c4, c4->createTemp, 1, NULL, fileType ) ;
+            return file4tempLow( file, c4, c4->createTemp, 1, NULL ) ;
          else
             rc = file4createLow( file, c4, name ) ;
       }
@@ -1005,7 +559,7 @@ int S4FUNCTION file4createInternal( FILE4 *file, CODE4 *c4, S4CONST char *name, 
 
    if ( doAlloc && name != NULL )
    {
-      len = c4strlen(name) + 1 ;
+      len = strlen(name) + 1 ;
       file->nameBuf = (char *)u4allocEr( c4, (long)len ) ;
       if ( file->nameBuf == 0 )
       {
@@ -1026,11 +580,7 @@ int S4FUNCTION file4createInternal( FILE4 *file, CODE4 *c4, S4CONST char *name, 
       file->fileCreated = 1 ;
    #endif
    if ( c4->createTemp == 1 )
-   {
-      // AS Sep. 17/01 - changed isTemp to be done via a function for code4validate() capability
-      // AS Sep. 17/01 - Assume that it is NOT a data file...
-      file4setTemporary( file, 1, 0 ) ;
-   }
+      file->isTemp = 1 ;
 
    #ifdef S4TRACK_FILES_OR_SERVER
       #ifdef S4TRACK_FILES
@@ -1057,204 +607,5 @@ int S4FUNCTION file4createInternal( FILE4 *file, CODE4 *c4, S4CONST char *name, 
       numFiles5++ ;
    #endif
 
-   file->type = fileType ;
-   #if defined( S4PREPROCESS_FILE )
-      #ifdef S4ENCRYPT_DLL // LY Jul 19/04
-         if ( c4->encrypt == 0 ) // not enabled
-      #else
-         if ( c4->encryptInit == 0 )   // not enabled
-      #endif
-         file->preprocessed = 0 ;
-      else
-         file->preprocessed = code4encryptFileHook( c4, file, code4getPreprocessInit( c4 ) ) ;
-   #endif
-
-   // AS Nov 8/02 - sema4 locking
-   #ifdef S4MUTEX4LOCK
-      len = c4strlen( name ) + 1 ;
-      u4ncpy( file->lockMutexName, name, (unsigned int)len ) ;
-      // also replace all '\' and '.' characters with dashes
-      for ( int loop = c4strlen( name ) - 1 ; loop >= 0 ; loop-- )
-      {
-         if ( file->lockMutexName[loop] == '\\' || file->lockMutexName[loop] == '.' )
-            file->lockMutexName[loop] = '-' ;
-      }
-      u4nameExt( file->lockMutexName, sizeof( file->lockMutexName ), "MUT", 1 ) ;
-      c4upper( file->lockMutexName ) ;
-
-      mutex4initShare( &(file->lockMutex), file->lockMutexName ) ;
-   #endif
-
    return 0 ;
-}
-
-
-
-#ifndef S4INTERNAL_COMPILE_CHECK
-// AS May 24/02 - created file4createInternal for internal use to indicate file types
-int S4FUNCTION file4create( FILE4 *file, CODE4 *c4, S4CONST char *name, const int doAlloc )
-{
-   // AS Jan 16/03 - Modified file type to indicate a user type so that it would become encrypted
-   return file4createInternal( file, c4, name, doAlloc, OPT4USER ) ;
-}
-#endif
-
-
-
-// AS Jan 15/03 - Support for generic file compression
-// AS Aug 1/03 - The generic support does not include support for large files, this function is for small files only.
-// d4create uses a different algorithm for large file support
-int S4FUNCTION file4compressCreate( FILE4 *newFile, FILE4 *sourceFile, S4CONST char *name, short blockSize )
-{
-   // AS Mar 23/04 - only in fox...
-   // AS May 17/04 - client/server functionality to copmress the data file...
-   #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
-      #ifdef E4PARM_HIGH
-         if ( newFile == 0 || sourceFile == 0 || name == 0 || blockSize < 0 )
-            return error4( 0, e4parm, E90602 ) ;
-      #endif
-      // we store into the file:  The compressed header information followed by the compressed file
-      if ( blockSize == 0 ) // use a default setting, currently set at 32k
-         blockSize = 32 ;
-
-      CODE4 *c4 = sourceFile->codeBase ;
-
-      FILE4LONG fileLen = file4lenLow( sourceFile ) ;
-      assert5( file4longGetHi( fileLen ) == 0 ) ;
-      long numOffsets = (file4longGetLo( fileLen ) / (blockSize*1024)) + 1 ;
-      long sizeInfo = sizeof( COMPRESS4DATA_SHORT ) + (numOffsets - 1) * sizeof( long ) ;  // -1 because COMPRESS4DATA_SHORT structure contains the first entry
-
-      int rc = file4createInternal( newFile, c4, name, 0, OPT4OTHER ) ;
-      if ( rc != 0 )
-         return rc ;
-
-      #ifdef S4PREPROCESS_FILE
-         // ensure sizeInfo is on a block boundary for reading/writing - makes much more efficient
-         if ( newFile->preprocessed == 1 )
-         {
-            // AS Jul 24/03 - available directly now
-            // short blockSize = preprocess4getBlockSize( &c4->preprocess ) ;
-            if ( ( sizeInfo % c4->encrypt->blockSize ) != 0 )
-               sizeInfo += (c4->encrypt->blockSize - ( sizeInfo % c4->encrypt->blockSize ) ) ;
-         }
-      #endif
-      COMPRESS4DATA_SHORT *compressInfo = (COMPRESS4DATA_SHORT *)u4allocFree( c4, sizeInfo ) ;
-      if ( compressInfo == 0 )
-      {
-         newFile->isTemporary = 1 ;
-         file4close( newFile ) ;
-         return e4memory ;
-      }
-
-      compressInfo->version = 1 ;
-      compressInfo->blockSize = blockSize ;
-      compressInfo->numOffsets = numOffsets ;
-      compressInfo->fileLen = file4longGetLo( file4lenLow( sourceFile ) ) ;
-
-      FILE4LONG fileOffset ;
-      file4longAssign( fileOffset, sizeInfo, 0 ) ;  // where to start writing to data file  // AS Nov 22/04 - sizeInfo is the low value
-
-      // buffer and offset into compression buffer - when it is full we compress it.
-      long uncompressedBufSize = blockSize * 1024 ;
-      unsigned char *uncompressedBuffer = (unsigned char *)u4allocFree( c4, uncompressedBufSize ) ;
-      long compressedBufSize = (long)(uncompressedBufSize * 1.01) + 12 ;
-      unsigned char *compressedBuffer = (unsigned char *)u4allocFree( c4, compressedBufSize ) ;
-      if ( uncompressedBuffer == 0 || compressedBuffer == 0 )
-      {
-         if ( uncompressedBuffer != 0 )
-            u4free( uncompressedBuffer ) ;
-         if ( compressedBuffer != 0 )
-            u4free( compressedBuffer ) ;
-         newFile->isTemporary = 1 ;
-         file4close( newFile ) ;
-         u4free( compressInfo ) ;
-         return e4memory ;
-      }
-      long bufferCount = 0 ;  // which buffer entry are we on?
-
-      FILE4LONG pos ;
-      file4longAssign( pos, 0, 0L ) ;
-      while ( rc == 0 )
-      {
-         long lenRead = file4readInternal( sourceFile, pos, uncompressedBuffer, uncompressedBufSize ) ;
-         if ( lenRead < 0 )
-         {
-            rc = -1 ;
-            break ;
-         }
-
-         if ( lenRead < uncompressedBufSize )  // when compressing the last piece, use nulls
-            memset( uncompressedBuffer+lenRead, 0, uncompressedBufSize-lenRead ) ;
-
-         compressInfo->offsets[bufferCount] = file4longGetLo( fileOffset ) ;
-         unsigned long outLen = (unsigned long)compressedBufSize ;
-         // AS May 13/04 - support configureable compression
-         rc = c4compress( c4, compressedBuffer, &outLen, uncompressedBuffer, uncompressedBufSize, c4getFileCompressLevel( c4 ), 0 ) ;
-         if ( rc != 0 )
-            break ;
-         bufferCount++ ;
-         assert5( bufferCount <= compressInfo->numOffsets ) ;
-         #ifdef S4PREPROCESS_FILE
-            if ( newFile->preprocessed == 1 )
-            {
-               // AS May 24/02 - Modify the record length for preprocessing - the record must lie on the block
-               // byte boundary
-               // AS Jul 24/03 - available directly now
-               // short blockSize = preprocess4getBlockSize( &c4->preprocess ) ;
-               if ( ( outLen % c4->encrypt->blockSize ) != 0 )
-                  outLen += (c4->encrypt->blockSize - ( outLen % c4->encrypt->blockSize ) ) ;
-            }
-         #endif
-         rc = file4writeInternal( newFile, fileOffset, compressedBuffer, outLen ) ;
-         if ( rc != 0 )
-            break ;
-         file4longAdd( &fileOffset, outLen ) ;
-         file4longAdd( &pos, uncompressedBufSize ) ;
-
-         if ( lenRead < uncompressedBufSize )  // done
-            break ;
-      }
-
-      assert5( bufferCount == compressInfo->numOffsets ) ;
-
-      if ( rc == 0 ) // now write out the header information...
-      {
-         FILE4LONG zeroPos ;
-         file4longAssign( zeroPos, 0, 0L ) ;
-         rc = file4writeInternal( newFile, zeroPos, compressInfo, sizeInfo ) ;
-      }
-
-      u4free( uncompressedBuffer ) ;
-      u4free( compressedBuffer ) ;
-
-      // AS Aug 1/03 - Set up the handler
-      COMPRESS4HANDLER *handler = (COMPRESS4HANDLER *)u4allocFree( c4, sizeof(COMPRESS4HANDLER) ) ;
-      if ( handler == 0 )
-      {
-         newFile->isTemporary = 1 ;
-         u4free( compressInfo ) ;
-         file4close( newFile ) ;
-         return e4memory ;
-      }
-      handler->isLongOrCompress = 0 ;
-      handler->shortCompress = compressInfo ;
-
-      if ( rc == 0 )
-         rc = file4compressInit( newFile, handler, 0 ) ;
-
-      if ( rc != 0 )  // delete the file
-      {
-         newFile->isTemporary = 1 ;
-         u4free( compressInfo ) ;
-         u4free( handler ) ;
-         file4close( newFile ) ;
-         return rc ;
-      }
-
-      newFile->freeCompressInfo = 1 ;
-
-      return 0 ;
-   #else
-      return e4notSupported ;
-   #endif
 }

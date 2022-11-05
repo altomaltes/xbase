@@ -12,7 +12,10 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/* m4check.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* revisited by altomaltes@gmail.com
+ */
+
+/* m4check.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
 
@@ -22,11 +25,6 @@
 #ifndef S4MFOX
 #ifndef S4MNDX
 
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifndef S4MEMO_OFF
 int S4FUNCTION f4memoCheck( MEMO4FILE *f4memo, DATA4 *data )
@@ -39,7 +37,11 @@ int S4FUNCTION f4memoCheck( MEMO4FILE *f4memo, DATA4 *data )
 
    d4 = f4memo->data ;
    #ifndef S4OFF_MULTI
-      rc = d4lockFile( data ) ;
+      #ifdef S4SERVER
+         rc = dfile4lockFile( d4, d4->currentClientId, d4->serverId ) ;
+      #else
+         rc = d4lockFile( data ) ;
+      #endif
       if ( rc != 0 )
          return rc ;
    #endif
@@ -52,7 +54,7 @@ int S4FUNCTION f4memoCheck( MEMO4FILE *f4memo, DATA4 *data )
    if ( f4memo->blockSize == 0 ) // invalid
       return -1 ;
 
-   if ( f4flagInit( &flags, d4->c4, file4longGetLo( file4lenLow( &f4memo->file ) ) / f4memo->blockSize, 0 ) < 0 )
+   if ( f4flagInit( &flags, d4->c4, file4longGetLo( file4lenLow( &f4memo->file ) ) / f4memo->blockSize ) < 0 )
       return error4stack( d4->c4, e4memory, E95206 ) ;
 
    /* Set flags for the data file entries */

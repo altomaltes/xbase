@@ -1,20 +1,11 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* d4fresh.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* d4fresh.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
+#ifndef S4UNIX
+   #ifdef __TURBOC__
+      #pragma hdrstop
+   #endif
+#endif
 
 int S4FUNCTION d4refresh( DATA4 *data )
 {
@@ -41,7 +32,7 @@ int dfile4refresh( DATA4FILE *data )
    #ifndef S4SINGLE
       #ifndef S4OFF_OPTIMIZE
          #ifndef S4OFF_INDEX
-            #ifdef S4CLIPPER
+            #ifdef N4OTHER
                TAG4FILE *tagOn ;
             #else
                INDEX4FILE *indexOn ;
@@ -55,15 +46,11 @@ int dfile4refresh( DATA4FILE *data )
 
          file4refresh( &data->file ) ;
          #ifndef S4OFF_MEMO
-            // LY 2003/07/31 #ifdef S4WIN64 /* LY 00/09/20 */
-            //    if ( data->memoFile.file.hand != NULL )
-            // #else
-               if ( data->memoFile.file.hand != INVALID4HANDLE )
-            // #endif
+            if ( data->memoFile.file.hand != INVALID4HANDLE )
                file4refresh( &data->memoFile.file ) ;
          #endif
          #ifndef S4OFF_INDEX
-            #ifdef S4CLIPPER
+            #ifdef N4OTHER
                for( tagOn = 0 ;; )
                {
                   tagOn = dfile4tagNext( data, tagOn) ;
@@ -79,7 +66,7 @@ int dfile4refresh( DATA4FILE *data )
                      break ;
                   file4refresh( &indexOn->file ) ;
                }
-            #endif /* S4CLIPPER */
+            #endif /* N4OTHER */
          #endif /* S4OFF_INDEX */
 
          if ( error4code( data->c4 ) < 0 )
@@ -123,9 +110,7 @@ int S4FUNCTION d4refreshRecord( DATA4 *data )
       if ( data->recNum <= 0L || data->recNum > d4recCount( data ) )
          return 0 ;
 
-      // AS Apr 15/03 - support for new lockId for shared clone locking
-      if ( dfile4lockTestFile( data->dataFile, data4lockId( data ), data4serverId( data ), lock4write ) == 1 ||
-           dfile4lockTestFile( data->dataFile, data4lockId( data ), data4serverId( data ), lock4read ) == 1 ||
+      if ( dfile4lockTestFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) != 0 ||
            data->dataFile->file.lowAccessMode != OPEN4DENY_NONE || opt == 0 )
       {
          #ifndef S4MEMO_OFF
@@ -144,11 +129,7 @@ int S4FUNCTION d4refreshRecord( DATA4 *data )
 
       #ifndef S4OFF_MEMO
          if ( data->dataFile->nFieldsMemo > 0 &&
-            // LY 2003/07/31 #ifdef S4WIN64
-            //    data->dataFile->memoFile.file.hand != NULL )
-            // #else
-               data->dataFile->memoFile.file.hand != INVALID4HANDLE )
-            // #endif
+            data->dataFile->memoFile.file.hand != INVALID4HANDLE )
          {
             file4refresh( &data->dataFile->memoFile.file ) ;
             for ( i = 0; i < data->dataFile->nFieldsMemo; i++ )
@@ -165,7 +146,7 @@ int S4FUNCTION d4refreshRecord( DATA4 *data )
       if ( data->dataFile->file.doBuffer )  /* also makes sure 'opt' should exist */
          opt->forceCurrent = 0 ;
 
-      if ( d4lockTest( data, data->recNum, lock4write ) == 1 )
+      if ( d4lockTest( data, data->recNum ) )
       {
          memcpy( data->recordOld, data->record, dfile4recWidth( data->dataFile ) ) ;
          data->recNumOld = data->recNum ;

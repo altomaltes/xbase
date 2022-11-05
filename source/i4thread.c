@@ -1,17 +1,3 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
 /* This module is used to describe the communications thread.
 
 If E4PARM_LOW is defined, the functions in this module will ensure that
@@ -24,7 +10,6 @@ as requested by worker threads.
 
 #include "d4all.h"
 #ifndef S4STAND_ALONE
-#ifndef S4OFF_COMMUNICATIONS
 #ifndef S4OFF_THREAD
 #include <process.h>
 
@@ -104,9 +89,9 @@ void inter4( void *input )
    #endif
 
    #ifdef E4PARM_LOW
-      if ( inter == 0 )
+      if ( inter == NULL )
       {
-         error4( 0, e4parmNull, E96952 ) ;
+         error4( NULL, e4parmNull, E96952 ) ;
          return ;
       }
    #endif
@@ -114,7 +99,7 @@ void inter4( void *input )
    #ifdef S4CLIENT
       #ifdef S4DEAD_CHECK
          waitTime = INTER4WAITTIME*1000 ;
-         checkTime = time( 0 ) + DEAD4CHECK_TIMEOUT ;
+         checkTime = time( NULL ) + DEAD4CHECK_TIMEOUT ;
       #else
          waitTime = INFINITE ;
       #endif
@@ -127,29 +112,27 @@ void inter4( void *input )
    {
       rc = signal4arrayWait( &inter->signalArray, &routineToExecute, waitTime ) ;
       //routineToExecute = signal4arrayWait( &inter->signalArray, waitTime ) ;
-      if ( rc == e4result )  /* means a wait failed -- just try again */
-         continue ;
-      if ( routineToExecute != 0 )
+      if ( rc == e4result )
+         ;  /* Figure out later what should happen on error */
+      if ( routineToExecute != NULL )
          routineToExecute->routine( inter, routineToExecute ) ;
       #ifdef S4CLIENT
-         #ifdef S4DEAD_CHECK
-            if ( i==DEAD4CHECK_LOOP )
+      #ifdef S4DEAD_CHECK
+         if ( i==DEAD4CHECK_LOOP )
+         {
+            currentTime = time( NULL ) ;
+            i = 0 ;
+            if ( currentTime > checkTime )
             {
-               currentTime = time( 0 ) ;
-               i = 0 ;
-               if ( currentTime > checkTime )
-               {
-                  inter4connectionCheck( inter ) ;
-                  checkTime = currentTime + DEAD4CHECK_TIMEOUT ;
-               }
+               inter4connectionCheck( inter ) ;
+               checkTime = currentTime + DEAD4CHECK_TIMEOUT ;
             }
-            i++ ;
-         #endif
+         }
+         i++ ;
+      #endif
       #endif
    }
 }
-
-
 
 void inter4completeRequested( INTER4 *inter, CONNECT4THREAD *connectThread )
 {
@@ -170,9 +153,9 @@ void inter4completeRequested( INTER4 *inter, CONNECT4THREAD *connectThread )
 */
 
    #ifdef E4PARM_LOW
-      if ( ( inter == 0 )|| ( connectThread == 0 ) )
+      if ( ( inter == NULL )|| ( connectThread == NULL ) )
       {
-         error4( 0, e4parmNull, E96953 ) ;
+         error4( NULL, e4parmNull, E96953 ) ;
          return ;
       }
    #endif
@@ -188,8 +171,6 @@ void inter4completeRequested( INTER4 *inter, CONNECT4THREAD *connectThread )
    semaphore4release( &inter->completesRequestedSemaphore ) ;
    return ;
 }
-
-
 
 void inter4completeRequired( INTER4 *inter, SIGNAL4ROUTINE *signal )
 {
@@ -215,6 +196,36 @@ void inter4completeRequired( INTER4 *inter, SIGNAL4ROUTINE *signal )
      thread.
 
    This routine releases the CONNECT4THREAD.completedSemaphore
+
+   PSEUDOCODE
+
+   CONNECT4THREAD = list4mutexRemove( INTER4.completesRequested ) ;
+
+   // wait for writing writes to finish
+   for ( ;; )
+   {
+      SIGNAL4ROUTINE = connect4threadWriteSignalRetrieve( CONNECT4THREAD, NULL, 1 )
+      if ( SIGNAL4ROUTINE == NULL )
+         break ;
+      event4wait( SIGNAL4ROUTINE.signalStructure, 1 )
+      // next line will implicitly queue another write if possible
+      call inter4writeCompleted( INTER4, SIGNAL4ROUTINE )
+   }
+
+   // close the socket
+   connect4netLowClose( CONNECT4THREAD->conLow )
+
+   // retrieve the failed reads and just delete them ( they should be
+   // cancelled )
+   for ( ;; )
+   {
+      SIGNAL4ROUTINE = connect4threadReadSignalRetrieve( CONNECT4THREAD, NULL, 1 )
+      if ( SIGNAL4ROUTINE == NULL )
+         break ;
+      // wait for error to ensure winsock.dll is done with structure.
+      event4wait( SIGNAL4ROUTINE.signalStructure, 1 )
+      call inter4readCompleted( INTER4, SIGNAL4ROUTINE )
+   }
 */
 
    CONNECT4THREAD *conThread ;
@@ -222,53 +233,44 @@ void inter4completeRequired( INTER4 *inter, SIGNAL4ROUTINE *signal )
    int rc ;
 
    #ifdef E4PARM_LOW
-      if ( ( inter == 0 ) && ( signal == 0 ) )
+      if ( ( inter == NULL ) && ( signal == NULL ) )
       {
-         error4( 0, e4parmNull, E96954 ) ;
+         error4( NULL, e4parmNull, E96954 ) ;
          return ;
       }
    #endif
 
    conThread = ( CONNECT4THREAD * )list4mutexRemove( &inter->completesRequested ) ;
 
-   if ( conThread == 0 )
+   if ( conThread == NULL )
       return ;
    /* Wait for writing writes to finish */
 
    while( 1 )
    {
-      /* sigRoutine = connect4threadWriteSignalRetrieve( conThread, 0, 1 ) ; */
-      sigRoutine = (SIGNAL4ROUTINE *)l4first( &conThread->writingSignalsList );
+      /* sigRoutine = connect4threadWriteSignalRetrieve( conThread, NULL, 1 ) ; */
+      sigRoutine = ( SIGNAL4ROUTINE * )l4first( &conThread->writingSignalsList );
 
-      if ( sigRoutine == 0 )
+      if ( sigRoutine == NULL )
          break;
-      rc = event4wait( (EVENT4 *)sigRoutine->signalStructure, 1 ) ;
+      rc = event4wait( ( EVENT4 * )sigRoutine->signalStructure, 1 ) ;
       if ( rc <= 0 )
       {
-         l4remove( &conThread->writingSignalsList, (void *)sigRoutine ) ;
-         inter4releaseSignal( inter, sigRoutine ) ;  /* AS 07/09/98 was losing some resources, think here */
+         l4remove( &conThread->writingSignalsList, ( void * )sigRoutine ) ;
          continue ;
       }
       inter4writeCompleted( inter, sigRoutine ) ;
    }
-
-
-   CONNECT4BUFFER *connectBuffer = conThread->connectBuffer ;
-   connect4lowEnterExclusive( connectBuffer ) ;
-   if ( connect4bufferLowGet( connectBuffer ) != 0 )
-      connect4lowClose( connect4bufferLowGet( connectBuffer ) ) ;   /* Ignoring return code */
-   connect4lowExitExclusive( connectBuffer ) ;
-
+   connect4lowClose( conThread->connectBuffer->connectLow ) ;   /* Ignoring return code */
    while( 1 )
    {
-      sigRoutine = (SIGNAL4ROUTINE *)l4first( &conThread->readSignalsList ) ;
-      if ( sigRoutine == 0 )
+      sigRoutine = ( SIGNAL4ROUTINE * )l4first( &conThread->readSignalsList ) ;
+      if ( sigRoutine == NULL )
          break ;
-      rc = event4wait( (EVENT4 *)sigRoutine->signalStructure, 1 ) ;
+      rc = event4wait( ( EVENT4 * )sigRoutine->signalStructure, 1 ) ;
       if ( rc <= 0 )
       {
-         l4remove( &conThread->readSignalsList, (void *)sigRoutine ) ;
-         inter4releaseSignal( inter, sigRoutine ) ;  /* AS 07/09/98 was losing some resources, think here */
+         l4remove( &conThread->readSignalsList, ( void * )sigRoutine ) ;
          continue ;
       }
       inter4readCompleted( inter, sigRoutine ) ;
@@ -276,10 +278,9 @@ void inter4completeRequired( INTER4 *inter, SIGNAL4ROUTINE *signal )
    semaphore4release( &conThread->completedSemaphore ) ;
 }
 
-
-
 #ifdef S4DEAD_CHECK
 #ifdef S4CLIENT
+
 void inter4connectionCheck( INTER4 *inter )
 {
    CONNECT4LOW conlow ;
@@ -292,8 +293,6 @@ void inter4connectionCheck( INTER4 *inter )
 }
 #endif /* S4CLIENT */
 #endif /* S4DEAD_CHECK */
-
-
 
 void inter4error( INTER4 *inter, CONNECT4THREAD *connectThread )
 {
@@ -319,49 +318,52 @@ void inter4error( INTER4 *inter, CONNECT4THREAD *connectThread )
      appropriate list.
 */
 
+   SIGNAL4ROUTINE *sigRoutine ;
+   NET4MESSAGE *message ;
+   int rc ;
+
    #ifdef E4PARM_LOW
-      if ( ( inter == 0 ) && ( connectThread == 0 ) )
+      if ( ( inter == NULL ) && ( connect == NULL ) )
       {
-         error4( 0, e4parmNull, E96955 ) ;
+         error4( NULL, e4parmNull, E96955 ) ;
          return ;
       }
    #endif
-
-   CONNECT4BUFFER *connectBuffer = connectThread->connectBuffer ;
-   connect4lowEnterExclusive( connectBuffer ) ;
-   connect4lowError( connect4bufferLowGet( connectBuffer ) ) ;
-   connect4lowExitExclusive( connectBuffer ) ;
-
+   connect4lowError( connectThread->connectBuffer->connectLow ) ;
    while ( 1 )
    {
-      SIGNAL4ROUTINE *sigRoutine = connect4threadWriteSignalRetrieve( connectThread, 0, 0 ) ;
-      if ( sigRoutine == 0 )
+      sigRoutine = connect4threadWriteSignalRetrieve( connectThread, NULL, 0 ) ;
+      if ( sigRoutine == NULL )
          break ;
-      if ( event4wait( (EVENT4 *)sigRoutine->signalStructure, 1 ) <= 0 )
+      rc = event4wait( ( EVENT4 * )sigRoutine->signalStructure, 1 ) ;
+      if ( rc <= 0 )
          continue ;
       inter4writeCompleted( inter, sigRoutine ) ;
    }
 
    while( 1 )
    {
-      // AS 08/29/00 - make more efficient, pop off
-      SIGNAL4ROUTINE *sigRoutine = (SIGNAL4ROUTINE *)l4pop( &connectThread->readSignalsList ) ;
-      if ( sigRoutine == 0 )
+
+      sigRoutine = ( SIGNAL4ROUTINE * )l4first( &connectThread->readSignalsList ) ;
+      if ( sigRoutine == NULL )
          break ;
-      // l4remove( &connectThread->readSignalsList, (void *)sigRoutine ) ;
-      if ( event4wait( (EVENT4 *)sigRoutine->signalStructure, 1 ) <= 0 )
+      l4remove( &connectThread->readSignalsList, ( void * )sigRoutine ) ;
+      rc = event4wait( ( EVENT4 * )sigRoutine->signalStructure, 1 ) ;
+      if ( rc <= 0 )
          continue ;
-      NET4MESSAGE *message = (NET4MESSAGE *)sigRoutine->data ;
+      message = (NET4MESSAGE *)sigRoutine->data ;
       message->messageLen = -1 ;
-      #ifdef E4ANALYZE  // CS 2000/08/30
-         assert5( message->inUse == 1 ) ;
-         message->inUse = 0 ;
-      #endif
-      connect4threadReadStore(message->connectThread, message, 0 ) ;
+      connect4threadReadStore(message->connectThread, message ) ;
       inter4releaseSignal(inter, sigRoutine ) ;
+/*      sigRoutine = connect4threadReadSignalRetrieve( connectThread, NULL, 0 ) ;
+      if ( sigRoutine == NULL )
+         break ;
+      rc = event4wait( ( EVENT4 * )sigRoutine->signalStructure, 1 ) ;
+      if ( rc <= 0 )
+         continue ;
+      inter4readCompleted( inter, sigRoutine ) ;*/
    }
 }
-
 
 
 int inter4init( INTER4 *inter, CODE4 *cb )
@@ -413,15 +415,17 @@ int inter4init( INTER4 *inter, CODE4 *cb )
      list4mutexInit( inter->completesRequested )
 */
 
+   int rc ;
+
    #ifdef E4PARM_LOW
-      if ( ( inter == 0 ) || ( cb == 0 ) )
+      if ( ( inter == NULL ) || ( cb == NULL ) )
          return ( error4( cb, e4parm_null, E96956 ) ) ;
    #endif
 
    memset( inter, 0, sizeof( INTER4 ) ) ;
    inter->cb = cb ;
 
-   int rc = semaphore4init( &inter->readsRequestedSemaphore ) ;
+   rc = semaphore4init( &inter->readsRequestedSemaphore ) ;
    if ( rc )
       return error4( cb, rc, E96956 ) ;
 
@@ -447,7 +451,7 @@ int inter4init( INTER4 *inter, CODE4 *cb )
       return error4( cb, rc, E96956 ) ;
    }
    inter->signalRoutineMemory = mem4create( cb, MEMORY4START_SIGNAL_ROUTINE , sizeof( SIGNAL4ROUTINE ), MEMORY4EXPAND_SIGNAL_ROUTINE, 0 ) ;
-   if ( inter->signalRoutineMemory == 0 )
+   if ( inter->signalRoutineMemory == NULL )
    {
       inter4initUndo( inter ) ;
       return error4( cb, rc, E96956 ) ;
@@ -535,8 +539,6 @@ void inter4initUndo( INTER4 *inter )
    code4clearEvents( inter->cb ) ;
 }
 
-
-
 void inter4readCompleted( INTER4 *inter, SIGNAL4ROUTINE *signalRoutine )
 {
 /* PARAMATERS
@@ -571,20 +573,20 @@ void inter4readCompleted( INTER4 *inter, SIGNAL4ROUTINE *signalRoutine )
    SIGNAL4ROUTINE *sig ;
 
    #ifdef E4PARM_LOW
-      if ( ( inter==0 ) || ( signalRoutine == 0 ) )
+      if ( ( inter==NULL ) || ( signalRoutine == NULL ) )
       {
-         error4( 0, e4parmNull, E96957 ) ;
+         error4( NULL, e4parmNull, E96957 ) ;
          return ;
       }
    #endif
 
-   mess = (NET4MESSAGE *)signalRoutine->data ;
+   mess = ( NET4MESSAGE * )signalRoutine->data ;
    conThr = mess->connectThread ;
    #ifdef E4DEBUG /* We should only be completing on the first message */
       sig = (SIGNAL4ROUTINE *)l4first(&conThr->readSignalsList) ;
       if (signalRoutine != sig )
       {
-         error4( 0, e4message, E96957 ) ;
+         error4( NULL, e4message, E96957 ) ;
          return ;
       }
    #endif
@@ -595,14 +597,12 @@ void inter4readCompleted( INTER4 *inter, SIGNAL4ROUTINE *signalRoutine )
    inter4releaseSignal( inter, signalRoutine ) ;
 
    /* If there are any on the list, we need to add them to the signal4array*/
-   sig = (SIGNAL4ROUTINE *)l4first( &mess->connectThread->readSignalsList ) ;
+   sig = ( SIGNAL4ROUTINE * )l4first( &mess->connectThread->readSignalsList ) ;
    if ( sig )
       signal4arrayAdd( &inter->signalArray, sig, 0 ) ;
 
    return ;
 }
-
-
 
 void inter4readRequested( INTER4 *inter, NET4MESSAGE *message )
 {
@@ -627,9 +627,9 @@ void inter4readRequested( INTER4 *inter, NET4MESSAGE *message )
    #endif
 
    #ifdef E4PARM_LOW
-      if ( ( inter==0 ) || ( message == 0 ) )
+      if ( ( inter==NULL ) || ( message == NULL ) )
       {
-         error4( 0, e4parmNull, E96958 ) ;
+         error4( NULL, e4parmNull, E96958 ) ;
          return ;
       }
    #endif
@@ -643,8 +643,6 @@ void inter4readRequested( INTER4 *inter, NET4MESSAGE *message )
    semaphore4release( &inter->readsRequestedSemaphore ) ;
    return ;
 }
-
-
 
 void inter4readRequired( INTER4 *inter, SIGNAL4ROUTINE *dummy )
 {
@@ -700,9 +698,9 @@ void inter4readRequired( INTER4 *inter, SIGNAL4ROUTINE *dummy )
    int rc ;
 
    #ifdef E4PARM_LOW
-      if ( inter == 0 )
+      if ( inter == NULL )
       {
-         error4( 0, e4parmNull, E96959 ) ;
+         error4( NULL, e4parmNull, E96959 ) ;
          return ;
       }
    #endif
@@ -717,22 +715,19 @@ void inter4readRequired( INTER4 *inter, SIGNAL4ROUTINE *dummy )
       }
    */
 
-   mess = (NET4MESSAGE *)list4mutexRemove( &inter->readsRequested ) ;
-   if ( mess == 0 )
+   mess = ( NET4MESSAGE * )list4mutexRemove( &inter->readsRequested ) ;
+   if ( mess == NULL )
    {
       error4( 0, e4result, E96959 ) ;
       return ;
    }
-   sig = (SIGNAL4ROUTINE *)mem4allocZero( inter->signalRoutineMemory ) ;
-   if ( sig == 0 )
+   sig = ( SIGNAL4ROUTINE * )mem4alloc( inter->signalRoutineMemory ) ;
+   if ( sig == NULL )
    {
       error4( 0, e4memory, E96959 ) ;
       return ;
    }
    eve = code4getEvent( inter->cb );
-   // eve was returning a null in at least some cases - due to error - meaning gpf later
-   if ( eve == 0 )
-      return ;
    rc = signal4routineInit( sig, eve->handle, inter4readCompleted, eve, mess ) ;
    if ( rc )
    {
@@ -740,21 +735,9 @@ void inter4readRequired( INTER4 *inter, SIGNAL4ROUTINE *dummy )
       return ;
    }
 
-   CONNECT4BUFFER *connectBuffer = mess->connectThread->connectBuffer ;
-   // AS May 23/07 - connectBuffer was null in some cases here...possibly if the connection had since been closed off.  In that case just cancel this...
-   if ( connectBuffer == 0 )
-      return ;
-   connect4lowEnterExclusive( connectBuffer ) ;
-   rc = connect4lowReadAsynchronous( connect4bufferLowGet( connectBuffer ), mess, eve, c4getCompress( inter->cb ) ) ;
-   connect4lowExitExclusive( connectBuffer ) ;
+   rc = connect4lowReadAsynchronous( mess->connectThread->connectBuffer->connectLow, mess, eve ) ;
    if ( rc == r4success )
       SetEvent( eve->handle ) ;
-
-   #ifdef E4ANALYZE
-      assert5( mess->inUse == 0 ) ;    // should not be in use now
-      mess->inUse = 1 ;    // mark as in use on the signals list
-   #endif
-
    if ( rc >=0 )
    {
       l4add( &mess->connectThread->readSignalsList, sig ) ; /* add to the end of the list */
@@ -780,25 +763,21 @@ void inter4readRequired( INTER4 *inter, SIGNAL4ROUTINE *dummy )
    return ;
 }
 
-
-
 static void inter4releaseSignal( INTER4 *inter, SIGNAL4ROUTINE *signalRoutine )
 {
    #ifdef E4PARM_LOW
-      if ( ( inter==0 ) || ( signalRoutine == 0 ) )
+      if ( ( inter==NULL ) || ( signalRoutine == NULL ) )
       {
-         error4( 0, e4parmNull, E96983 ) ;
+         error4( NULL, e4parmNull, E96983 ) ;
          return ;
       }
    #endif
 
-   code4freeEvent( inter->cb, (EVENT4 *)signalRoutine->signalStructure ) ;
+   code4freeEvent( inter->cb, ( EVENT4 * )signalRoutine->signalStructure ) ;
    if (signalRoutine->inArray)
       signal4arrayRemoveSignal( &inter->signalArray, signalRoutine ) ;
    mem4free( inter->signalRoutineMemory, signalRoutine ) ;
 }
-
-
 
 void inter4shutdown( INTER4 *inter, SIGNAL4ROUTINE *dummy )
 {
@@ -842,22 +821,20 @@ void inter4shutdown( INTER4 *inter, SIGNAL4ROUTINE *dummy )
 */
 
    #ifdef E4PARM_LOW
-      if ( inter == 0 )
+      if ( inter == NULL )
       {
-         error4( 0, e4parmNull, E96960 ) ;
+         error4( NULL, e4parmNull, E96960 ) ;
          return ;
       }
    #endif
 
    inter4initUndo( inter ) ;
 
-   if ( inter->finishedShutdownThreadPtr != 0 )
+   if ( inter->finishedShutdownThreadPtr != NULL )
       event4set( inter->finishedShutdownThreadPtr ) ;
 
    _endthread() ;
 }
-
-
 
 void inter4shutdownRequest( INTER4 *inter )
 {
@@ -889,16 +866,12 @@ void inter4shutdownRequest( INTER4 *inter )
    EVENT4 eve ;
 
    #ifdef E4PARM_LOW
-      if ( inter == 0 )
+      if ( inter == NULL )
       {
-         error4( 0, e4parmNull, E96961 ) ;
+         error4( NULL, e4parmNull, E96961 ) ;
          return ;
       }
    #endif
-
-   // AS Dec 30/09 - if the initialization of the inter thread hasn't been completed we don't need to do this (e.g. an error during intialization of the inter thread)
-   if ( inter->cb->interThreadHandle == 0 )
-      return ;
 
    rc = event4init( &eve );
    if ( rc )
@@ -908,13 +881,11 @@ void inter4shutdownRequest( INTER4 *inter )
    }
    inter->finishedShutdownThreadPtr = &eve ;
    event4set( &inter->shutdownThreadEvent ) ;
-  // inter4shutdown( inter, 0 ) ;
+  // inter4shutdown( inter, NULL ) ;
    event4wait( &eve, WAIT4EVER ) ;
    event4initUndo( &eve ) ;
    return ;
 }
-
-
 
 void inter4write( INTER4 *inter, NET4MESSAGE *message, SIGNAL4ROUTINE *signalRoutine )
 {
@@ -967,10 +938,14 @@ void inter4write( INTER4 *inter, NET4MESSAGE *message, SIGNAL4ROUTINE *signalRou
        Return from function.
 */
 
+   CONNECT4THREAD *conThrd ;
+   CONNECT4LOW *conLow ;
+   int rc ;
+
    #ifdef E4PARM_LOW
-      if ( ( inter==0 ) || ( message == 0 ) || ( signalRoutine == 0 ) )
+      if ( ( inter==NULL ) || ( message == NULL ) || ( signalRoutine == NULL ) )
       {
-         error4( 0, e4parmNull, E96962 ) ;
+         error4( NULL, e4parmNull, E96962 ) ;
          return ;
       }
    #endif
@@ -985,50 +960,32 @@ void inter4write( INTER4 *inter, NET4MESSAGE *message, SIGNAL4ROUTINE *signalRou
       }
    */
 
-   CONNECT4THREAD *conThrd = message->connectThread ;
-   CONNECT4BUFFER *connectBuffer = conThrd->connectBuffer ;
-   connect4lowEnterExclusive( connectBuffer ) ;
-   // AS 08/17/99 conLow may be NULL if a connection timeout on connect occurs, in which case, just mark as failed...
-   int rc ;
-   if ( connect4bufferLowGet( connectBuffer ) == 0 )
-      rc = -1 ;
-   else
-   {
-      // AS May 13/02 - communications compression coding
-      rc = connect4lowWriteAsynchronous( connect4bufferLowGet( connectBuffer ), message, (EVENT4 *)signalRoutine->signalStructure, c4getCompress( connectBuffer->cb )) ;
-   }
-
-   connect4lowExitExclusive( connectBuffer ) ;
-
-   if ( rc < 0 )  // write failed
+   conThrd = message->connectThread ;
+   conLow  = conThrd->connectBuffer->connectLow ;
+   rc = connect4lowWriteAsynchronous( conLow, message, ( EVENT4 * )signalRoutine->signalStructure ) ;
+   if ( rc<0 )
    {
       message->messageLen = -1 ;
-      code4freeEvent( inter->cb, (EVENT4 *)signalRoutine->signalStructure ) ;
+      code4freeEvent( inter->cb, ( EVENT4 * )signalRoutine->signalStructure ) ;
       list4mutexAdd( &conThrd->writeMessageCompletedList, message ) ;
       semaphore4release( &conThrd->writeMessageCompletedListSemaphore ) ;
       mem4free( inter->signalRoutineMemory, signalRoutine ) ;
+      /* list4mutexRelease( &inter->writesCompleted ) ; */
       inter4error( inter, conThrd ) ;
       return ;
    }
-
    l4add( &conThrd->writingSignalsList, signalRoutine ) ;
-
-   if ( rc == r4success )  // write succeeded and completed (as opposed to being left in a pending state)
+   if ( rc==r4success )
    {
       message->messageLen = r4success ;
       inter4writeCompleted( inter, signalRoutine ) ;
       return ;
    }
-
-   // write is left as pending...put an entry into the signal array so that we will be signalled
-   // when the write is finished.  Since only the intercommunications thread uses this array
-   // and only the intercommunications thread calls current function, we do not need to semaphore
-   // the signal array.
+   /* rc == r4outstanding */
+   /* l4add( &conThrd->writingSignalsList, signalRoutine ) ; */
    signal4arrayAdd( &inter->signalArray, signalRoutine, 0 ) ;
    return ;
 }
-
-
 
 void inter4writeCompleted( INTER4 *inter, SIGNAL4ROUTINE *signalRoutine )
 {
@@ -1067,10 +1024,14 @@ void inter4writeCompleted( INTER4 *inter, SIGNAL4ROUTINE *signalRoutine )
      return
 */
 
+   NET4MESSAGE *mess, *mess2 ;
+   CONNECT4THREAD  *conThrd ;
+   int rc ;
+
    #ifdef E4PARM_LOW
-      if ( ( inter == 0 ) || ( signalRoutine == 0 ) )
+      if ( ( inter == NULL ) || ( signalRoutine == NULL ) )
       {
-         error4( 0, e4parmNull, E96963 ) ;
+         error4( NULL, e4parmNull, E96963 ) ;
          return ;
       }
    #endif
@@ -1085,39 +1046,26 @@ void inter4writeCompleted( INTER4 *inter, SIGNAL4ROUTINE *signalRoutine )
       }
    */
 
-   NET4MESSAGE *mess = (NET4MESSAGE *)signalRoutine->data ;
-   CONNECT4THREAD *conThrd = mess->connectThread ;
+   mess = ( NET4MESSAGE * )signalRoutine->data ;
+   conThrd = mess->connectThread ;
    connect4threadWriteCompleted( conThrd, mess, signalRoutine ) ;
-
-   // AS Mar 10/03 - Might not be a severe error, but it is a communications error.
-   // was failing if client terminated in the middle of a large memo retrieval.
-   if ( mess->messageLen < 0 && conThrd->connectBuffer->communicationError == 0 )
+   if ( mess->messageLen < 0 )
    {
-      conThrd->connectBuffer->communicationError = e4connect ;
+      error4( 0, e4result, E96963 ) ;
+      return ;
    }
-
-   // AS 09/09/99 - not an error if mess->messageLen < 0, this may occur during shutdown procedure
-   // if ( mess->messageLen < 0 )
-   // {
-   //    error4( 0, e4result, E96963 ) ;
-   //    return ;
-   // }
-
-   // request that the next outstanding message be written...
-   NET4MESSAGE *outstandingMessage = (NET4MESSAGE *)l4first( &conThrd->writeMessageOutstandingList ) ;
-   if ( outstandingMessage != 0 )
+   mess2 = ( NET4MESSAGE * )l4first( &conThrd->writeMessageOutstandingList ) ;
+   if ( mess2 != NULL )
    {
-      l4remove( &conThrd->writeMessageOutstandingList, outstandingMessage ) ;
+      l4remove( &conThrd->writeMessageOutstandingList, mess2 ) ;
       signal4arrayRemoveSignal( &inter->signalArray, signalRoutine ) ;
-      int rc = signal4routineInit( signalRoutine, ( (EVENT4 *)( signalRoutine->signalStructure ) )->handle, inter4writeCompleted, signalRoutine->signalStructure, outstandingMessage ) ;
-
+      rc = signal4routineInit( signalRoutine, ( ( EVENT4 * )( signalRoutine->signalStructure ) )->handle, inter4writeCompleted, signalRoutine->signalStructure, mess2 ) ;
       if ( rc )
       {
          error4( 0, rc, E96963 ) ;
          return ;
       }
-
-      inter4write( inter, outstandingMessage, signalRoutine );
+      inter4write( inter, mess2, signalRoutine );
       return ;
    }
 
@@ -1125,8 +1073,6 @@ void inter4writeCompleted( INTER4 *inter, SIGNAL4ROUTINE *signalRoutine )
 
    return ;
 }
-
-
 
 void inter4writeRequested( INTER4 *inter, NET4MESSAGE *message )
 {
@@ -1146,9 +1092,9 @@ void inter4writeRequested( INTER4 *inter, NET4MESSAGE *message )
 */
 
    #ifdef E4PARM_LOW
-      if ( ( inter==0 ) || ( message == 0 ) )
+      if ( ( inter==NULL ) || ( message == NULL ) )
       {
-         error4( 0, e4parmNull, E96964 ) ;
+         error4( NULL, e4parmNull, E96964 ) ;
          return ;
       }
    #endif
@@ -1156,8 +1102,6 @@ void inter4writeRequested( INTER4 *inter, NET4MESSAGE *message )
    list4mutexAdd( &inter->writesRequested, message ) ;
    semaphore4release( &inter->writesRequestedSemaphore ) ;
 }
-
-
 
 void inter4writeRequired( INTER4 *inter, SIGNAL4ROUTINE *dummy )
 {
@@ -1202,47 +1146,49 @@ void inter4writeRequired( INTER4 *inter, SIGNAL4ROUTINE *dummy )
      Call inter4write( INTER4, NET4MESSAGE, SIGNAL4ROUTINE )
 */
 
+   SIGNAL4ROUTINE *sig ;
+   EVENT4 *eve ;
+   NET4MESSAGE *mess, *message ;
+   CONNECT4THREAD *conThrd ;
+
    #ifdef E4PARM_LOW
-      if ( inter == 0 )
+      if ( inter == NULL )
       {
-         error4( 0, e4parmNull, E96965 ) ;
+         error4( NULL, e4parmNull, E96965 ) ;
          return ;
       }
    #endif
 
-   NET4MESSAGE *message = (NET4MESSAGE *)list4mutexRemove( &inter->writesRequested ) ;
-   if ( message == 0 )
+/* if ( error4code( inter->cb ) < 0 )
+   {
+      error4( inter->cb, error4code( inter->cb ), E96965 ) ;
+      return ;
+   }
+*/
+
+   message = ( NET4MESSAGE * )list4mutexRemove( &inter->writesRequested ) ;
+   if ( message == NULL )
    {
       error4( 0, e4result, E96965 ) ;
       return ;
    }
 
-   CONNECT4THREAD *conThrd = message->connectThread ;
-   // If there is already a message on the 'outstanding' list (i.e. there is a pending
-   // write already), then just add this message to the list of outstanding messages
-   // to write.
-   NET4MESSAGE *messOutstanding = (NET4MESSAGE *)l4first( &conThrd->writeMessageOutstandingList ) ;
-
-   if ( messOutstanding != 0 )
+   conThrd = message->connectThread ;
+   mess = ( NET4MESSAGE * )l4first( &conThrd->writeMessageOutstandingList ) ;
+   if ( mess != NULL )
    {
       l4add( &conThrd->writeMessageOutstandingList, message ) ;
       return ;
    }
-
-   // if the # of to-write messages sent to the system exceeds or == maximum, just put our
-   // message on the outstanding list for later writing
    if ( l4numNodes( &conThrd->writingSignalsList ) >=S4MAX_WRITES )
    {
       l4add( &conThrd->writeMessageOutstandingList, message ) ;
       return ;
    }
-
-   // we are allowed to write the message out, so set it up and do so.
-   SIGNAL4ROUTINE *sig = (SIGNAL4ROUTINE *)mem4allocZero( inter->signalRoutineMemory ) ;
-   EVENT4 *eve = code4getEvent( inter->cb ) ;
+   sig = ( SIGNAL4ROUTINE * )mem4alloc( inter->signalRoutineMemory ) ;
+   eve = code4getEvent( inter->cb ) ;
    signal4routineInit( sig, eve->handle, inter4writeCompleted, eve, message ) ;
    inter4write( inter, message, sig ) ;
 }
 #endif /*!S4OFF_THREAD */
-#endif /* not S4OFF_COMMUNICATIONS */
 #endif /*!S4STAND_ALONE */

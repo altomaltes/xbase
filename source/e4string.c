@@ -1,22 +1,8 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
 #include "d4all.h"
 
 #ifndef E4OFF_STRING
 
-/* e4string.h   (c)Copyright Sequiter Software Inc., 1988-1999.  All rights reserved. */
+/* e4string.h   (c)Copyright Sequiter Software Inc., 1988-1996.  All rights reserved. */
 /* contains 2nd error number info */
 /* ABCDE: */
 /*   A =  PRODUCT, LEVEL OR DETAIL NUMBER */
@@ -24,17 +10,18 @@
 /*   DE = LOCAL AREA ID # */
 /* Do not renumber error #'s 88004-89004 or insert within that range */
 /* without also modifying c4comws.c & c4comws.h */
-#ifdef E4VBASIC
+#ifdef S4VBASIC
 static ERROR4INFO_ARRAY error4array4[] =
-{{ 00000L, "" }
-,{ 40101L, "code4autoOpen()" }
-,{ 40102L, "code4createError()" }
-,{ 40103L, "code4dateFormatVB()" }
-,{ 40104L, "code4defaultUniqueError()" }
-,{ 40105L, "code4errorCode()" }
-,{ 40106L, "code4exclusive()" }
-,{ 40107L, "code4exprError()" }
-,{ 40108L, "code4fieldNameError()" },
+{
+   { 00000L, "" },
+   { 40101L, "code4autoOpen()" },
+   { 40102L, "code4createError()" },
+   { 40103L, "code4dateFormatVB()" },
+   { 40104L, "code4defaultUniqueError()" },
+   { 40105L, "code4errorCode()" },
+   { 40106L, "code4exclusive()" },
+   { 40107L, "code4exprError()" },
+   { 40108L, "code4fieldNameError()" },
    { 40109L, "code4goError()" },
    { 40110L, "code4hInst()" },
    { 40111L, "code4hWnd()" },
@@ -86,21 +73,23 @@ static ERROR4INFO_ARRAY error4array4[] =
    { 40156L, "code4unlockAuto()" },
    { 40157L, "code4unlockAutoSet()" }
 };
-#endif
 
+#endif
 #ifdef S4TESTING
 static ERROR4INFO_ARRAY error4array5[] =
-{{ 00000L, "" }
-,{ 50101L, "testing error: expected memDisplay not initialized" }
+{
+   { 00000L, "" },
+   { 50101L, "testing error: expected memDisplay not initialized" }
 };
 
 #endif
 #ifdef S4CBPP
 static ERROR4INFO_ARRAY error4array6[] =
-{{ 00000L, "" }
-,{ 60101L, "Code4::Code4" }
-,{ 60102L, "Code4::calcCreate" }
-,{ 60103L, "Code4::closeAll" },
+{
+   { 00000L, "" },
+   { 60101L, "Code4::Code4" },
+   { 60102L, "Code4::calcCreate" },
+   { 60103L, "Code4::closeAll" },
    { 60104L, "Code4::data" },
    { 60105L, "Code4::error" },
    { 60106L, "Code4::errorLog" },
@@ -340,9 +329,10 @@ static ERROR4INFO_ARRAY error4array6[] =
 #endif
 #ifdef S4SERVER
 static ERROR4INFO_ARRAY error4array7[] =
-{{ 00000L, "" }
-,{ 70101L, "failure to initialize server" }
-,{ 70102L, "server failure" },
+{
+   { 00000L, "" },
+   { 70101L, "failure to initialize server" },
+   { 70102L, "server failure" },
    { 70103L, "server4securityInit" },
    { 70104L, "invalid table authorization file" },
    { 70105L, "server4init" },
@@ -439,7 +429,7 @@ static ERROR4INFO_ARRAY error4array7[] =
    { 70196L, "DEFPATH field not found" },
    { 70197L, "DEFPATH default path not available" },
    { 70198L, "DEFPATH default path drive not available" },
-   { 70199L, "Could not open existing error file - Verify another instance of Server is not running" },
+   { 70199L, "Could not open existing error file" },
    { 70200L, "Could not create error file" },
    { 70201L, "D4CREATE field not found" },
    { 70203L, "I4CREATE field not found" },
@@ -456,7 +446,7 @@ static ERROR4INFO_ARRAY error4array7[] =
    { 70214L, "ADDCATALOG field not found" },
    { 70215L, "ADDCATALOG invalid value( <0 or >3 )" },
    { 70216L, "USECATALOG field not found" },
-   { 70217L, "USECATALOG invalid value( only 1,2 and 4 are valid )" },
+   { 70217L, "USECATALOG invalid value( <0 or >2 )" },
    { 70218L, "Security Database Not Initialized" },
    { 70219L, "Security Database Has Invalid Field" },
    { 70220L, "Security Database Invalid" },
@@ -475,12 +465,7 @@ static ERROR4INFO_ARRAY error4array7[] =
    { 70233L, "unable to create blast connection" },
    { 70234L, "TCPBEGIN field not found" },
    { 70235L, "TCPEND field not found" },
-   { 70236L, "TCPEND or TCPBEGIN field contains invalid tcp/ip address" },
-   { 70237L, "ODBCPORTNO field not found" },
-   { 70238L, "unexpected error attempting to access registry. Possibly product was installed incorrectly." },
-   { 70239L, "field missing in server configuration file" },
-   { 70240L, "LOG setting set to LOG4BACK_ONLY (4), but backup logging (BACKLOG1) is disabled. Settings are incompatible." },
-   { 70241L, "unable to run system command" }
+   { 70236L, "TCPEND or TCPBEGIN field contains invalid tcp/ip address" }
 };
 
 #endif
@@ -541,10 +526,6 @@ static ERROR4INFO_ARRAY error4array8[] =
    { 81407L, "create failed on unnamed temporary file" },
    { 81408L, "too many fields on unnamed temporary file" },
    { 81409L, "field function not supported for given field type" },
-   { 81410L, "cannot have more than 1 field with r4autoIncrement set on" },
-   { 81411L, "r4autoIncrement option set for non-valid field type (only valid for r4double field types)" },
-   { 81412L, "cannot have more than 1 field with r4timestamp set on" },
-   { 81413L, "r4autoTimestamp option set for non-valid field type (only valid for r4dateTime and r4dateTimeMilli field types)" },
    { 81502L, "cannot compress memo file due to a transaction conflict" },
    { 81503L, "cannot zap data file due to a transaction conflict" },
    { 81504L, "cannot perform action due to other user transaction conflicts" },
@@ -640,7 +621,6 @@ static ERROR4INFO_ARRAY error4array8[] =
    { 83814L, "cannot begin transactions because CODE4::logOpen is zero" },
    { 83815L, "invalid transaction file--cannot use a backed up transaction file for transactions" },
    { 83816L, "exceeded maximum allowable users for transaction file" },
-   { 83817L, "Your current version of CodeBase does not support this table.  Upgrade to a newer version of CodeBase." },
    { 83901L, "invalid lock type" },
    { 84301L, "input name exceeds allowable length" },
    { 84302L, "default server unavailable" },
@@ -651,7 +631,6 @@ static ERROR4INFO_ARRAY error4array8[] =
    { 84307L, "attempt to get an additional handle on an open data file but with a more restrictive access level not supported" },
    { 84308L, "input name is longer than allowable" },
    { 84309L, "data file has no fields" },
-   { 84310L, "invalid communication message type sent" },
    { 84401L, "relation client initialization failed" },
    { 84402L, "input relate must be created with relate4init(), not relate4createSlave()" },
    { 84403L, "Called relate4createSlave() with a database that already exists in another part of the relation" },
@@ -670,7 +649,7 @@ static ERROR4INFO_ARRAY error4array8[] =
    { 84416L, "invalid relation type" },
    { 84417L, "backwards skip attempted without calling relate4skipEnable()" },
    { 84501L, "expected environment variable not set to a valid value" },
-   { 84801L, "functionality supported only from a valid record number" },
+   { 84801L, "skip must be made from valid record number" },
    { 84901L, "expression length doesn't match tag length" },
    { 84902L, "expression length too long for tag" },
    { 84903L, "non-logical filter type invalid" },
@@ -720,11 +699,8 @@ static ERROR4INFO_ARRAY error4array8[] =
    { 86102L, "removing lock which was never placed" },
    { 86201L, "corrupt linked list" },
    { 86202L, "link not on list" },
-   { 86203L, "system does not support negative locks" },
-   { 86401L, "cannot perform data file structure modification from within a transaction" },
+   { 86401L, "cannot call dfile4remove from within a transaction" },
    { 86402L, "cannot call dfile4remove for a datafile with open data handles" },
-   { 86403L, "dBASE 7 data file format not supported" },
-   { 86404L, "Cannot perform data file structure modification when auto recovery is enabled" },
    { 86801L, "unable to create socket" },
    { 86805L, "cannot set socket options" },
    { 86806L, "cannot set socket options" },
@@ -767,13 +743,13 @@ static ERROR4INFO_ARRAY error4array8[] =
    { 88056L, "Socket is already connected" },
    { 88057L, "Socket is not connected" },
    { 88058L, "Socket has been shutdown" },
-   { 88059L, "too many sockets" },
+   { 88059L, "Too many sockets" },
    { 88060L, "Connection request timed out" },
    { 88061L, "Connection refused, no server running on host machine" },
    { 88062L, "WSAELOOP" },
    { 88063L, "WSAENAMETOOLONG" },
    { 88064L, "WSAEHOSTDOWN" },
-   { 88065L, "host unreachable" },
+   { 88065L, "Host unreachable" },
    { 88066L, "WSAENOTEMPTY" },
    { 88067L, "WSAEPROCLIM" },
    { 88068L, "WSAEUSERS" },
@@ -786,7 +762,7 @@ static ERROR4INFO_ARRAY error4array8[] =
    { 89001L, "Authoritive DNS answer host not found" },
    { 89002L, "Nonauthoritive DNS answer host not found" },
    { 89003L, "Winsock unrecoverable operation" },
-   { 89004L, "unable to locate host" }
+   { 89004L, "Unable to locate host" }
 };
 
 static ERROR4INFO_ARRAY error4array9[] =
@@ -902,43 +878,39 @@ static ERROR4INFO_ARRAY error4array9[] =
    { 90919L, "expr4str" },
    { 90920L, "expr4calcCreate" },
    { 90921L, "expr4calcReset" },
-   { 90922L, "expr4..." },
    { 91001L, "code4init" },
    { 91002L, "code4initUndo" },
    { 91003L, "code4closeAll" },
    { 91004L, "code4connect" },
    { 91005L, "code4userConnect" },
    { 91006L, "code4timeout" },
-///   { 91007L, "code4 timeoutSet" },
-   { 91008L, "code4lock" }
-,{ 91009L, "code4lockNetworkId" }
-,{ 91010L, "code4lockUserId" }
-,{ 91011L, "code4lockFileName" }
-,{ 91012L, "code4lockItem" }
-,{ 91013L, "code4logCreate" }
-,{ 91014L, "code4logFileName" }
-,{ 91015L, "code4logOpen" }
-,{ 91016L, "code4logOpenOff" }
-,{ 91017L, "code4passwordSet" }
-,{ 91018L, "code4lockClear" }
-,{ 91019L, "code4status" }
-,{ 91020L, "code4validate" }
-,{ 91021L, "code4memoCompress" }
-,{ 91101L, "d4lockAppendRecord" }
-,{ 91102L, "dfile4...()" }
-,{ 91103L, "d4append" }
-,{ 91104L, "d4appendBlank" }
-,{ 91105L, "d4appendData" }
-,{ 91107L, "d4appendStart" }
-,{ 91108L, "d4unappend" }
-,{ 91110L, "code4indexFormat" }
-,{ 91111L, "code4version" }
-,{ 91112L, "code4serverName" }
-,{ 91201L, "d4bottom" }
-,{ 91302L, "d4close" }
-,{ 91304L, "code4dataFileCloseAll" }
-,{ 91401L, "d4create" }
-,{ 91403L, "d4createTemp" },
+   { 91007L, "code4timeoutSet" },
+   { 91008L, "code4lock" },
+   { 91009L, "code4lockNetworkId" },
+   { 91010L, "code4lockUserId" },
+   { 91011L, "code4lockFileName" },
+   { 91012L, "code4lockItem" },
+   { 91013L, "code4logCreate" },
+   { 91014L, "code4logFileName" },
+   { 91015L, "code4logOpen" },
+   { 91016L, "code4logOpenOff" },
+   { 91017L, "code4passwordSet" },
+   { 91018L, "code4lockClear" },
+   { 91101L, "d4lockAppendRecord" },
+   { 91102L, "dfile4...()" },
+   { 91103L, "d4append" },
+   { 91104L, "d4appendBlank" },
+   { 91105L, "d4appendData" },
+   { 91107L, "d4appendStart" },
+   { 91108L, "d4unappend" },
+   { 91110L, "code4indexFormat" },
+   { 91111L, "code4version" },
+   { 91112L, "code4serverName" },
+   { 91201L, "d4bottom" },
+   { 91302L, "d4close" },
+   { 91304L, "code4dataFileCloseAll" },
+   { 91401L, "d4create" },
+   { 91403L, "d4createTemp" },
    { 91521L, "d4authorize" },
    { 91530L, "server4client...()" },
    { 91601L, "t4uniqueSet" },
@@ -1100,7 +1072,6 @@ static ERROR4INFO_ARRAY error4array9[] =
    { 94107L, "code4flush" },
    { 94109L, "d4update" },
    { 94110L, "d4updateRecord" },
-   { 94111L, "d4copyTable" },
    { 94201L, "d4refresh" },
    { 94203L, "d4refreshRecord" },
    { 94301L, "d4open" },
@@ -1134,10 +1105,6 @@ static ERROR4INFO_ARRAY error4array9[] =
    { 94427L, "relate4dataOpen" },
    { 94428L, "relate4querySet" },
    { 94429L, "relate4sortSet" },
-   { 94430L, "relate4count" },
-   { 94431L, "relate4skipMaster" },
-   { 94432L, "relate4readBuffer" },
-   { 94433L, "relate4retain" },
    { 94501L, "u4allocAgainDefault" },
    { 94502L, "u4ncpy" },
    { 94503L, "u4environ" },
@@ -1211,6 +1178,7 @@ static ERROR4INFO_ARRAY error4array9[] =
    { 95905L, "mem4allocDefault" },
    { 95906L, "mem4createDefault" },
    { 95907L, "mem4freeDefault" },
+   { 95908L, "u4allocFixedDefault" },
    { 95909L, "u4allocErDefault" },
    { 95910L, "u4freeDefault" },
    { 95911L, "mem4reset" },
@@ -1237,7 +1205,6 @@ static ERROR4INFO_ARRAY error4array9[] =
    { 96601L, "error4set()" },
    { 96602L, "error4code()" },
    { 96701L, "d4...()" },
-   { 96702L, "code4...()" },
    { 96801L, "account4...()" },
    { 96901L, "address4makeName" },
    { 96902L, "address4makeNetID" },
@@ -1255,15 +1222,15 @@ static ERROR4INFO_ARRAY error4array9[] =
    { 96914L, "connect4bufferAuxConnection" },
    { 96915L, "connect4bufferAuxConnectionGet" },
    { 96916L, "connect4bufferAuxConnectionSpecific" },
-///   { 96917L, "connect4 bufferConnect" },
-   { 96918L, "address4getLocalNetID" }
-,{ 96919L, "connect4bufferDisconnect" }
-,{ 96920L, "connect4bufferGetWriteBuffer" }
-,{ 96921L, "connect4bufferInit" }
-,{ 96922L, "connect4bufferInitUndo" }
-,{ 96923L, "connect4bufferInitRead" }
-,{ 96924L, "connect4bufferReadRetrieve" }
-,{ 96925L, "connect4threadInit" },
+   { 96917L, "connect4bufferConnect" },
+   { 96918L, "address4getLocalNetID" },
+   { 96919L, "connect4bufferDisconnect" },
+   { 96920L, "connect4bufferGetWriteBuffer" },
+   { 96921L, "connect4bufferInit" },
+   { 96922L, "connect4bufferInitUndo" },
+   { 96923L, "connect4bufferInitRead" },
+   { 96924L, "connect4bufferReadRetrieve" },
+   { 96925L, "connect4threadInit" },
    { 96926L, "list4mutexAdd" },
    { 96927L, "list4mutexInit" },
    { 96928L, "list4mutexRelease" },
@@ -1323,16 +1290,9 @@ static ERROR4INFO_ARRAY error4array9[] =
    { 96982L, "inter4connectionCheck" },
    { 96983L, "inter4releaseSignal" },
    { 96984L, "connect4threadReadStore" },
-   { 96985L, "pipe4recvOpen" },
-   { 96986L, "pipe4sendOpen" },
-   { 96987L, "pipe4recvClose" },
-   { 96988L, "pipe4sendClose" },
-   { 96989L, "pipe4sendMessageN" },
-   { 96990L, "pipe4sendMessage" },
-   { 96991L, "pipe4recvMessage" },
-   { 96992L, "pipe4recvMessageVB" }
-,{ 99999L, "Testing Only" }};
+   { 99999L, "Testing Only" },
 
+};
 
 #endif /* E4OFF_STRING */
 #include "e4str2.c"

@@ -12,7 +12,10 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/*  c4bcd.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* revisited by altomaltes@gmail.com
+ */
+
+/*  c4bcd.c   */
 /*                binary digit is:   xxxx xxxx  xxxx xx01                */
 /*                                   sig dig    |||| ||||                */
 /*                                              |||| ||always 01         */
@@ -21,9 +24,6 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif  /* __TUROBC__ */
 
 #ifdef S4MDX
 
@@ -74,10 +74,105 @@ int S4CALL c4bcdCmp( S4CMP_PARM aPtr, S4CMP_PARM bPtr, size_t dummyLen )
    compareLen = (compareLen+1)/2 ;
 
    rc = c4memcmp( ((C4BCD *)aPtr)->bcd, ((C4BCD *)bPtr)->bcd, compareLen ) ;
-   if ( aSign < 0 )
-      return -rc ;
+   if ( aSign < 0 )  return -rc ;
 
    return rc ;
+}
+
+/* MDX */
+void c4bcdFromA( char *result, const char *inputPtr, const int inputPtrLen )
+{
+   char *ptr ;
+   unsigned len ;
+   int n, lastPos, pos, isBeforeDec, zeroCount ;
+
+   memset( result, 0, sizeof(C4BCD) ) ;
+
+   lastPos = inputPtrLen - 1 ;
+   pos = 0 ;
+   for ( ; pos <= lastPos; pos++ )
+      if ( inputPtr[pos] != ' ' )  break ;
+
+   if ( pos <= lastPos )
+   {
+      if ( inputPtr[pos] == '-' )
+      {
+         ((C4BCD *)result)->digitInfo=(unsigned char)((int)((C4BCD *)result)->digitInfo | 0x80) ;
+         pos++ ;
+      }
+      else
+      {
+         if ( inputPtr[pos] == '+' )  pos++ ;
+      }
+   }
+
+   for ( ; pos <= lastPos; pos++ )
+      if ( inputPtr[pos] != ' ' && inputPtr[pos] != '0' )  break ;
+
+   isBeforeDec = 1 ;
+
+   ((C4BCD *)result)->sigDig = 0x34 ;
+   if ( pos <= lastPos )
+      if ( inputPtr[pos] == '.' )
+      {
+         isBeforeDec = 0 ;
+         pos++ ;
+         for ( ; pos <= lastPos; pos++ )
+         {
+            if ( inputPtr[pos] != '0' )  break ;
+            ((C4BCD *)result)->sigDig-- ;
+         }
+      }
+
+   ptr = (char *) ((C4BCD *)result)->bcd ; ;
+   zeroCount = 0 ;
+
+   for ( n=0; pos <= lastPos; pos++ )
+   {
+      if ( inputPtr[pos] >= '0' && inputPtr[pos] <= '9' )
+      {
+         if ( inputPtr[pos] == '0' )
+            zeroCount++ ;
+         else
+            zeroCount = 0 ;
+         if ( n >= 20 )  break ;
+         if ( n & 1 )
+            *ptr++ |= inputPtr[pos] - '0' ;
+         else
+            *ptr += (unsigned char)( (unsigned char)((unsigned char)inputPtr[pos] - (unsigned char)'0') << 4 ) ;
+      }
+      else
+      {
+         if ( inputPtr[pos] != '.'  ||  ! isBeforeDec )
+            break ;
+
+         isBeforeDec = 0 ;
+         continue ;
+      }
+      if ( isBeforeDec )
+         ((C4BCD *)result)->sigDig++ ;
+
+      n++ ;
+   }
+                                        /* 'always one' bit filled  */
+   ((C4BCD *)result)->digitInfo = (unsigned char)( ((C4BCD *)result)->digitInfo | 0x1 ) ;
+
+   #ifdef E4MISC
+      if ( n - zeroCount < 0 )
+      {
+         error4( 0, e4info, E95105 ) ;
+         return ;
+      }
+   #endif
+
+   len = n - zeroCount ;
+   if (len > 31)
+      len = 31 ;
+
+   ((C4BCD *)result)->digitInfo = (unsigned char)( ((C4BCD *)result)->digitInfo | (len << 2) ) ;
+
+   if ( len == 0 )
+      ((C4BCD *)result)->digitInfo = (unsigned char)( ((C4BCD *)result)->digitInfo & 0x7F ) ;
 }
 
 /* MDX */
@@ -104,26 +199,33 @@ void  c4bcdFromD( char *result, const double doub )
    {
       dec = -dec ;
       len = dec+1+pos ;
-      c4memcpy( tempStr+len, ptr, E4ACCURACY_DIGITS ) ;
-      c4memset( tempStr+pos, '0', len-pos ) ;
+      memcpy( tempStr+len, ptr, E4ACCURACY_DIGITS ) ;
+      memset( tempStr+pos, '0', len-pos ) ;
       tempStr[pos] = '.' ;
 
-      c4bcdFromA( 0, result, tempStr, E4ACCURACY_DIGITS + len, 0 ) ;
+      c4bcdFromA( result, tempStr, E4ACCURACY_DIGITS + len ) ;
    }
    else
    {
-      c4memcpy( tempStr+pos, ptr, dec ) ;
+      memcpy( tempStr+pos, ptr, dec ) ;
       pos += dec ;
       if ( dec < E4ACCURACY_DIGITS )
       {
          tempStr[pos++] = '.' ;
 
          len = E4ACCURACY_DIGITS - dec ;
-         c4memcpy( tempStr+pos, ptr+dec, len ) ;
+         memcpy( tempStr+pos, ptr+dec, len ) ;
          pos += len ;
       }
-      c4bcdFromA( 0, result, tempStr, pos, 0 ) ;
+      c4bcdFromA( result, tempStr, pos ) ;
    }
 }
 
 #endif  /* S4MDX */
+
+#ifndef S4MDX /*Change made for non MDX indexes to support non index dependent OLEDB dll */
+void c4bcdFromA( char *junk1, const char *junk2, const int junk3 )
+{
+   error4(0,e4notSupported, 0L);
+}
+#endif

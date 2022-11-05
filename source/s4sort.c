@@ -12,7 +12,10 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-/* s4sort.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved.
+/* revisited by altomaltes@gmail.com
+ */
+
+/* s4sort.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved.
 
 Internal sort information is saved as follows:
    Sort Info, Rec Num, Other Info
@@ -23,12 +26,11 @@ is put.
 
 #include "d4all.h"
 
+
 void s4deleteSpoolEntry( SORT4 *s4 )
 {
-   c4memcpy( (void *)s4->spoolPointer, (void *)( s4->spoolPointer + 1 ), --s4->spoolsN * sizeof( S4SPOOL ) ) ;
+   memcpy( (void *)s4->spoolPointer, (void *)( s4->spoolPointer + 1 ), --s4->spoolsN * sizeof( S4SPOOL ) ) ;
 }
-
-
 
 int s4flush( SORT4 *s4 )
 {
@@ -47,18 +49,13 @@ int s4flush( SORT4 *s4 )
 
    if ( s4->spoolsMax == 0 )  /* Temporary file must be created. */
    {
-      // AS May 24/02 - created file4createInternal for internal use to indicate file types
-      file4tempLow( &s4->file, s4->codeBase, 1, 1, NULL, OPT4NONE ) ;
-      /* LY July 7/03 : changed from 0 to 0L for Linux compiler */
-      file4longAssign( startPos, 0, 0L ) ;
+      file4tempLow( &s4->file, s4->codeBase, 1, 1, NULL ) ;
+      file4longAssign( startPos, 0, 0 ) ;
       file4seqWriteInitLow( &s4->seqwrite, &s4->file, startPos, s4->seqwriteBuffer, s4->codeBase->memSizeSortBuffer ) ;
    }
 
    for ( i = 0; i < s4->pointersUsed; i++ )
-   {
-      if ( file4seqWrite( &s4->seqwrite, s4->pointers[i], s4->totLen) < 0 )
-         return -1 ;
-   }
+      if ( file4seqWrite( &s4->seqwrite, s4->pointers[i], s4->totLen) < 0 ) return -1 ;
 
    s4->pointersUsed = 0 ;
    if ( (unsigned S4LONG) s4->spoolsMax * (unsigned S4LONG) sizeof(S4SPOOL) >= (unsigned S4LONG) UINT_MAX )
@@ -70,8 +67,6 @@ int s4flush( SORT4 *s4 )
 
    return 0 ;
 }
-
-
 
 int S4FUNCTION sort4free( SORT4 *s4 )
 {
@@ -98,13 +93,11 @@ int S4FUNCTION sort4free( SORT4 *s4 )
    }
    mem4release( s4->poolMemory ) ;
 
-   c4memset( (void *)s4, 0, sizeof(SORT4) ) ;
+   memset( (void *)s4, 0, sizeof(SORT4) ) ;
    s4->file.hand = INVALID4HANDLE ;
 
    return 0 ;
 }
-
-
 
 int S4FUNCTION sort4get( SORT4 *s4, S4LONG *recPtr, void **sortData, void **infoPtr )
 {
@@ -132,15 +125,13 @@ int S4FUNCTION sort4get( SORT4 *s4, S4LONG *recPtr, void **sortData, void **info
       memcpy( (void *)&recl, ptr + s4->sortLen, sizeof(S4LONG) ) ;
       *recPtr = recl ;
    #else
-      c4memcpy( (void *)recPtr, ptr + s4->sortLen, sizeof(S4LONG) ) ;
+      memcpy( (void *)recPtr, ptr + s4->sortLen, sizeof(S4LONG) ) ;
    #endif
    *sortData= (void *)ptr ;
    *infoPtr = (void *)( ptr + s4->infoOffset ) ;
 
    return 0 ;
 }
-
-
 
 int sort4getPtrPtr( SORT4 *s4, char **ptrPtr )
 {
@@ -177,8 +168,6 @@ int sort4getPtrPtr( SORT4 *s4, char **ptrPtr )
    return 0 ;
 }
 
-
-
 int S4FUNCTION sort4put( SORT4 *s4, const S4LONG rec, const void *sortData, const void *info )
 {
    char *ptr ;
@@ -197,7 +186,7 @@ int S4FUNCTION sort4put( SORT4 *s4, const S4LONG rec, const void *sortData, cons
    {
       if ( s4->pointersUsed < s4->pointersMax && s4->isMemAvail )
       {
-         ptr = (char *)mem4allocNoZero( s4->poolMemory ) ;
+         ptr = (char *)mem4alloc( s4->poolMemory ) ;
          if ( ptr == 0 )
          {
             ptrMemAvail = ( s4->pointersMax - s4->pointersUsed ) * ( sizeof( char * ) ) - ( sizeof(S4LONG) ) ;
@@ -228,9 +217,9 @@ int S4FUNCTION sort4put( SORT4 *s4, const S4LONG rec, const void *sortData, cons
    #endif
 
    ptr = s4->pointers[s4->pointersUsed++] ;
-   c4memcpy( ptr, sortData, s4->sortLen ) ;
-   c4memcpy( ptr+ s4->sortLen, (void *)&rec, sizeof( rec ) ) ;
-   c4memcpy( ptr+ s4->infoOffset, info, s4->infoLen ) ;
+   memcpy( ptr, sortData, s4->sortLen ) ;
+   memcpy( ptr+ s4->sortLen, (void *)&rec, sizeof( rec ) ) ;
+   memcpy( ptr+ s4->infoOffset, info, s4->infoLen ) ;
 
    return 0 ;
 }

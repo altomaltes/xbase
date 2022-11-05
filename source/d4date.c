@@ -1,29 +1,20 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* d4date.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* d4date.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#include "assert.h"
+#ifndef S4UNIX
+   #ifdef __TURBOC__
+      #pragma hdrstop
+   #endif  /* __TUROBC__ */
+#endif  /* S4UNIX */
 
-// AS 08/14/00 - moved defs to d4date.c for mdx odbc
-
+#define  JULIAN_ADJUSTMENT    1721425L
+#define  S4NULL_DATE          1.0E100   /* may not compile on some Op.Sys. */
+                                        /* Set to MAXDOUBLE ?              */
 static int monthTot[] =
-{ 0, 0,  31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 } ;
-    /* Jan Feb Mar  Apr  May  Jun        Jul  Aug  Sep  Oct  Nov  Dec
-        31  28  31   30   31   30         31   31   30        31   30   31
-     */
+    { 0, 0,  31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365 } ;
+         /* Jan Feb Mar  Apr  May  Jun        Jul  Aug  Sep  Oct  Nov  Dec
+             31  28  31   30   31   30         31   31   30        31   30   31
+         */
 
 typedef struct
 {
@@ -37,220 +28,246 @@ typedef struct
 
 static DOW dayOfWeek[] =
 #ifndef S4LANGUAGE
-   {
-      { "\0          " },
-      { "Sunday\0    " },
-      { "Monday\0    " },
-      { "Tuesday\0   " },
-      { "Wednesday\0 " },
-      { "Thursday\0  " },
-      { "Friday\0    " },
-      { "Saturday\0  " },
-   } ;
+{
+   { "\0          " },
+   { "Sunday\0    " },
+   { "Monday\0    " },
+   { "Tuesday\0   " },
+   { "Wednesday\0 " },
+   { "Thursday\0  " },
+   { "Friday\0    " },
+   { "Saturday\0  " },
+} ;
 #else
    #ifdef S4GERMAN
-      {
-         { "\0          " },
-         { "Sonntag\0   " },
-         { "Montag\0    " },
-         { "Dienstag\0  " },
-         { "Mittwoch\0  " },
-         { "Donnerstag\0" },
-         { "Freitag\0   " },
-         { "Samstag\0   " },
-      } ;
+   {
+      { "\0          " },
+      { "Sonntag\0   " },
+      { "Montag\0    " },
+      { "Dienstag\0  " },
+      { "Mittwoch\0  " },
+      { "Donnerstag\0" },
+      { "Freitag\0   " },
+      { "Samstag\0   " },
+   } ;
    #endif
    #ifdef S4FRENCH
-      {
-         { "\0          " },
-         { "Dimanche\0  " },
-         { "Lundi\0     " },
-         { "Mardi\0     " },
-         { "Mercredi\0  " },
-         { "Jeudi\0     " },
-         { "Vendredi\0  " },
-         { "Samedi\0    " },
-      } ;
+   {
+      { "\0          " },
+      { "Dimanche\0  " },
+      { "Lundi\0     " },
+      { "Mardi\0     " },
+      { "Mercredi\0  " },
+      { "Jeudi\0     " },
+      { "Vendredi\0  " },
+      { "Samedi\0    " },
+   } ;
    #endif
    #ifdef S4SWEDISH
-      {
-         { "\0          " },
-         { "M†ndag\0    " },
-         { "Tisdag\0    " },
-         { "Onsdag\0    " },
-         { "Torsdag\0   " },
-         { "Fredag\0    " },
-         { "L”rdag\0    " },
-         { "S”ndag\0    " },
-      } ;
+   {
+      { "\0          " },
+      { "M†ndag\0    " },
+      { "Tisdag\0    " },
+      { "Onsdag\0    " },
+      { "Torsdag\0   " },
+      { "Fredag\0    " },
+      { "L”rdag\0    " },
+      { "S”ndag\0    " },
+   } ;
    #endif
    #ifdef S4FINNISH
-      {
-         { "\0          " },
-         { "Maanantai\0 " },
-         { "Tiistai\0   " },
-         { "Keskiviikko " },
-         { "Torstai\0   " },
-         { "Perjantai\0 " },
-         { "Lauantai\0  " },
-         { "Suununtai\0 " },
-      } ;
+   {
+      { "\0          " },
+      { "Maanantai\0 " },
+      { "Tiistai\0   " },
+      { "Keskiviikko " },
+      { "Torstai\0   " },
+      { "Perjantai\0 " },
+      { "Lauantai\0  " },
+      { "Suununtai\0 " },
+   } ;
    #endif
    #ifdef S4NORWEGIAN
-      {
-         { "\0          " },
-         { "Mandag\0    " },
-         { "Tirsdag\0   " },
-         { "Onsdag\0    " },
-         { "Torsdag\0   " },
-         { "Fredag\0    " },
-         { "L”rdag\0    " },
-         { "S”ndag\0    " },
-      } ;
+   {
+      { "\0          " },
+      { "Mandag\0    " },
+      { "Tirsdag\0   " },
+      { "Onsdag\0    " },
+      { "Torsdag\0   " },
+      { "Fredag\0    " },
+      { "L”rdag\0    " },
+      { "S”ndag\0    " },
+   } ;
    #endif
 #endif
 
 static MONTH monthOfYear[] =
 #ifndef S4LANGUAGE
-   {
-      { "\0        " },
-      { "January\0 " },
-      { "February\0" },
-      { "March\0   " },
-      { "April\0   " },
-      { "May\0     " },
-      { "June\0    " },
-      { "July\0    " },
-      { "August\0  " },
-      { "September" },
-      { "October\0 " },
-      { "November\0" },
-      { "December\0" },
-   } ;
+{
+   { "\0        " },
+   { "January\0 " },
+   { "February\0" },
+   { "March\0   " },
+   { "April\0   " },
+   { "May\0     " },
+   { "June\0    " },
+   { "July\0    " },
+   { "August\0  " },
+   { "September" },
+   { "October\0 " },
+   { "November\0" },
+   { "December\0" },
+} ;
 #else
-   #ifdef S4GERMAN
-      {
-         { "\0        " },
-         { "Januar\0  " },
-         { "Februar\0 " },
-         { "M„rz\0    " },
-         { "April\0   " },
-         { "Mai\0     " },
-         { "Juni\0    " },
-         { "Juli\0    " },
-         { "August\0  " },
-         { "September" },
-         { "Oktober\0 " },
-         { "November\0" },
-         { "Dezember\0" },
-      } ;
-   #endif
-   #ifdef S4FRENCH
-      {
-         { "\0        " },
-         { "Janvier\0 " },
-         { "F‚vrier\0 " },
-         { "Mars\0    " },
-         { "Avril\0   " },
-         { "Mai\0     " },
-         { "Juin\0    " },
-         { "Juillet\0 " },
-         { "Ao–t\0    " },
-         { "Septembre" },
-         { "Octobre\0 " },
-         { "Novembre\0" },
-         { "D‚cembre\0" },
-      } ;
-   #endif
-   #ifdef S4SWEDISH
-      {
-         { "\0        " },
-         { "Januari\0 " },
-         { "Februari\0" },
-         { "Mars\0    " },
-         { "April\0   " },
-         { "Maj\0     " },
-         { "Juni\0    " },
-         { "Juli\0    " },
-         { "Augusti\0 " },
-         { "September" },
-         { "Oktober\0 " },
-         { "November\0" },
-         { "December\0" },
-      } ;
-   #endif
-   #ifdef S4FINNISH
-      {
-         { "\0        " },
-         { "Tammikuu\0" },
-         { "Helmikuu\0" },
-         { "Maaliskuu" },
-         { "Huhtikuu\0" },
-         { "Toukokuu\0" },
-         { "Kes„kuu\0 " },
-         { "Hein„kuu\0" },
-         { "Elokuu\0  " },
-         { "Syyskuu\0 " },
-         { "Lokakuu\0 " },
-         { "Marraskuu" },
-         { "Joulukuu\0" },
-      } ;
-   #endif
-   #ifdef S4NORWEGIAN
-      {
-         { "\0        " },
-         { "Januar\0  " },
-         { "Februar\0 " },
-         { "Mars\0    " },
-         { "April\0   " },
-         { "Mai\0     " },
-         { "Juni\0    " },
-         { "Juli\0    " },
-         { "August \0 " },
-         { "September" },
-         { "Oktober\0 " },
-         { "November\0" },
-         { "Desember\0" },
-      } ;
-   #endif
+#ifdef S4GERMAN
+{
+   { "\0        " },
+   { "Januar\0  " },
+   { "Februar\0 " },
+   { "M„rz\0    " },
+   { "April\0   " },
+   { "Mai\0     " },
+   { "Juni\0    " },
+   { "Juli\0    " },
+   { "August\0  " },
+   { "September" },
+   { "Oktober\0 " },
+   { "November\0" },
+   { "Dezember\0" },
+} ;
+#endif
+#ifdef S4FRENCH
+{
+   { "\0        " },
+   { "Janvier\0 " },
+   { "F‚vrier\0 " },
+   { "Mars\0    " },
+   { "Avril\0   " },
+   { "Mai\0     " },
+   { "Juin\0    " },
+   { "Juillet\0 " },
+   { "Ao–t\0    " },
+   { "Septembre" },
+   { "Octobre\0 " },
+   { "Novembre\0" },
+   { "D‚cembre\0" },
+} ;
+#endif
+#ifdef S4SWEDISH
+{
+   { "\0        " },
+   { "Januari\0 " },
+   { "Februari\0" },
+   { "Mars\0    " },
+   { "April\0   " },
+   { "Maj\0     " },
+   { "Juni\0    " },
+   { "Juli\0    " },
+   { "Augusti\0 " },
+   { "September" },
+   { "Oktober\0 " },
+   { "November\0" },
+   { "December\0" },
+} ;
+#endif
+#ifdef S4FINNISH
+{
+   { "\0        " },
+   { "Tammikuu\0" },
+   { "Helmikuu\0" },
+   { "Maaliskuu" },
+   { "Huhtikuu\0" },
+   { "Toukokuu\0" },
+   { "Kes„kuu\0 " },
+   { "Hein„kuu\0" },
+   { "Elokuu\0  " },
+   { "Syyskuu\0 " },
+   { "Lokakuu\0 " },
+   { "Marraskuu" },
+   { "Joulukuu\0" },
+} ;
+#endif
+#ifdef S4NORWEGIAN
+{
+   { "\0        " },
+   { "Januar\0  " },
+   { "Februar\0 " },
+   { "Mars\0    " },
+   { "April\0   " },
+   { "Mai\0     " },
+   { "Juni\0    " },
+   { "Juli\0    " },
+   { "August \0 " },
+   { "September" },
+   { "Oktober\0 " },
+   { "November\0" },
+   { "Desember\0" },
+} ;
+#endif
 #endif
 
 #ifndef S4SERVER
-   const char *S4FUNCTION code4dateFormat( CODE4 *c4 )
-   {
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
+const char *S4FUNCTION code4dateFormat( CODE4 *c4 )
+{
+   #ifdef E4PARM_HIGH
+      if ( c4 == 0 )
+      {
+         error4( c4, e4parm_null, E96303 ) ;
+         return 0 ;
+      }
+   #endif
+
+   #ifdef S4SERVER
+      return c4->currentClient->trans.dateFormat ;
+   #else
+      return c4->c4trans.trans.dateFormat ;
+   #endif
+}
+
+int S4FUNCTION code4dateFormatSet( CODE4 *c4, const char *str )
+{
+   #ifdef S4CLIENT
+      CONNECTION4 *connection ;
+      CONNECTION4DATE_FORMAT_SET_INFO_IN *infoIn ;
+      int rc ;
+   #endif
+
+   #ifdef E4PARM_HIGH
+      if ( c4 == 0 || str == 0 )
+         return error4( c4, e4parm_null, E96302 ) ;
+      if ( strlen( str ) >= sizeof( c4->c4trans.trans.dateFormat ) )
+         return error4( c4, e4parm, E96302 ) ;
+   #endif
+
+   #ifdef S4SERVER
+      strcpy( c4->currentClient->trans.dateFormat, str ) ;
+   #else
+      strcpy( c4->c4trans.trans.dateFormat, str ) ;
+      #ifdef S4CLIENT
+         if ( c4->defaultServer.connected )
          {
-            error4( c4, e4parm_null, E96303 ) ;
-            return 0 ;
+            connection = &c4->defaultServer ;
+            #ifdef E4ANALYZE
+               if ( connection == 0 )
+                  return error4( c4, e4struct, E96302 ) ;
+            #endif
+            connection4assign( connection, CON4DATE_FORMAT, 0L, 0L ) ;
+            connection4addData( connection, NULL, sizeof(CONNECTION4DATE_FORMAT_SET_INFO_IN), (void **)&infoIn ) ;
+            memcpy( infoIn->dateFormat, &c4->c4trans.trans.dateFormat, sizeof( c4->c4trans.trans.dateFormat ) ) ;
+            connection4sendMessage( connection ) ;
+            rc = connection4receiveMessage( connection ) ;
+            if ( rc < 0 )
+               return error4stack( c4, rc, E96302 ) ;
+            rc = connection4status( connection ) ;
+            if ( rc < 0 )
+               connection4error( connection, c4, rc, E96302 ) ;
+            return rc ;
          }
       #endif
+   #endif
 
-      #ifdef E4VBASIC
-         if ( c4parm_check( c4, 1, E96303 ) )
-            return 0 ;
-      #endif
-
-      return c4->c4trans.trans.dateFormat ;
-   }
-
-   int S4FUNCTION code4dateFormatSet( CODE4 *c4, const char *str )
-   {
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 || str == 0 )
-            return error4( c4, e4parm_null, E96302 ) ;
-         if ( c4strlen( str ) >= sizeof( c4->c4trans.trans.dateFormat ) )
-            return error4( c4, e4parm, E96302 ) ;
-      #endif
-
-      #ifdef S4SERVER
-         c4strcpy( c4->currentClient->trans.dateFormat, sizeof( c4->c4trans.trans.dateFormat ), str ) ;
-      #else
-         c4strcpy( c4->c4trans.trans.dateFormat, sizeof( c4->c4trans.trans.dateFormat ), str ) ;  // AS Dec 13/05 vs 5.0 fixes
-      #endif
-
-      return 0 ;
-   }
+   return 0 ;
+}
 #endif
 
 int S4FUNCTION date4isLeap( const char *date )
@@ -261,7 +278,7 @@ int S4FUNCTION date4isLeap( const char *date )
    return ( ( ((year%4 == 0) && (year%100 != 0)) || (year%400 == 0 )) ?  1 : 0 ) ;
 }
 
-static int c4dayOfYear( const int year, const int month, const int day )
+static int c4Julian( const int year, const int month, const int day )
 {
    /*  Returns */
    /*     >0   The day of the year starting from 1 */
@@ -269,7 +286,6 @@ static int c4dayOfYear( const int year, const int month, const int day )
    /*     -1   Illegal Date */
    int isLeap, monthDays ;
 
-   // AS 06/21/00 it turns out that year 0 is really 1BC, and is not a leap year!
    isLeap =  ( ((year%4 == 0) && (year%100 != 0)) || (year%400 == 0) ) ?  1 : 0 ;
 
    monthDays = monthTot[ month+1 ] -  monthTot[ month] ;
@@ -285,7 +301,7 @@ static int c4dayOfYear( const int year, const int month, const int day )
    return(  monthTot[month] + day + isLeap ) ;
 }
 
-int S4FUNCTION c4monDy( const int year, const int days,  int *monthPtr,  int *dayPtr )
+static int c4monDy( const int year, const int days,  int *monthPtr,  int *dayPtr )
 {
    /*  Given the year and the day of the year, returns the month and day of month. */
    int isLeap, i ;
@@ -312,7 +328,7 @@ int S4FUNCTION c4monDy( const int year, const int days,  int *monthPtr,  int *da
    return -1 ;
 }
 
-long S4FUNCTION c4ytoj( const int y )
+static long c4ytoj( const int y )
 {
    int yr ;
    /*  Calculates the number of days to the year */
@@ -322,27 +338,23 @@ long S4FUNCTION c4ytoj( const int y )
    /*     3)  Otherwise, years divisible by four are leap years. */
    /*  Since we do not want to consider the current year, we will */
    /*  subtract the year by 1 before doing the calculation. */
-
-   // AS 06/21/00 there is a problem for negative years.  Namely, the /4 adjustment,
-   // to see this, year 4, yr = 3, yr/4 = 0,  year -2, yr = -3, yr/4 = 0  a range of 7 years both
-   // have the same adjustment.  To recover from this, if yr < 0, we need to subtract a further '1' value
    yr = y - 1 ;
-   return( yr*365L +  yr/4L - yr/100L + yr/400L - ( (yr < 0) ? 1 : 0 )  ) ;
+   return( yr*365L +  yr/4L - yr/100L + yr/400L ) ;
 }
 
-int S4FUNCTION date4assignLow( char *datePtr, const long ldate, int isOle )
+int S4FUNCTION date4assign( char *datePtr, const long ldate )
 {
    /* Converts from a Julian day to the dbf file date format. */
    long totDays ;
-   int  iTemp, year, nDays, nDaysInYear, month, day ;
+   int  iTemp, year, nDays, maxDays, month, day ;
 
    if ( ldate <= 0 )
    {
-      c4memset( datePtr, isOle ? '0' : ' ',  8 ) ;
+      memset( datePtr, ' ',  8 ) ;
       return 0L ;
    }
 
-   totDays = ldate - JULIAN4ADJUSTMENT ;
+   totDays = ldate - JULIAN_ADJUSTMENT ;
    iTemp = (int)( (double)totDays / 365.2425 ) ;
    year = iTemp + 1 ;
    nDays = (int)( totDays - c4ytoj( year ) ) ;
@@ -353,14 +365,14 @@ int S4FUNCTION date4assignLow( char *datePtr, const long ldate, int isOle )
    }
 
    if ( (( year % 4 == 0 ) && ( year % 100 )) || ( year % 400 == 0 ) )
-      nDaysInYear = 366 ;
+      maxDays = 366 ;
    else
-      nDaysInYear = 365 ;
+      maxDays = 365 ;
 
-   if ( nDays > nDaysInYear )
+   if ( nDays > maxDays )
    {
       year++ ;
-      nDays -= nDaysInYear ;
+      nDays -= maxDays ;
    }
 
    #ifdef E4MISC
@@ -408,13 +420,13 @@ void S4FUNCTION date4format( const char *datePtr, char *result, char *picture )
    unsigned int resultLen, length ;
    char *ptrEnd, *monthPtr, tChar ;
 
-   resultLen = c4strlen( picture ) ;
-   c4memset( result, ' ', resultLen ) ;
+   resultLen = strlen( picture ) ;
+   memset( result, ' ', resultLen ) ;
 
    c4upper( picture ) ;
    c4encode( result, datePtr, picture, "CCYYMMDD" ) ;
 
-   ptrEnd = c4strchr( picture, 'M' ) ;
+   ptrEnd = strchr( picture, 'M' ) ;
    if ( ptrEnd )
    {
       monthPtr = result+ (int)( ptrEnd - picture ) ;
@@ -427,7 +439,7 @@ void S4FUNCTION date4format( const char *datePtr, char *result, char *picture )
          /* Convert from a numeric form to character format for month */
          if (!c4memcmp( datePtr+4, "  ", 2 ))   /* if blank month */
          {
-            c4memset( monthPtr, ' ', length ) ;
+            memset( monthPtr, ' ', length ) ;
             return ;
          }
 
@@ -442,14 +454,14 @@ void S4FUNCTION date4format( const char *datePtr, char *result, char *picture )
          if (length > 9)
             length = 9 ;
 
-         c4memcpy( monthPtr, monthOfYear[mNum].cmonth, length ) ;
+         memcpy( monthPtr, monthOfYear[mNum].cmonth, length ) ;
          if (rest > 0)
-            c4memset( monthPtr+length, (int) ' ', (size_t)rest ) ;
+            memset( monthPtr+length, (int) ' ', (size_t)rest ) ;
 
          tChar = monthOfYear[mNum].cmonth[length] ;
          if( tChar == '\0' || tChar == ' ' )
          {
-            mNum = c4strlen(monthOfYear[mNum].cmonth) ;
+            mNum = strlen(monthOfYear[mNum].cmonth) ;
             if ( (unsigned)mNum != length )
                monthPtr[mNum] = ' ' ;
          }
@@ -492,107 +504,85 @@ void S4FUNCTION date4init( char *datePtr, const char *dateData, char *picture )
    char *monthStart, monthData[10], buf[2] ;
    int yearCount, monthCount, dayCount, centuryCount, i, length ;
    long currentCentury ;
-   dayCount = 8 ;
-   monthCount = 6 ;
-   yearCount = 4 ;
-   centuryCount = 2 ;
+   #ifdef S4WINCE
+      SYSTEMTIME st ;
+   #else
+      time_t currentTime ;
+      struct tm *brokenTime ;
+   #endif
+   dayCount = 5 ;
+   monthCount = 3 ;
+   yearCount = 1 ;
+   centuryCount= -1 ;
 
-   c4memset( datePtr, ' ', 8 ) ;
+   memset( datePtr, ' ', 8 ) ;
 
    c4upper( picture ) ;
-   /* LY 2003/07/23 : if the picture contains single digits old algorithm fails
-      ( "M/DD/YY" and "9/11/01" produces "2001/90/11" ) */
-   //   for ( i=0; picture[i] != '\0'; i++ )
-   for ( i = ( strlen( picture ) < strlen( dateData ) ? strlen( picture ) : strlen( dateData ) ) - 1 ; i >= 0 ; i-- )
+   for ( i=0; picture[i] != '\0'; i++ )
    {
-      if ( dateData[i] == 0 )  // reached end of input string - just stop, ignore rest of picture
-         break ;
-
       switch( picture[i] )
       {
          case 'D':
-            // if ( ++dayCount >= 8 )
-            if ( --dayCount < 6  )
+            if ( ++dayCount >= 8 )
                break ;
             datePtr[dayCount] = dateData[i] ;
-         break ;
-
+            break ;
          case 'M':
-            // if ( ++monthCount >=6 )
-            if ( --monthCount < 4 )
+            if ( ++monthCount >=6 )
                break ;
             datePtr[monthCount] = dateData[i] ;
-         break ;
-
+            break ;
          case 'Y':
-            // if ( ++yearCount >= 4 )
-            if ( --yearCount < 2 )
+            if ( ++yearCount >= 4 )
                break ;
             datePtr[yearCount] = dateData[i] ;
-         break ;
-
+            break ;
          case 'C':
-            // if ( ++centuryCount >= 2 )
-            if ( --centuryCount < 0 )
+            if ( ++centuryCount >= 2 )
                break ;
             datePtr[centuryCount] = dateData[i] ;
-         break ;
-
+            break ;
          default:
             break ;
       }
    }
 
-   if ( c4strcmp( datePtr, "        " ) == 0 )
+   if ( strcmp( datePtr, "        " ) == 0 )
       return ;
 
-   // if ( centuryCount == -1 )
-   if ( centuryCount == 2 )
+   if ( centuryCount == -1 )
    {
       /* check the century on the system clock if possible */
-      #if defined(S4WINCE) || defined(__WIN32)
-         SYSTEMTIME st ;
-         GetLocalTime(&st) ;
-         currentCentury = st.wYear / 100 ;
-      #elif defined(S4PALM)
-         DateTimeType timeNow;
-         TimSecondsToDateTime(TimGetSeconds(),&timeNow);
-         currentCentury = timeNow.year / 100 ;
-      #else
-         time_t currentTime ;
-         struct tm *brokenTime ;
+      #ifndef S4WINCE
          time( &currentTime ) ;
          brokenTime = localtime( &currentTime ) ;
          currentCentury = (1900 + brokenTime->tm_year) / 100 ;
+      #else
+         GetLocalTime(&st) ;
+         currentCentury = st.wYear / 100 ;
       #endif
       c4ltoa45( currentCentury, datePtr, 2 ) ;
       /* memcpy( datePtr, "19", (size_t)2 ) ; */
    }
-   // if ( yearCount ==  1 )
-   if ( yearCount ==  4 )
-      c4memcpy( datePtr + 2, "01", (size_t)2 ) ;
-   // if ( monthCount == 3 )
-   if ( monthCount == 6 )
-      c4memcpy( datePtr + 4, "01", (size_t)2 ) ;
-   // if ( dayCount == 5 )
-   if ( dayCount == 8 )
-      c4memcpy( datePtr + 6, "01", (size_t)2 ) ;
+   if ( yearCount ==  1 )
+      memcpy( datePtr + 2, "01", (size_t)2 ) ;
+   if ( monthCount == 3 )
+      memcpy( datePtr + 4, "01", (size_t)2 ) ;
+   if ( dayCount == 5 )
+      memcpy( datePtr + 6, "01", (size_t)2 ) ;
 
-   // if ( monthCount >= 6 )
-   if ( monthCount < 4 )
+   if ( monthCount >= 6 )
    {
       /* Convert the Month from Character Form to Date Format */
-      monthStart = c4strchr( picture, 'M' ) ;
+      monthStart = strchr( picture, 'M' ) ;
 
-      // length = monthCount - 3 ;        /* Number of 'M' characters in picture */
-      length = 6 - monthCount ;        /* Number of 'M' characters in picture */
+      length = monthCount - 3 ;        /* Number of 'M' characters in picture */
 
-      datePtr[4] = ' ';
-      datePtr[5] = ' ';
+      memcpy( datePtr+4, "  ", (size_t)2 ) ;
 
       if ( length > 3 )
          length = 3 ;
-      c4strncpy( monthData, sizeof( monthData ), dateData + (int)( monthStart - picture ), (size_t)length) ;  // AS Dec 13/05 vs 5.0 fixes
+      memcpy( monthData, dateData + (int)( monthStart - picture ), (size_t)length) ;
       while ( length > 0 )
          if ( monthData[length-1] == ' ' )
             length-- ;
@@ -610,7 +600,7 @@ void S4FUNCTION date4init( char *datePtr, const char *dateData, char *picture )
       if ( length > 0 )
          for( i = 1 ; i <= 12; i++ )
          {
-            if ( u4memcmp( monthOfYear[i].cmonth, monthData, (size_t)length ) == 0 )
+            if ( c4memcmp( monthOfYear[i].cmonth, monthData, (size_t)length ) == 0 )
             {
                c4ltoa45( (long) i, datePtr+4, 2 ) ;  /* Found Month Match */
                break ;
@@ -623,19 +613,6 @@ void S4FUNCTION date4init( char *datePtr, const char *dateData, char *picture )
          datePtr[i] = '0' ;
 }
 
-
-
-long S4FUNCTION date4yymmddToJulianLong( const int year, const int month, const int day )
-{
-   int dayOfTheYear = c4dayOfYear( year, month, day ) ;
-   if ( dayOfTheYear < 1 )    /* Illegal Date */
-      return -1L ;
-
-   return ( c4ytoj( year ) + dayOfTheYear + JULIAN4ADJUSTMENT ) ;
-}
-
-
-
 long S4FUNCTION date4long( const char *datePtr )
 {
    /*  Returns: */
@@ -644,47 +621,37 @@ long S4FUNCTION date4long( const char *datePtr )
    /*           Ex.  Jan 1, 1981 is  2444606 */
    /*     0  -  NULL Date (dbfDate is all blank) */
    /*    -1  -  Illegal Date */
-   int year, month, day, i ;
+   int  year, month, day, dayYear, i ;
 
    /* first verify that the input date is valid --> which returns a -1 */
    for ( i = 0 ; i < 8 ; i++ )
-   {
       if ( ( datePtr[i] < '0' || datePtr[i] > '9' ) && datePtr[i] != ' ' )
          return -1 ;
-   }
 
    year = c4atoi( datePtr, 4 ) ;
    if ( year == 0)
-   {
-      // AS 01/24/00 -- foxPro sometimes inserts a blank date as '00000000', so consider this as blank as well
-      if ( c4memcmp( datePtr, "        ", 8 ) == 0 || c4memcmp( datePtr, "00000000", 8 ) == 0 )
+      if ( c4memcmp( datePtr, "        ", 8 ) == 0)
          return  0 ;
-   }
 
    month = c4atoi( datePtr + 4, 2 ) ;
    day = c4atoi( datePtr + 6, 2 ) ;
+   dayYear = c4Julian( year, month, day ) ;
+   if ( dayYear < 1 )    /* Illegal Date */
+      return -1L ;
 
-   return date4yymmddToJulianLong( year, month, day ) ;
+   return ( c4ytoj( year ) + dayYear + JULIAN_ADJUSTMENT ) ;
 }
-
-
 
 void S4FUNCTION date4timeNow( char *timeData )
 {
-   #if defined(S4WINCE) || defined(__WIN32)
+   #ifdef S4WINCE
       SYSTEMTIME st;
       GetLocalTime( &st );
       c4ltoa45( (long)st.wHour, timeData, -2) ;
       c4ltoa45( (long)st.wMinute, timeData + 3, -2) ;
       c4ltoa45( (long)st.wSecond, timeData + 6, -2) ;
-   #elif defined(S4PALM)
-      DateTimeType timeNow;
-      TimSecondsToDateTime(TimGetSeconds(),&timeNow);
-      c4ltoa45( (long)timeNow.hour, timeData, -2) ;
-      c4ltoa45( (long)timeNow.minute, timeData + 3, -2) ;
-      c4ltoa45( (long)timeNow.second, timeData + 6, -2) ;
    #else
-      #ifdef __unix___THREADS
+      #ifdef S4UNIX_THREADS
          long timeVal ;
          struct tm result ;
 
@@ -694,7 +661,7 @@ void S4FUNCTION date4timeNow( char *timeData )
          c4ltoa45( (long)result.tm_hour, timeData, -2) ;
          c4ltoa45( (long)result.tm_min, timeData + 3, -2) ;
          c4ltoa45( (long)result.tm_sec, timeData + 6, -2) ;
-      #else  /* !S4WINCE, !__WIN32, !__unix___THREADS */
+      #else
          time_t timeVal ;
          struct tm *tmPtr ;
 
@@ -710,25 +677,17 @@ void S4FUNCTION date4timeNow( char *timeData )
    timeData[5] = ':' ;
 }
 
-
-
 void S4FUNCTION date4today( char *datePtr )
 {
-   #if defined(S4WINCE) || defined(__WIN32)
+   #ifdef S4WINCE
       SYSTEMTIME st;
       GetLocalTime( &st );
 
       c4ltoa45( st.wYear, datePtr, -4 ) ;
       c4ltoa45( st.wMonth, datePtr + 4, -2 ) ;
       c4ltoa45( st.wDay, datePtr + 6, -2 ) ;
-   #elif defined(S4PALM)
-      DateTimeType timeNow;
-      TimSecondsToDateTime(TimGetSeconds(),&timeNow);
-      c4ltoa45( timeNow.year, datePtr, -4 ) ;
-      c4ltoa45( timeNow.month, datePtr + 4, -2 ) ;
-      c4ltoa45( timeNow.day, datePtr + 6, -2 ) ;
    #else
-      #ifdef __unix___THREADS
+      #ifdef S4UNIX_THREADS
          time_t timeVal ;
          struct tm result ;
 
@@ -738,7 +697,7 @@ void S4FUNCTION date4today( char *datePtr )
          c4ltoa45( 1900L + result.tm_year, datePtr, -4 ) ;
          c4ltoa45( (long)result.tm_mon + 1, datePtr + 4, -2 ) ;
          c4ltoa45( (long)result.tm_mday, datePtr + 6, -2 ) ;
-      #else  /* !S4WINCE, !__WIN32, !__unix___THREADS */
+      #else
          time_t timeVal ;
          struct tm *tmPtr ;
 
@@ -752,25 +711,99 @@ void S4FUNCTION date4today( char *datePtr )
    #endif
 }
 
+/* inlined*/
+/*int S4FUNCTION date4month( const char *datePtr )*/
+/*{*/
+/*   return (int)c4atol( datePtr + 4, 2 ) ;*/
+/*}*/
+/*int S4FUNCTION date4year( const char *yearPtr )*/
+/*{*/
+/*   return (int)c4atol( yearPtr, 4 ) ;*/
+/*}*/
 
 
-void date4timeNowFull( void *timeData )
+#ifdef S4VB_DOS
+
+
+/* DATE Functions */
+
+void date4assign_v( char *date, long julianDay )
 {
-   // returns full date and time, including time to the millisecond level.
-   // output is in r4dateTime / r4dateTimeMilli format ((2 longs), first long is date, 2nd is time )
-   #ifndef S4MACINTOSH  // LY Jul 16/04
-      assert( "added autoTimestampField support" ) ;
-   #endif
-   // AS Mar 11/03 - support for new feature r4autoTimestamp
-   #if defined(S4WINCE) || defined(__WIN32)
-      SYSTEMTIME st;
-      GetSystemTime( &st );  // use Co-ordinated Universal Time in case machines are run accross time-zone boundaries.
+  date4assign( c4buf, julianDay ) ;
+  c4buf[8] = '\0' ;
+  u4ctov( date, c4buf ) ;
+}
 
-      long *dtTime = (long *)timeData ;
-       dtTime[0] = date4yymmddToJulianLong( st.wYear, st.wMonth, st.wDay ) ;
-       dtTime[1] = st.wHour * 3600000 + st.wMinute * 60000 + st.wSecond * 1000 + st.wMilliseconds ;
-   #else
-      error4( 0, e4notSupported, E96303 ) ;
-   #endif
+char * date4cdow_v( char *date )
+{
+   return v4str( date4cdow( c4str(date) ) ) ;
+}
+
+char * date4cmonth_v( char *date )
+{
+   return v4str( date4cmonth( c4str(date) ) ) ;
+}
+
+int date4day_v( char *date )
+{
+  return date4day( c4str(date) ) ;
+}
+
+int date4dow_v( char *date )
+{
+  return date4dow( c4str(date) ) ;
+}
+
+void date4format_v( char *vDate, char *vRes, char *vPic )
+{
+ char cDate[9], cRes[255], cPic[255] ;
+
+ u4vtoc( cDate, sizeof(cDate), vDate ) ;
+ u4vtoc( cPic, sizeof(cPic), vPic ) ;
+
+ date4format( cDate, cRes, cPic ) ;
+ u4ctov( vRes, cRes ) ;
 
 }
+
+double date4formatMdx ( char *date )
+{
+ return date4formatMdx( c4str(date) ) ;
+}
+
+void date4init_v( char *vRes, char *vDate, char *vPic )
+{
+ char cRes[9],cDate[255],cPic[255] ;
+
+ u4vtoc( cDate, sizeof(cDate), vDate ) ;
+ u4vtoc( cPic, sizeof(cPic), vPic ) ;
+
+ date4init( cRes, cDate, cPic ) ;
+
+ cRes[8] = '\0' ;
+
+ u4ctov( vRes, cRes ) ;
+}
+
+long date4long_v( char *date )
+{
+ return date4long( c4str(date) ) ;
+}
+
+int date4month_v( char *date )
+{
+ return date4month( c4str(date) ) ;
+}
+
+void date4today_v( char *vDate )
+{
+ date4today( c4buf ) ;
+ u4ctov( vDate, c4buf ) ;
+}
+
+int date4year_v( char *date )
+{
+ return date4year( c4str(date) ) ;
+}
+
+#endif /* S4VB_DOS */

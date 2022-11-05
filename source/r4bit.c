@@ -1,18 +1,4 @@
-/* *********************************************************************************************** */
-/* Copyright (C) 1999-2015 by Sequiter, Inc., 9644-54 Ave, NW, Suite 209, Edmonton, Alberta Canada.*/
-/* This program is free software: you can redistribute it and/or modify it under the terms of      */
-/* the GNU Lesser General Public License as published by the Free Software Foundation, version     */
-/* 3 of the License.                                                                               */
-/*                                                                                                 */
-/* This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;       */
-/* without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.       */
-/* See the GNU Lesser General Public License for more details.                                     */
-/*                                                                                                 */
-/* You should have received a copy of the GNU Lesser General Public License along with this        */
-/* program. If not, see <https://www.gnu.org/licenses/>.                                           */
-/* *********************************************************************************************** */
-
-/* r4bit.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
+/* r4bit.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
 
@@ -27,9 +13,9 @@
 #define IS_WIN30_DIB(lpbi)  ((*(LPDWORD) (lpbi)) == sizeof (BITMAPINFOHEADER))
 
 
-//DWORD PASCAL kwrite ( int, VOID FAR *, DWORD );
+DWORD PASCAL kwrite ( int, VOID FAR *, DWORD );
 
-WORD S4FUNCTION bmp4DIBNumColors(LPBITMAPINFOHEADER lpbi)
+WORD S4FUNCTION bmp4DIBNumColors (LPSTR lpbi)
 {
    WORD wBitCount;
 
@@ -75,56 +61,63 @@ WORD S4FUNCTION bmp4DIBNumColors(LPBITMAPINFOHEADER lpbi)
 }
 
 
-WORD S4FUNCTION bmp4PaletteSize(LPBITMAPINFOHEADER lpbi)
+WORD S4FUNCTION bmp4PaletteSize (LPSTR lpbi)
 {
    if (IS_WIN30_DIB (lpbi))
-      return (bmp4DIBNumColors(lpbi) * sizeof(RGBQUAD));
+      return (bmp4DIBNumColors (lpbi) * sizeof (RGBQUAD));
    else
-      return (bmp4DIBNumColors(lpbi) * sizeof(RGBTRIPLE));
+      return (bmp4DIBNumColors (lpbi) * sizeof (RGBTRIPLE));
 }
 
-LPVOID S4FUNCTION bmp4FindDIBBits(LPBITMAPINFO lpbi)
+LPSTR S4FUNCTION bmp4FindDIBBits (LPSTR lpbi)
 {
-   return (((char *)lpbi) + lpbi->bmiHeader.biSize + bmp4PaletteSize(&(lpbi->bmiHeader)));
+   return (lpbi + *(LPDWORD)lpbi + bmp4PaletteSize (lpbi));
 }
 
 
 
-//HANDLE S4FUNCTION bmp4GetDIB ( LPSTR fname, CODE4 *codeBase )
-PBITMAPINFO S4FUNCTION bmp4GetDIB( LPSTR fname, CODE4 *codeBase )
+HANDLE S4FUNCTION bmp4GetDIB ( LPSTR fname, CODE4 *codeBase )
 {
-   //int      hFile, errOpen;
-   int oldErrOpen, oldReadOnly;
-   //HANDLE hFile;
-   //OFSTRUCT ofs;
-   PBITMAPINFO pDIB = 0;  // CS 2001/06/13
-   char fname2[14];
-   FILE4 file;
-   int rc;
 
-   SetCursor(LoadCursor((HINSTANCE)NULL, IDC_WAIT));
+   int      hFile, errOpen;
+   OFSTRUCT ofs;
+   HANDLE   hDIB;
+   char     fname2[14];
+   FILE4    file;
 
-   oldErrOpen = codeBase->errOpen;
+   u4namePiece( fname2, sizeof(fname2), fname, 0, 1 );
+   SetCursor(LoadCursor((HWND)NULL, IDC_WAIT));
+
+   errOpen = codeBase->errOpen;
    codeBase->errOpen = 0;
 
-   oldReadOnly = codeBase->readOnly;
-   codeBase->readOnly = 1;
-
-   u4namePiece( fname2, 14, fname, 0, 1 );  // strip path from fname and put in fname2
-   rc = file4open( &file, codeBase, fname2, 1 );
-   if (rc != r4success)
-      rc = file4open( &file, codeBase, fname, 1 );
-
-   if (rc == r4success )
+   if( file4open( &file, codeBase, fname2, 1 ) == 0 )
    {
-      pDIB = bmp4ReadDIBFile(&file);
-      file4close(&file);
+      file4close( &file );
+      codeBase->errOpen = errOpen;
+
+      if ((hFile = OpenFile (fname2, &ofs, OF_READ)) != -1)
+      {
+         hDIB = bmp4ReadDIBFile (hFile);
+         _lclose (hFile);
+         SetCursor(LoadCursor((HWND)NULL, IDC_ARROW));
+         return hDIB;
+      }
    }
    else
       error4set( codeBase, 0 );
 
-   SetCursor(LoadCursor((HINSTANCE)NULL, IDC_ARROW));
-   return pDIB;
+   codeBase->errOpen = errOpen;
+   if ((hFile = OpenFile (fname, &ofs, OF_READ)) != -1)
+   {
+      hDIB = bmp4ReadDIBFile (hFile);
+      _lclose (hFile);
+      SetCursor(LoadCursor((HWND)NULL, IDC_ARROW));
+      return hDIB;
+   }
+
+   SetCursor(LoadCursor((HWND)NULL, IDC_ARROW));
+   return (HANDLE)NULL;
 }
 
 /*************************************************************************
@@ -144,31 +137,30 @@ PBITMAPINFO S4FUNCTION bmp4GetDIB( LPSTR fname, CODE4 *codeBase )
 
 *************************************************************************/
 
-/*BOOL MyRead (int hFile, LPSTR lpBuffer, DWORD dwSize)
+BOOL MyRead (int hFile, LPSTR lpBuffer, DWORD dwSize)
 {
-   #ifndef S4WIN32
-      char huge *lpInBuf = (char huge *)lpBuffer;
+   #ifndef __WIN32
+      char huge *lpInBuf = (char huge *) lpBuffer;
    #else
-      char *lpInBuf = (char *)lpBuffer;
+      char *lpInBuf = (char *) lpBuffer;
    #endif
-   int nBytes;
-   FILE4SEQ_READ fseq;
+   int       nBytes;
 
-   file4seqReadInit(&fseq, hFile, 0
 
    while (dwSize)
-   {
-      nBytes = (int) (dwSize > (DWORD) BYTES_PER_READ ? BYTES_PER_READ : LOWORD (dwSize));
+      {
+      nBytes = (int) (dwSize > (DWORD) BYTES_PER_READ ? BYTES_PER_READ :
+                                                        LOWORD (dwSize));
 
       if (_lread (hFile, (LPSTR) lpInBuf, nBytes) != (WORD) nBytes)
          return FALSE;
 
       dwSize  -= nBytes;
       lpInBuf += nBytes;
-   }
+      }
 
    return TRUE;
-}*/
+}
 
 
 /*************************************************************************
@@ -196,57 +188,53 @@ PBITMAPINFO S4FUNCTION bmp4GetDIB( LPSTR fname, CODE4 *codeBase )
 
 *************************************************************************/
 
-//HANDLE S4FUNCTION bmp4ReadDIBFile (int hFile)
-PBITMAPINFO S4FUNCTION bmp4ReadDIBFile(FILE4 *hFile)  // CS 2000/06/25
+HANDLE S4FUNCTION bmp4ReadDIBFile (int hFile)
 {
-   BITMAPFILEHEADER bmfHeader;
-   DWORD dwBitsSize;
-   //HANDLE hDIB;
-   PBITMAPINFO pDIB;
-   unsigned int lenRead;
+   BITMAPFILEHEADER   bmfHeader;
+   DWORD              dwBitsSize;
+   HANDLE             hDIB;
+   LPSTR              pDIB;
+
 
    /* get length of DIB in bytes for use when reading */
-   //#ifdef S4WIN32
-     //dwBitsSize = file4longGetLo( u4filelength((HANDLE)hFile) ) ;
-   //#else
-     //dwBitsSize = u4filelength (hFile);
-   //#endif
-   dwBitsSize = file4len(hFile);
+   #ifdef __WIN32
+     dwBitsSize = file4longGetLo( u4filelength ((HANDLE)hFile) ) ;
+   #else
+     dwBitsSize = u4filelength (hFile);
+   #endif
    /* Go read the DIB file header and check if it's valid. */
 
-   //_lread (hFile, (LPSTR) &bmfHeader, sizeof (bmfHeader))
-   lenRead = file4read(hFile, 0, &bmfHeader, sizeof(bmfHeader));
-   if ((lenRead != sizeof (bmfHeader)) || bmfHeader.bfType != DIB_HEADER_MARKER)
-      return 0;
+   if ((_lread (hFile, (LPSTR) &bmfHeader, sizeof (bmfHeader)) != sizeof (bmfHeader)) ||
+        (bmfHeader.bfType != DIB_HEADER_MARKER))
+      {
+/*      DIBError (ERR_NOT_DIB); */
+      return (HANDLE)NULL;
+      }
 
    /* Allocate memory for DIB */
 
-   /*hDIB = GlobalAlloc(GMEM_MOVEABLE | GMEM_ZEROINIT, dwBitsSize - sizeof(BITMAPFILEHEADER));
+   hDIB = GlobalAlloc (GMEM_MOVEABLE | GMEM_ZEROINIT, dwBitsSize - sizeof(BITMAPFILEHEADER));
+
    if (hDIB == 0)
-      return (HANDLE)INVALID_HANDLE_VALUE;
+     {
+/*     DIBError (ERR_MEMORY); */
+     return (HANDLE)NULL;
+     }
 
-   pDIB = (LPSTR)GlobalLock(hDIB);*/
-
-   pDIB = (PBITMAPINFO)HeapAlloc(GetProcessHeap(), HEAP_ZERO_MEMORY, dwBitsSize - sizeof(BITMAPFILEHEADER));
-   if (pDIB == 0)
-      return 0;
+   pDIB = (LPSTR)GlobalLock (hDIB);
 
    /* Go read the bits. */
 
-   lenRead = file4read(hFile, sizeof(bmfHeader), pDIB, dwBitsSize - sizeof(bmfHeader) );
-   // LY Dec 1/04 : corrected length comparison to dwBitsSize - sizeof(bmfHeader)
-   if ( lenRead != (dwBitsSize - sizeof(bmfHeader)) )
-      return 0;
+   if (!MyRead (hFile, pDIB, dwBitsSize - sizeof(BITMAPFILEHEADER)))
+      {
+      GlobalUnlock (hDIB);
+      GlobalFree   (hDIB);
+      return (HANDLE)NULL;
+      }
 
-   /*if (!MyRead(hFile, pDIB, dwBitsSize - sizeof(BITMAPFILEHEADER)))
-   {
-      GlobalUnlock(hDIB);
-      GlobalFree(hDIB);
-      return INVALID_HANDLE_VALUE;
-   }*/
 
-   //GlobalUnlock(hDIB);
-   return pDIB;
+   GlobalUnlock (hDIB);
+   return hDIB;
 }
 
 /****************************************************************************
@@ -259,28 +247,28 @@ PBITMAPINFO S4FUNCTION bmp4ReadDIBFile(FILE4 *hFile)  // CS 2000/06/25
                  number of bytes written otherwise.
 
  ****************************************************************************/
-/*DWORD PASCAL kwrite(int fh, VOID FAR *pv, DWORD ul)
+DWORD PASCAL kwrite (int fh, VOID FAR *pv, DWORD ul)
 {
    DWORD     ulT = ul;
-   #ifndef S4WIN32
+   #ifndef __WIN32
       BYTE huge *hp = (unsigned char huge *)pv;
    #else
       BYTE *hp = (BYTE*)pv;
    #endif
    while (ul > BYTES_PER_READ)
-   {
+      {
       if (_lwrite(fh, (LPSTR)hp, (WORD)BYTES_PER_READ) != BYTES_PER_READ)
                    return 0;
 
       ul -= BYTES_PER_READ;
       hp += BYTES_PER_READ;
-   }
+      }
 
    if (_lwrite(fh, (LPSTR)hp, (WORD)ul) != (WORD)ul)
       return 0;
 
    return ulT;
-}*/
+}
 
 
 /****************************************************************************
@@ -293,73 +281,49 @@ PBITMAPINFO S4FUNCTION bmp4ReadDIBFile(FILE4 *hFile)  // CS 2000/06/25
               FALSE - otherwise
 
  ****************************************************************************/
-//BOOL S4FUNCTION bmp4WriteDIB (CODE4 *c4, LPSTR szFile, HANDLE hdib)
-BOOL S4FUNCTION bmp4WriteDIB (CODE4 *c4, LPSTR szFile, LPVOID pDIB)
+BOOL S4FUNCTION bmp4WriteDIB (LPSTR szFile, HANDLE hdib)
 {
-   BITMAPFILEHEADER hdr;
-   LPBITMAPINFOHEADER lpbi = (LPBITMAPINFOHEADER)pDIB;
-   //int                 fh;
-   //OFSTRUCT            of;
-   FILE4 fh;
-   char oldSafety;
-   int rc;
+    BITMAPFILEHEADER    hdr;
+    LPBITMAPINFOHEADER  lpbi;
+    int                 fh;
+    OFSTRUCT            of;
 
-   if (!pDIB)
-      return FALSE;
+    if (!hdib)
+        return FALSE;
 
-   /* fh = OpenFile (szFile, &of, OF_CREATE|OF_READWRITE);
+    fh = OpenFile (szFile, &of, OF_CREATE|OF_READWRITE);
     if (fh == -1)
-        return FALSE;*/
+        return FALSE;
 
-   oldSafety = c4->safety;
-   c4->safety = 0;
-   rc = file4create(&fh, c4, szFile, 1);
-   c4->safety = oldSafety;
-   if (rc != r4success)
-      return false;
-
-    //lpbi = (LPBITMAPINFOHEADER)GlobalLock (hdib);
+    lpbi = (LPBITMAPINFOHEADER)GlobalLock (hdib);
 
     /* Fill in the fields of the file header */
     hdr.bfType          = DIB_HEADER_MARKER;
-    hdr.bfSize          = sizeof(BITMAPFILEHEADER) + HeapSize(GetProcessHeap(), 0, pDIB);
+    hdr.bfSize          = GlobalSize (hdib) + sizeof (BITMAPFILEHEADER);
     hdr.bfReserved1     = 0;
     hdr.bfReserved2     = 0;
     hdr.bfOffBits       = (DWORD)sizeof(BITMAPFILEHEADER) + lpbi->biSize +
-                          bmp4PaletteSize(lpbi);
+                          bmp4PaletteSize((LPSTR)lpbi);
 
     /* Write the file header */
-    /*if (!_lwrite (fh, (LPSTR)&hdr, sizeof (BITMAPFILEHEADER)))
+    if (!_lwrite (fh, (LPSTR)&hdr, sizeof (BITMAPFILEHEADER)))
       {
       GlobalUnlock (hdib);
       _lclose (fh);
       return FALSE;
-      }*/
-   if (file4write(&fh, 0, &hdr, sizeof(BITMAPFILEHEADER)) != r4success)
-   {
-      error4set(c4, 0);
-      file4close(&fh);
-      return FALSE;
-   }
+      }
 
-   /* Write the DIB header and the bits */
-    /*if (!kwrite (fh, (LPSTR)lpbi, GlobalSize (hdib)))
+    /* Write the DIB header and the bits */
+    if (!kwrite (fh, (LPSTR)lpbi, GlobalSize (hdib)))
       {
       GlobalUnlock (hdib);
       _lclose (fh);
       return FALSE;
-      }*/
-   if (file4write(&fh, sizeof(BITMAPFILEHEADER), lpbi, HeapSize(GetProcessHeap(), 0, pDIB)) != r4success)
-   {
-      error4set(c4, 0);
-      file4close(&fh);
-      return FALSE;
-   }
+      }
 
-    /*GlobalUnlock (hdib);
-    _lclose (fh);*/
-   file4close(&fh);
-   return TRUE;
+    GlobalUnlock (hdib);
+    _lclose (fh);
+    return TRUE;
 }
 #endif
 #endif   /* S4OFF_REPORT */
