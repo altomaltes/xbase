@@ -1,11 +1,6 @@
 /* d4go.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifdef S4CLIENT
 /* d4go, d4skip, d4seek, after complete, perform the record information transferral... */

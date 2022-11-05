@@ -2,11 +2,6 @@
 
 #include "d4all.h"
 
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifdef __WATCOMC__
    #ifdef M_I386
@@ -85,7 +80,7 @@ static int file4lowFlush( FILE4 *file )
             if ( !FlushFileBuffers( (HANDLE) file->hand ) )
                rc = error4( file->codeBase, e4optFlush, E90610 ) ;
          #else
-            #ifndef S4UNIX
+            #ifndef __unix__
                dosFlush.h.ah = 0x68 ;
                #ifdef S4USE_EBX
                   dosFlush.x.ebx = (unsigned int)file->hand ;

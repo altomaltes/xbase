@@ -34,7 +34,7 @@
       #include <sys\timeb.h>
    #endif
 #endif
-#ifdef S4UNIX
+#ifdef __unix__
    #include <sys/times.h>
    #ifndef S4LINUX
       #ifdef S4NO_USLEEP
@@ -170,7 +170,7 @@ void *S4FUNCTION u4allocFreeDefault( CODE4 *c4, long n )
 void S4FUNCTION u4delayHundredth( const unsigned int numHundredths )
 {
    #ifndef __WIN32
-      #ifndef S4UNIX
+      #ifndef __unix__
          int sec ;
          unsigned int hundredths ;
       #endif
@@ -180,7 +180,7 @@ void S4FUNCTION u4delayHundredth( const unsigned int numHundredths )
       #ifdef S4WIN16
             MSG msg;
       #endif
-      #ifdef S4UNIX
+      #ifdef __unix__
          #ifdef S4NO_USLEEP
             #ifndef S4NO_SELECT
                struct timeval waitTime ;
@@ -195,7 +195,7 @@ void S4FUNCTION u4delayHundredth( const unsigned int numHundredths )
       #endif
    #endif
 
-   #ifdef S4UNIX
+   #ifdef __unix__
       #ifdef S4NO_USLEEP
          #ifndef S4NO_SELECT
             waitTime.tv_sec = numHundredths / 100 ;
@@ -248,7 +248,7 @@ void S4FUNCTION u4delayHundredth( const unsigned int numHundredths )
                break ;
      }
    #else
-      #ifdef S4UNIX
+      #ifdef __unix__
          #ifdef S4NO_USLEEP
             #ifdef S4NO_SELECT
                poll(0, NULL, numHundredths * 10 ) ;
@@ -879,7 +879,7 @@ void S4FUNCTION u4yymmdd( char *yymmdd )
    yymmdd[1] = (char)st.wMonth ;
    yymmdd[2] = (char)st.wDay ;
 #else
-   #ifdef S4UNIX_THREADS
+   #ifdef __unix___THREADS
       time_t timeVal ;
       struct tm result ;
 
@@ -956,7 +956,7 @@ int u4rename( const char *oldName, const char *newName )
       return MoveFile(from, to ) ;
    #else
       #ifdef S4NO_RENAME
-         #ifdef S4UNIX
+         #ifdef __unix__
             memcpy( (void *)buf, "mv ", 3 ) ; /* system rename or move call */
          #else
             memcpy( (void *)buf, "rename ", 7 ) ; /* system copy call */

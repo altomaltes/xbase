@@ -2,9 +2,6 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif  /* __TUROBC__ */
 
 #ifdef S4WINTEL
    #ifndef S4WINDOWS

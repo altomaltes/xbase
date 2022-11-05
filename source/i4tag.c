@@ -1,9 +1,6 @@
 /* i4tag.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 /*#ifndef S4LANGUAGE */
 /*#ifndef u4memcmp */

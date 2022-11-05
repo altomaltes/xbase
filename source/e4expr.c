@@ -1,9 +1,6 @@
 /* e4expr.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 char **expr4 ;
 char  *expr4constants ;

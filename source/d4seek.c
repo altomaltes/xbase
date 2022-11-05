@@ -1,11 +1,6 @@
 /* d4seek.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifndef S4INDEX_OFF
 
@@ -356,7 +351,7 @@ int S4FUNCTION d4seekNextN( DATA4 *data, const char *str, const short l )
 
       tfile = tag->tagFile ;
 
-      #ifdef S4UNIX
+      #ifdef __unix__
          #ifdef S4MDX
             switch ( tfile->keyType )
             {
@@ -572,7 +567,7 @@ int S4FUNCTION d4seekN( DATA4 *data, const char *str, const short l )
          else
       #endif
       {  /* for S4FOX */
-         #ifdef S4UNIX
+         #ifdef __unix__
             #ifdef S4MDX
                switch ( tfile->keyType )
                {
@@ -730,7 +725,7 @@ int S4FUNCTION d4seekDouble( DATA4 *data, const double dkey )
             return error4( data->codeBase, e4seek, E82902 ) ;
       #endif
 
-      #ifdef S4UNIX
+      #ifdef __unix__
          #ifdef S4MDX
             switch ( tfile->keyType )
             {
@@ -867,7 +862,7 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
             return error4( data->codeBase, e4seek, E82902 ) ;
       #endif
 
-      #ifdef S4UNIX
+      #ifdef __unix__
          #ifdef S4MDX
             switch ( tfile->keyType )
             {

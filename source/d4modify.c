@@ -2,10 +2,6 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif  /* __TUROBC__ */
-
 static int createReplacementFile( CODE4 *c4, FILE4 *newFile, const char *oldPathName )
 {
    char buf[258] ;

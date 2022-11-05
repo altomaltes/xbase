@@ -11,10 +11,6 @@
    #endif
 #endif
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
-
 #ifdef S4TEMP
    #include "t4test.h"
 #endif
@@ -254,7 +250,7 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
    #else
       int rc, numAttempts ;
       CODE4 *c4 ;
-      #ifdef S4UNIX
+      #ifdef __unix__
          #ifdef S4MULTIC4
             int pid, status;
          #endif
@@ -316,7 +312,7 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
             #endif
             rc = locking( file->hand, LK_NBLCK, numBytes ) ;
          #else
-            #ifdef S4UNIX
+            #ifdef __unix__
                #ifndef S4NO_LOCKF
                   lseek( file->hand, posStart, 0 ) ;
                #else
@@ -374,7 +370,7 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
                         rc = fcntl( file->hand, F_SETLK, &fstruct ) ;
                   #endif
                #endif  /*  !S4MULTIC4  */
-            #endif  /*  S4UNIX  */
+            #endif  /*  __unix__  */
 
             #ifdef S4IBMOS2
                L4RANGE.FileOffset = posStart ;
@@ -584,7 +580,7 @@ int S4FUNCTION file4unlockInternal( FILE4 *file, unsigned long posStart, long po
          #endif
          rc = locking( file->hand, LK_UNLCK, numBytes ) ;
       #else
-         #ifdef S4UNIX
+         #ifdef __unix__
             #ifndef S4NO_LOCKF /* lockf() replaces locking() for SUN OS, AT&T */
                lseek( file->hand, posStart, 0 ) ;
                rc = lockf( file->hand, F_ULOCK, numBytes ) ;

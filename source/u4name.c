@@ -97,7 +97,7 @@ static int u4nameFix( char *buf )
 
    for( i = 0 ; i < len - 2 ; i++ )
    {
-      #ifdef S4UNIX
+      #ifdef __unix__
          if ( c4memcmp(buf+i, "../", 3 ) == 0 )
       #else
          if ( c4memcmp( buf + i, "..\\", 3 ) == 0 )
@@ -127,7 +127,7 @@ static int u4nameFix( char *buf )
 
    for( i = 0 ; i < len - 1 ; i++ )
    {
-   #ifdef S4UNIX
+   #ifdef __unix__
       if ( c4memcmp( buf + i, "./", 2 ) == 0 )
    #else
       if ( c4memcmp( buf + i, ".\\", 2 ) == 0 )

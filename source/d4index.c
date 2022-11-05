@@ -1,9 +1,6 @@
 /* d4index.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #ifdef P4ARGS_USED
    #pragma argsused

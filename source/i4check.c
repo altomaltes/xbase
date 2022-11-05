@@ -1,11 +1,6 @@
 /* i4check.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifdef S4CLIENT
 int S4FUNCTION d4check( DATA4 *d4 )

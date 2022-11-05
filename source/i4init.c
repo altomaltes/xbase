@@ -1,9 +1,6 @@
 /* i4init.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 long time4long( const char *time, int strLen )
 {
@@ -292,7 +289,7 @@ int tfile4initSeekConv( TAG4FILE *t4, int keyType )
       default:
          return error4( t4->codeBase, e4info, E82901 ) ;
    }
-   #ifdef S4UNIX
+   #ifdef __unix__
       switch( keyType )
       {
          case r4num:
@@ -561,7 +558,7 @@ int tfile4initSeekConv( TAG4FILE *t4, int type )
       default:
          return error4( t4->codeBase, e4info, E82901 ) ;
    }
-   #ifdef S4UNIX
+   #ifdef __unix__
       switch( type )
       {
          case r4num:
@@ -680,7 +677,7 @@ int tfile4initSeekConv( TAG4FILE *t4, int keyType )
          t4->cmp = (S4CMP_FUNCTION *)u4memcmp ;
          t4->stok = t4noChangeStr ;
          t4->dtok = t4dateDoubToStr ;
-         #ifdef S4UNIX
+         #ifdef __unix__
             t4->keyType = r4date ;
          #endif
          break ;
@@ -689,7 +686,7 @@ int tfile4initSeekConv( TAG4FILE *t4, int keyType )
          t4->cmp = (S4CMP_FUNCTION *)u4memcmp ;
          t4->stok = t4strToClip ;
          t4->dtok = 0 ;
-         #ifdef S4UNIX
+         #ifdef __unix__
             t4->keyType = r4num ;
          #endif
          break ;
@@ -698,7 +695,7 @@ int tfile4initSeekConv( TAG4FILE *t4, int keyType )
          t4->cmp = (S4CMP_FUNCTION *)u4memcmp ;
          t4->stok = t4noChangeStr ;
          t4->dtok = 0 ;
-         #ifdef S4UNIX
+         #ifdef __unix__
             t4->keyType = r4str ;
          #endif
          break ;

@@ -22,7 +22,7 @@
 
 #ifndef S4OPTIMIZE_OFF
 #ifdef E4ANALYZE_ALL
-#ifndef S4UNIX
+#ifndef __unix__
    #include <sys\stat.h>
    #include <share.h>
 #endif

@@ -1,11 +1,6 @@
 /* f4char.c (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifndef S4OFF_WRITE
 void S4FUNCTION f4assignChar( FIELD4 *field, const int chr )

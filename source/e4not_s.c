@@ -177,11 +177,6 @@
    #endif
 #endif
 
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifdef S4SERVER
 /* for index-independence of OLE-DB dll, need to export some functions... */

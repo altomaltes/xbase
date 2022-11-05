@@ -1,9 +1,6 @@
 /* i4create.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #ifndef S4INDEX_OFF
 #ifndef S4OFF_WRITE

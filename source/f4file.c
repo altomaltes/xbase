@@ -1,9 +1,6 @@
 /* f4file.c (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #ifdef S4TEMP
    #include "t4test.h"
@@ -76,7 +73,7 @@
             return rc ;
          }
       #else
-         #ifdef S4UNIX
+         #ifdef __unix__
             #include  <sys/types.h>
             #include  <sys/stat.h>
 

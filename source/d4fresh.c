@@ -1,11 +1,6 @@
 /* d4fresh.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 int S4FUNCTION d4refresh( DATA4 *data )
 {

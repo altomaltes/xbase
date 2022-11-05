@@ -1,11 +1,6 @@
 /* d4lock.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifdef S4CLIENT
 int d4localLockSet( DATA4 *data, const long rec )

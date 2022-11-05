@@ -306,7 +306,7 @@ int connect4bufferConnect( CONNECT4BUFFER *connectBuffer, CONNECT4 *connect )
    connectBuffer->connectLow = connectLow ;
    #ifdef S4COM_PRINT
       #ifdef S4CLIENT
-         #ifdef S4UNIX
+         #ifdef __unix__
             printf( "Sending Message:  STREAM4RECONNECT\n" ) ;
          #endif
       #endif

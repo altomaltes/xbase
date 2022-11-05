@@ -19,11 +19,6 @@
 
 #include "d4all.h"
 
-#ifndef UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 /* TRANSACTION FILE FORMAT
    -----------------------

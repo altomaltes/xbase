@@ -106,7 +106,7 @@
    #define S4INLINE
 #endif
 
-#ifndef S4UNIX
+#ifndef __unix__
    #ifndef S4MACINTOSH
       #ifndef S4OS2
          #ifndef _MSC_VER
@@ -305,11 +305,11 @@
 #ifndef S4WIN16
    #ifndef __WIN32
       #ifndef S4OS2
-         #ifndef S4UNIX
+         #ifndef __unix__
             #ifndef S4MACINTOSH
                #ifndef S4PASCAL_WIN
                   #ifndef S4DOS
-                     #error NO OPERATING SYSTEM SELECTED (S4WIN16/__WIN32/S4DOS/S4UNIX/...)
+                     #error NO OPERATING SYSTEM SELECTED (S4WIN16/__WIN32/S4DOS/__unix__/...)
                   #endif
                #endif
             #endif
@@ -318,7 +318,7 @@
    #endif
 #endif
 
-#ifndef S4UNIX
+#ifndef __unix__
   #ifndef S4MACINTOSH
      #define S4WINTEL   /*This will include DOS and OS2 also */
   #endif
@@ -432,7 +432,7 @@
    #endif
 #endif
 
-#ifdef S4UNIX
+#ifdef __unix__
    #ifndef S4CONSOLE
       #define S4CONSOLE
    #endif
@@ -442,7 +442,7 @@
    #ifndef S4OFF_TRAN
       #define S4STAND_ALONE_TRANS
    #endif
-   #ifdef S4UNIX
+   #ifdef __unix__
       #define S4OFF_COMMUNICATIONS
    #endif
    #ifdef S4OS2
@@ -595,7 +595,7 @@
    typedef unsigned HANDLE ;
 #endif
 
-#ifdef S4UNIX
+#ifdef __unix__
    #define S4DIR '/'
    #define INVALID4HANDLE -1
 #else
@@ -681,7 +681,7 @@
    #define __DLL__ 1
 #endif
 
-#ifdef S4UNIX
+#ifdef __unix__
    #define S4ERRNO           /* use global variable, 'errno' */
    #define S4NO_DUP          /* use if dup() not found/not required */
 /* #define S4LSEEK        */ /* use if lseek() cannot seek past EOF */
@@ -699,7 +699,7 @@
       #error - Multithreading not supported under Unix. Set S4OFF_THREAD.
    #endif
    #ifndef S4OFF_THREAD
-      #define S4UNIX_THREADS
+      #define __unix___THREADS
    #endif
 #endif
 
@@ -984,7 +984,7 @@
    #define S4HAS_DESCENDING
 #endif
 
-#ifdef S4UNIX
+#ifdef __unix__
    #ifdef S4NDX
       #error:  dBase III support not allowed.
    #endif
@@ -1393,7 +1393,7 @@
       #error IPX/SPX communication protocol not supported
    #endif
 
-   #ifdef S4UNIX
+   #ifdef __unix__
       #ifdef S4WINSOCK
          #error Windows Sockets not supported under UNIX
       #endif
@@ -1918,8 +1918,8 @@
    #ifdef S4OS2PM
       #error - CodeBase Server incorrectly built with S4OS2PM
    #endif
-   #ifdef S4UNIX
-      #error - CodeBase Server incorrectly built with S4UNIX
+   #ifdef __unix__
+      #error - CodeBase Server incorrectly built with __unix__
    #endif
    #ifdef S4MACINTOSH
       #error - CodeBase Server incorrectly built with S4MACINTOSH
@@ -2070,7 +2070,7 @@
 
 #ifndef S4OFF_COMMUNICATIONS
    #define WS4MAX_PENDING_CONNECTS 4
-   #ifndef S4UNIX
+   #ifndef __unix__
       #define S4NO_INET_ATON      /* A unix address conversion function */
    #endif
 #endif

@@ -63,7 +63,7 @@ typedef struct
    unsigned char   nameLen ;
    char   priority ;
    char   returnType ;
-   #ifdef S4UNIX
+   #ifdef __unix__
       signed char  numParms ;  /* -1 means that the number is flexible */
    #else
       S4CONV( signed char numParms, signed char num_parms ) ;  /* -1 means that the number is flexible */

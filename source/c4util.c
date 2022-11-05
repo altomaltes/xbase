@@ -21,10 +21,6 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif  /* __TUROBC__ */
-
 DATA4 *S4FUNCTION code4directory( CODE4 *c4, char *directory )
 {
       error4( c4, e4notSupported, 0 ) ;

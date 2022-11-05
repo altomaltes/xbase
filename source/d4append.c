@@ -18,11 +18,6 @@
 /* d4append.c  */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif  /* __TUROBC__ */
-#endif  /* S4UNIX */
 
 #ifndef S4OFF_WRITE
 

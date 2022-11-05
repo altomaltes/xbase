@@ -1,9 +1,6 @@
 /* e4calc.c (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef ___TURBOC__
-   #pragma hdrstop
-#endif
 
 void S4FUNCTION expr4calcMassage( EXPR4CALC *calc )
 {

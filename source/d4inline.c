@@ -1,11 +1,6 @@
 /* d4inline.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif  /* __TUROBC__ */
-#endif  /* S4UNIX */
 
 #ifdef S4SERVER
 #ifndef S4SINGLE

@@ -1,11 +1,6 @@
 /* f4ass_f.c (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifndef S4OFF_WRITE
 void S4FUNCTION f4assignField( FIELD4 *fieldTo, const FIELD4 *fieldFrom )

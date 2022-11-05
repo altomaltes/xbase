@@ -1,16 +1,13 @@
 /* d4open.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #ifdef S4OFF_MEMO
    extern char f4memoNullChar ;
 #endif
 
 #ifndef S4MACINTOSH
-   #ifdef S4UNIX
+   #ifdef __unix__
       #include <sys/stat.h>
       #include <sys/types.h>
    #else
@@ -660,11 +657,7 @@ DATA4 *S4FUNCTION d4openClone( DATA4 *dataOld )
                if ( i4 == NULL )
                   break ;
                if ( !index4isProduction( i4->indexFile ) ) /* not production, so didn't get opened */
-                  #ifdef S4CLIENT
-                     i4open( d4, i4->alias ) ;
-                  #else
                      i4open( d4, i4->accessName ) ;
-                  #endif
             }
          #endif /* S4CLIPPER */
       #endif /* S4CLIENT */
@@ -1054,22 +1047,14 @@ static DATA4FILE *data4reopen( DATA4FILE *d4, char **info )
             case OPEN4DENY_NONE:
                break ;
             case OPEN4DENY_RW:
-               #ifdef S4CLIENT
-                  if ( d4->accessMode != OPEN4DENY_RW )
-               #else
                   if ( d4->file.lowAccessMode != OPEN4DENY_RW )
-               #endif
                   {
                      error4describe( c4, e4instance, E84307, dfile4name( d4 ), 0, 0 ) ;
                      return 0 ;
                   }
                break ;
             case OPEN4DENY_WRITE:
-               #ifdef S4CLIENT
-                  if ( d4->accessMode == OPEN4DENY_NONE )
-               #else
                   if ( d4->file.lowAccessMode == OPEN4DENY_NONE )
-               #endif
                   {
                      error4describe( c4, e4instance, E84307, dfile4name( d4 ), 0, 0 ) ;
                      return 0 ;
@@ -1124,7 +1109,6 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
    #ifdef E4MISC
       unsigned fieldDataLen ;
    #endif
-   #ifdef S4CLIENT
       CONNECTION4 *connection ;
       int len2, len3 ;
       CONNECTION4OPEN_INFO_IN *dataIn ;
@@ -1132,7 +1116,6 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
       #ifndef S4OFF_INDEX
          char indexName[258] ;
       #endif
-   #else
       FILE4LONG pos, tLen ;
       #ifndef E4MISC
          unsigned fieldDataLen ;
@@ -1147,7 +1130,6 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
             int i ;
          #endif
       #endif
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( c4, 1, E91102 ) )
@@ -1160,13 +1142,11 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
          error4( c4, e4parm_null, E91102 ) ;
          return 0 ;
       }
-      #ifdef S4CLIENT
          if ( data == 0 )
          {
             error4( c4, e4parm_null, E91102 ) ;
             return 0 ;
          }
-      #endif
    #endif
 
    if ( error4code( c4 ) < 0 )
@@ -1180,16 +1160,12 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
       }
    #endif
 
-   #ifdef S4CLIENT
-      d4 = dfile4data( c4, name ) ;
-   #else
       u4nameCurrent( nameBuf, sizeof( nameBuf ), name ) ;
       u4nameExt( nameBuf, sizeof(nameBuf), "dbf", 0 ) ;
       #ifndef S4CASE_SEN                     /* preserve the case sensitivity for unix */
          c4upper( nameBuf ) ;
       #endif
       d4 = dfile4data( c4, nameBuf ) ;
-   #endif
 
    if ( d4 != 0 )
    {

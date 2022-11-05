@@ -1,9 +1,6 @@
 /* f4temp.c (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #ifdef S4TEMP
    #include "t4test.h"
@@ -36,7 +33,7 @@ int S4FUNCTION file4temp( FILE4 *file, CODE4 *c4, char *buf, const int auto_remo
       LINK4 tf_link ;
    #endif
    time_t t ;
-   #ifdef S4UNIX
+   #ifdef __unix__
       #ifndef S4NO_FTIME
          struct timeb timeVal ;
       #else
@@ -91,7 +88,7 @@ int S4FUNCTION file4temp( FILE4 *file, CODE4 *c4, char *buf, const int auto_remo
    for ( i = 0 ; i < 100 ; i++ )
    {
       u4delaySec() ;
-      #ifndef S4UNIX
+      #ifndef __unix__
          time( &t ) ;
          t %= 10000L ;
       #else
@@ -235,7 +232,7 @@ int file4tempLow( FILE4 *file, CODE4 *c4, const int autoRemove, int useTempDirec
    #ifndef S4WINCE
       if ( useTempDirectory )
       {
-         #ifdef S4UNIX
+         #ifdef __unix__
             env = u4environ( "TMPDIR", 0 ) ;
          #else
             env = u4environ( "TEMP", 0 ) ;

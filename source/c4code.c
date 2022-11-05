@@ -38,7 +38,6 @@
 
 #ifdef S4WINTEL
    #ifdef __TURBOC__
-      #pragma hdrstop
       #ifndef __DLL__
          #ifndef S4OS2PM
             #ifndef __WIN32
@@ -2005,14 +2004,14 @@ const char *S4FUNCTION code4indexExtension( CODE4 *c4 )
 
 #ifdef S4WIN16
    #ifdef S4OPERATING
-      #error Choose only one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, S4UNIX, S4MACINTOSH or S4PASCAL_WIN
+      #error Choose only one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, __unix__, S4MACINTOSH or S4PASCAL_WIN
    #endif
    #define S4OPERATING 0x20
 #endif
 
 #ifdef __WIN32
    #ifdef S4OPERATING
-      #error Choose only one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, S4UNIX, S4MACINTOSH or S4PASCAL_WIN
+      #error Choose only one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, __unix__, S4MACINTOSH or S4PASCAL_WIN
    #endif
    #define S4OPERATING 0x40
 #endif
@@ -2025,34 +2024,34 @@ const char *S4FUNCTION code4indexExtension( CODE4 *c4 )
 
 #ifdef S4OS2
    #ifdef S4OPERATING
-      #error Choose only one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, S4UNIX, S4MACINTOSH or S4PASCAL_WIN
+      #error Choose only one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, __unix__, S4MACINTOSH or S4PASCAL_WIN
    #endif
    #define S4OPERATING 0x100
 #endif
 
-#ifdef S4UNIX
+#ifdef __unix__
    #ifdef S4OPERATING
-      #error Choose only one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, S4UNIX, S4MACINTOSH or S4PASCAL_WIN
+      #error Choose only one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, __unix__, S4MACINTOSH or S4PASCAL_WIN
    #endif
    #define S4OPERATING 0x200
 #endif
 
 #ifdef S4MACINTOSH
    #ifdef S4OPERATING
-      #error Choose only one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, S4UNIX, S4MACINTOSH or S4PASCAL_WIN
+      #error Choose only one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, __unix__, S4MACINTOSH or S4PASCAL_WIN
    #endif
    #define S4OPERATING 0x400
 #endif
 
 #ifdef S4PASCAL_WIN
    #ifdef S4OPERATING
-      #error Choose only one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, S4UNIX, S4MACINTOSH or S4PASCAL_WIN
+      #error Choose only one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, __unix__, S4MACINTOSH or S4PASCAL_WIN
    #endif
    #define S4OPERATING 0x800
 #endif
 
 #ifndef S4OPERATING
-   #error Must choose one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, S4UNIX, S4MACINTOSH or S4PASCAL_WIN
+   #error Must choose one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, __unix__, S4MACINTOSH or S4PASCAL_WIN
 #endif
 
 #ifdef S4CB51

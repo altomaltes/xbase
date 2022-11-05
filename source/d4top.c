@@ -1,11 +1,6 @@
 /* d4top.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif  /* __TUROBC__ */
-#endif  /* S4UNIX */
 
 #ifdef S4CLIENT
 int S4FUNCTION d4top( DATA4 *data )

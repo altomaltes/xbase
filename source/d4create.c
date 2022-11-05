@@ -19,9 +19,6 @@
 /* d4create.c */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif  /* __TUROBC__ */
 
 #ifndef S4OFF_WRITE
 

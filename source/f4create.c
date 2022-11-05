@@ -2,10 +2,6 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
-
 #ifdef S4TEMP
    #include "t4test.h"
 #endif
@@ -161,7 +157,7 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
    }
 }
 #endif /*S4MACINTOSH*/
-#ifdef S4UNIX
+#ifdef __unix__
 static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
 {
    int oflag  ;
@@ -290,7 +286,7 @@ static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )
    #endif
    return 0 ;
 }
-#endif /* S4UNIX */
+#endif /* __unix__ */
 
 #ifdef __WIN32
 static int file4createLow( FILE4 *file, CODE4 *c4, const char *name )

@@ -1,11 +1,6 @@
 /* d4date.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif  /* __TUROBC__ */
-#endif  /* S4UNIX */
 
 #define  JULIAN_ADJUSTMENT    1721425L
 #define  S4NULL_DATE          1.0E100   /* may not compile on some Op.Sys. */
@@ -651,7 +646,7 @@ void S4FUNCTION date4timeNow( char *timeData )
       c4ltoa45( (long)st.wMinute, timeData + 3, -2) ;
       c4ltoa45( (long)st.wSecond, timeData + 6, -2) ;
    #else
-      #ifdef S4UNIX_THREADS
+      #ifdef __unix___THREADS
          long timeVal ;
          struct tm result ;
 
@@ -687,7 +682,7 @@ void S4FUNCTION date4today( char *datePtr )
       c4ltoa45( st.wMonth, datePtr + 4, -2 ) ;
       c4ltoa45( st.wDay, datePtr + 6, -2 ) ;
    #else
-      #ifdef S4UNIX_THREADS
+      #ifdef __unix___THREADS
          time_t timeVal ;
          struct tm result ;
 

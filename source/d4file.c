@@ -1,11 +1,6 @@
 /* d4file.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif  /* __TUROBC__ */
-#endif  /* S4UNIX */
 
 /* fromDisk set to 1 if ensure that a disk read is done, instead of a buffer read */
 #ifdef P4ARGS_USED

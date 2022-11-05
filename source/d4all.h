@@ -38,7 +38,7 @@
 /* #define S4OS2        */   /* for OS/2 */
 /* #define S4WIN16      */   /* for Windows 3.x */
 /* #define S4WINCE      */   /* for Windows CE */
-/* #define S4UNIX       */   /* requires CodeBase Portability version */
+/* #define __unix__       */   /* requires CodeBase Portability version */
 /* #define S4MACINTOSH  */   /* requires CodeBase Mac version */
 /* #define S4PASCAL_WIN */   /* requires CodePascal version */
 
@@ -113,7 +113,7 @@
    #include <time.h>
 #endif
 
-#ifdef S4UNIX
+#ifdef __unix__
    #include "p4port.h"
 #else
    #ifdef S4MACINTOSH

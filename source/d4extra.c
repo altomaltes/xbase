@@ -2,11 +2,6 @@
 
 #include "d4all.h"
 
-#ifndef UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifdef E4ANALYZE
 #ifdef P4ARGS_USED

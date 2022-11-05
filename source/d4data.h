@@ -2162,7 +2162,7 @@ typedef struct TAG4FILESt
       #ifdef S4MDX
          S4LONG       changed ;
       #endif
-      #ifdef S4UNIX
+      #ifdef __unix__
          int keyType ;
       #endif
    #endif

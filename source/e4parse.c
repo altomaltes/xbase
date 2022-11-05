@@ -40,9 +40,6 @@
 */
 
 #include "d4all.h"
-#ifdef __TURBOC__
-   #pragma hdrstop
-#endif
 
 #include <ctype.h>
 

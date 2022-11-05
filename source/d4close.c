@@ -19,11 +19,6 @@
 /* d4close.c   */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif  /* __TUROBC__ */
-#endif  /* S4UNIX */
 
 #ifndef S4MEMO_OFF
    extern char f4memoNullChar ;

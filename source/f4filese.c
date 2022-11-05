@@ -1,11 +1,6 @@
 /* f4filese.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifdef S4ADVANCE_READ
 void S4CALL file4seqReadCompletionRoutine( void *advance )

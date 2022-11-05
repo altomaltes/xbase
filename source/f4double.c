@@ -6,11 +6,6 @@
 */
 
 #include "d4all.h"
-#ifndef S4UNIX
-   #ifdef __TURBOC__
-      #pragma hdrstop
-   #endif
-#endif
 
 #ifndef S4OFF_WRITE
 void S4FUNCTION f4assignDouble( FIELD4 *field, const double dValue )
