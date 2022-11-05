@@ -19,7 +19,7 @@
 \***********************************************************************/
 /* See User's Manual, chapter 12 */
 
-#include "d4all.h"
+#include "../../../source/d4all.h"
 
 #ifdef __TURBOC__
    extern unsigned _stklen = 10000 ; /*for all Borland Compilers*/
@@ -138,4 +138,4 @@ void main( void )
    code4initUndo( &codeBase ) ;
 }
 
-
+

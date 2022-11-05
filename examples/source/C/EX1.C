@@ -19,12 +19,12 @@ int main( )
 {
    CODE4 codeBase ;
 	DATA4 *newDataFile ;
+
 	FIELD4INFO fieldInfo [] =
-	{
-		{"NAME", 'C', 20, 0},
-		{"AGE", 'N', 3, 0},
-		{"BIRTHDATE", 'D', 8, 0},
-		{0, 0, 0, 0},
+	{{ "NAME"     , 'C', 20, 0 }
+	,{ "AGE"      , 'N',  3, 0 }
+	,{ "BIRTHDATE", 'D',  8, 0 }
+	,{0, 0, 0, 0}
 	};
 
 	code4init( &codeBase );

@@ -19,7 +19,7 @@
 \***********************************************************************/
 /* See User's Manual, chapter 6 */
 
-#include "d4all.h"
+#include "../../../source/d4all.h"
 
 #ifdef __TURBOC__
    extern unsigned _stklen = 10000;
@@ -83,7 +83,7 @@ void printRecord(void)
    printf("%7s\n",f4str(cCode));
 }
 
-void main(void)
+int main(void)
 {
    openDataFiles();
 

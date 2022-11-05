@@ -14,7 +14,7 @@
 
 /* d4verify.c (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
-#include "d4all.h"
+#include "../../../source/d4all.h"
 
 #ifdef __TURBOC__
    extern unsigned _stklen = 10000 ;

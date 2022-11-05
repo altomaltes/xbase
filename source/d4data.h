@@ -326,7 +326,7 @@ typedef struct
    } FILE4LONG ;
 
       #define file4longAssign( f2, longLoIn, longHiIn ) ( ((f2).piece.longLo) = (longLoIn), ((f2).piece.longHi) = (longHiIn) )
-      #define file4longAssignLong( f1, f2 ) ( (f1).dLong = (f2).dLong )
+      #define file4longAssignLong( f1, f2 ) ( (f1) = (f2))    // JACS
       #define file4longCmp( f1, f2 ) ( ( (f1).piece.longLo == (f2).piece.longLo && (f1).piece.longHi == (f2).piece.longHi ) ? 0 : 1 )
       #define file4longGetLo( f1 ) ( (f1).piece.longLo )
       #define file4longGetHi( f1 ) ( (f1).piece.longHi )
