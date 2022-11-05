@@ -218,7 +218,7 @@ long S4FUNCTION time4long( const char *time, int strLen, Bool5 isMilli )
 
 
 
-#if defined( S4CLIENT ) || ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
+#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
    void t4dblToCur( char *result, const double d )
    {
       /* result must be big enough to hold a CURRENCY4 structure - 8 bytes */
@@ -262,7 +262,7 @@ char *c4descend( char *to, const char *from, int len )
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX )
+#if  defined( S4FOX )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -276,11 +276,11 @@ char *c4descend( char *to, const char *from, int len )
       t4curToFox( result, &hold ) ;
       *lenOut = sizeof( CURRENCY4 ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) */
+#endif /* && defined( S4FOX ) */
 
 
 
-#if defined( S4CLIENT ) || defined( S4FOX )
+#if  defined( S4FOX )
    /*
        COLLATION NOTES:
 
@@ -307,64 +307,78 @@ char *c4descend( char *to, const char *from, int len )
 
 
    /* the actual array of collations available... */
-   COLLATE4 collationArray[NUM4AVAIL_COLLATION_ENTRIES] =
-   {
       /* the basic machine byte order sequence...
          Collate4machine
       */
-      {
-         collate4machineByteOrder,                         // enum Collate4type collateType
-         &unused4filler,                                   // void *charToKeyTranslationArray
-         &unused4filler,                                   // void *unicodeToKeyTranslationArray
-         &unused4filler,                                   // void *charToKeyCompressionArray
-         &unused4filler,                                   // void *unicodeToKeyCompressionArray
-         UNUSED4,                                          // unsigned short keySizeCharPerCharAdd
-         UNUSED4,                                          // unsigned short expandOrCompressChar
-         UNUSED4,                                          // unsigned short noTailChar
-         0,                                                // Bool5 didAllocChar
-         0,                                                // Bool5 didAllocUnicode
-         UNUSED4,                                          // unsigned short expandOrCompressUnicode
-         UNUSED4,                                          // unsigned short noTailUnicode
-         0                                                 // Bool5 lossOfData
-      },
 
-      /* general collation for CodePage 1252
-         Collate4generalCp1252
-      */
-      { collate4subSortCompress, (void *)cp1252generalCollationArray, MUST4GENERATE_ARRAY,
-        (void *)cp1252generalCompressArray, MUST4GENERATE_ARRAY, NEED4ONE_EXTRA_BYTE, EXPAND4CHAR_TO_TWO_BYTES, NO4TAIL_BYTES, 0, 0, UNUSED4, UNUSED4, 1 },
+   COLLATE4 collationArray[NUM4AVAIL_COLLATION_ENTRIES] =
+   {{ collate4machineByteOrder                         // enum Collate4type collateType
+    , &unused4filler                                   // void *charToKeyTranslationArray
+    , &unused4filler                                   // void *unicodeToKeyTranslationArray
+    , &unused4filler                                   // void *charToKeyCompressionArray
+    , &unused4filler                                   // void *unicodeToKeyCompressionArray
+    , UNUSED4                                          // unsigned short keySizeCharPerCharAdd
+    , UNUSED4                                          // unsigned short expandOrCompressChar
+    , UNUSED4                                          // unsigned short noTailChar
+    , 0                                                // Bool5 didAllocChar
+    , 0                                                // Bool5 didAllocUnicode
+    , UNUSED4                                          // unsigned short expandOrCompressUnicode
+    , UNUSED4                                          // unsigned short noTailUnicode
+    , 0 }                                                 // Bool5 lossOfData
+
+/* general collation for CodePage 1252  Collate4generalCp1252
+*/
+    ,{ collate4subSortCompress
+    , (void *)cp1252generalCollationArray
+    , MUST4GENERATE_ARRAY
+    , (void *)cp1252generalCompressArray
+    , MUST4GENERATE_ARRAY, NEED4ONE_EXTRA_BYTE
+    , EXPAND4CHAR_TO_TWO_BYTES, NO4TAIL_BYTES
+    , 0
+    , 0
+    , UNUSED4
+    , UNUSED4
+    , 1 }
 
 
-      /* general collation for CodePage 437
-         Collate4generalCp437
-      */
-      {
-         collate4subSortCompress,                          // enum Collate4type collateType
-         (void *)cp437generalCollationArray,               // void *charToKeyTranslationArray
-         MUST4GENERATE_ARRAY,                              // void *unicodeToKeyTranslationArray
-         (void *)cp437generalCompressArray,                // void *charToKeyCompressionArray
-         MUST4GENERATE_ARRAY,                              // void *unicodeToKeyCompressionArray
-         NEED4ONE_EXTRA_BYTE,                              // unsigned short keySizeCharPerCharAdd
-         EXPAND4CHAR_TO_TWO_BYTES,                         // unsigned short expandOrCompressChar
-         NO4TAIL_BYTES,                                    // unsigned short noTailChar
-         0,                                                // Bool5 didAllocChar
-         0,                                                // Bool5 didAllocUnicode
-         UNUSED4,                                          // unsigned short expandOrCompressUnicode
-         UNUSED4,                                          // unsigned short noTailUnicode
-         1                                                 // Bool5 lossOfData
-      },
+/* general collation for CodePage 437         Collate4generalCp437
+ */
+    ,{ collate4subSortCompress                          // enum Collate4type collateType
+    , (void *)cp437generalCollationArray               // void *charToKeyTranslationArray
+    , MUST4GENERATE_ARRAY                              // void *unicodeToKeyTranslationArray
+    , (void *)cp437generalCompressArray                // void *charToKeyCompressionArray
+    , MUST4GENERATE_ARRAY                              // void *unicodeToKeyCompressionArray
+    , NEED4ONE_EXTRA_BYTE                              // unsigned short keySizeCharPerCharAdd
+    , EXPAND4CHAR_TO_TWO_BYTES                         // unsigned short expandOrCompressChar
+    , NO4TAIL_BYTES                                    // unsigned short noTailChar
+    , 0                                                // Bool5 didAllocChar
+    , 0                                                // Bool5 didAllocUnicode
+    , UNUSED4                                          // unsigned short expandOrCompressUnicode
+    , UNUSED4                                          // unsigned short noTailUnicode
+    , 1 }                                                // Bool5 lossOfData
 
-      /* This entry is for testing the loading capability.  Also, users may use this entry
-         to create their own customized collating sequences.
-         Collate4test
-      */
-      { collate4unknown, MUST4LOAD_ARRAY, MUST4LOAD_ARRAY, MUST4LOAD_ARRAY, MUST4LOAD_ARRAY,
-        MUST4LOAD, MUST4LOAD, MUST4LOAD, 0, 0, MUST4LOAD, MUST4LOAD, MUST4LOAD },
+
+/* This entry is for testing the loading capability.  Also, users may use this entry
+ * to create their own customized collating sequences. Collate4test
+ */
+    ,{ collate4unknown
+    , MUST4LOAD_ARRAY
+    , MUST4LOAD_ARRAY
+    , MUST4LOAD_ARRAY
+    , MUST4LOAD_ARRAY
+    , MUST4LOAD
+    , MUST4LOAD
+    , MUST4LOAD
+    , 0
+    , 0
+    , MUST4LOAD
+    , MUST4LOAD
+    , MUST4LOAD }
 
       /* croation collation for CodePage 1250
          Collate4croatianCp1250
       */
-      {
+      ,{
          collate4simple,                                   // enum Collate4type collateType
          (void *)cp1250croatianCollationArray,             // void *charToKeyTranslationArray
          &unused4filler,                                   // void *unicodeToKeyTranslationArray
@@ -378,12 +392,12 @@ char *c4descend( char *to, const char *from, int len )
          UNUSED4,                                          // unsigned short expandOrCompressUnicode
          UNUSED4,                                          // unsigned short noTailUnicode
          0                                                 // Bool5 lossOfData
-      },
+      }
 
       /* croation case insensitive collation for CodePage 1250
          Collate4croatianUpperCp1250
       */
-      {
+      ,{
          collate4simple,                                   // enum Collate4type collateType
          (void *)cp1250croatianUpperCollationArray,             // void *charToKeyTranslationArray
          &unused4filler,                                   // void *unicodeToKeyTranslationArray
@@ -397,10 +411,10 @@ char *c4descend( char *to, const char *from, int len )
          UNUSED4,                                          // unsigned short expandOrCompressUnicode
          UNUSED4,                                          // unsigned short noTailUnicode
          0                                                 // Bool5 lossOfData
-      },
+      }
 
       // AS Jun 9/04 - Support for CodePage 850
-      {
+      ,{
          collate4subSortCompress,                          // enum Collate4type collateType
          (void *)cp850generalCollationArray,               // void *charToKeyTranslationArray
          MUST4GENERATE_ARRAY,                              // void *unicodeToKeyTranslationArray
@@ -414,30 +428,28 @@ char *c4descend( char *to, const char *from, int len )
          UNUSED4,                                          // unsigned short expandOrCompressUnicode
          UNUSED4,                                          // unsigned short noTailUnicode
          1                                                 // Bool5 lossOfData
-      },
+      }
 
       /* Custom collation for Avaya (case-insensitive & accent-insensitive)
          collate4avaya1252
       */
-      {
-         collate4subSortCompress,
-         (void *)avaya1252CollationArray,
-         MUST4GENERATE_ARRAY,
-         (void *)avaya1252CompressArray,
-         MUST4GENERATE_ARRAY,
-         NEED4ONE_EXTRA_BYTE,
-         EXPAND4CHAR_TO_TWO_BYTES,
-         NO4TAIL_BYTES,
-         0,
-         0,
-         UNUSED4,
-         UNUSED4,
-         1
-      },
+      ,{ collate4subSortCompress
+      , (void *)avaya1252CollationArray
+      ,  MUST4GENERATE_ARRAY
+      , (void *)avaya1252CompressArray
+      ,  MUST4GENERATE_ARRAY
+      ,  NEED4ONE_EXTRA_BYTE
+      ,  EXPAND4CHAR_TO_TWO_BYTES
+      ,  NO4TAIL_BYTES
+      ,  0
+      ,  0
+      , UNUSED4
+      , UNUSED4
+      , 1 }
 
       /* AS Jun30/08 Support for Spanish collations
       */
-      {
+      ,{
          collate4simple,
          (void *)spanishCp1252CollationArray,
          &unused4filler,                                   // void *unicodeToKeyTranslationArray
@@ -451,8 +463,9 @@ char *c4descend( char *to, const char *from, int len )
          UNUSED4,                                          // unsigned short expandOrCompressUnicode
          UNUSED4,                                          // unsigned short noTailUnicode
          0                                                 // Bool5 lossOfData
-      },
-      {
+      }
+
+      ,{
          collate4simple,
          (void *)spanishCp850CollationArray,
          &unused4filler,                                   // void *unicodeToKeyTranslationArray
@@ -466,7 +479,7 @@ char *c4descend( char *to, const char *from, int len )
          UNUSED4,                                          // unsigned short expandOrCompressUnicode
          UNUSED4,                                          // unsigned short noTailUnicode
          0                                                 // Bool5 lossOfData
-      },
+      }
 
 
       /* to add an entry, increment NUM4AVAIL_COLLATION_ENTRIES by 1, add a member
@@ -600,7 +613,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
 
 
-#if !defined( S4CLIENT ) && ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
+#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
    void t4strToDateTime( COLLATE4 *collate, char *result, const char *input, const int len, int *lenOut )
    {
       // AS 06/26/00 - not requite that collate be 0
@@ -669,7 +682,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
 
 
-#if defined( S4CLIENT ) || ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
+#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -717,7 +730,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX )
+#if  defined( S4FOX )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -730,11 +743,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       t4unsignedIntToFox( result, &val ) ;
       *lenOut = sizeof( unsigned long ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) */
+#endif /*  defined( S4FOX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX )
+#if  defined( S4FOX )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -772,11 +785,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       #endif
       t4floatToFox( result, &val ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) */
+#endif /*  defined( S4FOX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX )
+#if  defined( S4FOX )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -797,10 +810,10 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
          #endif
       t4unsignedIntToFox( result, &val ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) */
+#endif /*  defined( S4FOX ) */
 
 
-#if !defined( S4CLIENT ) && ( defined( S4MDX ) || defined( S4CLIPPER ) )
+#if  ( defined( S4MDX ) || defined( S4CLIPPER ) )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -814,10 +827,10 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       #endif
       c4memcpy( result, (void *)&d, sizeof(double) ) ;
    }
-#endif /* !defined( S4CLIENT ) && ( defined( S4MDX ) || defined( S4CLIPPER ) ) */
+#endif /*  ( defined( S4MDX ) || defined( S4CLIPPER ) ) */
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX )
+#if  defined( S4FOX ) && !defined( S4OFF_INDEX )
    void t4strToTime( COLLATE4 *collate, char *result, const char *input, const int len, int *lenOut )
    {
       // AS May 21/04 - if collate is not null, it appears to be ok due to some tests done...
@@ -846,11 +859,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
       *lenOut = sizeof( DBTIME ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) */
+#endif /* defined( S4FOX ) && !defined( S4OFF_INDEX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) && ( defined( __WIN32 ) || defined( S4MACINTOSH ) )
+#if  defined( S4FOX ) && !defined( S4OFF_INDEX ) && ( defined( __WIN32 ) || defined( S4MACINTOSH ) )
    void t4strToLongLong( COLLATE4 *collate, char *result, const char *input, const int len, int *lenOut )
    {
       assert5( collate == 0 && lenOut != 0 ) ;  // should not be used.
@@ -861,11 +874,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
       *lenOut = sizeof( LONGLONG ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) */
+#endif /*  defined( S4FOX ) && !defined( S4OFF_INDEX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) && ( defined( __WIN32 ) || defined( S4MACINTOSH ) )
+#if  defined( S4FOX ) && !defined( S4OFF_INDEX ) && ( defined( __WIN32 ) || defined( S4MACINTOSH ) )
    void t4dblToLongLong( char *result, const double input )
    {
       LONGLONG *lngLng = (LONGLONG *)result ;
@@ -877,11 +890,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       #endif
       t4i8ToFox( (char *)lngLng, lngLng ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) */
+#endif /*  defined( S4FOX ) && !defined( S4OFF_INDEX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX )
+#if  defined( S4FOX ) && !defined( S4OFF_INDEX )
    void t4strToLog( COLLATE4 *collate, char *dest, const char *src, const int l, int *lenOut )
    {
       assert5( collate == 0 && lenOut != 0 ) ;  // should not be used.
@@ -910,11 +923,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
       *lenOut = 1 ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) */
+#endif /*  defined( S4FOX ) && !defined( S4OFF_INDEX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4CLIPPER )
+#if  defined( S4CLIPPER )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -925,11 +938,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       double d = c4atod( input, c4strlen( input )) ;
       c4memcpy( result, &d, sizeof(double) ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4CLIPPER ) */
+#endif /*  defined( S4CLIPPER ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4CLIPPER )
+#if  defined( S4CLIPPER )
    void t4strToClip( COLLATE4 *dummyCollate, char *result, const char *input, const int len, int *dummyIntOut )
    {
       assert5( dummyCollate == 0 ) ;  // not used here, should be 0
@@ -987,11 +1000,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
       c4clip( result, c4strlen( result ), dLen ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4CLIPPER ) */
+#endif /*  defined( S4CLIPPER ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4CLIPPER )
+#if  defined( S4CLIPPER )
    void  t4dateDoubToStr( char *result, const double d )
    {
       long  l ;
@@ -999,11 +1012,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       l = (long) d ;
       date4assign( result, l ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4CLIPPER ) */
+#endif /*  defined( S4CLIPPER ) */
 
 
 
-#if defined( S4FOX ) || defined( OLEDB5BUILD ) || defined( S4CLIENT )
+#if defined( S4FOX ) || defined( OLEDB5BUILD )
    /* LY 2001/07/28 : changed from long to S4LONG for 64-bit */
    void t4intToFox( char *result, const S4LONG *val )
    {
@@ -1029,11 +1042,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       else /* negative */
          result[0] -= (unsigned)0x80 ;
    }
-#endif /* defined( S4FOX ) || defined( OLEDB5BUILD ) || defined( S4CLIENT ) */
+#endif /* defined( S4FOX ) || defined( OLEDB5BUILD ) */
 
 
 
-#if defined( S4CLIENT ) || ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
+#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
    void t4unsignedIntToFox( char *result, const unsigned long *val )
    {
       *((long *)result) = x4reverseLong( val ) ;
@@ -1049,7 +1062,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
 
 
-#if defined( S4CLIENT ) || ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
+#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
    void t4foxToUnsignedInt( char *result, const unsigned long *val )
    {
       *((long *)result) = x4reverseLong( val ) ;
@@ -1058,7 +1071,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX )
+#if  defined( S4FOX )
    void t4shortToFox( char *result, const short *val )
    {
       int isPositive ;
@@ -1070,7 +1083,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       else /* negative */
          result[0] -= (unsigned)0x80 ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) */
+#endif /*  defined( S4FOX ) */
 
 
 #if ( ( defined( S4FOX ) || defined( OLEDB5BUILD ) ) || defined( S4CLIENT ) ) && !defined( S4NO_LONGLONG )
@@ -1113,7 +1126,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX )
+#if  defined( S4FOX )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -1123,11 +1136,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       t4dblToFox( result, (double) date4long( inputPtr ) ) ;
       *lenOut = inputPtrLen ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) */
+#endif /*  defined( S4FOX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX )
+#if  defined( S4FOX )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -1151,11 +1164,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       t4dbDateToFox( result, &dbDate ) ;
       *lenOut = sizeof( DBDATE ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) */
+#endif /*  defined( S4FOX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX )
+#if  defined( S4FOX )
    static void dbDate4assignLow( DBDATE *datePtr, const long ldate )
    {
       /* Converts from a Julian day to the DBDATE format. */
@@ -1194,11 +1207,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       datePtr->month = month ;
       datePtr->day = day ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) */
+#endif /*  defined( S4FOX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX )
+#if  defined( S4FOX )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -1208,11 +1221,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       dbDate4assignLow( (DBDATE *)result, (long)d ) ;
       t4dbDateToFox( result, (DBDATE *)result ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) */
+#endif /*  defined( S4FOX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX )
+#if  defined( S4FOX )
    void t4strToFox( COLLATE4 *collate, char *result, const char *inputPtr, const int inputPtrLen, int *lenOut )
    {
       //#ifdef S4BYTE_SWAP  /* LY 2001/06/26 */
@@ -1228,7 +1241,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       // *lenOut = inputPtrLen ;
       *lenOut = 8 ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) */
+#endif /*  defined( S4FOX ) */
 
 
 
@@ -1352,7 +1365,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
 
 
 
-#if defined( S4CLIENT ) || ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
+#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
    void t4curToFox( char *result, const CURRENCY4 *source )
    {
       char i ;
@@ -1501,7 +1514,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
 
 
 
-#if defined( S4FOX ) || defined( OLEDB5BUILD ) || defined( S4CLIENT )
+#if defined( S4FOX ) || defined( OLEDB5BUILD )
    // AS 09/14/00 - flags for fox compatibility - FoxPro appears to have an unusual conversion
    // algorithm which could not be deciphered for key creation.  This bitmap below indicates
    // all records which need to have their keys decremented by 1 to be fox compatible.
@@ -2358,11 +2371,11 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
 
       t4dblToFox( result, val ) ;
    }
-#endif /* defined( S4FOX ) || defined( OLEDB5BUILD ) || defined( S4CLIENT ) */
+#endif /* defined( S4FOX ) || defined( OLEDB5BUILD ) */
 
 
 
-#if ( defined( S4FOX ) || defined( S4CLIENT ) )
+#if ( defined( S4FOX )  )
    void t4dblToCurFox( char *result, const double doub )
    {
       CURRENCY4 hold ;
@@ -2370,11 +2383,11 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
       t4dblToCur( (char *)&hold, doub ) ;
       t4curToFox( result, &hold ) ;
    }
-#endif /* ( defined( S4FOX ) || defined( S4CLIENT ) ) */
+#endif /* ( defined( S4FOX )  ) */
 
 
 
-#if defined( S4FOX ) || defined( OLEDB5BUILD ) || defined( S4CLIENT )
+#if defined( S4FOX ) || defined( OLEDB5BUILD )
    // AS Jul 21/05 - Support for new field type binary float
    void t4floatToFox( char *result, const float *flt )
    {
@@ -2460,7 +2473,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
                result[i] = (char) (~(*( (unsigned char *)&doub + 7 - i ))) ;
       #endif
    }
-#endif /* defined( S4FOX ) || defined( OLEDB5BUILD ) || defined( S4CLIENT ) */
+#endif /* defined( S4FOX ) || defined( OLEDB5BUILD )  */
 
 
 
@@ -2492,7 +2505,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
 
 
 
-#if defined( S4MDX ) || defined( OLEDB5BUILD ) || defined( S4CLIENT )
+#if defined( S4MDX ) || defined( OLEDB5BUILD )
 void c4bcdFromA( COLLATE4 *dummyCollate, char *result, const char *inputPtr, const int inputPtrLen, int *dummyIntOut )
 {
    assert5( dummyCollate == 0 && dummyIntOut == 0 ) ;  // not used here, should be 0
@@ -2599,11 +2612,10 @@ void c4bcdFromA( COLLATE4 *dummyCollate, char *result, const char *inputPtr, con
       ((C4BCD *)result)->digitInfo = (unsigned char)( ((C4BCD *)result)->digitInfo & 0x7F ) ;
 }
 #else
-void c4bcdFromA( char *junk1, const char *junk2, const int junk3 )
-{
-   error4(0,e4notSupported, 0L);
+void c4bcdFromA( COLLATE4 *dummyCollate, char *result, const char *inputPtr, const int inputPtrLen, int *dummyIntOut )
+{ error4(0,e4notSupported, 0L);
 }
 
 
 
-#endif /* defined( S4FOX ) || defined( OLEDB5BUILD ) || defined( S4CLIENT ) */
+#endif /* defined( S4FOX ) || defined( OLEDB5BUILD ) */

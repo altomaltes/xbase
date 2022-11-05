@@ -24,276 +24,278 @@
    double S4FUNCTION total4value( TOTAL4 *t4 );
 #endif
 
+/* function, name, code, nameLen, priority, returnType, numParms, type[]
+ */
+
 const E4FUNCTIONS v4functions[EXPR4NUM_FUNCTIONS] =
-{
-   /* function, name, code, nameLen, priority, returnType, numParms, type[]*/
-   { e4fieldAdd,   0,   0, 0, 0, r4str,      0, 0, 0, 0 },  /*  1 - E4FIELD_STR */
-   { e4fieldAdd,   0,   0, 0, 0, r5wstr,     0, 0, 0, 0 },  /*  2 - E4FIELD_WSTR */
-   { e4fieldCopy,  0,   0, 0, 0, r5wstrLen,  0, 0, 0, 0 },  /*  3 - E4FIELD_WSTR_LEN */
-   { e4fieldCopy,  0,   1, 0, 0, r4str,      0, 0, 0, 0 },  /*  4 - E4FIELD_STR_CAT */
-   { e4fieldCopy,  0,   2, 0, 0, r5wstr,     0, 0, 0, 0 },  /*  5 - E4FIELD_STR_CAT */
-   { e4fieldLog,   0,   3, 0, 0, r4log,      0, 0, 0, 0 },  /*  6 - E4FIELD_LOG */
-   { e4fieldDateD, 0,   4, 0, 0, r4dateDoub, 0, 0, 0, 0 },  /*  7 - E4FIELD_DATE_D */
-   { e4fieldAdd,   0,   5, 0, 0, r4date,     0, 0, 0, 0 },  /*  8 - E4FIELD_DATE_S */
-   { e4fieldNumD,  0,   6, 0, 0, r4numDoub,  0, 0, 0, 0 },  /*  9 - E4FIELD_NUM_D */
-   { e4fieldAdd,   0,   7, 0, 0, r4num,      0, 0, 0, 0 },  /* 10 - E4FIELD_NUM_S */
-   { e4fieldAdd,   0, 440, 0, 0, r4currency, 0, 0, 0, 0 },  /* 11 - E4FIELD_CUR */
+{{ e4fieldAdd,   0,   0, 0, 0, r4str,      0, 0, 0, 0 }  /*  1 - E4FIELD_STR */
+,{ e4fieldAdd,   0,   0, 0, 0, r5wstr,     0, 0, 0, 0 }  /*  2 - E4FIELD_WSTR */
+,{ e4fieldCopy,  0,   0, 0, 0, r5wstrLen,  0, 0, 0, 0 }  /*  3 - E4FIELD_WSTR_LEN */
+,{ e4fieldCopy,  0,   1, 0, 0, r4str,      0, 0, 0, 0 }  /*  4 - E4FIELD_STR_CAT */
+,{ e4fieldCopy,  0,   2, 0, 0, r5wstr,     0, 0, 0, 0 }  /*  5 - E4FIELD_STR_CAT */
+,{ e4fieldLog,   0,   3, 0, 0, r4log,      0, 0, 0, 0 }  /*  6 - E4FIELD_LOG */
+,{ e4fieldDateD, 0,   4, 0, 0, r4dateDoub, 0, 0, 0, 0 }  /*  7 - E4FIELD_DATE_D */
+,{ e4fieldAdd,   0,   5, 0, 0, r4date,     0, 0, 0, 0 }  /*  8 - E4FIELD_DATE_S */
+,{ e4fieldNumD,  0,   6, 0, 0, r4numDoub,  0, 0, 0, 0 }  /*  9 - E4FIELD_NUM_D */
+,{ e4fieldAdd,   0,   7, 0, 0, r4num,      0, 0, 0, 0 }  /* 10 - E4FIELD_NUM_S */
+,{ e4fieldAdd,   0, 440, 0, 0, r4currency, 0, 0, 0, 0 }  /* 11 - E4FIELD_CUR */
    // AS July 27/01 - field value is stored in intel ordering always, so need a special function to extract
    // the value in local double ordering format
-   { e4fieldDoubD, 0, 441, 0, 0, r4numDoub,  0, 0, 0, 0 },  /* 12 - E4FIELD_DOUB */
-   { e4fieldAdd,   0, 442, 0, 0, r4int,      0, 0, 0, 0 },  /* 13 - E4FIELD_INT */
-   { e4fieldAdd,   0, 443, 0, 0, r5ui4,      0, 0, 0, 0 },  /* 14 - E4FIELD_UNS_INT */
-   { e4fieldAdd,   0, 444, 0, 0, r5i2,       0, 0, 0, 0 },  /* 15 - E4FIELD_SHORT */
-   { e4fieldAdd,   0, 445, 0, 0, r5ui2,      0, 0, 0, 0 },  /* 16 - E4FIELD_UNS_SHORT */
-   { e4fieldAdd,   0, 446, 0, 0, r4dateTime, 0, 0, 0, 0 },  /* 17 - E4FIELD_DTTIME */
-   { e4fieldAdd,   0, 447, 0, 0, r4dateTimeMilli, 0, 0, 0, 0 },  /*  18- E4FIELD_DTTIME_MILLI */   // AS Mar 10/03 - ms support in datetime
-   { e4fieldIntD,  0, 448, 0, 0, r4numDoub,  0, 0, 0, 0 },  /* 19 - E4FIELD_INT_D */
-   { e4fieldCurD,  0, 449, 0, 0, r4numDoub,  0, 0, 0, 0 },  /* 20 - E4FIELD_CUR_D */
-   { e4fieldAdd,   0, 450, 0, 0, r5i8,       0, 0, 0, 0 },  /* 21 - E4FIELD_I8 */
-   { e4fieldAdd,   0, 451, 0, 0, r5dbDate,   0, 0, 0, 0 },  /* 22 - E4FIELD_DBDATE */
-   { e4fieldAdd,   0, 452, 0, 0, r5dbTime,   0, 0, 0, 0 },  /* 23 - E4FIELD_DBTIME */
-   { e4fieldAdd,   0, 453, 0, 0, r5dbTimeStamp, 0, 0, 0, 0 }, /* 24 - E4FIELD_DBTIMESTAMP */
+,{ e4fieldDoubD, 0, 441, 0, 0, r4numDoub,  0, 0, 0, 0 }  /* 12 - E4FIELD_DOUB */
+,{ e4fieldAdd,   0, 442, 0, 0, r4int,      0, 0, 0, 0 }  /* 13 - E4FIELD_INT */
+,{ e4fieldAdd,   0, 443, 0, 0, r5ui4,      0, 0, 0, 0 }  /* 14 - E4FIELD_UNS_INT */
+,{ e4fieldAdd,   0, 444, 0, 0, r5i2,       0, 0, 0, 0 }  /* 15 - E4FIELD_SHORT */
+,{ e4fieldAdd,   0, 445, 0, 0, r5ui2,      0, 0, 0, 0 }  /* 16 - E4FIELD_UNS_SHORT */
+,{ e4fieldAdd,   0, 446, 0, 0, r4dateTime, 0, 0, 0, 0 }  /* 17 - E4FIELD_DTTIME */
+,{ e4fieldAdd,   0, 447, 0, 0, r4dateTimeMilli, 0, 0, 0, 0 }  /*  18- E4FIELD_DTTIME_MILLI */   // AS Mar 10/03 - ms support in datetime
+,{ e4fieldIntD,  0, 448, 0, 0, r4numDoub,  0, 0, 0, 0 }  /* 19 - E4FIELD_INT_D */
+,{ e4fieldCurD,  0, 449, 0, 0, r4numDoub,  0, 0, 0, 0 }  /* 20 - E4FIELD_CUR_D */
+,{ e4fieldAdd,   0, 450, 0, 0, r5i8,       0, 0, 0, 0 }  /* 21 - E4FIELD_I8 */
+,{ e4fieldAdd,   0, 451, 0, 0, r5dbDate,   0, 0, 0, 0 }  /* 22 - E4FIELD_DBDATE */
+,{ e4fieldAdd,   0, 452, 0, 0, r5dbTime,   0, 0, 0, 0 }  /* 23 - E4FIELD_DBTIME */
+,{ e4fieldAdd,   0, 453, 0, 0, r5dbTimeStamp, 0, 0, 0, 0 } /* 24 - E4FIELD_DBTIMESTAMP */
    // AS Jul 21/05 - Support for new field type binary float
-   { e4fieldAdd,   0, 454, 0, 0, r4floatBin, 0, 0, 0, 0 }, /* 25 - E4FIELD_BINFLOAT */
-   // { e4fieldFloatD,   0, 455, 0, 0, r4numDoub, 0, 0, 0, 0 }, /* 26 - E4FIELD_BINFLOAT_D */
-   // { e4fieldFloatD,   0, 455, 0, 0, r5i8, 0, 0, 0, 0 }, /* 26 - E4FIELD_BINFLOAT_D  -  a dummy holder for now */
-   { e4fieldIntF,  0, 456, 0, 0, r4float,    0, 0, 0, 0 },  /* 26 - E4FIELD_INT_F */
+,{ e4fieldAdd,   0, 454, 0, 0, r4floatBin, 0, 0, 0, 0 } /* 25 - E4FIELD_BINFLOAT */
+   // { e4fieldFloatD,   0, 455, 0, 0, r4numDoub, 0, 0, 0, 0 } /* 26 - E4FIELD_BINFLOAT_D */
+   // { e4fieldFloatD,   0, 455, 0, 0, r5i8, 0, 0, 0, 0 } /* 26 - E4FIELD_BINFLOAT_D  -  a dummy holder for now */
+,{ e4fieldIntF,  0, 456, 0, 0, r4float,    0, 0, 0, 0 }  /* 26 - E4FIELD_INT_F */
 
    /* *** E4LAST_FIELD IS SET TO SAME VALUE AS E4FIELD_MEMO,
           THIS MEANS ALL NEW FIELD ADDITIONS MUST GO BEFORE THIS COMMENT LINE
    */
    #ifdef S4OFF_MEMO
-      { 0,           0, 7, 0,  0, r4str, 0, 0, 0, 0 },       /* 27- */
+,    { 0,           0, 7, 0,  0, r4str, 0, 0, 0, 0 }       /* 27- */
    #else
-      { e4fieldMemo, 0, 7, 0,  0, r4str, 0, 0, 0, 0 },       /* 27- E4FIELD_MEMO */
+,{ e4fieldMemo, 0, 7, 0,  0, r4str, 0, 0, 0, 0 }       /* 27- E4FIELD_MEMO */
    #endif
 
-   { e4copyConstant, 0,  8, 0, 0, r4numDoub,  0, 0, 0, 0 },   /* 28 - E4DOUBLE */
-   { e4copyConstant, 0,  9, 0, 0, r4str,      0, 0, 0, 0 },   /* 29 - E4STRING */
-   { e4copyToFloat, 0, 10, 0, 0, r4floatBin,  0, 0, 0, 0 },   /* 30 - E4FLOAT */
+,{ e4copyConstant, 0,  8, 0, 0, r4numDoub,  0, 0, 0, 0 }   /* 28 - E4DOUBLE */
+,{ e4copyConstant, 0,  9, 0, 0, r4str,      0, 0, 0, 0 }   /* 29 - E4STRING */
+,{ e4copyToFloat, 0, 10, 0, 0, r4floatBin,  0, 0, 0, 0 }   /* 30 - E4FLOAT */
 
    /* E4FIRST_LOG STARTS AT E4LAST_FIELD + 4 (i.e. after copy constants) */
-   { expr4trueFunction, ".TRUE.",  14, 6, 0, r4log, 0,     0, 0, 0 }, /* 31 - */
-   { expr4trueFunction, ".T.",     14, 3, 0, r4log, 0,     0, 0, 0 }, /* 32 - */
-   { e4false,           ".FALSE.", 16, 7, 0, r4log, 0,     0, 0, 0 }, /* 33 - */
-   { e4false,           ".F.",     16, 3, 0, r4log, 0,     0, 0, 0 }, /* 34 - */
-   { e4not,             ".NOT.",   18, 5, 5, r4log, 1, r4log, 0, 0 }, /* 35 - */
-   { e4not,             "!",   18, 1, 5, r4log, 1, r4log, 0, 0 },     /* 36 - */
+,{ expr4trueFunction, ".TRUE.",  14, 6, 0, r4log, 0,     0, 0, 0 } /* 31 - */
+,{ expr4trueFunction, ".T.",     14, 3, 0, r4log, 0,     0, 0, 0 } /* 32 - */
+,{ e4false,           ".FALSE.", 16, 7, 0, r4log, 0,     0, 0, 0 } /* 33 - */
+,{ e4false,           ".F.",     16, 3, 0, r4log, 0,     0, 0, 0 } /* 34 - */
+,{ e4not,             ".NOT.",   18, 5, 5, r4log, 1, r4log, 0, 0 } /* 35 - */
+,{ e4not,             "!",   18, 1, 5, r4log, 1, r4log, 0, 0 }     /* 36 - */
 
    /* E4LAST_LOG IS SET AT E4FIRST_LOG + 4 (since inclusive 10 to 14 = 5) */
 
    /* E4FIRST_OPERATOR IS SET AT E4LAST_LOG + 1 */
    /* E4LAST_OPERATOR IS SET AT E4FIRST_OPERATOR + 58 (59 entries less one for exclusive) */
-   { e4or,            ".OR.",   20, 4, 3, r4log, -1, r4log, 0, 0 }, /*  37 - Flexible # of parms.*/
-   { e4and,           ".AND.",  22, 5, 4, r4log, -1, r4log, 0, 0 }, /*  38 - */
+,{ e4or,            ".OR.",   20, 4, 3, r4log, -1, r4log, 0, 0 } /*  37 - Flexible # of parms.*/
+,{ e4and,           ".AND.",  22, 5, 4, r4log, -1, r4log, 0, 0 } /*  38 - */
 
-   { e4parmRemove,   "+", 25, 1, 7, r4str,      2, r4str,     r4str,      0 },  /*  39 - Concatenate */
-   { e4parmRemove,     0, 25, 0, 7, r5wstr,     2, r5wstr,    r5wstr,     0 },  /*  40 - Concatenate */
-   { e4wstrLenCon,     0, 25, 0, 7, r5wstrLen,  2, r5wstrLen, r5wstrLen,     0 },  /*  41 - Concatenate */
-   { e4concatTrim,     0, 25, 0, 7, r4str,      2, r4str,     r4str,      0 },  /*  42 - Concatenate */
-   { e4add,            0, 25, 0, 7, r4numDoub,  2, r4numDoub, r4numDoub,  0 }, /*  43 - */
-   { e4addDate,        0, 25, 0, 7, r4dateDoub, 2, r4numDoub, r4dateDoub, 0 }, /*  44 - */
-   { e4addDate,        0, 25, 0, 7, r4dateDoub, 2, r4dateDoub,r4numDoub,  0 }, /*  45 - */
-   { e4addFloat,       0, 25, 0, 7, r4floatBin,  2, r4floatBin, r4floatBin,  0 }, /*  46 - */
+,{ e4parmRemove,   "+", 25, 1, 7, r4str,      2, r4str,     r4str,      0 }  /*  39 - Concatenate */
+,{ e4parmRemove,     0, 25, 0, 7, r5wstr,     2, r5wstr,    r5wstr,     0 }  /*  40 - Concatenate */
+,{ e4wstrLenCon,     0, 25, 0, 7, r5wstrLen,  2, r5wstrLen, r5wstrLen,     0 }  /*  41 - Concatenate */
+,{ e4concatTrim,     0, 25, 0, 7, r4str,      2, r4str,     r4str,      0 }  /*  42 - Concatenate */
+,{ e4add,            0, 25, 0, 7, r4numDoub,  2, r4numDoub, r4numDoub,  0 } /*  43 - */
+,{ e4addDate,        0, 25, 0, 7, r4dateDoub, 2, r4numDoub, r4dateDoub, 0 } /*  44 - */
+,{ e4addDate,        0, 25, 0, 7, r4dateDoub, 2, r4dateDoub,r4numDoub,  0 } /*  45 - */
+,{ e4addFloat,       0, 25, 0, 7, r4floatBin,  2, r4floatBin, r4floatBin,  0 } /*  46 - */
 
-   { e4concatTwo,    "-", 30, 1, 7, r4str,      2, r4str,      r4str,      0 }, /*  47 - */
-   { e4sub,            0, 30, 0, 7, r4numDoub,  2, r4numDoub,  r4numDoub,  0 }, /*  48 - */
-   { e4subDate,        0, 30, 0, 7, r4numDoub,  2, r4dateDoub, r4dateDoub, 0 }, /*  49 - */
-   { e4subDate,        0, 30, 0, 7, r4dateDoub, 2, r4dateDoub, r4numDoub,  0 }, /*  50 - */
-   { e4subFloat,       0, 30, 0, 7, r4floatBin,  2, r4floatBin,  r4floatBin,  0 }, /*  51 - */
+, { e4concatTwo,    "-", 30, 1, 7, r4str,      2, r4str,      r4str,      0 } /*  47 - */
+, { e4sub,            0, 30, 0, 7, r4numDoub,  2, r4numDoub,  r4numDoub,  0 } /*  48 - */
+, { e4subDate,        0, 30, 0, 7, r4numDoub,  2, r4dateDoub, r4dateDoub, 0 } /*  49 - */
+, { e4subDate,        0, 30, 0, 7, r4dateDoub, 2, r4dateDoub, r4numDoub,  0 } /*  50 - */
+, { e4subFloat,       0, 30, 0, 7, r4floatBin,  2, r4floatBin,  r4floatBin,  0 } /*  51 - */
 
    /* E4COMPARE_START IS E4FIRST_OPEATOR + 12 */
-   { e4notEqual,       "#",  50, 1, 6, r4log, 2, r4str,      r4str,      0 }, /*  52 - */
-   { e4notEqual,      "<>",  50, 2, 6, r4log, 2, r4str,      r4str,      0 }, /*  53 - */
-   { e4notEqual,         0,  50, 0, 6, r4log, 2, r4numDoub,  r4numDoub,  0 }, /*  54 - */
-   { e4notEqual,         0,  50, 0, 6, r4log, 2, r4dateDoub, r4dateDoub, 0 }, /*  55 - */
-   { e4notEqual,         0,  50, 0, 6, r4log, 2, r4log,      r4log,      0 }, /*  56 - */
-   { e4notEqualCur,      0,  50, 0, 6, r4log, 2, r4currency, r4currency, 0 }, /*  57 - */
-   { e4notEqualDtTime,   0,  50, 0, 6, r4log, 2, r4dateTime, r4dateTime, 0 }, /*  58 - */
-   { e4notEqualDtTime,   0,  50, 0, 6, r4log, 2, r4dateTimeMilli, r4dateTimeMilli, 0 }, /*  59 - */
-   { e4notEqual,         0,  50, 0, 6, r4log, 2, r4floatBin,  r4floatBin,  0 }, /*  60 - */
+, { e4notEqual,       "#",  50, 1, 6, r4log, 2, r4str,      r4str,      0 } /*  52 - */
+, { e4notEqual,      "<>",  50, 2, 6, r4log, 2, r4str,      r4str,      0 } /*  53 - */
+, { e4notEqual,         0,  50, 0, 6, r4log, 2, r4numDoub,  r4numDoub,  0 } /*  54 - */
+, { e4notEqual,         0,  50, 0, 6, r4log, 2, r4dateDoub, r4dateDoub, 0 } /*  55 - */
+, { e4notEqual,         0,  50, 0, 6, r4log, 2, r4log,      r4log,      0 } /*  56 - */
+, { e4notEqualCur,      0,  50, 0, 6, r4log, 2, r4currency, r4currency, 0 } /*  57 - */
+, { e4notEqualDtTime,   0,  50, 0, 6, r4log, 2, r4dateTime, r4dateTime, 0 } /*  58 - */
+, { e4notEqualDtTime,   0,  50, 0, 6, r4log, 2, r4dateTimeMilli, r4dateTimeMilli, 0 } /*  59 - */
+, { e4notEqual,         0,  50, 0, 6, r4log, 2, r4floatBin,  r4floatBin,  0 } /*  60 - */
 
-   { e4greaterEq,     ">=",  60, 2, 6, r4log, 2, r4str,      r4str,      0 }, /*  61 - */
-   { e4greaterEq,     "=>",  60, 2, 6, r4log, 2, r4str,      r4str,      0 }, /*  62 - */
-   { e4greaterEqDoub,    0,  60, 0, 6, r4log, 2, r4numDoub,  r4numDoub,  0 }, /*  63 - */
-   { e4greaterEqDoub,    0,  60, 0, 6, r4log, 2, r4dateDoub, r4dateDoub, 0 }, /*  64 - */
-   { e4greaterEqCur,     0,  60, 0, 6, r4log, 2, r4currency, r4currency, 0 }, /*  65 - */
-   { e4greaterEqDtTime,  0,  60, 0, 6, r4log, 2, r4dateTime, r4dateTime, 0 }, /*  66 - */
-   { e4greaterEqDtTime,  0,  60, 0, 6, r4log, 2, r4dateTimeMilli, r4dateTimeMilli, 0 }, /*  67 - */
-   { e4greaterEqFloat,   0,  60, 0, 6, r4log, 2, r4floatBin, r4floatBin, 0 }, /*  68 - */
+, { e4greaterEq,     ">=",  60, 2, 6, r4log, 2, r4str,      r4str,      0 } /*  61 - */
+, { e4greaterEq,     "=>",  60, 2, 6, r4log, 2, r4str,      r4str,      0 } /*  62 - */
+, { e4greaterEqDoub,    0,  60, 0, 6, r4log, 2, r4numDoub,  r4numDoub,  0 } /*  63 - */
+, { e4greaterEqDoub,    0,  60, 0, 6, r4log, 2, r4dateDoub, r4dateDoub, 0 } /*  64 - */
+, { e4greaterEqCur,     0,  60, 0, 6, r4log, 2, r4currency, r4currency, 0 } /*  65 - */
+, { e4greaterEqDtTime,  0,  60, 0, 6, r4log, 2, r4dateTime, r4dateTime, 0 } /*  66 - */
+, { e4greaterEqDtTime,  0,  60, 0, 6, r4log, 2, r4dateTimeMilli, r4dateTimeMilli, 0 } /*  67 - */
+, { e4greaterEqFloat,   0,  60, 0, 6, r4log, 2, r4floatBin, r4floatBin, 0 } /*  68 - */
 
-   { e4lessEq,        "<=",  70, 2, 6, r4log, 2, r4str,      r4str, 0 },        /*  69 - */
-   { e4lessEq,        "=<",  70, 2, 6, r4log, 2, r4str,      r4str, 0 },        /*  70 - */
-   { e4lessEqDoub,       0,  70, 0, 6, r4log, 2, r4numDoub,  r4numDoub, 0 },    /*  71 - */
-   { e4lessEqDoub,       0,  70, 0, 6, r4log, 2, r4dateDoub, r4dateDoub, 0 },   /*  72 - */
-   { e4lessEqCur,        0,  70, 0, 6, r4log, 2, r4currency, r4currency, 0 },   /*  73 - */
-   { e4lessEqDtTime,     0,  70, 0, 6, r4log, 2, r4dateTime, r4dateTime, 0 },   /*  74 - */
-   { e4lessEqDtTime,     0,  70, 0, 6, r4log, 2, r4dateTimeMilli, r4dateTimeMilli, 0 },   /*  75 - */
-   { e4lessEqFloat,      0,  70, 0, 6, r4log, 2, r4floatBin, r4floatBin, 0 },   /*  76 - */
+, { e4lessEq,        "<=",  70, 2, 6, r4log, 2, r4str,      r4str, 0 }        /*  69 - */
+, { e4lessEq,        "=<",  70, 2, 6, r4log, 2, r4str,      r4str, 0 }        /*  70 - */
+, { e4lessEqDoub,       0,  70, 0, 6, r4log, 2, r4numDoub,  r4numDoub, 0 }    /*  71 - */
+, { e4lessEqDoub,       0,  70, 0, 6, r4log, 2, r4dateDoub, r4dateDoub, 0 }   /*  72 - */
+, { e4lessEqCur,        0,  70, 0, 6, r4log, 2, r4currency, r4currency, 0 }   /*  73 - */
+, { e4lessEqDtTime,     0,  70, 0, 6, r4log, 2, r4dateTime, r4dateTime, 0 }   /*  74 - */
+, { e4lessEqDtTime,     0,  70, 0, 6, r4log, 2, r4dateTimeMilli, r4dateTimeMilli, 0 }   /*  75 - */
+, { e4lessEqFloat,      0,  70, 0, 6, r4log, 2, r4floatBin, r4floatBin, 0 }   /*  76 - */
 
-   { e4equal,          "=",  40, 1, 6, r4log, 2, r4str,      r4str,      0 },   /*  77 - */
-   { e4equal,            0,  40, 0, 6, r4log, 2, r4log,      r4log,      0 },   /*  78 - */
-   { e4equal,            0,  40, 0, 6, r4log, 2, r4numDoub,  r4numDoub,  0 },   /*  79 - */
-   { e4equal,            0,  40, 0, 6, r4log, 2, r4dateDoub, r4dateDoub, 0 },   /*  80 - */
-   { e4equalCur,         0,  40, 0, 6, r4log, 2, r4currency, r4currency, 0 },   /*  81 - */
-   { e4equalDtTime,      0,  40, 0, 6, r4log, 2, r4dateTime, r4dateTime, 0 },   /*  82 - */
-   { e4equalDtTime,      0,  40, 0, 6, r4log, 2, r4dateTimeMilli, r4dateTimeMilli, 0 }, /*  83 - */
-   { e4equal,            0,  40, 0, 6, r4log, 2, r4floatBin, r4floatBin, 0 }, /*  84 - */
+, { e4equal,          "=",  40, 1, 6, r4log, 2, r4str,      r4str,      0 }   /*  77 - */
+, { e4equal,            0,  40, 0, 6, r4log, 2, r4log,      r4log,      0 }   /*  78 - */
+, { e4equal,            0,  40, 0, 6, r4log, 2, r4numDoub,  r4numDoub,  0 }   /*  79 - */
+, { e4equal,            0,  40, 0, 6, r4log, 2, r4dateDoub, r4dateDoub, 0 }   /*  80 - */
+, { e4equalCur,         0,  40, 0, 6, r4log, 2, r4currency, r4currency, 0 }   /*  81 - */
+, { e4equalDtTime,      0,  40, 0, 6, r4log, 2, r4dateTime, r4dateTime, 0 }   /*  82 - */
+, { e4equalDtTime,      0,  40, 0, 6, r4log, 2, r4dateTimeMilli, r4dateTimeMilli, 0 } /*  83 - */
+, { e4equal,            0,  40, 0, 6, r4log, 2, r4floatBin, r4floatBin, 0 } /*  84 - */
 
-   { e4greater,          ">",  80, 1, 6, r4log, 2, r4str, r4str, 0 },           /*  85 - */
-   { e4greaterDoub,       0,  80, 0, 6, r4log, 2, r4numDoub,  r4numDoub, 0 },   /*  86 - */
-   { e4greaterDoub,       0,  80, 0, 6, r4log, 2, r4dateDoub, r4dateDoub, 0 },  /*  87 - */
-   { e4greaterCur,        0,  80, 0, 6, r4log, 2, r4currency, r4currency, 0 },  /*  88 - */
-   { e4greaterDtTime,     0,  80, 0, 6, r4log, 2, r4dateTime, r4dateTime, 0 },  /*  89 - */
-   { e4greaterDtTime,     0,  80, 0, 6, r4log, 2, r4dateTimeMilli, r4dateTimeMilli, 0 },  /*  90 - */
-   { e4greaterFloat,     0,  80, 0, 6, r4log, 2, r4floatBin, r4floatBin, 0 },  /*  91 - */
+, { e4greater,          ">",  80, 1, 6, r4log, 2, r4str, r4str, 0 }           /*  85 - */
+, { e4greaterDoub,       0,  80, 0, 6, r4log, 2, r4numDoub,  r4numDoub, 0 }   /*  86 - */
+, { e4greaterDoub,       0,  80, 0, 6, r4log, 2, r4dateDoub, r4dateDoub, 0 }  /*  87 - */
+, { e4greaterCur,        0,  80, 0, 6, r4log, 2, r4currency, r4currency, 0 }  /*  88 - */
+, { e4greaterDtTime,     0,  80, 0, 6, r4log, 2, r4dateTime, r4dateTime, 0 }  /*  89 - */
+, { e4greaterDtTime,     0,  80, 0, 6, r4log, 2, r4dateTimeMilli, r4dateTimeMilli, 0 }  /*  90 - */
+, { e4greaterFloat,     0,  80, 0, 6, r4log, 2, r4floatBin, r4floatBin, 0 }  /*  91 - */
 
-   { e4less,             "<",  90, 1, 6, r4log, 2, r4str, r4str, 0 },           /*  92 - */
-   { e4lessDoub,          0,  90, 0, 6, r4log, 2, r4numDoub,  r4numDoub, 0 },   /*  93 - */
-   { e4lessDoub,          0,  90, 0, 6, r4log, 2, r4dateDoub, r4dateDoub, 0 },  /*  94 - */
-   { e4lessCur,           0,  90, 0, 6, r4log, 2, r4currency, r4currency, 0 },  /*  95 - */
-   { e4lessDtTime,        0,  90, 0, 6, r4log, 2, r4dateTime, r4dateTime, 0 },  /*  96 - */
-   { e4lessDtTime,        0,  90, 0, 6, r4log, 2, r4dateTimeMilli, r4dateTimeMilli, 0 },  /*  97 - */
-   { e4lessFloat,        0,  90, 0, 6, r4log, 2, r4floatBin, r4floatBin, 0 },  /*  98 - */
+,{ e4less,             "<",  90, 1, 6, r4log, 2, r4str, r4str, 0 }           /*  92 - */
+,{ e4lessDoub,          0,  90, 0, 6, r4log, 2, r4numDoub,  r4numDoub, 0 }   /*  93 - */
+,{ e4lessDoub,          0,  90, 0, 6, r4log, 2, r4dateDoub, r4dateDoub, 0 }  /*  94 - */
+,{ e4lessCur,           0,  90, 0, 6, r4log, 2, r4currency, r4currency, 0 }  /*  95 - */
+,{ e4lessDtTime,        0,  90, 0, 6, r4log, 2, r4dateTime, r4dateTime, 0 }  /*  96 - */
+,{ e4lessDtTime,        0,  90, 0, 6, r4log, 2, r4dateTimeMilli, r4dateTimeMilli, 0 }  /*  97 - */
+,{ e4lessFloat,        0,  90, 0, 6, r4log, 2, r4floatBin, r4floatBin, 0 }  /*  98 - */
    /* E4COMPARE_END IS E4COMPARE_START + 41 */
 
    #ifdef S4NO_POW
-      {       0,             0,   95, 0, 0, r4numDoub, 2, r4numDoub, 0, 0 },    /*  99 - */
-      {       0,             0,   95, 0, 0, r4numDoub, 2, r4numDoub, 0, 0 },    /* 100 - */
+      {       0,             0,   95, 0, 0, r4numDoub, 2, r4numDoub, 0, 0 }    /*  99 - */
+      {       0,             0,   95, 0, 0, r4numDoub, 2, r4numDoub, 0, 0 }    /* 100 - */
    #else
-      { e4power,           "^",  100, 1, 9, r4numDoub, 2, r4numDoub, r4numDoub, 0}, /*  99 - */
-      { e4power,          "**",  100, 2, 9, r4numDoub, 2, r4numDoub, r4numDoub, 0}, /* 100 - */
+   , { e4power,           "^",  100, 1, 9, r4numDoub, 2, r4numDoub, r4numDoub, 0} /*  99 - */
+   , { e4power,          "**",  100, 2, 9, r4numDoub, 2, r4numDoub, r4numDoub, 0} /* 100 - */
    #endif
 
-   { e4multiply,         "*", 102, 1, 8, r4numDoub, 2, r4numDoub, r4numDoub, 0},  /* 101 - */
-   { e4multiplyFlt,      "*", 102, 1, 8, r4floatBin, 2, r4floatBin, r4floatBin, 0},  /* 102 - */
-   { e4divide,           "/", 105, 1, 8, r4numDoub, 2, r4numDoub, r4numDoub, 0},  /* 103 - */
-   { e4divideFlt,        "/", 105, 1, 8, r4floatBin, 2, r4floatBin, r4floatBin, 0},  /* 104 - */
-   { e4contain,          "$", 110, 1, 6, r4log, 2, r4str, r4str, 0 },  /* 105 - */
+, { e4multiply,         "*", 102, 1, 8, r4numDoub, 2, r4numDoub, r4numDoub, 0}  /* 101 - */
+, { e4multiplyFlt,      "*", 102, 1, 8, r4floatBin, 2, r4floatBin, r4floatBin, 0}  /* 102 - */
+, { e4divide,           "/", 105, 1, 8, r4numDoub, 2, r4numDoub, r4numDoub, 0}  /* 103 - */
+, { e4divideFlt,        "/", 105, 1, 8, r4floatBin, 2, r4floatBin, r4floatBin, 0}  /* 104 - */
+, { e4contain,          "$", 110, 1, 6, r4log, 2, r4str, r4str, 0 }  /* 105 - */
 
    /* E4FIRST_FUNCTION IS E4COMPARE_END + 6 --> since compare_end was
       inclusive, should be 1 more than above functions (which is 5) */
-   { e4chr,       "CHR", 120, 3, 0, r4str, 1, r4numDoub,  0, 0 },   /* 106 - */
-   { e4del,       "DEL", 130, 3, 0, r4str, 0, 0,          0, 0 },   /* 107 - */
-   { e4str,       "STR", 140, 3, 0, r4str, 1, r4numDoub,  0, 0 },   /* 108 - */
-   { e4wideToStr,       "STR", 140, 1, 0, r4str, 1, r5wstr,  0, 0 }, /* 109 - */
+, { e4chr,       "CHR", 120, 3, 0, r4str, 1, r4numDoub,  0, 0 }   /* 106 - */
+, { e4del,       "DEL", 130, 3, 0, r4str, 0, 0,          0, 0 }   /* 107 - */
+, { e4str,       "STR", 140, 3, 0, r4str, 1, r4numDoub,  0, 0 }   /* 108 - */
+, { e4wideToStr,       "STR", 140, 1, 0, r4str, 1, r5wstr,  0, 0 } /* 109 - */
    // As 07/16/99 --> Added new function ... StrZero - similar as Str but adds 0's on the left...
-   { e4strZero,   "STRZERO", 145, 7, 0, r4str, 1, r4numDoub,  0, 0 },  /* 110 - */
-   { e4substr, "SUBSTR", 150, 6, 0, r4str, 1, r4str,      0, 0 },      /* 111 - */
-   { e4time,     "TIME", 160, 4, 0, r4str, 0, 0,          0, 0 },      /* 112 - */
-   { e4upper,   "UPPER", 170, 5, 0, r4str, 1, r4str,      0, 0 },      /* 113 - */
-   { e4copyParm, "DTOS", 180, 4, 0, r4str, 1, r4date,     0, 0 },      /* 114 - */
-   { e4dtosDoub,      0, 180, 0, 0, r4str, 1, r4dateDoub, 0, 0 },      /* 115 - */
-   { e4dtoc,     "DTOC", 200, 4, 0, r4str, 1, r4date,     0, 0 },      /* 116 - */
-   { e4dtocDoub,      0, 200, 4, 0, r4str, 1, r4dateDoub, 0, 0 },      /* 117 - */
+, { e4strZero,   "STRZERO", 145, 7, 0, r4str, 1, r4numDoub,  0, 0 }  /* 110 - */
+, { e4substr, "SUBSTR", 150, 6, 0, r4str, 1, r4str,      0, 0 }      /* 111 - */
+, { e4time,     "TIME", 160, 4, 0, r4str, 0, 0,          0, 0 }      /* 112 - */
+, { e4upper,   "UPPER", 170, 5, 0, r4str, 1, r4str,      0, 0 }      /* 113 - */
+, { e4copyParm, "DTOS", 180, 4, 0, r4str, 1, r4date,     0, 0 }      /* 114 - */
+, { e4dtosDoub,      0, 180, 0, 0, r4str, 1, r4dateDoub, 0, 0 }      /* 115 - */
+, { e4dtoc,     "DTOC", 200, 4, 0, r4str, 1, r4date,     0, 0 }      /* 116 - */
+, { e4dtocDoub,      0, 200, 4, 0, r4str, 1, r4dateDoub, 0, 0 }      /* 117 - */
    // AS Apr 22/04 - support for TTOC
-   { e4ttoc,     "TTOC", 205, 4, 0, r4str, 1, r4date, 0, 0 },  /* 118 - */
-   { e4ttocDateTime,     0, 205, 4, 0, r4str, 1, r4dateTime,  0, 0 },  /* 119 - */
-   { e4ttocDoub, 0, 205, 4, 0, r4str, 1, r4dateDoub,  0, 0 },  /* 120 - */
+, { e4ttoc,     "TTOC", 205, 4, 0, r4str, 1, r4date, 0, 0 }  /* 118 - */
+, { e4ttocDateTime,     0, 205, 4, 0, r4str, 1, r4dateTime,  0, 0 }  /* 119 - */
+, { e4ttocDoub, 0, 205, 4, 0, r4str, 1, r4dateDoub,  0, 0 }  /* 120 - */
 
    // AS July 25/02 - Added new function SPACE(N)
-   { e4space,    "SPACE",210, 5, 0, r4str, 1, r4numDoub, 0, 0 },       /* 121 - */
+, { e4space,    "SPACE",210, 5, 0, r4str, 1, r4numDoub, 0, 0 }       /* 121 - */
 
 
-   { e4trim,     "TRIM",220, 4, 0, r4str, 1, r4str, 0, 0 },           /* 122 - */
-   { e4ltrim,   "LTRIM",230, 5, 0, r4str, 1, r4str, 0, 0 },           /* 123 - */
-   { e4alltrim, "ALLTRIM",235, 7, 0, r4str, 1, r4str, 0, 0 },         /* 124 - */
-   { e4substr,   "LEFT",240, 4, 0, r4str, 1, r4str, 0, 0 },           /* 125 - */
-   { e4substr,   "RIGHT",245, 5, 0, r4str, 1, r4str, 0, 0 },          /* 126 - */
+, { e4trim,     "TRIM",220, 4, 0, r4str, 1, r4str, 0, 0 }           /* 122 - */
+, { e4ltrim,   "LTRIM",230, 5, 0, r4str, 1, r4str, 0, 0 }           /* 123 - */
+, { e4alltrim, "ALLTRIM",235, 7, 0, r4str, 1, r4str, 0, 0 }         /* 124 - */
+, { e4substr,   "LEFT",240, 4, 0, r4str, 1, r4str, 0, 0 }           /* 125 - */
+, { e4substr,   "RIGHT",245, 5, 0, r4str, 1, r4str, 0, 0 }          /* 126 - */
 
-   { e4padLeft,  "PADL", 246, 4, 0, r4str, 1, r4str, 0, 0 },          /* 127 - */
-   { e4padRight, "PADR", 247, 4, 0, r4str, 1, r4str, 0, 0 },          /* 128 - */
+, { e4padLeft,  "PADL", 246, 4, 0, r4str, 1, r4str, 0, 0 }          /* 127 - */
+, { e4padRight, "PADR", 247, 4, 0, r4str, 1, r4str, 0, 0 }          /* 128 - */
 
-   { e4iifStr,  "IIF", 250, 3, 0,      r4str, 3, r4log,      r4str, r4str },  /* 129 - */
-   { e4iif,      0, 250, 0, 0,  r4numDoub, 3, r4log,  r4numDoub, r4numDoub},  /* 130 - */
-   { e4iif,      0, 250, 0, 0, r4dateDoub, 3, r4log, r4dateDoub, r4dateDoub}, /* 131 - */
-   { e4iif,      0, 250, 0, 0,      r4log, 3, r4log,      r4log, r4log },     /* 132 - */
+, { e4iifStr,  "IIF", 250, 3, 0,      r4str, 3, r4log,      r4str, r4str }  /* 129 - */
+, { e4iif,      0, 250, 0, 0,  r4numDoub, 3, r4log,  r4numDoub, r4numDoub}  /* 130 - */
+, { e4iif,      0, 250, 0, 0, r4dateDoub, 3, r4log, r4dateDoub, r4dateDoub} /* 131 - */
+, { e4iif,      0, 250, 0, 0,      r4log, 3, r4log,      r4log, r4log }     /* 132 - */
 
    // 09/20/00 - DATETIME() function
    // AS Mar 10/03 - ms support in datetime - support optional millisecond paramater
-   { e4dateTime,    "DATETIME", 259, 8, 0, r4dateTime, 3, r4numDoub,r4numDoub,r4numDoub },  /* 133 - */
-   { e4dateTime,    0, 259, 8, 0, r4dateTimeMilli, 3, r4numDoub,r4numDoub,r4numDoub },  /* 134 - */
-   { e4stod,        "STOD",  260, 4, 0, r4dateDoub, 1,      r4str, 0, 0 },                  /* 135 - */
-   { e4ctod,        "CTOD",  270, 4, 0, r4dateDoub, 1,      r4str, 0, 0 },                  /* 136 - */
-   { e4date,        "DATE",  280, 4, 0, r4dateDoub, 0,          0, 0, 0 },                  /* 137 - */
-   { e4day,          "DAY",  290, 3, 0,  r4numDoub, 1,     r4date, 0, 0 },                  /* 138 - */
-   { e4dayDoub,          0,  290, 0, 0,  r4numDoub, 1, r4dateDoub, 0, 0 },                  /* 139 - */
-   { e4month,      "MONTH",  310, 5, 0,  r4numDoub, 1,     r4date, 0, 0 },                  /* 140 - */
-   { e4monthDoub,        0,  310, 0, 0,  r4numDoub, 1, r4dateDoub, 0, 0 },                  /* 141 - */
-   { e4year,        "YEAR",  340, 4, 0,  r4numDoub, 1,     r4date, 0, 0 },                  /* 142 - */
-   { e4yearDoub,         0,  340, 0, 0,  r4numDoub, 1, r4dateDoub, 0, 0 },                  /* 143 - */
-   { e4deleted,  "DELETED",  350, 7, 0,      r4log, 0,          0, 0, 0 },                  /* 144 - */
-//   { e4notDeleted,  "!DELETED",  355, 8, 0,  r4log, 0,          0, 0, 0 },
-   { e4recCount,"RECCOUNT",  360, 8, 0,  r4numDoub, 0,          0, 0, 0 },                  /* 145 - */
-   { e4recno,      "RECNO",  370, 5, 0,  r4numDoub, 0,          0, 0, 0 },                  /* 146 - */
-   { e4val,          "VAL",  380, 3, 0,  r4numDoub, 1,      r4str, 0, 0 },                  /* 147 - */
+, { e4dateTime,    "DATETIME", 259, 8, 0, r4dateTime, 3, r4numDoub,r4numDoub,r4numDoub }  /* 133 - */
+, { e4dateTime,    0, 259, 8, 0, r4dateTimeMilli, 3, r4numDoub,r4numDoub,r4numDoub }  /* 134 - */
+, { e4stod,        "STOD",  260, 4, 0, r4dateDoub, 1,      r4str, 0, 0 }                  /* 135 - */
+, { e4ctod,        "CTOD",  270, 4, 0, r4dateDoub, 1,      r4str, 0, 0 }                  /* 136 - */
+, { e4date,        "DATE",  280, 4, 0, r4dateDoub, 0,          0, 0, 0 }                  /* 137 - */
+, { e4day,          "DAY",  290, 3, 0,  r4numDoub, 1,     r4date, 0, 0 }                  /* 138 - */
+, { e4dayDoub,          0,  290, 0, 0,  r4numDoub, 1, r4dateDoub, 0, 0 }                  /* 139 - */
+, { e4month,      "MONTH",  310, 5, 0,  r4numDoub, 1,     r4date, 0, 0 }                  /* 140 - */
+, { e4monthDoub,        0,  310, 0, 0,  r4numDoub, 1, r4dateDoub, 0, 0 }                  /* 141 - */
+, { e4year,        "YEAR",  340, 4, 0,  r4numDoub, 1,     r4date, 0, 0 }                  /* 142 - */
+, { e4yearDoub,         0,  340, 0, 0,  r4numDoub, 1, r4dateDoub, 0, 0 }                  /* 143 - */
+, { e4deleted,  "DELETED",  350, 7, 0,      r4log, 0,          0, 0, 0 }                  /* 144 - */
+//, { e4notDeleted,  "!DELETED",  355, 8, 0,  r4log, 0,          0, 0, 0 }
+, { e4recCount,"RECCOUNT",  360, 8, 0,  r4numDoub, 0,          0, 0, 0 }                  /* 145 - */
+, { e4recno,      "RECNO",  370, 5, 0,  r4numDoub, 0,          0, 0, 0 }                  /* 146 - */
+, { e4val,          "VAL",  380, 3, 0,  r4numDoub, 1,      r4str, 0, 0 }                  /* 147 - */
 
    #ifndef __unix__
-      { e4l2bin,      "L2BIN",  385, 5, 0,      r4str, 1,  r4numDoub, 0, 0 },               /* 148 - */
+   , { e4l2bin,      "L2BIN",  385, 5, 0,      r4str, 1,  r4numDoub, 0, 0 }               /* 148 - */
    #else
-      { 0,                  0,  385, 5, 0,      r4str, 1,  r4numDoub, 0, 0 },               /* 148 - */
+      { 0,                  0,  385, 5, 0,      r4str, 1,  r4numDoub, 0, 0 }               /* 148 - */
    #endif
 
-   { e4calcFunction,     0,  390, 0, 0,          0, 0,          0, 0, 0 },                  /* 149 - */
+, { e4calcFunction,     0,  390, 0, 0,          0, 0,          0, 0, 0 }                  /* 149 - */
 
    #ifndef S4OFF_REPORT
-      /* { e4calcFunction,     0,  390, 0, 0,          0, 0,          0, 0, 0 },*/
-      { e4calcTotal,        0,  400, 0, 0,  r4numDoub, 0,          0, 0, 0 },               /* 150 - */
-      { e4pageno,    "PAGENO",  410, 6, 0,  r4numDoub, 0,          0, 0, 0 },               /* 151 - */
+      /* { e4calcFunction,     0,  390, 0, 0,          0, 0,          0, 0, 0 }*/
+   , { e4calcTotal,        0,  400, 0, 0,  r4numDoub, 0,          0, 0, 0 }               /* 150 - */
+   , { e4pageno,    "PAGENO",  410, 6, 0,  r4numDoub, 0,          0, 0, 0 }               /* 151 - */
    #else
-      /* { 0,                  0,  390, 0, 0,          0, 0,          0, 0, 0 },*/
-      { 0,                  0,  400, 0, 0,  r4numDoub, 0,          0, 0, 0 },               /* 150 - */
-      { 0,                  0,  410, 6, 0,  r4numDoub, 0,          0, 0, 0 },               /* 151 - */
+      /*, { 0,                  0,  390, 0, 0,          0, 0,          0, 0, 0 }*/
+,      { 0,                  0,  400, 0, 0,  r4numDoub, 0,          0, 0, 0 }               /* 150 - */
+,      { 0,                  0,  410, 6, 0,  r4numDoub, 0,          0, 0, 0 }               /* 151 - */
    #endif
 
    // AS Jun 27/03 - Added EMPTY() function - for now for r4str types only
-   { e4empty,         "EMPTY",  415, 5, 0,      r4log, 1,        r4str, 0, 0 },             /* 152 - */
-   { e4emptyNum,            0,  415, 5, 0,      r4log, 1,        r4numDoub, 0, 0 },         /* 153 - */
-   { e4emptyDtTm,           0,  415, 5, 0,      r4log, 1,        r4dateTime, 0, 0 },        /* 154 - */
-   { e4emptyNum,           0,   415, 5, 0,      r4log, 1,        r4dateDoub, 0, 0 },        /* 155 - */
-   { e4emptyLog,           0,   415, 5, 0,      r4log, 1,        r4log, 0, 0 },             /* 156 - */
+, { e4empty,         "EMPTY",  415, 5, 0,      r4log, 1,        r4str, 0, 0 }             /* 152 - */
+, { e4emptyNum,            0,  415, 5, 0,      r4log, 1,        r4numDoub, 0, 0 }         /* 153 - */
+, { e4emptyDtTm,           0,  415, 5, 0,      r4log, 1,        r4dateTime, 0, 0 }        /* 154 - */
+, { e4emptyNum,           0,   415, 5, 0,      r4log, 1,        r4dateDoub, 0, 0 }        /* 155 - */
+, { e4emptyLog,           0,   415, 5, 0,      r4log, 1,        r4log, 0, 0 }             /* 156 - */
 
-   /* DESCEND() only works like Clipper with Char parameter. */
-   { e4descend,    "DESCEND",  420, 7, 0, r4str, 1, r4str,     0, 0 },                      /* 157 - E4DESCEND_STR */
-   { e4descend,            0,  420, 7, 0, r4str, 1, r4num,     0, 0 },                      /* 158 - E4DESCEND_NUM */
-   { e4descend,            0,  420, 7, 0, r4str, 1, r4dateDoub,0, 0 },                      /* 159 - E4DESCEND_DATE_D */
-   { e4descend,            0,  420, 7, 0, r4str, 1, r4log,     0, 0 },                      /* 160 - E4DESCEND_LOG */
-   { e4descendBinary,      0,  420, 7, 0, r4str, 1, r4dateTime, 0, 0 },                     /* 161 - */
-   { e4descendBinary,      0,  420, 7, 0, r4str, 1, r4int, 0, 0 },                          /* 162 - */
-   { e4descendBinary,      0,  420, 7, 0, r4str, 1, r4currency, 0, 0 },                     /* 163 - */
-   { e4descendBinary,      0,  420, 7, 0, r4str, 1, r5wstr, 0, 0 },                         /* 164 - */
-   { e4descendBinary,      0,  420, 7, 0, r4str, 1, r5wstrLen, 0, 0 },                      /* 165 - */
-   { e4descendBinary,      0,  420, 7, 0, r4str, 1, r4numDoub, 0, 0 },                      /* 166 - */
-   { e4descendBinary,      0,  420, 7, 0, r4str, 1, r5i8, 0, 0 },                           /* 167 - */
-   { e4descendBinary,      0,  420, 7, 0, r4str, 1, r5ui4, 0, 0 },                          /* 168 - */
-   { e4descendBinary,      0,  420, 7, 0, r4str, 1, r5ui2, 0, 0 },                          /* 169 - */
-   { e4descendBinary,      0,  420, 7, 0, r4str, 1, r5i2, 0, 0 },                           /* 170 - */
-   { e4descendBinary,      0,  420, 7, 0, r4str, 1, r5dbDate, 0, 0 },                       /* 171 - */
-   { e4descendBinary,      0,  420, 7, 0, r4str, 1, r5dbTime, 0, 0 },                       /* 172 - */
-   { e4descendBinary,      0,  420, 7, 0, r4str, 1, r5dbTimeStamp, 0, 0 },                  /* 173 - */
-   { e4ascend,      "ASCEND",  430, 6, 0, r4str, 1, r4str,     0, 0 },                      /* 174 - E4ASCEND_STR */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r5wstr,    0, 0 },                      /* 175 - */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r5wstrLen, 0, 0 },                      /* 176 - */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r4num,     0, 0 },                      /* 177 - E4ASCEND_NUM */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r4date,    0, 0 },                      /* 178 - E4ASCEND_DATE */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r4dateDoub,0, 0 },                      /* 179 - E4ASCEND_DATE_D */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r4log,     0, 0 },                      /* 180 - E4ASCEND_LOG */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r4int,    0, 0 },                       /* 181 - */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r4dateTime, 0, 0 },                     /* 182 - */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r4currency,    0, 0 },                  /* 183 - */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r4numDoub, 0, 0 },                      /* 184 - */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r5ui4, 0, 0 },                          /* 185 - */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r5ui2, 0, 0 },                          /* 186 - */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r5i2, 0, 0 },                           /* 187 - */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r5i8, 0, 0 },                           /* 188 - */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r5dbDate, 0, 0 },                       /* 189 - */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r5dbTime, 0, 0 },                       /* 190 - */
-   { e4ascend,             0,  430, 6, 0, r4str, 1, r5dbTimeStamp, 0, 0 },                  /* 191 - */
+/* DESCEND() only works like Clipper with Char parameter.
+ */
+,{ e4descend,    "DESCEND",  420, 7, 0, r4str, 1, r4str,     0, 0 }                      /* 157 - E4DESCEND_STR */
+,{ e4descend,            0,  420, 7, 0, r4str, 1, r4num,     0, 0 }                      /* 158 - E4DESCEND_NUM */
+,{ e4descend,            0,  420, 7, 0, r4str, 1, r4dateDoub,0, 0 }                      /* 159 - E4DESCEND_DATE_D */
+,{ e4descend,            0,  420, 7, 0, r4str, 1, r4log,     0, 0 }                      /* 160 - E4DESCEND_LOG */
+,{ e4descendBinary,      0,  420, 7, 0, r4str, 1, r4dateTime, 0, 0 }                     /* 161 - */
+,{ e4descendBinary,      0,  420, 7, 0, r4str, 1, r4int, 0, 0 }                          /* 162 - */
+,{ e4descendBinary,      0,  420, 7, 0, r4str, 1, r4currency, 0, 0 }                     /* 163 - */
+,{ e4descendBinary,      0,  420, 7, 0, r4str, 1, r5wstr, 0, 0 }                         /* 164 - */
+,{ e4descendBinary,      0,  420, 7, 0, r4str, 1, r5wstrLen, 0, 0 }                      /* 165 - */
+,{ e4descendBinary,      0,  420, 7, 0, r4str, 1, r4numDoub, 0, 0 }                      /* 166 - */
+,{ e4descendBinary,      0,  420, 7, 0, r4str, 1, r5i8, 0, 0 }                           /* 167 - */
+,{ e4descendBinary,      0,  420, 7, 0, r4str, 1, r5ui4, 0, 0 }                          /* 168 - */
+,{ e4descendBinary,      0,  420, 7, 0, r4str, 1, r5ui2, 0, 0 }                          /* 169 - */
+,{ e4descendBinary,      0,  420, 7, 0, r4str, 1, r5i2, 0, 0 }                           /* 170 - */
+,{ e4descendBinary,      0,  420, 7, 0, r4str, 1, r5dbDate, 0, 0 }                       /* 171 - */
+,{ e4descendBinary,      0,  420, 7, 0, r4str, 1, r5dbTime, 0, 0 }                       /* 172 - */
+,{ e4descendBinary,      0,  420, 7, 0, r4str, 1, r5dbTimeStamp, 0, 0 }                  /* 173 - */
 
-   // AS Jan 6/05 - Added support for a new KEYEQUAL function (useful with general collations for example to make a-accent == a for partial match)
-   { e4keyEqual, "KEYEQUAL",  440, 8, 0, r4log, 2, r4str, r4str, 0 },                  /* 192 - */
-   { 0,0, E4TERMINATOR, 0, 0, 0, 0, 0, 0, 0 },
-} ;
+,{ e4ascend,      "ASCEND",  430, 6, 0, r4str, 1, r4str,     0, 0 }                      /* 174 - E4ASCEND_STR */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r5wstr,    0, 0 }                      /* 175 - */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r5wstrLen, 0, 0 }                      /* 176 - */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r4num,     0, 0 }                      /* 177 - E4ASCEND_NUM */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r4date,    0, 0 }                      /* 178 - E4ASCEND_DATE */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r4dateDoub,0, 0 }                      /* 179 - E4ASCEND_DATE_D */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r4log,     0, 0 }                      /* 180 - E4ASCEND_LOG */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r4int,    0, 0 }                       /* 181 - */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r4dateTime, 0, 0 }                     /* 182 - */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r4currency,    0, 0 }                  /* 183 - */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r4numDoub, 0, 0 }                      /* 184 - */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r5ui4, 0, 0 }                          /* 185 - */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r5ui2, 0, 0 }                          /* 186 - */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r5i2, 0, 0 }                           /* 187 - */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r5i8, 0, 0 }                           /* 188 - */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r5dbDate, 0, 0 }                       /* 189 - */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r5dbTime, 0, 0 }                       /* 190 - */
+,{ e4ascend,             0,  430, 6, 0, r4str, 1, r5dbTimeStamp, 0, 0 }                  /* 191 - */
+
+// AS Jan 6/05 - Added support for a new KEYEQUAL function (useful with general collations for example to make a-accent == a for partial match)
+,{ e4keyEqual, "KEYEQUAL",  440, 8, 0, r4log, 2, r4str, r4str, 0 }                  /* 192 - */
+,{ 0,0, E4TERMINATOR, 0, 0, 0, 0, 0, 0, 0 }};
 
 
 
@@ -1841,10 +1843,6 @@ void e4keyEqual()
       else
       {
          // AS Sep 7/05 - not supported in client version...
-         #ifdef S4CLIENT
-            error4( expr4ptr->codeBase, e4notSupported, E90906 ) ;
-            *intPtr = 0 ;
-         #else
             #ifndef S4OFF_INDEX
                TAG4FILE *tagPtr = expr4infoPtr->tagPtr ;
                if ( tagPtr == 0 )    // no tag so just a memcmp
@@ -1864,7 +1862,6 @@ void e4keyEqual()
                      *intPtr = !u4keycmp( buf1, buf2, len, len, 0, collation4get( tagPtr->collateName ) ) ;
                }
             #endif
-         #endif
       }
    #else
       *intPtr = !u4memcmp( expr4[-2], expr4[-1], (unsigned int)expr4infoPtr->i1 )  ;

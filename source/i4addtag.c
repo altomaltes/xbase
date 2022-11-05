@@ -22,7 +22,7 @@
 #endif
 
 
-#if defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
+#if defined( S4CLIPPER )  && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
    int tfile4add( TAG4FILE *t4, unsigned char *keyInfo, const unsigned long recNum, short int errUnique )
    {
       #ifdef S4DATA_ALIGN  /* LY 00/02/17 : t4index2.c on HP */
@@ -355,11 +355,11 @@
          oldBlock = (B4BLOCK *) t4->blocks.lastNode ;
       }
    }
-#endif /* defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) */
+#endif /* defined( S4CLIPPER )  && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) */
 
 
 
-#if defined( E4ANALYZE ) && defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
+#if defined( E4ANALYZE ) && defined( S4CLIPPER )  && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
    static void tfile4verifyBlocksValid( TAG4FILE *tfile )
    {
       // do a quick scan to ensure integrity of blocks...
@@ -380,11 +380,11 @@
          assert5( saveBlockOn->data != 0 ) ;
       }
    }
-#endif /* #if defined( E4ANALYZE ) && defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )*/
+#endif /* #if defined( E4ANALYZE ) && defined( S4CLIPPER )  && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )*/
 
 
 
-#if defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
+#if defined( S4CLIPPER )  && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
    int t4addCalc( TAG4 *t4, long rec )
    {
       int rc ;
@@ -455,11 +455,11 @@
       #endif
       return rc ;
    }
-#endif /* defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) */
+#endif /* defined( S4CLIPPER )  && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) */
 
 
 
-#if defined( S4FOX ) && !defined( S4OFF_MULTI ) && !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
+#if defined( S4FOX ) && !defined( S4OFF_MULTI )  && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
    static B4NODE tfile4swap( B4BLOCK *parent, B4BLOCK *left )
    {
       /* (temporary) fix for FoxPro multi-user compatibility swaps parent and right blocks */
@@ -539,11 +539,11 @@
 
       return left->fileBlock ;
    }
-#endif /* #if defined( S4FOX ) && !defined( S4OFF_MULTI ) !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) */
+#endif /* #if defined( S4FOX ) && !defined( S4OFF_MULTI ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) */
 
 
 
-#if defined( S4FOX ) && !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
+#if defined( S4FOX )  && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
    int tfile4add( TAG4FILE *t4, const unsigned char *keyInfo, const unsigned long recIn, short int errUnique )
    {
       int rc ;
@@ -560,11 +560,11 @@
             return rc ;
       }
    }
-#endif /* #if defined( S4FOX ) && !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) */
+#endif /* #if defined( S4FOX )  && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) */
 
 
 
-#if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
+#if !defined( S4CLIPPER )  && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
    int tfile4addDo( TAG4FILE *t4, const unsigned char *keyInfo, unsigned long rec, short int errUnique )
    {
       /* errUnique must be 0 if the tag is not unique, otherwise must contain unique error */
@@ -976,11 +976,11 @@
          }
       #endif
    }
-#endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) */
+#endif /* #if !defined( S4CLIPPER )  && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) */
 
 
 
-#if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
+#if !defined( S4CLIPPER )  && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
    int t4addCalc( TAG4 *t4, long rec )
    {
       int len ;
@@ -1055,4 +1055,4 @@
       #endif
       return tfile4add( tfile, (unsigned char *)ptr, rec, t4unique( t4 ) ) ;
    }
-#endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) */
+#endif /* #if !defined( S4CLIPPER )  && !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) */

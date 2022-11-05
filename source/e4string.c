@@ -916,29 +916,29 @@ static ERROR4INFO_ARRAY error4array9[] =
 ,{ 91011L, "code4lockFileName" }
 ,{ 91012L, "code4lockItem" }
 ,{ 91013L, "code4logCreate" }
-,{ 91014L, "code4logFileName" },
-   { 91015L, "code4logOpen" },
-   { 91016L, "code4logOpenOff" },
-   { 91017L, "code4passwordSet" },
-   { 91018L, "code4lockClear" },
-   { 91019L, "code4status" },
-   { 91020L, "code4validate" },
-   { 91021L, "code4memoCompress" },
-   { 91101L, "d4lockAppendRecord" },
-   { 91102L, "dfile4...()" },
-   { 91103L, "d4append" },
-   { 91104L, "d4appendBlank" },
-   { 91105L, "d4appendData" },
-   { 91107L, "d4appendStart" },
-   { 91108L, "d4unappend" },
-   { 91110L, "code4indexFormat" },
-   { 91111L, "code4version" },
-   { 91112L, "code4serverName" },
-   { 91201L, "d4bottom" },
-   { 91302L, "d4close" },
-   { 91304L, "code4dataFileCloseAll" },
-   { 91401L, "d4create" },
-   { 91403L, "d4createTemp" },
+,{ 91014L, "code4logFileName" }
+,{ 91015L, "code4logOpen" }
+,{ 91016L, "code4logOpenOff" }
+,{ 91017L, "code4passwordSet" }
+,{ 91018L, "code4lockClear" }
+,{ 91019L, "code4status" }
+,{ 91020L, "code4validate" }
+,{ 91021L, "code4memoCompress" }
+,{ 91101L, "d4lockAppendRecord" }
+,{ 91102L, "dfile4...()" }
+,{ 91103L, "d4append" }
+,{ 91104L, "d4appendBlank" }
+,{ 91105L, "d4appendData" }
+,{ 91107L, "d4appendStart" }
+,{ 91108L, "d4unappend" }
+,{ 91110L, "code4indexFormat" }
+,{ 91111L, "code4version" }
+,{ 91112L, "code4serverName" }
+,{ 91201L, "d4bottom" }
+,{ 91302L, "d4close" }
+,{ 91304L, "code4dataFileCloseAll" }
+,{ 91401L, "d4create" }
+,{ 91403L, "d4createTemp" },
    { 91521L, "d4authorize" },
    { 91530L, "server4client...()" },
    { 91601L, "t4uniqueSet" },
@@ -1330,10 +1330,9 @@ static ERROR4INFO_ARRAY error4array9[] =
    { 96989L, "pipe4sendMessageN" },
    { 96990L, "pipe4sendMessage" },
    { 96991L, "pipe4recvMessage" },
-   { 96992L, "pipe4recvMessageVB" },
-   { 99999L, "Testing Only" },
+   { 96992L, "pipe4recvMessageVB" }
+,{ 99999L, "Testing Only" }};
 
-};
 
 #endif /* E4OFF_STRING */
 #include "e4str2.c"

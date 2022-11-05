@@ -38,7 +38,7 @@
 #endif
 
 // AS May 17/04 - client/server functionality to copmress the data file...
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE )
+#if  defined( S4FOX ) && !defined( S4OFF_WRITE )
    #include "zlib.h"
 #endif
 
@@ -409,7 +409,7 @@
 
 
 // AS May 17/04 - client/server functionality to copmress the data file...
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+#if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
    // AS Aug 1/03 - Large file support
    static FILE4LONG compress4handlerFileLen( COMPRESS4HANDLER *compress )
    {
@@ -551,7 +551,7 @@
             }
       }
    }
-#endif /* #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS ) */
+#endif /* #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS ) */
 
 
 FILE4LONG S4FUNCTION file4lenLow( FILE4 *f4 )
@@ -589,7 +589,7 @@ FILE4LONG S4FUNCTION file4lenLow( FILE4 *f4 )
    #endif
          assert5 ( f4->hand != INVALID4HANDLE ) ;
          // AS May 17/04 - client/server functionality to copmress the data file...
-         #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+         #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
             if ( f4->compressInfo != 0 ) // file is compressed, return the length as indicated in the compressed header
             {
                // AS Jul 31/03 - Support for large file support
@@ -634,7 +634,7 @@ FILE4LONG S4FUNCTION file4lenLow( FILE4 *f4 )
             f4->len = lrc ;
             #if defined( E4ANALYZE ) || defined( S4TESTING )
                // LY Feb 2/05 : added #if's to avoid compiler errors
-               #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+               #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
                   if ( f4->compressInfo != 0 && f4->compressInfo->writeCompress != 0 && file4longGreaterEq( f4->len, f4->compressHeaderOffset ) )
                   {
                      // ensure the blocks have been extended out (was not working right)
@@ -815,7 +815,7 @@ static int file4lenSetLowDo( FILE4 *f4, FILE4LONG newLen )
 
 
 // LY Jan 18/05 : added additional switches (avoid compiler errors)
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+#if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
    static int compress4writeFreeBlock( COMPRESS4WRITE_HEADER *writeCompress, FILE4 *f4, unsigned long blockOn )
    {
       critical4sectionVerify( &f4->critical4file ) ;
@@ -1161,7 +1161,7 @@ static int file4lenSetLowDo( FILE4 *f4, FILE4LONG newLen )
          #endif
 
          // LY Jan 19/05 : added switches to avoid compiler error
-         #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+         #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
             // AS Jul 28/04 - It looks like the compress set len must be called no matter what becuase we need to set out
             // that info...
             if ( f4->compressInfo != 0 )
@@ -1193,7 +1193,7 @@ static int file4lenSetLowDo( FILE4 *f4, FILE4LONG newLen )
          #endif
             {
                // LY Feb 9/05 : added ifdef's to avoid compiler errors
-               #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+               #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
                   if ( f4->compressInfo != 0 )  // LY Sep 20/04 : need for S4OFF_OPTIMIZE
                      return file4compressSetLen( f4, newLen ) ;
                   else
@@ -1362,7 +1362,7 @@ static unsigned file4readLowPhysical( FILE4 *f4, FILE4LONG pos, void *ptr, unsig
       urc = (unsigned)read( f4->hand, (char *)ptr, len ) ;
    #endif
 
-   #if defined( S4PREPROCESS_FILE ) && !defined( S4CLIENT )
+   #if defined( S4PREPROCESS_FILE )
       if ( f4->preprocessed && urc > 0 )
          code4fileDecrypt( f4, file4longGetLo( pos ), ptr, urc, ptr ) ;
          // file4postProcess( &f4->codeBase->preprocess, preprocess4getInit( &(f4->codeBase->preprocess) ), f4, file4longGetLo( pos ), ptr, urc, ptr )
@@ -1468,7 +1468,7 @@ unsigned file4readOnBoundary( FILE4 *f4, FILE4LONG pos, void *ptr, unsigned len 
 
 // AS Oct 7/03 - improve performance without compression
 // AS May 17/04 - client/server functionality to copmress the data file...
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+#if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
    unsigned file4readDecompressDo( FILE4 *f4, FILE4LONG pos, void *ptr, unsigned len )
    {
       critical4sectionVerify( &f4->critical4file ) ;
@@ -2023,16 +2023,12 @@ unsigned file4readInternal( FILE4 *f4, FILE4LONG pos, void *ptr, unsigned len )
 
    #ifdef E4ANALYZE
       // AS Sep 3/03 - may be invalid if temporary
-      #ifdef S4CLIENT
-         if ( f4->hand == INVALID4HANDLE )
-      #else
          if ( f4->hand == INVALID4HANDLE && ( f4->isTemporary == 0
          // AS Oct 18/06 - only in optimization case...
          #if !defined( S4OFF_MULTI ) && !defined( S4OFF_OPTIMIZE )  // LY Jul 12/04
             || f4->fileCreated == 1
          #endif
             ) )
-      #endif
       {
          error4( f4->codeBase, e4parm, E90607 ) ;
          return 0 ;
@@ -2243,7 +2239,7 @@ int S4FUNCTION file4replace( FILE4 *keep, FILE4 *from )
       // AS Sept 17/01 - We don't want to mess with the validation table here, if replacing a file, so just change the marker
       file4setTemporary( keep, file4getTemporary( &tmp ), 0 ) ;
       keep->doAllocFree = tmp.doAllocFree ;
-      #if defined( S4PREPROCESS_FILE ) && !defined( S4CLIENT )
+      #if defined( S4PREPROCESS_FILE )
          keep->preprocessed = tmp.preprocessed ;  // CS 2000/04/30
       #endif
       if ( keep->doAllocFree == 1 )  /* AS 3/4/98 also must assign NameBuf or memory leakage */
@@ -3133,7 +3129,7 @@ void opt4advanceReadBuf( FILE4 *f4, FILE4LONG pos, unsigned len )
 
 // AS Nov 26/02 - Support for data file compression
 // AS May 17/04 - client/server functionality to copmress the data file...
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+#if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
    // AS Aug 1/03 - Large file support
    int file4compressInit( FILE4 *file, COMPRESS4HANDLER *compress, long compressHeaderOffset )
    {

@@ -1639,12 +1639,8 @@
    {
       struct PIPE4VBINFO info ;
 
-      #ifdef S4CLIENT
-         if ( pipe4recvMessage( pipe, &info.msgLen, (void **)&info.msgPtr ) != r4success )
-      #else
          error4( 0, e4notSupported, E96992 ) ;
          info.msgPtr = 0 ;
-      #endif
             info.msgLen = 0 ;
 
       return info ;

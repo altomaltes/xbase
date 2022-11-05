@@ -16,7 +16,7 @@
 
 #include "d4all.h"
 
-#if !defined( S4OFF_MULTI ) && !defined( S4CLIENT )
+#if !defined( S4OFF_MULTI )
 
    #if !defined( S4CLIPPER ) && !defined( S4OFF_MEMO )
       int dfile4memoUnlock( DATA4FILE *data )
@@ -173,7 +173,7 @@
          data->fileServerWriteLock = 0 ;
          data->fileClientWriteLock = 0 ;
          // LY Jan 18/05 : added #ifdef (avoid compiler errors)
-         #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+         #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
             // AS Jul 9/04 - For compressed writing to tables, if the data file is locked, the compression area is also considered locked
             if ( data->file.compressInfo != 0 )
                data->file.compressInfo->isLocked = 0 ;
@@ -324,4 +324,4 @@
       return 0 ;
    }
 
-#endif /* !defined( S4OFF_MULTI ) && !defined( S4CLIENT ) */
+#endif /* !defined( S4OFF_MULTI )  */

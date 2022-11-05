@@ -182,7 +182,7 @@ static int file4closeHandle( FILE4 *file )
 
 static int file4closeRemoveTempFile( FILE4 *file )
 {
-   #if !defined( S4CLIENT ) && !defined( S4OFF_OPTIMIZE )
+   #if  !defined( S4OFF_OPTIMIZE )
       // AS Sep 3/03 - The file may not have actually been created, in which case just return
       if ( file->fileCreated == 0 )
          return 0 ;
@@ -217,7 +217,7 @@ static void file4closeCleanStructure( FILE4 *file )
    }
 
    // AS May 17/04 - client/server functionality to copmress the data file...
-   #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+   #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
       // AS Nov 26/02 - Support for data file compression
       if ( file->compressInfo != 0 )
          file4compressInitUndo( file ) ;
@@ -273,15 +273,11 @@ int S4FUNCTION file4close( FILE4 *file )
    #endif
 
    // AS Sep 3/03 - the file handle may be invalid on a temporary non created file, in which case we continue anyway
-   #ifdef S4CLIENT
-      if ( file->isTemporary == 0 )
-   #else
       if ( file->isTemporary == 0
       #ifndef S4OFF_OPTIMIZE  /* LY Dec 9/03 */
          || file->fileCreated == 1
       #endif
       )
-   #endif
    {
       if ( file->hand == INVALID4HANDLE )
          return 0 ;

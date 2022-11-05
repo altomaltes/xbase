@@ -758,19 +758,11 @@ int relate4save_relate( RELATE4 *relate, FILE4SEQ_WRITE *seq, int path )
    {
       if ( !path )
       {
-         #ifndef S4CLIENT
             u4namePiece( name_buf, sizeof(name_buf), relate_on->data->dataFile->file.name, FALSE, TRUE ) ;
-         #else
-            u4namePiece( name_buf, sizeof(name_buf), d4fileName( relate_on->data ), FALSE, TRUE ) ;
-         #endif
          rc = save4string( seq, name_buf ) ;
       }
       else
-         #ifndef S4CLIENT
             rc = save4string( seq, relate_on->data->dataFile->file.name ) ;
-         #else
-            rc = save4string( seq, d4fileName( relate_on->data ) ) ;
-         #endif
 
       if ( rc < 0 )
          return -1 ;
@@ -785,11 +777,7 @@ int relate4save_relate( RELATE4 *relate, FILE4SEQ_WRITE *seq, int path )
           save4short( seq, (short *)&(relate_on->errorAction) ) < 0 )
          return -1 ;
 
-      #ifndef S4CLIENT
          ttype = report4index_type() ;
-      #else
-         ttype = code4indexFormat( relate_on->codeBase ) ;
-      #endif
 
       indcount = 0 ;
       if ( r4ntx == ttype )
@@ -821,29 +809,19 @@ int relate4save_relate( RELATE4 *relate, FILE4SEQ_WRITE *seq, int path )
                   break ;
                if ( !path )
                {
-                  #ifndef S4CLIENT
                      #ifdef N4OTHER
                         u4namePiece( name_buf, sizeof(name_buf), tag_on->tagFile->file.name, FALSE, TRUE ) ;
                      #else
                         u4namePiece( name_buf, sizeof(name_buf), i4fileName(tag_on->index), FALSE, TRUE ) ;
                      #endif
-                  #else
-                     /* when CodeServer supports Clipper indexes, will require fcn t4fileName */
-                     /* u4namePiece( name_buf, sizeof(name_buf), t4fileName( tag_on ), FALSE, TRUE ); */
-                  #endif
                   rc = save4string( seq, name_buf ) ;
                }
                else
-                  #ifndef S4CLIENT
                      #ifdef N4OTHER
                         rc = save4string( seq, tag_on->tagFile->file.name ) ;
                      #else
                         rc = save4string( seq, i4fileName(tag_on->index ) ) ;
                      #endif
-                  #else
-                     /* when CodeServer supports Clipper indexes, will require fcn t4fileName */
-                     /* rc = save4string( seq, t4fileName( tag_on ) ) ; */
-                  #endif
 
                if ( rc < 0 )
                   return -1 ;
@@ -853,27 +831,19 @@ int relate4save_relate( RELATE4 *relate, FILE4SEQ_WRITE *seq, int path )
          {
             if ( !path )
             {
-               #ifndef S4CLIENT
                   #ifdef N4OTHER
                      u4namePiece( name_buf, sizeof(name_buf), index_on->file.name, FALSE, TRUE ) ;
                   #else
                      u4namePiece( name_buf, sizeof(name_buf), i4fileName(index_on ), FALSE, TRUE ) ;
                   #endif
-               #else
-                  u4namePiece( name_buf, sizeof(name_buf), i4fileName( index_on ), FALSE, TRUE ) ;
-               #endif
                rc = save4string( seq, name_buf ) ;
             }
             else
-               #ifndef S4CLIENT
                   #ifdef N4OTHER
                      rc = save4string( seq, index_on->file.name ) ;
                   #else
                      rc = save4string( seq, i4fileName(index_on) ) ;
                   #endif
-               #else
-                  rc = save4string( seq, i4fileName( index_on ) ) ;
-               #endif
 
             if ( rc < 0 )
                return -1 ;
@@ -885,11 +855,7 @@ int relate4save_relate( RELATE4 *relate, FILE4SEQ_WRITE *seq, int path )
       {
          tag_on = d4tagSelected( relate_on->data ) ;
          if ( tag_on )
-            #ifdef S4CLIENT
-               rc = save4string( seq, t4alias(tag_on) ) ;
-            #else
                rc = save4string( seq, tag_on->tagFile->alias ) ;
-            #endif
          else
             rc = save4string( seq, "\0" ) ;
          if ( rc < 0 )
@@ -898,11 +864,7 @@ int relate4save_relate( RELATE4 *relate, FILE4SEQ_WRITE *seq, int path )
       else
       {
          if ( relate_on->dataTag != NULL )
-            #ifdef S4CLIENT
-               rc = save4string( seq, t4alias(relate_on->dataTag) ) ;
-            #else
                rc = save4string( seq, relate_on->dataTag->tagFile->alias ) ;
-            #endif
          else
             rc = save4string( seq, "\0" ) ;
          if ( rc < 0 )

@@ -23,16 +23,14 @@
 
 
 
-#ifndef S4CLIENT
    static INDEX4 *i4openLocal( DATA4 *d4, const char *fileName ) ;
-#endif
 
 
 
 #ifndef S4INDEX_OFF
 
 
-   #if defined( S4CLIPPER ) && !defined( S4CLIENT )
+   #if defined( S4CLIPPER )
       #ifdef P4ARGS_USED
          #pragma argsused
       #endif
@@ -75,7 +73,7 @@
 
          return 0 ;
       }
-   #endif /* #if defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+   #endif /* #if defined( S4CLIPPER ) */
 
 
 
@@ -92,7 +90,7 @@
          if ( i4->codeBase == 0 )
             return error4( 0, e4parm, E91701 ) ;
 
-         #if !defined( S4CLIPPER ) && !defined( S4CLIENT )
+         #if !defined( S4CLIPPER )
             // users are not allowed to close production index files
             if ( index4isProduction( i4->indexFile ) )
             {
@@ -107,7 +105,7 @@
       #endif
 
       // AS Feb 12/03 - Moved from i4closeLow(), where we want to allow closing in some instances.
-      #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_TRAN )
+      #if !defined( S4CLIPPER ) && !defined( S4OFF_TRAN )
          // AS Jun 20/03 - was checking wrong flag
          #if defined( S4SERVER ) && defined( S4ODBC_BUILD )
             if ( i4->codeBase->server->odbcTrans == 1 )  // odbc build, no trans available
@@ -179,7 +177,7 @@
 
 
 
-   #if !defined( S4CLIPPER ) && !defined( S4CLIENT )
+   #if !defined( S4CLIPPER )
       int tfile4free( TAG4FILE *tagFile )
       {
          // frees all memory associated with a tagFile.  Assumes already removed from lists.
@@ -204,11 +202,11 @@
 
          return 0 ;
       }
-   #endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+   #endif /* #if !defined( S4CLIPPER )*/
 
 
 
-   #if !defined( S4CLIPPER ) && !defined( S4CLIENT )
+   #if !defined( S4CLIPPER )
       int S4FUNCTION i4closeLow( INDEX4 *i4 )
       {
          int rc, finalRc ;
@@ -286,11 +284,11 @@
 
          return 0 ;
       }
-   #endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+   #endif /* #if !defined( S4CLIPPER )  */
 
 
 
-   #if !defined( S4CLIPPER ) && !defined( S4CLIENT )
+   #if !defined( S4CLIPPER )
       int index4close( INDEX4FILE *i4 )
       {
          int finalRc ;
@@ -416,11 +414,11 @@
             return 0 ;
          }
       }
-   #endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+   #endif /* #if !defined( S4CLIPPER )  */
 
 
 
-   #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE )
+   #if !defined( S4CLIPPER )  && !defined( S4OFF_WRITE )
       B4NODE index4extend( INDEX4FILE *i4 )
       {
          /*
@@ -583,11 +581,11 @@
 
          return oldEof ;
       }
-   #endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE ) */
+   #endif /* #if !defined( S4CLIPPER ) && !defined( S4OFF_WRITE ) */
 
 
 
-   #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE )
+   #if !defined( S4CLIPPER )  && !defined( S4OFF_WRITE )
       int index4flush( INDEX4FILE *i4 )
       {
          #ifdef E4PARM_LOW
@@ -601,11 +599,11 @@
 
          return rc ;
       }
-   #endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE ) */
+   #endif /* #if !defined( S4CLIPPER )  && !defined( S4OFF_WRITE ) */
 
 
 
-   #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE )
+   #if !defined( S4CLIPPER )  && !defined( S4OFF_WRITE )
       int index4update( INDEX4FILE *i4 )
       {
          #ifdef E4PARM_LOW
@@ -651,85 +649,12 @@
 
          return 0 ;
       }
-   #endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE ) */
+   #endif /* #if !defined( S4CLIPPER )  && !defined( S4OFF_WRITE ) */
 
 
 
-   #ifdef S4CLIENT
-      static INDEX4 *i4openClient( DATA4 *d4, const char *fileName )
-      {
-         CODE4 *c4 = d4->codeBase ;
 
-         unsigned char buf[258] ;
-
-         if ( fileName == 0 )
-            u4ncpy( (char *)buf, d4->dataFile->accessName, sizeof( buf ) - 1 ) ;
-         else
-         {
-            if ( strlen( fileName ) > sizeof( buf ) - 1 )
-            {
-               error4( c4, e4name, E91706 ) ;
-               return 0 ;
-            }
-            strcpy( (char*)buf, fileName ) ;
-         }
-
-         if ((code4serverOS( c4 ) & 0x07) == O__WIN32)
-            c4upper( (char*)buf ) ;
-         INDEX4 *i4 = d4index( d4, (char S4PTR*)buf ) ;
-
-         if ( i4 != 0 )   /* duplicates not allowed */
-            error4( c4, e4instance, E91706 ) ;
-
-         INDEX4FILE *i4file = index4open( d4, (char S4PTR*)buf, 0 ) ;
-
-         if ( error4code( c4 ) < 0 )
-            return 0 ;
-         i4 = d4index( d4, (char S4PTR*)buf ) ;
-
-         if ( i4file == 0 )
-         {
-            if ( i4 == 0 )
-               return 0 ;
-            #ifdef E4ANALYZE
-               if ( i4->indexFile == 0 )
-               {
-                  error4( c4, e4info, E91706 ) ;
-                  return 0 ;
-               }
-            #endif
-            i4file = i4->indexFile ;
-            i4file->clientId = data4clientId( d4 ) ;
-            i4file->serverId = data4serverId( d4 ) ;
-         }
-         else  /* indexfile already exists so set up another index4 structure */
-         {
-            i4 = i4setup2( c4, i4file, d4, (char S4PTR*)buf, 0, 1 ) ;
-            if ( i4 == 0 )
-            {
-               index4close( i4file ) ;
-               return 0 ;
-            }
-         }
-
-         #ifdef E4ANALYZE
-            if ( i4->indexFile != i4file )
-            {
-               i4->isValid = 0 ;
-               i4close( i4 ) ;
-               error4( c4, e4info, E91706 ) ;
-               return 0 ;
-            }
-         #endif
-
-         i4->codeBase = c4 ;
-         return i4 ;
-      }
-   #endif /* S4CLIENT */
-
-
-
-   #if !defined( S4CLIPPER ) && !defined( S4CLIENT )
+   #if !defined( S4CLIPPER )
       static INDEX4 *i4openLocal( DATA4 *d4, const char *fileName )
       {
          CODE4 *c4 = d4->codeBase ;
@@ -877,7 +802,7 @@
          #endif
          return i4 ;
       }
-   #endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+   #endif /* #if !defined( S4CLIPPER )  */
 
 
    INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
@@ -898,9 +823,6 @@
       if ( error4code( d4->codeBase ) < 0 )
          return 0 ;
 
-      #ifdef S4CLIENT
-         return i4openClient( d4, fileName ) ;
-      #else
          INDEX4 *index = i4openLocal( d4, fileName ) ;
          // AS May 30/03 - if this is a production index being opened manually with a null
          // filename, we should be registering it as production
@@ -920,13 +842,12 @@
          }
 
          return index ;
-      #endif
    }
 
 
 
 
-   #if !defined( S4CLIPPER ) && !defined( S4CLIENT )
+   #if !defined( S4CLIPPER )
       INDEX4FILE *index4open( DATA4 *d4, const char *fileName, INDEX4 *index )
       {
          #ifdef E4PARM_LOW
@@ -935,13 +856,11 @@
                error4( 0, e4parm_null, E91707 ) ;
                return 0 ;
             }
-            #ifndef S4CLIENT
                if ( index == 0 )
                {
                   error4( 0, e4parm_null, E91707 ) ;
                   return 0 ;
                }
-            #endif
          #endif
 
          #ifdef E4VBASIC
@@ -1338,7 +1257,7 @@
          i4->isValid = 1 ;
          return i4 ;
       }
-   #endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+   #endif /* #if !defined( S4CLIPPER )  */
 
    #if !defined( S4CLIPPER )
       // !S4CLIPPER
@@ -1385,7 +1304,7 @@
 
 
 
-   #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE )
+   #if !defined( S4CLIPPER )  && !defined( S4OFF_WRITE )
       int index4shrink( INDEX4FILE *i4, B4NODE blockNo )
       {
          // blockNo is physical file byte offset of block to be shrunk
@@ -1486,21 +1405,21 @@
 
          return 0 ;
       }
-   #endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE ) */
+   #endif /* #if !defined( S4CLIPPER )  && !defined( S4OFF_WRITE ) */
 
 
 
-   #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE )
+   #if !defined( S4CLIPPER )  && !defined( S4OFF_WRITE )
       int i4updateHeader( INDEX4 *i4 )
       {
          /* Updates the header if the version has changed */
          return index4updateHeader( i4->indexFile ) ;
       }
-   #endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE ) */
+   #endif /* #if !defined( S4CLIPPER )  && !defined( S4OFF_WRITE ) */
 
 
 
-   #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE )
+   #if !defined( S4CLIPPER )  && !defined( S4OFF_WRITE )
       int index4updateHeader( INDEX4FILE *i4 )
       {
          FILE4LONG pos ;
@@ -1607,11 +1526,11 @@
 
          return 0 ;
       }
-   #endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE ) */
+   #endif /* #if !defined( S4CLIPPER )  && !defined( S4OFF_WRITE ) */
 
 
 
-   #if !defined( S4CLIPPER ) && !defined( S4CLIENT )
+   #if !defined( S4CLIPPER )
       #ifdef P4ARGS_USED
          #pragma argsused
       #endif
@@ -1733,17 +1652,17 @@
 
          return 0 ;
       }
-   #endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+   #endif /* #if !defined( S4CLIPPER )  */
 
 
 
-   #if !defined( S4CLIPPER ) && !defined( S4CLIENT )
+   #if !defined( S4CLIPPER )
       #ifdef P4ARGS_USED
          #pragma argsused
       #endif
       // AS Oct 11/05 - new paramater to improve performance...pass selected tag in if doing lookup for reading only...
       // if tagForReadOnly is not null, only that tag is checked (dBase version, avoid lookups for every tag)
-      // !S4CLIPPER, !S4CLIENT
+      // !S4CLIPPER
       int index4versionCheck( INDEX4FILE *i4, const int updateVersion, const TAG4 *tagForReadOnly )
       {
          /* Reads the header, checks the version to see if the blocks need to be freed. */
@@ -1960,12 +1879,11 @@
             return 1 ;
          #endif
       }
-   #endif /* #if !defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+   #endif /* #if !defined( S4CLIPPER )  */
 
 
 
-   #ifndef S4CLIENT
-      // !S4CLIENT
+
       // need a special version check
       int S4FUNCTION tfile4versionCheckFree( TAG4FILE *t4 )
       {
@@ -1995,7 +1913,6 @@
             return 0 ;
          #endif
       }
-   #endif
 
    #ifdef S4CLIPPER
       /* This function closes all the tags corresponding with the index */
@@ -2288,7 +2205,7 @@
             return 0 ;
          }
 
-         /* S4CLIPPER, !S4CLIENT */
+         /* S4CLIPPER */
          static INDEX4 *i4openLocal( DATA4 *d4, const char *fileName )
          {
             INDEX4 *i4 ;
@@ -2530,7 +2447,7 @@
 
 
 
-   #if !defined(S4CLIPPER) && !defined(S4CLIENT)
+   #if !defined(S4CLIPPER)
       int S4FUNCTION index4isProduction( INDEX4FILE *i4 )
       {
          #ifdef S4FOX
@@ -2546,27 +2463,19 @@
             /* AS 04/07/99 --> changed, was checking datafile not index marker in stand-alone mdx
                   #ifndef S4SERVER  // (old equivalent)
             */
-            #ifdef S4CLIENT
-               return i4->dataFile->openMdx ;
-            #else
                return i4->header.isProduction ;
-            #endif
          #endif
 
          #ifdef S4FOX
             /* AS 05/19/99 --> changed, was checking datafile not index marker in stand-alone fox
                   #ifdef S4SERVER  // (old equivalent)
             */
-            #ifndef S4CLIENT
                // AS 03/06/00 -- hasMdxMemo for fox == 0x02 for memo, so can't examine directly
                #ifdef S4FOX
                   if ( i4->dataFile->hasMdxMemo & 0x01 )
                #else
                   if ( i4->dataFile->hasMdxMemo )
                #endif
-            #else
-               if ( i4->dataFile->openMdx )
-            #endif
             {
                /* AS 08/04/97 fix #94 */
                /* first check extension */

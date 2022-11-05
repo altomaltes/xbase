@@ -343,44 +343,6 @@
    #define S4CLIENT_OR_FOX
 #endif
 
-#ifdef S4CLIENT
-   #ifndef S4OFF_WRITE_DELAY
-      #define S4OFF_WRITE_DELAY
-   #endif
-   #ifndef S4OFF_READ_ADVANCE
-      #define S4OFF_READ_ADVANCE
-   #endif
-   #ifndef S4CLIENT_OR_FOX
-      #define S4CLIENT_OR_FOX
-   #endif
-   #ifndef S4OFF_OPTIMIZE
-      #define S4OFF_OPTIMIZE
-   #endif
-   #ifndef S4OPTIMIZE_OFF
-      #define S4OPTIMIZE_OFF
-   #endif
-   #ifdef S4OFF_INDEX
-      #pragma message("Warning: Indexing support cannot be omitted in CodeBase client applications.")
-      #undef S4OFF_INDEX
-   #endif
-   #ifdef S4INDEX_OFF
-      #undef S4INDEX_OFF
-   #endif
-   #ifdef S4OFF_MEMO
-      #pragma message("Warning: Memo field support cannot be omitted in CodeBase client applications.")
-      #undef S4OFF_MEMO
-   #endif
-   #ifdef S4MEMO_OFF
-      #undef S4MEMO_OFF
-   #endif
-   #ifdef S4OFF_MULTI
-      #pragma message("Warning: Multi-user support cannot be omitted in CodeBase client applications.")
-      #undef S4OFF_MULTI
-   #endif
-   #ifdef S4SINGLE
-      #undef S4SINGLE
-   #endif
-#else
    #if !defined( S4MDX ) && !defined( S4FOX ) && !defined( S4CLIPPER )
       #error - Must compile with one of the indexing options (S4MDX, S4FOX, OR S4CLIPPER)
    #endif
@@ -388,7 +350,6 @@
    #if !defined( S4SERVER ) && !defined( S4STAND_ALONE )
       #error - Must compile with one of the configuration options (S4SERVER, S4CLIENT, S4STAND_ALONE)
    #endif
-#endif
 
 #if !defined(S4WIN16) && !defined(__WIN32) && !defined(S4OS2) && !defined(__unix__) && !defined(S4MACINTOSH) && !defined(S4PASCAL_WIN) && !defined(S4DOS) && !defined(S4PALM)
    #error NO OPERATING SYSTEM SELECTED (S4WIN16/__WIN32/S4DOS/__unix__/...)
@@ -508,14 +469,6 @@
 
 #if defined( S4CONSOLE ) && defined( S4OS2PM )
    #error - Both S4CONSOLE and S4OS2PM switches set - only one is allowed.
-#endif
-
-#if defined( S4STAND_ALONE ) && defined( S4CLIENT )
-   #error - Both S4STAND_ALONE and S4CLIENT switches set - only one is allowed.
-#endif
-
-#if defined( S4SERVER ) && defined( S4CLIENT )
-   #error - Both S4CLIENT and S4SERVER switches set - only one is allowed.
 #endif
 
 #if defined( S4STAND_ALONE ) && defined( S4SERVER )
@@ -1238,20 +1191,6 @@
    #endif
 #endif
 
-#ifdef S4CLIENT
-   #define MEMORY4START_CONNECT_LOW 2
-   #define MEMORY4EXPAND_CONNECT_LOW 5
-   #define MEMORY4START_CONNECT 2
-   #define MEMORY4EXPAND_CONNECT 5
-   #define MEMORY4START_CONNECT_BUFFER 2
-   #define MEMORY4EXPAND_CONNECT_BUFFER 2
-   #ifdef S4DEAD_CHECK
-      #define INTER4WAITTIME 10
-      #define DEAD4CHECK_LOOP    100
-      #define DEAD4CHECK_TIMEOUT 1500
-   #endif
-#endif
-
 #define TYPE4TEMP 'T'
 #define TYPE4PERMANENT 'P'
 #define TYPE4SCHEMA 'S'
@@ -1570,7 +1509,7 @@
 
 #define TIME4OUT 5
 
-#ifndef S4SINGLE
+// JACS #ifndef S4SINGLE
    #define LOCK4OFF       0
    #define LOCK4ALL       1
    #define LOCK4DATA      2
@@ -1578,7 +1517,7 @@
    #define LOCK4FILE     20
    #define LOCK4RECORD   30
    #define LOCK4INDEX    40
-#endif
+//#endif
 
 #ifndef S4STAND_ALONE
    #ifdef S4SPX
@@ -1659,10 +1598,6 @@
    // # times client attempts connection to server...
    #define CONNECT4MAX_TRY 5
 
-   #ifdef S4CLIENT
-      #define MEMORY4START_EVENT 4
-      #define MEMORY4EXPAND_EVENT 8
-   #endif
 
    #ifdef S4SERVER
       #define MEMORY4START_EVENT 20
@@ -1695,12 +1630,6 @@
 #endif
 
 #define LEN4DATE_FORMAT  20
-#ifdef S4CLIENT
-   #define LEN4PROTOCOL    128
-   #ifndef S4OFF_CATALOG
-      #define LEN4USER_ID   32
-   #endif
-#endif
 
 // used wihin transaction processing only
 #define LEN4TRANS_USERID       10
@@ -1722,8 +1651,9 @@
 #define log4compressed  3
 #define log4tempUncompressed  4
 
-// AS Jul 5/02 - New setting to keep log file in a permanently compressed state - does not allow
-// for backup/restore log utilities to run, but does allow for transactions and server recovery.
+/* AS Jul 5/02 - New setting to keep log file in a permanently compressed state - does not allow
+ * for backup/restore log utilities to run, but does allow for transactions and server recovery.
+ */
 #define LOG4COMPRESS   5
 #define LOG4BACK_ONLY  4
 #define LOG4OFF        3
@@ -2154,9 +2084,6 @@
 // the byte in the file to lock to avoid contention with compression writing
 #define L4LOCK_POS_COMPRESS   0xEFFFFFFFL
 
-#ifdef S4CLIENT
-   #define L4LOCK_POS     1000000000L
-#else
    #ifndef S4SINGLE
       #ifdef S4CLIPPER
          #define L4LOCK_POS     1000000000L
@@ -2175,7 +2102,6 @@
          #endif
       #endif
    #endif
-#endif
 
 #define LINK4PTR(p) ((LINK4 *)(p))
 
@@ -2470,14 +2396,12 @@
    #ifdef E4LOCK
       #undef E4LOCK
    #endif
-   #ifndef S4CLIENT
       #ifdef S4OFF_OPTIMIZE
          #error should not compile with both S4OFF_OPTIMIZE and S4SPEED_TEST
       #endif
       #ifndef S4OFF_TRAN
          #error should not compile without S4OFF_TRAN and S4SPEED_TEST
       #endif
-   #endif
    #ifdef S4OFF_THREAD
       #error should not compile with both S4OFF_THREAD and S4SPEED_TEST
    #endif
@@ -2562,7 +2486,6 @@
 #define FPT4EXT   "fpt"
 #define FPT4EXTW L"fpt"
 
-#ifndef S4CLIENT
    #ifndef S4OFF_MEMO
       #ifdef S4MFOX
          #define MEMO4EXT   "fpt"
@@ -2588,7 +2511,6 @@
          #define INDEX4EXT MDX4EXT
       #endif
    #endif
-#endif
 
 
 
@@ -2731,7 +2653,7 @@
 // AS Oct 22/02 - make available to be called in multi-user (if user calls directly)
 #define VALIDATE4NAME "VALID4"
 
-#if !defined( S4CLIENT ) && defined( S4TESTING ) && !defined( VALID4ENABLE )
+#if  defined( S4TESTING ) && !defined( VALID4ENABLE )
    #ifndef VALID4ENABLE
       // in single user mode, don't enable this if disabled so that t4python can run
       #if defined( S4OFF_MULTI ) && !defined( VALID4DISABLE )
@@ -2834,7 +2756,7 @@
    // LY Mar 30/04 : added S4CLIPPER so code4encryptConnection is exported
    // AS Apr 24/06 -- don't support encryption in Clipper Stand/Alone (yet)
    #if !defined( S4ENCRYPT_HOOK ) && (defined( S4CLIENT_OR_FOX ) || defined( S4MDX ) || (defined( S4CLIPPER ) && defined( S4CLIENT) ) )
-      #define S4ENCRYPT_HOOK
+// JACS      #define S4ENCRYPT_HOOK
    #endif
 //#endif
 
@@ -2842,7 +2764,7 @@
 #if defined( __WIN32 ) && (defined( S4ENCRYPT_HOOK ) || defined( S4ENCRYPT_COM ) ) && !defined( S4DLL_BUILD_ENCRYPT )
    #ifndef ENCRYPT4NO_DLL
       // in this instance we use dynamic loading of encryption if available
-      #define S4ENCRYPT_DLL
+   // JACS   #define S4ENCRYPT_DLL
    #endif
 #endif
 
@@ -2884,10 +2806,6 @@
          #define ENC4DLL8BIT_NAME "encrypt8s.dll"
          #define ENC4DLL256BIT_NAME "encrypt4s.dll"
       #endif
-   #endif
-   #ifdef S4CLIENT
-      #define ENC4DLL8BIT_NAME "encrypt8c.dll"
-      #define ENC4DLL256BIT_NAME "encrypt4c.dll"
    #endif
 #endif
 

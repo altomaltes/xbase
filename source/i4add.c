@@ -17,7 +17,7 @@
 #include "d4all.h"
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
    int S4FUNCTION t4uniqueModify( TAG4 *tag, int newUnique )
    {
       TAG4FILE *tagFile ;
@@ -69,18 +69,18 @@
          return file4writeInternal( &tagFile->indexFile->file, pos, &tagFile->header.typeCode, sizeof(tagFile->header.typeCode)) ;
       #endif
    }
-#endif /* #if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) */
+#endif /* #if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  */
 
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER ) && !defined( S4CLIENT )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER )
    #include "r4reinde.h"
 #endif
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER ) && !defined( S4CLIENT ) && defined( S4MDX )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER )  && defined( S4MDX )
    #define GARBAGE_LEN 518
 
    static int index4fileTagHeadersWriteSp( INDEX4FILE *i4, DATA4 *d4 )
@@ -223,11 +223,11 @@
 
       return 0 ;
    }
-#endif /* #if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER ) && !defined( S4CLIENT ) && defined( S4MDX ) */
+#endif /* #if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER )  && defined( S4MDX ) */
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER ) && !defined( S4CLIENT )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER )
    static int i4addOneTag( INDEX4 *i4, const TAG4INFO *tagData )
    {
       #ifdef S4FOX
@@ -944,11 +944,11 @@
 
       return saveRc ;
    }
-#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER )  */
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER ) && !defined( S4CLIENT )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER )
    static int i4tagAssociate( INDEX4 *i4 )
    {
       /* adds TAG4 entries to all other i4 structures referring to the same index file */
@@ -1029,11 +1029,11 @@
 
       return 0 ;
    }
-#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER )  */
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && defined( S4CLIPPER ) && !defined( S4CLIENT )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && defined( S4CLIPPER )
    int S4FUNCTION i4tagAdd( INDEX4 *i4, const TAG4INFO *tagDataIn )
    {
       // added for ODBC - just creates a tag and adds entry to group file
@@ -1107,11 +1107,11 @@
             return rc ;
       }
    }
-#endif /* #if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+#endif /* #if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER )  */
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER ) && !defined( S4CLIENT )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER )
    int S4FUNCTION i4tagAdd( INDEX4 *i4, const TAG4INFO *tagData )
    {
       /* takes an array of TAG4INFO and adds the input tags to the already existing index file i4 */
@@ -1245,11 +1245,11 @@
 
       return saveRc ;
    }
-#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIPPER )  */
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( S4CLIPPER )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && defined( S4CLIPPER )
    int i4indexRemove( INDEX4 *index )
    {
       /* remove all tags/indexes from data file */
@@ -1279,11 +1279,11 @@
 
       return 0 ;
    }
-#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) !defined( S4CLIENT ) && defined( S4CLIPPER ) */
+#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && defined( S4CLIPPER ) */
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && !defined( S4CLIPPER )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && !defined( S4CLIPPER )
    int i4indexRemove( INDEX4 *index )
    {
       INDEX4FILE *i4file ;
@@ -1331,11 +1331,11 @@
 
       return 0 ;
    }
-#endif /*!defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && !defined( S4CLIPPER ) */
+#endif /*!defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && !defined( S4CLIPPER ) */
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )
    int S4FUNCTION d4indexesRemove( DATA4 *data )
    {
       INDEX4 *index ;
@@ -1351,11 +1351,11 @@
 
       return 0 ;
    }
-#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) */
+#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  */
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( S4CLIPPER )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && defined( S4CLIPPER )
    static int file4getNextLine( FILE4 *file, int *currentPosition, char *charBuf, int lenBuf )
    {
       // fills in buffer with data from the next line in the file...
@@ -1402,11 +1402,11 @@
       charBuf[charOn] = 0 ;  // null-end string
       return 1 ;
    }
-#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( S4CLIPPER ) */
+#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && defined( S4CLIPPER ) */
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( S4CLIPPER )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && defined( S4CLIPPER )
    static void file4removePart( FILE4 *file, int startPos, int endPos )
    {
       // function removes parts of file starting and including at startPos, ending and including at endPos
@@ -1437,11 +1437,11 @@
       file4longAssign( writePos, len, 0 ) ;
       file4lenSetLow( file, writePos ) ;
    }
-#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( S4CLIPPER ) */
+#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && defined( S4CLIPPER ) */
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( S4CLIPPER )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && defined( S4CLIPPER )
    void i4removeTagEntryFromGroupFile( INDEX4 *index, const char *fullPathTagNameIn )
    {
       // this function removes the tag's entry from the group file as part of a 'remove tag'
@@ -1501,11 +1501,11 @@
          file4setTemporary( &groupFile, 1, 0 ) ;  // has the effect of removing the file
       file4close( &groupFile ) ;
    }
-#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( S4CLIPPER ) */
+#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && defined( S4CLIPPER ) */
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( S4CLIPPER )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && defined( S4CLIPPER )
    int S4FUNCTION i4tagRemove( TAG4 *tag )
    {
       char indexPathName[LEN4PATH] ;
@@ -1545,11 +1545,11 @@
 
       return 0 ;
    }
-#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( S4CLIPPER ) */
+#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && defined( S4CLIPPER ) */
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( S4FOX )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && defined( S4FOX )
    static int i4tagRemoveBlocksFox( TAG4FILE *t4, B4NODE *node1, B4NODE *node2, B4NODE *node3 )
    {
       int rc = tfile4down( t4 ) ;
@@ -1599,11 +1599,11 @@
 
       return 0 ;
    }
-#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( S4FOX ) */
+#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && defined( S4FOX ) */
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( S4MDX )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && defined( S4MDX )
    static int i4tagRemoveBlocksMdx( TAG4FILE *t4 )
    {
       int rc = tfile4down( t4 ) ;
@@ -1633,12 +1633,12 @@
 
       return 0 ;
    }
-#endif /* #if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( S4MDX ) */
+#endif /* #if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && defined( S4MDX ) */
 
 
 
 
-#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && !defined( S4CLIPPER )
+#if !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && !defined( S4CLIPPER )
    int S4FUNCTION i4tagRemove( TAG4 *tag )
    {
       #ifdef E4PARM_HIGH
@@ -1820,4 +1820,4 @@
 
       return 0 ;
    }
-#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && !defined( S4CLIPPER ) */
+#endif /* !defined( S4OFF_INDEX ) && !defined( S4OFF_WRITE )  && !defined( S4CLIPPER ) */

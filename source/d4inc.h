@@ -40,12 +40,14 @@
         #include <wchar.h>
       #endif
       #include <limits.h>
+
       #ifdef S4WINCE
                         #include <altcecrt.h>
                 #else
                         #include <stdio.h>
                         #include <time.h>
       #endif
+
       #include <ctype.h>
       // CS 2009/11/20 Needed by C++Builder.
       #include <math.h>

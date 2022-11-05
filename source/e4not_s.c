@@ -149,15 +149,6 @@
    #endif
 #endif
 
-#ifdef S4CLIENT
-   #ifndef ON_CLIENT_OFF_TRAN
-      #define ON_CLIENT_OFF_TRAN
-   #endif
-   #ifndef S4OFF_INDEX_WRITE_OR_CLIENT
-      #define S4OFF_INDEX_WRITE_OR_CLIENT
-   #endif
-#endif
-
 #ifdef S4OFF_TRAN
    #ifndef ON_CLIENT_OFF_TRAN
       #define ON_CLIENT_OFF_TRAN
@@ -194,20 +185,6 @@
 
 
 
-#ifdef S4CLIENT
-   // AS 11/18/99 need function exported from def file for link resolution for generic availability
-   int S4FUNCTION expr4key( EXPR4 *e4expr, char **ptrToPtrToConvertedFrom, TAG4FILE *t4file )
-   {
-      #ifdef E4PARM_HIGH
-         if ( e4expr == 0 )
-            return error4( 0, e4parm_null, E90913 ) ;
-         if ( ptrToPtrToConvertedFrom == 0 )
-            return error4( e4expr->codeBase, e4parm_null, E90913 ) ;
-      #endif
-
-      return error4( e4expr->codeBase, e4notSupported, E90913 ) ;
-   }
-#endif
 
 
 #ifdef S4SERVER
@@ -1809,7 +1786,6 @@
       }
    #endif /* S4WINDOWS */
 
-   #ifndef S4CLIENT
       #ifdef S4OFF_INDEX
          #ifdef P4ARGS_USED
             #pragma argsused
@@ -1819,7 +1795,6 @@
             return error4( 0, e4notSupported, E91637 ) ;
          }
       #endif
-   #endif /* S4CLIENT */
 
    #ifndef S4CB51
       #ifdef P4ARGS_USED
@@ -1855,7 +1830,7 @@
       }
    #endif /* S4CB51 */
 
-   #if !defined(S4CLIENT) && defined(__WIN32)
+   #if  defined(__WIN32)
       DATA4 *S4FUNCTION code4directory( CODE4 *c4, char *directory )
       {
          error4( c4, e4notSupported, 0 ) ;
@@ -1927,7 +1902,6 @@
       }
    #endif /* S4OFF_WRITE_MEMO */
 
-   #ifndef S4CLIENT
       #ifdef S4OFF_CLIPPER_INDEX
          #ifdef P4ARGS_USED
             #pragma argsused
@@ -1939,7 +1913,6 @@
             return 0 ;
          }
       #endif /* S4OFF_CLIPPER_INDEX_WRITE */
-   #endif /* S4STAND_ALONE */
 
    #ifdef S4OFF_STAND_WRITE_TRAN
       #ifdef P4ARGS_USED
@@ -3063,7 +3036,6 @@
    #endif
 #endif /* S4SERVER */
 
-#ifndef S4CLIENT
    #ifndef S4CLIPPER
       int S4FUNCTION tfile4versionCheck( TAG4FILE *t4, const int doSeek, const int updateVersion )
       {
@@ -3113,7 +3085,6 @@
    {
       return error4( 0, e4notSupported, E96991 ) ;
    }
-#endif
 
 #ifndef TIME4STATUS
    double S4FUNCTION code4status( CODE4 *cb )
@@ -3133,7 +3104,7 @@
 
 
 
-#if !defined( __WIN32 ) || defined( S4OFF_WRITE ) || defined( S4CLIENT ) || defined( S4OFF_INDEX )
+#if !defined( __WIN32 ) || defined( S4OFF_WRITE ) ||  defined( S4OFF_INDEX )
    INDEX4 * S4FUNCTION I4createOpen
    (
       DATA4 *data,
@@ -3164,7 +3135,7 @@
 #endif
 
 
-#if defined( S4CLIENT ) || defined( S4OFF_WRITE )
+#if  defined( S4OFF_WRITE )
    DATA4 *S4FUNCTION d4fieldsAdd( DATA4 *d4, short nFields, FIELD4INFO *fieldsToAdd )
    {
       error4( d4->codeBase, e4notSupported, E91019 ) ;
@@ -3188,14 +3159,14 @@
    }
 #endif
 
-#if defined( S4CLIENT ) || defined( S4OFF_INDEX )  /* LY 2002/11/19 : req'd for c4dll32.def */
+#if  defined( S4OFF_INDEX )  /* LY 2002/11/19 : req'd for c4dll32.def */
    int S4FUNCTION code4validate( CODE4 *c4, const char *validateTableName, Bool5 deleteTemp )
    {
       return error4( 0, e4notSupported, E91020 ) ;
    }
 #endif
 
-#if defined( __WIN32 ) && (defined( S4OFF_THREAD ) || !defined( S4CLIENT ))
+#if defined( __WIN32 )
    void S4FUNCTION c4setAcceptTimeOut( CODE4 *c4, long val )
    {
       // setting this value to 0 or -1 means to retry forever

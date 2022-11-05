@@ -77,27 +77,6 @@
 
 
 
-   #ifdef S4CLIENT
-      unsigned long S4FUNCTION data4serverId( DATA4 *d4 )
-      {
-         return d4->dataFile->serverId ;
-      }
-
-
-
-      unsigned long data4clientId( DATA4 *d4 )
-      {
-         return d4->clientId ;
-      }
-
-
-
-      // AS Apr 15/03 - support for new lockId for shared clone locking
-      unsigned long data4lockId( DATA4 *d4 )
-      {
-         return d4->lockId ;
-      }
-   #endif
 #endif  /* S4INLINE */
 
 
@@ -171,10 +150,6 @@ void S4FUNCTION d4aliasSet( DATA4 *data, const char * newAlias )
 
       u4ncpy( data->alias, newAlias, sizeof( data->alias ) ) ;
       d4aliasFix( data ) ;
-
-      #ifdef S4CLIENT
-         data->aliasSet = 1 ;
-      #endif
 
       #ifndef S4OFF_INDEX
          #ifdef S4STAND_ALONE
@@ -473,7 +448,6 @@ short S4FUNCTION d4logStatusCB( DATA4 *data )
 
 
 
-#ifndef S4CLIENT
    /*  currently this function is not used...
    int d4read( DATA4 *data, const long recNum, char *ptr )
    {
@@ -555,7 +529,6 @@ short S4FUNCTION d4logStatusCB( DATA4 *data )
 
       return 0 ;
    }
-#endif /* !S4CLIENT */
 
 
 
@@ -865,7 +838,6 @@ int d4verify( DATA4 *d4, const int subs )
    if ( d4->link.n == 0 || d4->link.p == 0 )
       return error4( d4->codeBase, e4struct, E93317 ) ;
 
-   #ifndef S4CLIENT
       if ( d4->dataFile == 0 )
          return error4( d4->codeBase, e4struct, E93317 ) ;
 
@@ -873,7 +845,6 @@ int d4verify( DATA4 *d4, const int subs )
          if ( subs == 1 )
             return dfile4verify( d4->dataFile, 0 ) ;
       #endif
-   #endif
 
    return 0 ;
 }
@@ -1026,105 +997,6 @@ int d4verify( DATA4 *d4, const int subs )
 #endif
 
 
-#ifdef S4CLIENT
-   void d4batchReadFree( DATA4 *data )
-   {
-      DATA4BATCH_READ *batch = &data->batchRead ;
-
-      if ( batch->readRecsToBuf != 0 )
-      {
-         assert5( batch->readAdvanceBuf != 0 ) ;
-         if ( batch->memos != 0 )
-         {
-            MEMO4BATCH *batchOn = batch->memos ;
-            for ( int onEntry = batch->readRecsToBuf - 1 ; onEntry >= 0 ; onEntry-- )
-            {
-               if ( batchOn->memos != 0 )
-               {
-                  for ( int onMemo = data->dataFile->nFieldsMemo - 1 ; onMemo >= 0 ; onMemo -- )
-                  {
-                     if ( batchOn->memos[onMemo].contents != 0 )
-                     {
-                        u4free( batchOn->memos[onMemo].contents ) ;
-                        batchOn->memos[onMemo].contents = 0 ;
-                        batchOn->memos[onMemo].contentsLen = 0 ;
-                        batchOn->memos[onMemo].contentsAllocLen = 0 ;
-                     }
-                  }
-               }
-               batchOn++ ;
-            }
-
-            u4free( batch->memos ) ;
-            batch->memos = 0 ;
-            if ( batch->memoBatchEntry != 0 )
-            {
-               u4free( batch->memoBatchEntry ) ;
-               batch->memoBatchEntry = 0 ;
-            }
-         }
-
-         u4free( batch->readAdvanceBuf ) ;
-         batch->readAdvanceBuf = 0 ;
-         batch->readRecsToBuf = 0 ;
-         d4readBufferReset( data, 1 ) ;
-      }
-
-      assert5( batch->readRecsToBuf == 0 ) ;
-   }
-
-
-
-   static int d4batchReadAlloc( DATA4 *data, long numRecs, short doMemos )
-   {
-      DATA4BATCH_READ *batch = &data->batchRead ;
-
-      batch->readAdvanceBuf = (char *)u4allocFree( data->codeBase, (d4recWidth( data ) + sizeof( long )) * numRecs ) ;
-      if ( batch->readAdvanceBuf == 0 )
-         return e4memory ;
-
-      int numMemos = data->dataFile->nFieldsMemo ;
-
-      if ( doMemos != 0 && numMemos != 0 )
-      {
-         // allocate memory for memo fields
-         // AS Sept 5/02 - may already be allocated, in which case free...
-         if ( batch->memos != 0 )
-         {
-            u4free( batch->memos ) ;
-            batch->memos = 0 ;
-         }
-         batch->memos = (MEMO4BATCH *)u4allocFree( data->codeBase, numRecs * sizeof( MEMO4BATCH ) ) ;
-         if ( batch->memos == 0 )
-         {
-            d4batchReadFree( data ) ;
-            return e4memory ;
-         }
-
-         if ( batch->memoBatchEntry != 0 )
-         {
-            u4free( batch->memoBatchEntry ) ;
-            batch->memoBatchEntry = 0 ;
-         }
-         batch->memoBatchEntry = (MEMO4BATCH_ENTRY *)u4allocFree( data->codeBase, numRecs * sizeof( MEMO4BATCH_ENTRY ) * numMemos ) ;
-         if ( batch->memoBatchEntry == 0 )
-         {
-            d4batchReadFree( data ) ;
-            return e4memory ;
-         }
-         // and set up the memo entries
-         for ( int memoLoop = 0 ; memoLoop < numRecs ; memoLoop++ )
-         {
-            batch->memos[memoLoop].memos = batch->memoBatchEntry + (numMemos * memoLoop) ;
-         }
-      }
-
-      return 0 ;
-   }
-#endif /* S4CLIENT */
-
-
-
 /* AS Dec 17/02 - New function for configuring advance-reading client/server */
 // AS Oct 1/04 - S4EXPORT shouldn't be in file
 int S4FUNCTION d4readBufferConfigure( DATA4 *data, long flags )
@@ -1156,9 +1028,6 @@ int S4FUNCTION d4readBufferConfigure( DATA4 *data, long flags )
          return error4describe( 0, e4parm, E93316, "invalid flags paramater settig both r4seek and r4seekMatch", 0, 0 ) ;
    #endif
 
-   #ifdef S4CLIENT
-      data->readBatchMode = flags ;
-   #endif
    return 0 ;
 }
 
@@ -1168,83 +1037,12 @@ int S4FUNCTION d4readBufferConfigure( DATA4 *data, long flags )
 // AS Oct 1/04 - S4EXPORT shouldn't be in file
 long S4FUNCTION d4readBuffer( DATA4 *data, long numRecsToBuf, short doMemos )
 {
-   #ifdef S4CLIENT
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parm_null, E93316 ) ;
-         if ( numRecsToBuf < -1 || doMemos < 0 || doMemos > 1 )
-            return error4( 0, e4parm, E93316 ) ;
-      #endif
-
-      if ( error4code( data->codeBase ) < 0 )
-         return e4codeBase ;
-
-      // AS May 2/02 - relax this constraint
-      // if ( code4indexFormat( data->codeBase ) != r4cdx )
-      //   return error4( data->codeBase, e4notSupported, E90913 ) ;
-
-      if ( numRecsToBuf == -1 )
-         return data->batchRead.readRecsToBuf ;
-
-      if ( numRecsToBuf == 0 )
-      {
-         d4batchReadFree( data ) ;
-         return data->batchRead.readRecsToBuf ;
-      }
-
-      // AS May 21/02 - New functionality, if numRecsToBuf == 1, doMemos indicates what should happen
-      // for memo field transferrance on single record read transfers (d4go, d4top, d4bottom, d4seek, etc.)
-      // in this case, only this functionality is affected
-      if ( numRecsToBuf == 1 )
-      {
-         data->includeMemos = 1 ;
-         return 0 ;
-      }
-
-      if ( data->batchRead.readRecsToBuf != 0 )  // possibly need to reset buffer
-      {
-         if( data->batchRead.readRecsToBuf < numRecsToBuf )  // if >= just re-use existing buffer
-         {
-            // in this instance we need to set up the bufferring...
-            u4free( data->batchRead.readAdvanceBuf ) ;
-            data->batchRead.readAdvanceBuf = 0 ;
-         }
-      }
-
-      if ( data->batchRead.readAdvanceBuf == 0 )
-      {
-         int rc = d4batchReadAlloc( data, numRecsToBuf, doMemos ) ;
-         if ( rc != 0 )
-            return rc ;
-      }
-
-      data->batchRead.readRecsToBuf = numRecsToBuf ;
-      data->batchRead.doMemos = (unsigned char)doMemos ;
-      d4readBufferReset( data, 0 ) ;
-      return data->batchRead.readRecsToBuf ;
-   #else
       // not S4CLIENT
       return 0 ;  // CS 2002/04/24  must always export function
-   #endif
+
 }
 
 
-
-#ifdef S4CLIENT
-   void d4readBufferReset( DATA4 *data, Bool5 resetModus )
-   {
-      // used to reset the read buffer to indicate not-read (but leave buffers in place)
-      data->batchRead.readBufNum = 0 ;
-      data->batchRead.readBufPos = -1 ;
-      data->batchRead.readBufRecNoOn = -1 ;
-      data->batchRead.readBufDirection = 0 ;
-      if ( data->batchRead.modusStart > 0 && resetModus == 1 )  // don't reset modus if not told to by input (sometimes we just want to reset the positions)
-      {
-         data->batchRead.currentDbl = data->batchRead.modusStart ;  // AS Aug 6/09 - and reset the modus
-         data->batchRead.readRecsToBufNext = abs(data->batchRead.nCacheIn) ;
-      }
-   }
-#endif
 
 
 LIST4 S4PTR * S4FUNCTION d4indexList( DATA4 S4PTR *data )

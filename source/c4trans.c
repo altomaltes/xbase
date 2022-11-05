@@ -108,7 +108,7 @@
 
 
 
-#if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( E4ANALYZE )
+#if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE )  && defined( E4ANALYZE )
    static int tran4fileLowVerify( TRAN4FILE_LOW *t4, int subs )
    {
       int rc ;
@@ -145,11 +145,11 @@
          return tran4fileLowVerify( t4, subs ) ;
       #endif
    }
-#endif  /* !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) && defined( E4ANALYZE ) */
+#endif  /* !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE )  && defined( E4ANALYZE ) */
 
 
 
-#if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT )
+#if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE )
    //CJ 31/10/00 - This function is called from many places in the above code.
    //Some work may have to be done for WINCE
    void tran4getTime( CODE4 *c4 )
@@ -2710,7 +2710,7 @@
 
       return rc ;
    }
-#endif /* !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) */
+#endif /* !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE )  */
 
 
 
@@ -2784,7 +2784,7 @@
 
 
 
-#if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT )
+#if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE )
    int S4FUNCTION code4tranCommit( CODE4 *c4 )
    {
       #ifdef E4PARM_HIGH
@@ -2798,7 +2798,7 @@
 
       return code4tranCommitPhaseTwo( c4, 1 ) ;
    }
-#endif /* #if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) */
+#endif /* #if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE )  */
 
 
 
@@ -4053,7 +4053,7 @@
          if ( c4trans->c4 == 0 )
             return error4( 0, e4struct, E93832 ) ;
 
-      #if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT )
+      #if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE )
          if ( c4trans->enabled == 1 )
             if ( c4trans->transFile == 0 && c4trans->c4->logDisable != log4disabled )
                return error4( c4trans->c4, e4struct, E93832 ) ;
@@ -4136,7 +4136,7 @@ int code4tranInitLow( TRAN4 *t4, CODE4TRANS *c4trans )
 }
 
 
-#if !defined( S4OFF_TRAN ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE ) && !defined( S4UTILS )
+#if !defined( S4OFF_TRAN )  && !defined( S4OFF_WRITE ) && !defined( S4UTILS )
 static void code4transInitUndoMarkShutdown( CODE4TRANS *c4trans )
 {
    // marks the transaction log file as validly shut dwon
@@ -4159,7 +4159,7 @@ static void code4transInitUndoMarkShutdown( CODE4TRANS *c4trans )
 
 
 
-#if !defined( S4OFF_TRAN ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE ) && !defined( S4UTILS )
+#if !defined( S4OFF_TRAN )  && !defined( S4OFF_WRITE ) && !defined( S4UTILS )
 void tran4fileLowMarkBackupClose( TRAN4FILE_LOW *t4 )
 {
    // marks the backup transaction log file as validly shut down as part of the backup/recovery procedure

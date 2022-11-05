@@ -165,9 +165,7 @@ void *S4FUNCTION u4allocFreeDefault( CODE4 *c4, long n )
          struct timeb oldTime, newTime ;
       #endif
       #ifdef S4WIN16
-         #ifndef S4CLIENT
             MSG msg;
-         #endif
       #endif
       #ifdef __unix__
          #ifdef S4NO_USLEEP
@@ -204,7 +202,6 @@ void *S4FUNCTION u4allocFreeDefault( CODE4 *c4, long n )
          for ( ;; )
          {
             /* Give some other application a chance to run. */
-            #ifndef S4CLIENT
                if ( PeekMessage( &msg, (HWND)NULL, (UINT)0, (UINT)0, PM_REMOVE ) )
                {
                   /* can't allow re-entrancy, so if not a paint message, just
@@ -217,7 +214,6 @@ void *S4FUNCTION u4allocFreeDefault( CODE4 *c4, long n )
                      DispatchMessage((LPMSG)&msg) ;
                   }
                }
-            #endif /* S4CLIENT */
 
             /* allow device drivers to run... */
             _asm mov ax, 0x1689
@@ -407,27 +403,14 @@ unsigned long S4FUNCTION u4ncpy( char *to, const char *from, const unsigned int 
 
          // AS May 3/07 - this shouldn't fail, but sometimes it was, causing problems...
          int rc ;
-         #ifdef S4CLIENT   //CJ- 25/11/99- setting the skipCom variable in client server causes the ats to fail in client/server
-            rc = code4initLow( &cb, DEF4PROTOCOL, S4VERSION, code4structSize(&cb), 0 ) ;
-         #else
             rc = code4initLow( &cb, DEF4PROTOCOL, S4VERSION, code4structSize(&cb), 1 ) ;
-         #endif
          if ( rc != 0 )
             error4( 0, e4info, E94504 ) ;
          cb.errOff = 1 ;
          // AS Jul 2/03 disable file optimization since it can slow things down for such a short operation
          code4optSuspend( &cb ) ;
 
-         #ifdef S4CLIENT
-            if( code4connect( &cb, serverId, 0, "S4TESTING", "S4TESTING", 0 ) != r4success )
-            {
-               code4close(&cb) ;
-               code4initUndo(&cb) ;
-               return ;
-            }
-         #else
             code4logOpenOff( &cb ) ;
-         #endif
 
          #ifndef S4OFF_MULTI
             cb.accessMode = OPEN4DENY_RW ;       /* open exclusively */
@@ -504,10 +487,8 @@ unsigned long S4FUNCTION u4ncpy( char *to, const char *from, const unsigned int 
          // AS May 1/07 - the code4init may fail...it shouldn't but it could...
          if ( code4initLow( &cb, DEF4PROTOCOL, S4VERSION, code4structSize(&cb), 1 ) != 0 )
             return -1 ;
-         #ifndef S4CLIENT
             code4logOpenOff( &cb ) ;
             code4optSuspend( &cb ) ;  // don't use optimization ...
-         #endif
 
          cb.errOff = 1 ;
          cb.errOpen = 0 ;   /* avoid endless loop due to error calling this function... */
@@ -535,9 +516,6 @@ unsigned long S4FUNCTION u4ncpy( char *to, const char *from, const unsigned int 
          ATS4RECINFO info ;
          const char *fieldStatus = "STATUS" ;
          const char *fieldRDate = "RDATE" ;
-         #ifdef S4CLIENT
-            char buf[100] ;
-         #endif
          char *serverId, rdate[8] ;
 
          if ( newValue == 0 )
@@ -545,15 +523,6 @@ unsigned long S4FUNCTION u4ncpy( char *to, const char *from, const unsigned int 
 
          serverId = 0 ;
 
-         #ifdef S4CLIENT
-         if ( getenv( "CSNAME" ) )
-            serverId = getenv( "CSNAME" ) ;
-         else
-         {
-            if ( ats4readInfo( ATS_FILENAME_CS, buf, sizeof( buf ) ) )
-               serverId = buf ;
-         }
-         #endif
 
          date4today( rdate ) ;
 

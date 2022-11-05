@@ -17,7 +17,6 @@
 #include "d4all.h"
 
 
-#ifndef S4CLIENT
 #ifndef S4OFF_INDEX
 
 /* not S4CLIENT, not S4OFF_INDEX */
@@ -40,7 +39,7 @@ int tfile4type( TAG4FILE *t4 )
 #ifdef E4ANALYZE
 
 /* for debug purposes only, else is an inline function */
-/* S4CLIPPER, E4ANALYZE, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, E4ANALYZE, not S4OFF_INDEX */
 B4BLOCK *S4FUNCTION tfile4block( TAG4FILE *t4 )
 {
    if ( t4 == 0 )
@@ -59,7 +58,7 @@ B4BLOCK *S4FUNCTION tfile4block( TAG4FILE *t4 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4rlBottom( TAG4FILE *t4 )
 {
    int rc ;
@@ -112,7 +111,7 @@ int tfile4rlBottom( TAG4FILE *t4 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int S4FUNCTION tfile4bottom( TAG4FILE *t4 )
 {
    #ifdef E4PARM_LOW
@@ -132,7 +131,7 @@ int S4FUNCTION tfile4bottom( TAG4FILE *t4 )
 
 
 #ifdef S4HAS_DESCENDING
-/* S4CLIPPER, HAS_DESCENDING, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, HAS_DESCENDING, not S4OFF_INDEX */
 void S4FUNCTION tfile4descending( TAG4FILE *tag, const unsigned short int setting )
 {
    tag->header.descending = setting ;
@@ -142,7 +141,7 @@ void S4FUNCTION tfile4descending( TAG4FILE *tag, const unsigned short int settin
 
 
 /* Returns  1 - Cannot move down; 0 - Success; -1 Error */
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4down( TAG4FILE *t4 )
 {
    #ifdef E4PARM_LOW
@@ -237,7 +236,7 @@ int tfile4down( TAG4FILE *t4 )
 
 
 #ifndef S4OFF_WRITE
-/* S4CLIPPER, not S4OFF_WRITE, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
 int tfile4flush( TAG4FILE *t4 )
 {
    int rc ;
@@ -258,7 +257,7 @@ int tfile4flush( TAG4FILE *t4 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4freeAll( TAG4FILE *t4 )
 {
    #ifdef E4PARM_LOW
@@ -272,7 +271,7 @@ int tfile4freeAll( TAG4FILE *t4 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4freeSaved( TAG4FILE *t4 )
 {
    B4BLOCK *blockOn ;
@@ -302,7 +301,7 @@ int tfile4freeSaved( TAG4FILE *t4 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 B4KEY_DATA *tfile4keyData( TAG4FILE *t4 )
 {
    B4BLOCK *b4 ;
@@ -321,7 +320,7 @@ B4KEY_DATA *tfile4keyData( TAG4FILE *t4 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 unsigned long S4FUNCTION tfile4recNo( TAG4FILE *t4 )
 {
    B4BLOCK *blockOn ;
@@ -342,7 +341,7 @@ unsigned long S4FUNCTION tfile4recNo( TAG4FILE *t4 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int S4FUNCTION tfile4seek( TAG4FILE *t4, const void *ptr, const int lenPtrIn )
 {
    int rc, lenPtr ;
@@ -468,7 +467,7 @@ int S4FUNCTION tfile4seek( TAG4FILE *t4, const void *ptr, const int lenPtrIn )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 long S4FUNCTION tfile4skip( TAG4FILE *t4, long numSkip )
 {
    int rc, sign, seekSpecial ;
@@ -623,7 +622,7 @@ long S4FUNCTION tfile4skip( TAG4FILE *t4, long numSkip )
 #ifndef S4OFF_WRITE
 /* NTX only needs to do a copy and adjust the index pointers */
 /* if extraOld is true then the extra key is placed in old, otherwise in new */
-/* S4CLIPPER, not S4OFF_WRITE, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
 B4BLOCK *tfile4split( TAG4FILE *t4, B4BLOCK *oldBlock, const int extraOld )
 {
    if ( error4code( t4->codeBase ) < 0 )
@@ -715,7 +714,7 @@ B4BLOCK *tfile4split( TAG4FILE *t4, B4BLOCK *oldBlock, const int extraOld )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4rlTop( TAG4FILE *t4 )
 {
    int rc ;
@@ -754,7 +753,7 @@ int tfile4rlTop( TAG4FILE *t4 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int S4FUNCTION tfile4top( TAG4FILE *t4 )
 {
    #ifdef E4PARM_LOW
@@ -774,7 +773,7 @@ int S4FUNCTION tfile4top( TAG4FILE *t4 )
 
 
 #ifndef S4OFF_WRITE
-/* S4CLIPPER, not S4OFF_WRITE, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
 int tfile4update( TAG4FILE *t4 )
 {
 
@@ -831,7 +830,7 @@ int tfile4update( TAG4FILE *t4 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4upToRoot( TAG4FILE *t4 )
 {
    LINK4 *linkOn ;
@@ -852,7 +851,7 @@ int tfile4upToRoot( TAG4FILE *t4 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4close( TAG4FILE *t4, DATA4FILE *d4 )
 {
    CODE4 *c4 ;
@@ -914,7 +913,7 @@ int tfile4close( TAG4FILE *t4, DATA4FILE *d4 )
 
 
 // AS Oct 20/04 - need an internal close to bypass the transaction check for internal close requests (temporary files)
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int t4closeLow( TAG4 *t4 )
 {
    int finalRc ;
@@ -963,7 +962,7 @@ int t4closeLow( TAG4 *t4 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int S4FUNCTION t4close( TAG4 *t4 )
 {
    #ifdef E4VBASIC
@@ -992,7 +991,7 @@ int S4FUNCTION t4close( TAG4 *t4 )
 
 
 #ifndef S4OFF_WRITE
-/* S4CLIPPER, not S4OFF_WRITE, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
 unsigned long tfile4extend( TAG4FILE *t4 )
 {
    CODE4 *c4 = t4->codeBase ;
@@ -1044,7 +1043,7 @@ unsigned long tfile4extend( TAG4FILE *t4 )
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4go2( TAG4FILE *t4, const unsigned char *ptr, const unsigned long recNum, const int goAdd )
 {
    int rc ;
@@ -1084,7 +1083,7 @@ int tfile4go2( TAG4FILE *t4, const unsigned char *ptr, const unsigned long recNu
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
 {
    TAG4FILE *tfile ;
@@ -1302,7 +1301,7 @@ static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 TAG4 *S4FUNCTION t4openLow( DATA4 *d4, INDEX4 *i4ndx, const char *fileName, const char *dummy )
 {
    CODE4 *c4 ;
@@ -1440,7 +1439,7 @@ TAG4 *S4FUNCTION t4openLow( DATA4 *d4, INDEX4 *i4ndx, const char *fileName, cons
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
-/* S4CLIPPER, not S4OFF_WRITE, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
 int tfile4shrink( TAG4FILE *t4, unsigned long blockNo )
 {
    #ifdef S4SINGLE
@@ -1494,7 +1493,7 @@ static void tfile4swapHeaderForWrite( T4HEADER *header, I4IND_HEAD_WRITE *swappe
 
 
 
-/* S4CLIPPER, not S4OFF_WRITE, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
 int tfile4writeHeader( TAG4FILE *t4, index4headerWrite desiredWrite )
 {
    /*   If desiredWrite is updateOnly then only those fields header fields which can change will be
@@ -1604,7 +1603,7 @@ int tfile4writeHeader( TAG4FILE *t4, index4headerWrite desiredWrite )
 }
 
 
-/* S4CLIPPER, not S4OFF_WRITE, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_WRITE, not S4OFF_INDEX */
 int tfile4updateHeader( TAG4FILE *t4 )
 {
    T4HEADER *header = &t4->header ;
@@ -1625,7 +1624,7 @@ int tfile4updateHeader( TAG4FILE *t4 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4goEof( TAG4FILE *t4 )
 {
    int rc ;
@@ -1651,7 +1650,7 @@ int tfile4goEof( TAG4FILE *t4 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int tfile4doVersionCheck( TAG4FILE *t4, int doSeek, int updateVersion )
 {
    #ifndef S4SINGLE
@@ -1763,7 +1762,7 @@ int tfile4doVersionCheck( TAG4FILE *t4, int doSeek, int updateVersion )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int S4FUNCTION i4versionCheck( INDEX4 *index, const int d1, const int d2 )
 {
    return error4( index->codeBase, e4notSupported, E94903 ) ;
@@ -1771,7 +1770,7 @@ int S4FUNCTION i4versionCheck( INDEX4 *index, const int d1, const int d2 )
 
 
 
-/* S4CLIPPER, not S4CLIENT, not S4OFF_INDEX */
+/* S4CLIPPER, not S4OFF_INDEX */
 int S4FUNCTION tfile4versionCheck( TAG4FILE *t4, const int doSeek, const int updateVersion )
 {
    /*   AS 02/02/99 --> even if bufferred, in this case we must do a version check because we
@@ -1804,11 +1803,10 @@ int S4FUNCTION t4close( TAG4 *t4 )
 #ifdef S4VB_DOS
 #ifdef S4CLIPPER
 
-/* S4VB_DOS, S4CLIPPER, not S4CLIENT */
+/* S4VB_DOS, S4CLIPPER */
 TAG4 *S4FUNCTION tfile4open_v(DATA4 *d4, char *name)
 {
    return tfile4open( d4, 0, c4str(name) ) ;
 }
 #endif  /* S4CLIPPER */
 #endif  /* S4VB_DOS */
-#endif  /* S4CLIENT */

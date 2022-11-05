@@ -133,7 +133,6 @@ double S4FUNCTION x4reverseDouble( const void *val )
 }
 
 
-#ifndef S4CLIENT
    int b4calcBlanks( const unsigned char *keyVal, const int len, const unsigned char pChar )
    {
       int a ;
@@ -148,9 +147,8 @@ double S4FUNCTION x4reverseDouble( const void *val )
             return ( len - a ) ;
       return len ;  /* all blanks */
    }
-#endif /* S4CLIENT */
 
-#if !defined(S4INDEX_OFF) && !defined(S4CLIENT)
+#if !defined(S4INDEX_OFF)
    B4BLOCK *b4alloc( TAG4FILE *t4, const B4NODE fb )
    {
       B4BLOCK *b4 ;
@@ -3725,4 +3723,4 @@ double S4FUNCTION x4reverseDouble( const void *val )
          return 0 ;
       }
    #endif /* E4INDEX_VERIFY */
-#endif // !S4INDEX_OFF && !S4CLIENT
+#endif // !S4INDEX_OFF

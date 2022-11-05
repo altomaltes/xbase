@@ -384,6 +384,7 @@ unsigned long S4FUNCTION c4atoul( const char *str, const int l )
    c4memcpy( buf, str, (size_t)lenStr) ;
    buf[lenStr] = '\0' ;
    char *dummy = 0 ;  // strtoul requires paramter we are not interested in...
+
    #if defined(S4WINCE) || defined(S4PALM)
       return c4strtoul( buf ) ;
    #else

@@ -16,13 +16,13 @@
 
 #include "d4all.h"
 
-#if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER ) && !defined( S4CLIENT )
+#if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER )
    #include "r4reinde.h"
-#endif /* #if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+#endif /* #if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER )  */
 
 
 
-#if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined(S4CLIENT) && !defined(S4OFF_TRAN)
+#if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) &&  !defined(S4OFF_TRAN)
    void i4deleteRemoveKeys( INDEX4 *index )
    {
       TAG4 *tagOn ;
@@ -53,27 +53,13 @@
          }
       }
    }
-#endif /* #if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined(S4CLIENT) && !defined(S4OFF_TRAN) */
+#endif /* #if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) &&  !defined(S4OFF_TRAN) */
 
 
 
-#if defined( TIME4STATUS ) && defined( S4CLIENT )
-   double S4FUNCTION code4status( CODE4 *c4 )
-   {
-      CONNECT4 *connect = c4getClientConnect( c4 ) ;
-      double result ;
-      if ( connect == 0 )
-         return error4( c4, e4parm, E92906 ) ;
-      connect4sendShort( connect, STREAM4BUSY_STATUS ) ;
-      connect4sendFlush( connect ) ;
-      connect4receive( connect, &result, sizeof( double ), code4timeoutVal( c4 ) ) ;
-      return htond( result ) ;
-   }
-#endif /* #if defined( TIME4STATUS ) && defined( S4CLIENT )*/
 
 
-
-#if defined( TIME4STATUS ) && !defined( S4CLIENT )
+#if defined( TIME4STATUS )
 
    // keep a status of the progress of the reindex
    // basically the timer layout is as follows:
@@ -209,66 +195,13 @@
          reindexStatus->c4->actionCode = ACTION4NONE ;  // CS 2000/01/16 move this line down
       }
    #endif /* S4OFF_WRITE */
-#endif /* #if defined( TIME4STATUS ) && !defined( S4CLIENT ) */
+#endif /* #if defined( TIME4STATUS )  */
 
 
 
-#if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER ) && defined( S4CLIENT )
-   int S4FUNCTION i4reindex( INDEX4 *index )
-   {
-      #ifdef E4VBASIC
-         if ( c4parm_check( index, 0, E92101 ) )
-            return -1 ;
-      #endif  /* E4VBASIC */
-
-      #ifdef E4PARM_HIGH
-         if ( index == 0 )
-            return error4( 0, e4parm_null, E92101 ) ;
-      #endif
-
-      DATA4 *d4 = index->data ;
-      if ( error4code( d4->codeBase ) < 0 )
-         return e4codeBase ;
-
-      CONNECTION4 *connection = d4->dataFile->connection ;
-      if ( connection == 0 )
-         return e4connection ;
-
-      CODE4 *c4 = d4->codeBase ;
-      int rc = connection4assign( connection, CON4INDEX_REINDEX, data4clientId( d4 ), data4serverId( d4 ) ) ;
-      if ( rc < 0 )
-         return rc ;
-      connection4addData( connection, index->indexFile->accessName, sizeof( index->indexFile->accessName ), NULL ) ;
-      rc = connection4repeat( connection ) ;
-      if ( rc == r4locked )
-         return r4locked ;
-      if ( rc != 0 )
-         return connection4error( connection, c4, rc, E92101 ) ;
-
-      if ( connection4len( connection ) != sizeof( CONNECTION4REINDEX_INFO_OUT ) )
-         return error4( c4, e4packetLen, E92101 ) ;
-      CONNECTION4REINDEX_INFO_OUT *out ;
-      out = (CONNECTION4REINDEX_INFO_OUT *)connection4data( connection ) ;
-      if ( out->lockedDatafile )
-      {
-         // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-         d4->dataFile->fileLockServerId = data4serverId( d4 ) ;
-         d4->dataFile->fileLockLockId = data4lockId( d4 ) ;
-      }
-
-      d4->recNum = -1 ;
-      d4->recNumOld = -1 ;
-      // AS Jun 28/02 - not doing a proper blank - sometimes null data is present
-      // c4memset( d4->record, ' ', dfile4recWidth( d4->dataFile ) ) ;
-      d4blankLow( d4, d4->record ) ;
-
-      return 0 ;
-   }
-#endif /* #if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER ) && defined( S4CLIENT ) */
 
 
-
-#if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER ) && !defined( S4CLIENT )
+#if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER )
    int S4FUNCTION i4reindex( INDEX4 *i4 )
    {
       #ifdef E4VBASIC
@@ -990,11 +923,11 @@
       }
       return tagOn ;
    }
-#endif /* #if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER ) && !defined( S4CLIENT ) */
+#endif /* #if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER )  */
 
 
 
-#if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER ) && !defined( S4CLIENT ) && defined( S4MDX )
+#if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER )  && defined( S4MDX )
    #define GARBAGE_LEN 518
 
    int r4reindexTagHeadersWrite( R4REINDEX *r4 )
@@ -1604,11 +1537,11 @@
       #endif  /* S4BYTE_SWAP */
       return 0 ;
    }
-#endif /* #if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER ) && !defined( S4CLIENT ) && defined( S4MDX ) */
+#endif /* #if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER )  && defined( S4MDX ) */
 
 
 
-#if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER ) && !defined( S4CLIENT ) && defined( S4FOX )
+#if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER )  && defined( S4FOX )
    static int r4reindexToDisk( R4REINDEX *r4, const char *keyValue )
    {
       /* Writes out the current block and adds references to higher blocks */
@@ -2503,4 +2436,4 @@
 
       return 0 ;
    }
-#endif /* #if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER ) && !defined( S4CLIENT ) && defined( S4FOX ) */
+#endif /* #if !defined(S4OFF_WRITE) && !defined(S4INDEX_OFF) && !defined( S4CLIPPER )  && defined( S4FOX ) */

@@ -16,7 +16,6 @@
 
 #include "d4all.h"
 
-#ifndef S4CLIENT
 #ifndef S4MEMO_OFF
 #ifndef S4OFF_WRITE
 
@@ -473,4 +472,3 @@ int memo4fileCreate( MEMO4FILE *m4file, CODE4 *c4, DATA4FILE *d4, const char *na
 
 #endif  /* S4OFF_WRITE */
 #endif  /* S4MEMO_OFF */
-#endif  /* S4CLIENT */

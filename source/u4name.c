@@ -1032,10 +1032,6 @@ int S4FUNCTION u4namePiece( char *result, const unsigned int lenResult, const ch
             #endif
             case S4DIR:
          #else
-            #ifdef S4CLIENT
-               case '\\':
-               case '/':
-            #endif
          #endif
          case ':':
             if ( namePos == 0 )
@@ -1221,8 +1217,6 @@ int S4FUNCTION u4namecmp( const char *string1, const char *string2, short ignore
          is used to determine if the comparison is to be case sensitive or not.
    */
    int rc ;
-   // AS 06/12/00 - appears to differ from contents, fixed.
-   // #ifdef S4CLIENT
    #ifdef S4STAND_ALONE
       #ifdef S4CASE_SEN
          rc = c4strcmp( string1, string2 ) ;
@@ -1264,17 +1258,6 @@ int S4FUNCTION u4namencmp( const char *string1, const char *string2, size_t coun
       count is the number of characters to compare.
    */
    int rc ;
-   #ifdef S4CLIENT
-      #ifdef S4CASE_SEN
-         rc = strncmp( string1, string2, count ) ;
-      #else
-         #ifdef __unix__
-            rc = strncasecmp( string1, string2, count ) ;
-         #else
-            rc = strnicmp( string1, string2, count ) ;
-         #endif
-      #endif
-   #else
       if ( ignoreCase )
       {
          #ifdef __unix__
@@ -1289,7 +1272,6 @@ int S4FUNCTION u4namencmp( const char *string1, const char *string2, size_t coun
       }
       else
          rc = c4strncmp( string1, string2, count ) ;
-   #endif
    return rc ;
 }
 

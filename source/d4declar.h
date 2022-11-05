@@ -263,9 +263,6 @@ S4EXPORT void S4FUNCTION code4logInfoDo( CODE4 *c4, char *info ) ;
 #else
    #define code4logInfo( c4, info ) ( code4logInfoDo( (c4), (info) ) )
 #endif
-#ifdef S4CLIENT
-   S4EXPORT int S4FUNCTION code4logConn( CODE4 *c4, short level, const char *name ) ;
-#endif
 
 /* CS 2007/02/21 Return the size of the CODE4 structure.
    This is done in place of the SIZEOF construct because the value returned
@@ -372,34 +369,11 @@ S4EXPORT int S4FUNCTION code4unlock( CODE4 S4PTR * ) ;
    S4EXPORT int S4FUNCTION code4freeBlocks( CODE4 S4PTR * ) ;
 #endif
 S4EXPORT int S4FUNCTION code4swapLogFile( CODE4 *, char *, int ) ;
-#ifdef S4CLIENT
-   #define code4alloc( protocol ) ( code4allocLow( (protocol), DEF4PROTOCOL, S4VERSION ) )
-   #define code4init( c4 ) ( code4initLow( (c4), DEF4PROTOCOL, S4VERSION, code4structSize( c4 ), 0 ) )
-   #define code4initAlloc() ( code4initAllocLow( DEF4PROTOCOL ) )
-   S4EXPORT int S4FUNCTION code4serverRestart( CODE4 S4PTR * ) ;  /* for testing only */
-   S4EXPORT int S4FUNCTION code4serverCrash( CODE4 S4PTR * ) ;  /* for testing only */
-   S4EXPORT char S4PTR *S4FUNCTION code4tables( CODE4 S4PTR *, const char S4PTR * ) ;
-   // LY Jul 28/04 : changed method of returning string from code4serverCurrentDirectory, due to memory leaks
-   // AS Mar 23/05 : added a length paramter to avoid possible gpf errors...
-   S4EXPORT int S4FUNCTION code4serverCurrentDirectory( CODE4 S4PTR *, char S4PTR *, short ) ;
-   S4EXPORT DATA4 S4PTR *S4FUNCTION code4directory( CODE4 S4PTR *, char S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4serverShutdown( CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4connectAcceptNew( CODE4 S4PTR *, short ) ;
-   S4EXPORT int S4FUNCTION code4connectCutAll( CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4connectCut( CODE4 S4PTR *, const char * ) ;
-   S4EXPORT int S4FUNCTION code4serverCloseFiles( CODE4 S4PTR * ) ;
-   S4EXPORT PIPE4RECV S4PTR * S4FUNCTION pipe4recvOpen( CODE4 S4PTR *, const char S4PTR * ) ;
-   S4EXPORT PIPE4SEND * S4FUNCTION pipe4sendOpen( CODE4 S4PTR *, const char S4PTR * ) ;
-   S4EXPORT void S4FUNCTION pipe4recvClose( PIPE4RECV S4PTR * ) ;
-   S4EXPORT void S4FUNCTION pipe4sendClose( PIPE4SEND S4PTR * ) ;
-   S4EXPORT short S4FUNCTION pipe4sendMessageN( PIPE4SEND S4PTR *, void S4PTR *, unsigned long ) ;
-   S4EXPORT short S4FUNCTION pipe4sendMessage( PIPE4SEND S4PTR *, char S4PTR *) ;
-   S4EXPORT short S4FUNCTION pipe4recvMessage( PIPE4RECV S4PTR *, unsigned long S4PTR *, void S4PTR * S4PTR * ) ;
-#else
+
    #define code4alloc( protocol ) ( code4allocLow( (protocol), 0, S4VERSION ) )
    #define code4init( c4 ) ( code4initLow( (c4), 0, S4VERSION, code4structSize( c4 ), 0 ) )
    #define code4initAlloc() ( code4initAlloclow( 0 ) )
-#endif
+
 // AS Jan 16/05 - S4UTILS not S4UTIL
 #ifdef S4UTILS
    S4EXPORT int S4FUNCTION code4passwordSet( CODE4 S4PTR *, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;  /* for utility only */
@@ -474,7 +448,7 @@ S4EXPORT int S4FUNCTION d4appendBlank( DATA4 S4PTR * ) ;
 S4EXPORT short S4FUNCTION d4appendStartLow( DATA4 S4PTR *, short ) ;
 S4EXPORT short S4FUNCTION d4appendStart( DATA4 S4PTR *, short ) ;
 // AS Jun 5/03 - cleaned up for clipper
-#if !defined( S4CLIENT ) && !defined( S4OFF_MULTI ) && defined( S4FOX ) && !defined( S4UTILS )
+#if  !defined( S4OFF_MULTI ) && defined( S4FOX ) && !defined( S4UTILS )
    // AS Mar 11/03 - support for new feature r4autoTimestamp
    void d4assignAutoTimestampField( DATA4 *data ) ;
 #endif
@@ -561,9 +535,9 @@ S4EXPORT int S4FUNCTION d4lockVB( DATA4 *, const long ) ;
    S4EXPORT int S4FUNCTION d4lockFile( DATA4 S4PTR * ) ;
    S4EXPORT int S4FUNCTION d4lock( DATA4 S4PTR *, const long ) ;
    #ifdef __cplusplus
-      S4EXPORT int S4FUNCTION d4lockFileInternal( DATA4 *, Bool5, Lock4type lockType = lock4write ) ;
-      S4EXPORT int S4FUNCTION d4lockInternal( DATA4 *, const long, Bool5, Lock4type lockType = lock4write ) ;
-      S4EXPORT int S4FUNCTION d4lockTest( DATA4 S4PTR *, const long, Lock4type lockType = lock4write ) ;
+      S4EXPORT int S4FUNCTION d4lockFileInternal( DATA4 *, Bool5, Lock4type lockType ) ;
+      S4EXPORT int S4FUNCTION d4lockInternal( DATA4 *, const long, Bool5, Lock4type lockType  ) ;
+      S4EXPORT int S4FUNCTION d4lockTest( DATA4 S4PTR *, const long, Lock4type lockType  ) ;
    #else
       S4EXPORT int S4FUNCTION d4lockFileInternal( DATA4 S4PTR *, Bool5, enum Lock4type lockType ) ;
       S4EXPORT int S4FUNCTION d4lockInternal(     DATA4 S4PTR *, const long, Bool5, enum Lock4type lockType ) ;
@@ -599,7 +573,7 @@ S4EXPORT int S4FUNCTION d4lockVB( DATA4 *, const long ) ;
    S4EXPORT short int S4FUNCTION d4numFields( DATA4 S4PTR * ) ;
 #endif
 S4EXPORT DATA4 S4PTR *S4FUNCTION d4open( CODE4 S4PTR *, const char S4PTR * ) ;
-#if !defined( S4OFF_WRITE ) && !defined( S4OFF_TRAN ) && !defined( S4CLIENT )
+#if !defined( S4OFF_WRITE ) && !defined( S4OFF_TRAN )
    void d4openConcludeSetupTransactions( DATA4 * ) ;
    int d4logClose( DATA4 *data ) ;
    int d4logCreate( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, const TAG4INFO *tagInfo ) ;
@@ -654,11 +628,6 @@ S4EXPORT char S4PTR *S4FUNCTION d4recordLow( DATA4 S4PTR * ) ;
 S4EXPORT unsigned long S4FUNCTION d4recWidthLow( DATA4 S4PTR * ) ;
 S4EXPORT int S4FUNCTION d4refresh( DATA4 S4PTR * ) ;
 S4EXPORT int S4FUNCTION d4skip( DATA4 S4PTR *, const long ) ;
-#ifdef S4CLIENT
-   // AS Feb 24/09 - New functions for cacheing
-   // AS Jul 17/09 - modus functionality added
-   S4EXPORT int S4FUNCTION d4skipCache( DATA4 S4PTR *, const long, long modus ) ;
-#endif
 S4EXPORT int S4FUNCTION d4top( DATA4 S4PTR * ) ;
 S4EXPORT int S4FUNCTION d4unappend( DATA4 * ) ;  /* internal only */
 S4EXPORT int S4FUNCTION d4writeLow( DATA4 S4PTR *, const long, const int, const int ) ;
@@ -722,15 +691,8 @@ S4EXPORT int S4FUNCTION d4zap( DATA4 S4PTR *, const long, const long ) ;
 #endif  /* !S4CB51 */
 #ifndef S4COMP_OFF_MULTI
    S4EXPORT int S4FUNCTION dfile4lockTestFile( DATA4FILE S4PTR *, const long, const long, enum Lock4type ) ;
-   #ifndef S4CLIENT
       int dfile4lockTestFileInternal( DATA4FILE *, const long, const long, enum Lock4type ) ;
-   #endif
 #endif
-#ifdef S4CLIENT
-   #ifndef S4COMP_OFF_MULTI
-      S4EXPORT int S4FUNCTION d4lockTestFile( DATA4 S4PTR * ) ;  /* testing only */
-   #endif
-#else
    #ifndef S4COMP_OFF_MULTI
       // AS Apr 15/03 - support for new lockId for shared clone locking
       #define d4lockTestFile( d4 ) ( dfile4lockTestFile( (d4)->dataFile, data4lockId( d4 ), data4serverId( d4 ), lock4write ) )
@@ -740,7 +702,6 @@ S4EXPORT int S4FUNCTION d4zap( DATA4 S4PTR *, const long, const long ) ;
       #endif
    #endif
    S4EXPORT int S4FUNCTION dfile4remove( DATA4FILE S4PTR * ) ;
-#endif /* !S4CLIENT */
 #if defined( S4OLEDB_OR_NOT_SERVER ) || defined( S4ODBC_BUILD ) || defined( E4MISC )
    S4EXPORT int S4FUNCTION d4deleted( DATA4 S4PTR * ) ;
 #endif
@@ -859,7 +820,7 @@ S4EXPORT void S4FUNCTION f4assignWideString( FIELD4 S4PTR *, const WSTR5 * ) ;
 S4EXPORT void S4FUNCTION f4assignUnicode( FIELD4 S4PTR *, const WSTR5 * ) ;
 S4EXPORT short S4FUNCTION f4memoAssignUnicode( FIELD4 S4PTR *, const WSTR5 * ) ;
 // AS Feb 8/06 - compile fix
-#if !defined( S4OFF_MEMO ) && !defined( S4CLIENT ) && !defined( S4OFF_WRITE )
+#if !defined( S4OFF_MEMO )  && !defined( S4OFF_WRITE )
    // AS Dec 12/05 - used externally for deleted row recycling...
    int f4memoSaveOld( FIELD4 *field, Bool5 checkIfInTag ) ;
 #endif
@@ -930,8 +891,10 @@ S4EXPORT int    S4FUNCTION file4close( FILE4 S4PTR * ) ;
 S4EXPORT int S4FUNCTION file4createInternal( FILE4 S4PTR *, CODE4 S4PTR *, S4CONST char S4PTR *, const int, char ) ;
 S4EXPORT int S4FUNCTION file4flush( FILE4 S4PTR * ) ;
 S4EXPORT FILE4LONG S4FUNCTION file4lenLow( FILE4 S4PTR * ) ;
+
 // AS Sep. 17/01 - Must use function to change temporary setting to update validation tables
 void file4setTemporary( FILE4 *file, Bool5 flag, Bool5 isDataFile ) ;
+
 #define file4getTemporary( file ) ((file)->isTemporary)
 #if defined(__WIN32) || defined(__unix__) || defined(S4PALM)
    S4EXPORT int S4FUNCTION file4exists( const char *fileName ) ;
@@ -1038,10 +1001,8 @@ int file4compressSetLenDo( FILE4 *f4, FILE4LONG newLen ) ;
    S4EXPORT int S4FUNCTION i4closeLow( INDEX4 S4PTR * ) ;
    S4EXPORT short S4FUNCTION i4createWithProgress( DATA4 S4PTR *data, const char *fileName, const TAG4INFO *tagData, REINDEX_CALLBACK callback, long milliseconds ) ;
    S4EXPORT INDEX4 S4PTR *S4FUNCTION i4create( DATA4 S4PTR *, const char S4PTR *, const TAG4INFO S4PTR * ) ; /* 0 name -> productn */
-   #ifndef S4CLIENT
       // AS Nov 19/09 - required for transaction remove index
       INDEX4 *i4createLow( DATA4 *, const char *, const TAG4INFO * ) ;
-   #endif
    S4EXPORT const char S4PTR *S4FUNCTION i4fileName( INDEX4 S4PTR * ) ;
    S4EXPORT const char S4PTR *S4FUNCTION t4fileName( TAG4 S4PTR * ) ;
    S4EXPORT INDEX4 S4PTR *S4FUNCTION i4open( DATA4 S4PTR *, const char S4PTR * ) ;
@@ -1143,22 +1104,14 @@ S4EXPORT void S4FUNCTION mem4release( MEM4 S4PTR * ) ;
    #ifdef S4CLIPPER
       int tfile4writeHeader( TAG4FILE *, enum index4headerWrite ) ;
    #endif
-   #ifdef S4CLIENT
-      #define t4filter( t4 ) ( t4filterLow( t4 ) )
-   #else
       #define t4filter( t4 ) ( ( (t4)->tagFile->filter == 0 ? 0 : (t4)->tagFile->filter->source ) )
-   #endif
    S4EXPORT const char S4PTR *S4FUNCTION t4filterCB( TAG4 * ) ;
    #ifndef S4SERVER
       S4EXPORT int S4FUNCTION t4uniqueSet( TAG4 S4PTR *, const short ) ;
       S4EXPORT S4CONST char S4PTR *S4FUNCTION t4exprLow( TAG4 S4PTR * ) ;
       S4EXPORT S4CONST char S4PTR *S4FUNCTION t4filterLow( TAG4 S4PTR * ) ;
-      #ifdef S4CLIENT
-         #define t4expr( t4 ) ( t4exprLow( t4 ) )
-      #else
          /* 'source' members are constant, so can use defines */
          #define t4expr( t4 )   ( (t4)->tagFile->expr->source )
-      #endif
       S4EXPORT const char S4PTR *S4FUNCTION t4exprCB( TAG4 * ) ;
    #endif
    S4EXPORT unsigned short int S4FUNCTION tfile4isDescending( TAG4FILE * ) ;  /* for SQL */
@@ -1437,22 +1390,19 @@ S4EXPORT long S4FUNCTION c4getTimeout( CODE4 S4PTR * ) ;
    #else
       #define c4getMemSizeMemoExpr( c4 ) ((c4)->memSizeMemoExpr)
    #endif
-   S4EXPORT char S4FUNCTION c4getOledbSchemaCreate( const CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION c4getOptimize( const CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION c4getOptimizeWrite( const CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION c4getReadLockDo( const CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION c4getReadOnlyDo( const CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION c4getSafety( const CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION c4getSingleOpen( const CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION c4getErrDefaultUnique( const CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION c4getFileFlush( const CODE4 S4PTR * ) ;
-   S4EXPORT void S4FUNCTION c4setFileFlush( CODE4 S4PTR *, int ) ;
-   S4EXPORT int S4FUNCTION c4getCollatingSequence( const CODE4 S4PTR * ) ;
+   S4EXPORT char  S4FUNCTION c4getOledbSchemaCreate( const CODE4 S4PTR * ) ;
+   S4EXPORT int   S4FUNCTION c4getOptimize( const CODE4 S4PTR * ) ;
+   S4EXPORT int   S4FUNCTION c4getOptimizeWrite( const CODE4 S4PTR * ) ;
+   S4EXPORT int   S4FUNCTION c4getReadLockDo( const CODE4 S4PTR * ) ;
+   S4EXPORT int   S4FUNCTION c4getReadOnlyDo( const CODE4 S4PTR * ) ;
+   S4EXPORT int   S4FUNCTION c4getSafety( const CODE4 S4PTR * ) ;
+   S4EXPORT int   S4FUNCTION c4getSingleOpen( const CODE4 S4PTR * ) ;
+   S4EXPORT int   S4FUNCTION c4getErrDefaultUnique( const CODE4 S4PTR * ) ;
+   S4EXPORT int   S4FUNCTION c4getFileFlush( const CODE4 S4PTR * ) ;
+   S4EXPORT void  S4FUNCTION c4setFileFlush( CODE4 S4PTR *, int ) ;
+   S4EXPORT int   S4FUNCTION c4getCollatingSequence( const CODE4 S4PTR * ) ;
    S4EXPORT char *S4FUNCTION c4getAppVerify( const CODE4 S4PTR * ) ;
 
-   #ifdef S4CLIENT
-      S4EXPORT CONNECT4 S4PTR *S4FUNCTION c4getClientConnect( CODE4 S4PTR * ) ;
-   #endif
 
    #if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE )
       S4EXPORT void S4FUNCTION c4setLog( CODE4 *c4, int val ) ;
@@ -1544,7 +1494,9 @@ S4EXPORT short S4FUNCTION code4indexBlockSizeSet( CODE4 S4PTR *, short ) ;
    /* AS 07/21/99 - added parm for win 95/98 to avoid endless laze writes */
    int I4create( DATA4 *, const char *, TAG4INFO *, char, char, char, char, int, short, enum Collate4name, enum Collate4name ) ;
    /* AS 07/21/99 - added extra parm for win 95/98 to avoid endless laze writes */
-   S4EXPORT INDEX4 * S4FUNCTION I4createOpen( DATA4 S4PTR *, const char *, TAG4INFO S4PTR *, char, char, char, char, char, short, enum Collate4name, enum Collate4name ) ;
+   S4EXPORT INDEX4 * S4FUNCTION I4createOpen( DATA4 S4PTR *
+                                            , const char  *
+                                            , TAG4INFO S4PTR *, char, char, char, char, char, short, enum Collate4name, enum Collate4name ) ;
 #endif
 
 S4EXPORT int S4FUNCTION D4writeDirect( DATA4 S4PTR *d4, long recIn, char S4PTR *buffer ) ;  // used for ODBC
@@ -1694,14 +1646,8 @@ S4EXPORT double S4FUNCTION code4status( CODE4 S4PTR * ) ;
 
 // AS Sep 8/05 - available in client version now as well
 int S4FUNCTION tfile4keyLenExport( TAG4FILE *tag ) ;
-#ifdef S4CLIENT
-   void d4tagInvalidateAll( DATA4 *data ) ;
-   #define tfile4keyLen( tagFile ) ( tfile4keyLenExport( tagFile ) )
-//   #define tfile4keyLen( tagFile ) ( (tagFile)->keyLen )
-#else
    #define tfile4keyLen( tagFile ) ( (tagFile)->header.keyLen )
-#endif
-#if !defined( S4CLIENT ) && !defined( S4OFF_INDEX )
+#if  !defined( S4OFF_INDEX )
    /* B4BLOCK */
    B4BLOCK *b4alloc( TAG4FILE *, const B4NODE ) ;
    int b4calcBlanks( const unsigned char *, const int, const unsigned char ) ;
@@ -1737,7 +1683,7 @@ int S4FUNCTION tfile4keyLenExport( TAG4FILE *tag ) ;
    S4EXPORT int S4FUNCTION b4skip( B4BLOCK *, int ) ;
    int b4seek( B4BLOCK *, const char *, const int ) ;
    int tfile4unique( TAG4FILE *, const short int ) ;
-   #if !defined( S4OFF_INDEX ) && !defined( S4CLIENT ) && defined( S4FOX )
+   #if !defined( S4OFF_INDEX )  && defined( S4FOX )
       int tfile4stok( TAG4FILE *t4, char *buf, const char *str, int len ) ;
       void tfile4dtok( TAG4FILE *t4, char *buf, const double dkey ) ;
    #endif
@@ -1880,7 +1826,7 @@ int S4FUNCTION tfile4keyLenExport( TAG4FILE *tag ) ;
    #else
       int tfile4free( TAG4FILE *tagFile ) ;
    #endif /* S4CLIPPER */
-#endif /* #if !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) */
+#endif /* #if  !defined( S4OFF_INDEX ) */
 
 S4EXPORT int S4FUNCTION c4clip( char *, int, int ) ;
 char *c4descend( char *, const char *, int ) ; /* exported for OLEDB */
@@ -1982,7 +1928,6 @@ int dfile4read( DATA4FILE *, long, char *, int ) ;
 int dfile4readOld( DATA4FILE *, long ) ;
 S4EXPORT long S4FUNCTION dfile4recCount( DATA4FILE S4PTR *, const long ) ;  /* exported for single-user version (d4recCount replacement) */
 //#define dfile4recordPosition( d4, rec ) ( (unsigned long)(d4)->headerLen + (unsigned long)(d4)->recWidth * ( (rec) - 1 ) )
-#ifndef S4CLIENT
    #ifdef __WIN32
       #ifdef S4FILE_EXTENDED
          #define dfile4recordPosition( d4, recNo ) ( file4longCoerce((DWORDLONG)((d4)->recWidth) * (DWORDLONG)(recNo-1) + (DWORDLONG)((d4)->headerLen) ))
@@ -1992,7 +1937,6 @@ S4EXPORT long S4FUNCTION dfile4recCount( DATA4FILE S4PTR *, const long ) ;  /* e
    #else
       S4EXPORT FILE4LONG S4FUNCTION dfile4recordPosition( DATA4FILE *, long ) ;
    #endif
-#endif
 
 #define dfile4recWidth( d4 ) ((unsigned int)(d4)->recWidth)
 int dfile4refresh( DATA4FILE * ) ;
@@ -2009,7 +1953,7 @@ int dfile4refresh( DATA4FILE * ) ;
 #endif /* S4OFF_INDEX */
 int dfile4updateHeader( DATA4FILE *, int, int, Bool5 ) ;
 
-#if !defined(S4CLIENT) && !defined(S4OFF_WRITE) && !defined( S4OFF_MULTI )
+#if  !defined(S4OFF_WRITE) && !defined( S4OFF_MULTI )
    double dfile4getAutoIncrementValue( DATA4FILE * ) ;
 #endif
 
@@ -2020,53 +1964,24 @@ int dfile4verify( DATA4FILE *, int ) ;
 #endif
 
 #ifndef S4OFF_MULTI
-   #ifdef S4CLIENT
-      #ifdef __cplusplus
-         int dfile4lock( DATA4FILE *, const long, const long, const long, Lock4type lockType = lock4write ) ;
-      #else
-         int dfile4lock( DATA4FILE *, const long, const long, const long, enum Lock4type lockType ) ;
-      #endif
-   #else
       int dfile4lock( DATA4FILE *, const long, const long, const long ) ;
-   #endif
    int dfile4lockAll( DATA4FILE *, const long, const long ) ;
    int dfile4lockAppend( DATA4FILE *, const long, const long ) ;
    int dfile4lockAppendRecord( DATA4FILE *, const long, const long ) ;
    S4EXPORT int S4FUNCTION dfile4lockIndex( DATA4FILE *, const long ) ;
-   #ifdef S4CLIENT
-      #ifdef __cplusplus
-         // AS Apr 15/03 - support for new lockId for shared clone locking
-         int dfile4lockTest( DATA4FILE *, DATA4 *, const long, const long, const long, enum Lock4type lockType = lock4write ) ;
-      #else
-         int dfile4lockTest( DATA4FILE *, DATA4 *, const long, const long, const long, enum Lock4type lockType ) ;
-      #endif
-   #else
       int dfile4lockTest( DATA4FILE *, DATA4 *, const long, const long, enum Lock4type ) ;
-   #endif
    /* AS Nov 13/02 - export for dot */
    S4EXPORT int S4FUNCTION dfile4lockTestIndex( DATA4FILE *, const long ) ;
    int dfile4lockTestRecs( DATA4FILE *, const long, const long ) ;
    int dfile4unlockFile( DATA4FILE *, const long, const long ) ;
    int dfile4unlockAppend( DATA4FILE *, const long, const long ) ;
-   #ifdef S4CLIENT
-      #ifdef __cplusplus
-         int dfile4lockFile( DATA4FILE *, const long, const long, DATA4 *, Lock4type lockType = lock4write ) ;
-      #else
-         int dfile4lockFile( DATA4FILE *, const long, const long, DATA4 *, enum Lock4type ) ;
-      #endif
-      int dfile4unlockRecords( DATA4FILE *, const long, const long ) ;
-   #else
       int dfile4lockFile( DATA4FILE *, const long, const long, enum Lock4type ) ;
-   #endif
 #endif /* S4OFF_MULTI */
 
 #ifdef S4DOS
    int d4negativeLockTest( CODE4 * ) ;
 #endif
 
-#ifdef S4CLIENT
-   int dfile4remove( DATA4FILE * ) ;
-#else
    int dfile4optimize( DATA4FILE *, const int ) ;
    int dfile4optimizeWrite( DATA4FILE *, const int ) ;
    int dfile4packData( DATA4FILE * ) ;
@@ -2077,13 +1992,12 @@ int dfile4verify( DATA4FILE *, int ) ;
       S4EXPORT int S4FUNCTION d4unlockIndex( DATA4 * ) ;
       S4EXPORT int S4FUNCTION dfile4unlockIndex( DATA4FILE *, const long ) ;
    #endif
-#endif
 
 #ifndef S4OFF_SECURITY
    int d4authorize( DATA4 *, struct SERVER4CLIENTSt * ) ;
 #endif
 
-#if !defined( S4OFF_TRAN ) && !defined( S4CLIENT )
+#if !defined( S4OFF_TRAN )
    int d4startMiniTransactionIfRequired( DATA4 *data ) ;
    int d4transEnabled( DATA4 *data, Bool5 checkActiveStatus ) ;
 #endif
@@ -2100,20 +2014,6 @@ S4EXPORT long S4FUNCTION d4readBuffer( DATA4 S4PTR *, long, short ) ;
 /* AS Dec 17/02 - New function for configuring advance-reading client/server */
 S4EXPORT int S4FUNCTION d4readBufferConfigure( DATA4 *data, long flags ) ;
 S4EXPORT long S4FUNCTION d4writeBuffer( DATA4 S4PTR *, long ) ;
-#ifdef S4CLIENT
-   // AS May 21/02 - code to support auto-transfer of memo fields
-   int d4goVirtualDoMemos( DATA4 *data, const char *memos ) ;
-   /* AS Apr 10/02 - New function for advance-reading client/server */
-   int f4memoReadSet( FIELD4 *field, long memoLen, const char *contents ) ;
-   void d4batchReadFree( DATA4 *data ) ;
-   void d4readBufferReset( DATA4 *, Bool5 ) ;   // used to reset the read buffer to indicate not-read (but leave buffers in place)
-   int d4skipFetchBuffer( DATA4 *data, char *out, long lenLeft, int nSkip ) ;
-   int d4writeBufferDo( DATA4 * ) ;
-   void d4batchWriteFree( DATA4 * ) ;
-   int d4skipFetchMultiple( DATA4 *data, short mode, const long nSkip ) ;
-   void code4writeBufferFlush( CODE4 *c4 ) ;
-   void code4writeBufferReset( CODE4 *c4 ) ;
-#endif
 S4EXPORT int S4FUNCTION d4recCountLessEq( DATA4 S4PTR *, long ) ;
 S4EXPORT int S4FUNCTION d4recCountLess( DATA4 S4PTR *, long ) ;
 S4EXPORT int S4FUNCTION d4recCountGreater( DATA4 S4PTR *, long ) ;
@@ -2170,7 +2070,7 @@ S4EXPORT void S4FUNCTION d4versionCheck( DATA4 *data ) ;  // used for ole-db in 
 int d4verify( DATA4 *, const int ) ;
 
 // AS Feb 6/03 - Not available in client mode.
-#if !defined( S4CLIENT ) && defined( S4FOX )
+#if  defined( S4FOX )
    #define d4compatibility( d4 ) ( (d4)->dataFile->compatibility )
 #endif
 
@@ -2180,12 +2080,6 @@ int d4verify( DATA4 *, const int ) ;
 #define d4version( d4 ) ( (d4)->dataFile->version )
 S4EXPORT char S4FUNCTION d4versionCB( DATA4 S4PTR * ) ;
 
-#ifdef S4CLIENT
-   int d4localLockSet( DATA4 *, const long ) ;
-   int dfile4registerLocked( DATA4FILE *, const long ) ;
-   //CJ - 06/08/01 This function is a static void function does not need to be declared. ( MAC error)
-   //void d4unlockClientData( DATA4 * ) ;
-#else
    /* AS Nov 13/02 - export for dot */
    S4EXPORT int S4FUNCTION d4packData( DATA4 * ) ;
    int d4writeData( DATA4 *, const long, const int ) ;
@@ -2198,7 +2092,6 @@ S4EXPORT char S4FUNCTION d4versionCB( DATA4 S4PTR * ) ;
          int d4validateMemoIds( DATA4 * ) ;
       #endif
    #endif
-#endif
 
 #ifndef S4OFF_MULTI
    #ifdef S4STAND_ALONE
@@ -2309,9 +2202,6 @@ S4EXPORT unsigned int S4FUNCTION f4memoReadPart( FIELD4 S4PTR *, char S4PTR *, u
    // AS Oct 29/03 - needs to be defined for client/server as well since exported
    S4EXPORT int S4FUNCTION t4versionCheckExport( TAG4 S4PTR *, const int, const int ) ;
 
-   #ifdef S4CLIENT
-      int i4setup( CODE4 *, DATA4 *, const char *, const char *, int, INDEX4 * ) ;
-   #else
       S4EXPORT int S4FUNCTION tfile4versionCheck( TAG4FILE S4PTR *, const int, const int ) ;
       int i4check( INDEX4 * ) ;
       void i4deleteRemoveKeys( INDEX4 * ) ;
@@ -2356,15 +2246,12 @@ S4EXPORT unsigned int S4FUNCTION f4memoReadPart( FIELD4 S4PTR *, char S4PTR *, u
             #define t4versionCheck( t4, doSeek, updateVersion ) (( (t4)->index->indexFile->file.doBuffer == 0 ) ? i4versionCheck( (t4)->index, doSeek, updateVersion ) : 0)
          #endif
       #endif  /* S4CLIPPER */
-   #endif /* S4CLIENT */
 #endif /* S4OFF_INDEX */
-#ifndef S4CLIENT
    #ifndef S4OFF_MULTI
       int lock4groupVerify( LOCK4GROUP *, const int ) ;
       int lock4groupLock( LOCK4GROUP * ) ;
       int lock4groupUnlock( LOCK4GROUP * ) ;
    #endif /* S4OFF_MULTI */
-#endif /* S4CLIENT */
 
 S4EXPORT int S4FUNCTION l4check( const LIST4 S4PTR * ) ;
 S4EXPORT int S4FUNCTION l4seek( const LIST4 S4PTR *, const void S4PTR * ) ;
@@ -2455,7 +2342,7 @@ S4EXPORT int S4FUNCTION code4memoCompress( CODE4 *c4, short flag ) ;
 // AS Nov 26/02 - New function for data file compression
 S4EXPORT DATA4 * S4FUNCTION d4compress( DATA4 S4PTR *data, const char S4PTR *compressedName, short blockSize ) ;
 // AS May 17/04 - server support for data file compression
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+#if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
    int file4compressInit( FILE4 *file, COMPRESS4HANDLER *compress, long compressHeaderOffset ) ;
    // AS Jan 18/06 - moved compression array reading from d4open to it's own function.
    int file4compressInitArrayOffsets( FILE4 *file, COMPRESS4WRITE_HEADER *writeCompress, FILE4LONG pos ) ;
@@ -2482,7 +2369,6 @@ S4EXPORT DATA4 * S4FUNCTION d4compress( DATA4 S4PTR *data, const char S4PTR *com
    unsigned file4readDecompressDo( FILE4 *f4, FILE4LONG pos, void *ptr, unsigned len ) ;
 #endif
 #ifndef S4OFF_MEMO
-   #ifndef S4CLIENT
       int memo4fileCheck( MEMO4FILE * ) ;
       int memo4fileCreate( MEMO4FILE *, CODE4 *, DATA4FILE *, const char * );
       int memo4fileOpen( MEMO4FILE *, DATA4FILE *, char * ) ;
@@ -2508,7 +2394,6 @@ S4EXPORT DATA4 * S4FUNCTION d4compress( DATA4 S4PTR *data, const char S4PTR *com
             #endif
          #endif /* S4MNDX  */
       #endif /* S4MFOX  */
-   #endif /* S4CLIENT */
 
    int memo4fileLock( MEMO4FILE * ) ;
    int memo4fileUnlock( MEMO4FILE * ) ;
@@ -2527,14 +2412,7 @@ S4EXPORT DATA4 * S4FUNCTION d4compress( DATA4 S4PTR *data, const char S4PTR *com
       S4EXPORT int S4FUNCTION t4uniqueSetLow( TAG4 *, const short, const char ) ;
    #endif
 
-   #ifdef S4CLIENT
-      void tfile4free( TAG4FILE * ) ;
-      void t4free( TAG4 *, Bool5 ) ;
-   #endif
    // AS Sep 8/05 - available in client version now as well
-   #ifdef S4CLIENT
-      #define tfile4dskip( t4, num ) ( tfile4dskipExport( (t4), (num) ) )
-   #else
       #if !defined( OLEDB5BUILD ) || defined( S4JOINT_OLEDB_DLL )
          #ifdef S4HAS_DESCENDING
             #define tfile4dskip( t4, num ) (((t4)->header.descending ) ? (-tfile4skip( (t4), -(num) )) : ( tfile4skip( (t4), (num))))
@@ -2544,9 +2422,7 @@ S4EXPORT DATA4 * S4FUNCTION d4compress( DATA4 S4PTR *data, const char S4PTR *com
       #else
          #define tfile4dskip( t4, num ) ( tfile4dskipExport( (t4), (num) ) )
       #endif
-   #endif
    S4EXPORT long S4FUNCTION tfile4dskipExport( TAG4FILE S4PTR *, long ) ;
-   #ifndef S4CLIENT
       S4EXPORT void S4FUNCTION tfile4descending( TAG4FILE *, const unsigned short int ) ;
       int t4addCalc( TAG4 *, long ) ; /* Calculates expression and adds */
       #define tfile4alias( t4 ) ( (t4)->alias )
@@ -2554,7 +2430,6 @@ S4EXPORT DATA4 * S4FUNCTION d4compress( DATA4 S4PTR *data, const char S4PTR *com
       int tfile4down( TAG4FILE * ) ;
       int tfile4dump( TAG4FILE *, int, const int ) ;
       S4EXPORT int S4FUNCTION tfile4empty( TAG4FILE S4PTR * ) ;  // exported for ODBC
-   #endif
    // AS Sep 8/05 - available in client version now as well
    S4EXPORT int S4FUNCTION tfile4bottom( TAG4FILE S4PTR * ) ;
    S4EXPORT int S4FUNCTION tfile4eof( TAG4FILE S4PTR *t4 ) ;
@@ -2562,11 +2437,7 @@ S4EXPORT DATA4 * S4FUNCTION d4compress( DATA4 S4PTR *data, const char S4PTR *com
    S4EXPORT int S4FUNCTION tfile4go( TAG4FILE S4PTR *, const unsigned char S4PTR *, const unsigned long, const int ) ;
    S4EXPORT char S4PTR * S4FUNCTION tfile4key( TAG4FILE S4PTR * ) ;
    // AS Jul 14/09 - we can't use t4position as a direct mapping because it needs some extended functionality
-   #ifdef S4CLIENT
-      #define t4position( a )        ( tfile4position( (a)->tagFile ) )
-   #else
       S4EXPORT double S4FUNCTION t4position( TAG4 S4PTR * ) ;              /* Returns the position as a percent */
-   #endif
    S4EXPORT double S4FUNCTION tfile4position( TAG4FILE S4PTR * ) ;              /* Returns the position as a percent */
    S4EXPORT int S4FUNCTION tfile4positionSet( TAG4FILE S4PTR *, const double ) ;  /* Positions a percentage */
    S4EXPORT unsigned long S4FUNCTION tfile4recNo( TAG4FILE S4PTR * ) ;
@@ -2578,24 +2449,11 @@ S4EXPORT DATA4 * S4FUNCTION d4compress( DATA4 S4PTR *data, const char S4PTR *com
    // CS Mar 3/09 Always define
    S4EXPORT int S4FUNCTION tfile4skipCache( TAG4FILE S4PTR *, long, long ) ;  // AS Jul 14/09 - support for extended functionality
    S4EXPORT long S4FUNCTION t4readBuffer( TAG4 S4PTR *, long ) ;
-   #ifdef S4CLIENT
-      void tfile4freeCache( TAG4FILE *, Bool5 ) ;
-   #endif
-   #ifdef S4CLIENT
-      // AS Oct 25/05 - new function available now...
-      long tfile4skipDo( TAG4FILE *t4, long numSkip, Bool5 tfile4dSkip ) ;
-      void tfile4cacheReset( TAG4FILE *t4 ) ;  // AS Aug 6/09 - for resetting cache
-   #endif
    #ifdef S4CLIPPER
       S4EXPORT int S4FUNCTION tfile4exprKey( TAG4FILE S4PTR *, unsigned char S4PTR * S4PTR * ) ;
    #else
-      #ifdef S4CLIENT
-         S4EXPORT int S4FUNCTION tfile4exprKey( TAG4FILE S4PTR *, unsigned char S4PTR * S4PTR * ) ;
-      #else
          #define tfile4exprKey( tag, ptrPtr ) ( expr4key( (tag)->expr, (char **)(ptrPtr), (tag) ) )
-      #endif
    #endif
-   #ifndef S4CLIENT
       int tfile4freeAll( TAG4FILE * ) ;
       int tfile4freeSaved( TAG4FILE * ) ;
       int tfile4goEof( TAG4FILE * ) ;
@@ -2665,10 +2523,9 @@ S4EXPORT DATA4 * S4FUNCTION d4compress( DATA4 S4PTR *data, const char S4PTR *com
          #endif
          B4BLOCK *tfile4split( TAG4FILE *, B4BLOCK * ) ;
       #endif
-   #endif /* S4CLIENT */
 #endif /* S4OFF_INDEX */
 
-#if !defined( S4CLIENT ) && (defined( E4ANALYZE ) || defined( S4TESTING ))
+#if  (defined( E4ANALYZE ) || defined( S4TESTING ))
    // AS Jun 24/02 - function to perform data movement counting for testing
    S4EXPORT void S4FUNCTION code4countPosReset( CODE4 *c4 ) ;  // reset count to 0
    S4EXPORT unsigned long S4FUNCTION code4countPosGet( CODE4 *c4 ) ;  // return current count
@@ -2895,7 +2752,7 @@ void t4dtstrToDbDate( COLLATE4 *, char *result, const char *inputPtr, const int 
 void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, const int numBytes, int * ) ;
 void t4dblToFox( char *, const double ) ;
 void t4shortToFox( char *result, const short *val ) ;
-#if !defined( S4CLIENT ) && defined( S4FOX )
+#if  defined( S4FOX )
    void t4strToCur( COLLATE4 *, char *, const char *, const int, int * ) ;
    void t4strToDbTimeStamp( COLLATE4 *, char *result, const char *input, const int len, int * ) ;
    void t4strToUnsignedInt( COLLATE4 *, char *result, const char *input, const int len, int * ) ;
@@ -2903,8 +2760,8 @@ void t4shortToFox( char *result, const short *val ) ;
    void t4dblToInt( char *result, const double d ) ;
    // AS Jul 21/05 - Support for new field type binary float
    void t4dblToFloat( char *result, const double d ) ;
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) */
-#if !defined( S4CLIENT ) && ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
+#endif /*  defined( S4FOX ) */
+#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
    void t4strToDateTime( COLLATE4 *, char *result, const char *input, const int len, int * ) ;
    void t4strToDateTimeMilli( COLLATE4 *, char *result, const char *input, const int len, int * ) ;// AS Mar 10/03 - supports 3 decimal fraction
    void t4strToInt( COLLATE4 *, char *result, const char *input, const int len, int * ) ;
@@ -2913,7 +2770,7 @@ void t4shortToFox( char *result, const short *val ) ;
 #endif
 
 
-#if defined( S4FOX ) || defined( S4CLIENT ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) )
+#if defined( S4FOX ) ||  ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) )
    void t4curToFox( char *, const CURRENCY4 * ) ;
    void t4intToFox( char *, const S4LONG * ) ;  /* LY 2001/07/28 : changed from long* to S4LONG* for 64-bit */
    void t4unsignedIntToFox( char *, const unsigned long * ) ;
@@ -3045,12 +2902,12 @@ S4EXPORT int S4FUNCTION expr4currency( const EXPR4 * ) ;
 #ifdef __cplusplus
    }
 #endif
-#if !defined( S4CLIENT ) && !defined( S4OFF_INDEX )
+#if  !defined( S4OFF_INDEX )
    int code4validateAddClose( CODE4 *c4, const char *fullPathTableName, Bool5 isTempIn ) ;
    int code4validateAddOpen( CODE4 *c4, const char *fullPathTableName, Bool5 isTempIn ) ;
    int code4validateUndo( CODE4 *c4 ) ;
    int code4validateModifyTemp( CODE4 *c4, const char *fullPathTableName, Bool5 isTempIn ) ;
-#endif /* !defined( S4CLIENT ) && !defined( S4OFF_INDEX ) */
+#endif /*  !defined( S4OFF_INDEX ) */
 
 // AS Sept. 19/02 - modify to include input buffer length to avoid access violations, and error if buf not big enough
 int u4createCopyrightFromStamp( char *, int ) ;

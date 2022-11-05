@@ -20,7 +20,6 @@
    extern unsigned short f4memoNullChar ;
 #endif  /* not S4OFF_MEMO */
 
-#ifndef S4CLIENT
    int dfile4closeLow( DATA4FILE *data )
    {
       /* closes the given datafile if it's user count is zero */
@@ -109,7 +108,7 @@
       if ( file4openTest( &data->file ) )
       {
          // AS Oct 22/02 - make available to be called in multi-user (if user calls directly)
-         #if !defined( S4CLIENT ) && !defined( S4OFF_INDEX )
+         #if  !defined( S4OFF_INDEX )
             // AS Nov 7/02 - don't mark for invalid tables - ocurred with preprocess on
             if ( c4->validationTable != 0 && data->valid == 1 )
                code4validateAddClose( c4, data->file.name, file4getTemporary( &data->file ) ) ;
@@ -176,20 +175,11 @@
 
       return 0 ;
    }
-#endif /* !S4CLIENT */
 
 
 
 int dfile4close( DATA4FILE *data )
 {
-   // #ifndef S4STAND_ALONE
-   //    CODE4 *c4 ;
-   // #endif
-   #ifdef S4CLIENT
-      // int finalRc ; //, saveRc ;
-      INDEX4FILE *i4 ;
-      CONNECTION4 *connection ;
-   #endif
 
    #ifdef E4PARM_LOW
       if ( data == 0 )
@@ -200,9 +190,7 @@ int dfile4close( DATA4FILE *data )
       if ( data->userCount <= 0 )
       {
          // AS 04/30/99 -- added 'data->valid', else failing when open fails...
-         #ifndef S4CLIENT
             if ( data->valid )
-         #endif
                return error4( 0, e4struct, E91102 ) ;
       }
    #endif
@@ -299,7 +287,7 @@ int dfile4close( DATA4FILE *data )
 
 
 
-#if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT )
+#if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE )
    int d4logClose( DATA4 *data )
    {
       // log the close message to the transaction log file
@@ -346,7 +334,7 @@ int dfile4close( DATA4FILE *data )
       }
       return saveRc ;
    }
-#endif /* !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) */
+#endif /* !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE )  */
 
 
 
@@ -369,15 +357,6 @@ int S4FUNCTION d4close( DATA4 *data )
    else
       saveRc2 = 0 ;
 
-   #ifdef S4CLIENT
-      d4batchReadFree( data ) ;
-      // Apr 19/02 - flush out any bufferred records...
-      saveRc = d4writeBufferDo( data ) ;
-      if ( saveRc != 0 && saveRc2 == 0 )
-         saveRc2 = saveRc ;
-      d4batchWriteFree( data ) ;
-   #endif
-
    if ( data->dataFile != 0 )
    {
       /* need to remove any references to any code4lock() calls */
@@ -394,11 +373,11 @@ int S4FUNCTION d4close( DATA4 *data )
 
       int rc = 0 ;
 
-      #if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT )
+      #if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE )
          rc = d4logClose( data ) ;
          if ( rc < 0 )
             saveRc = rc ;
-      #endif /* !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE ) && !defined( S4CLIENT ) */
+      #endif /* !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE )  */
 
       #if !defined( S4OFF_TRAN ) && !defined( S4OFF_WRITE )
          // if we are within a transaction and the file may have changed we just put it into a list of files to be
@@ -408,12 +387,8 @@ int S4FUNCTION d4close( DATA4 *data )
          // need the table for rolling back.  Plus with SQL, we would open read-only on select and then could not
          // re-open for write if we wanted to make a change within the same transaction
          TRAN4 *trans = code4trans( c4 ) ;
-         #ifdef S4CLIENT
-            if ( code4transEnabled( c4 ) && code4tranStatus( c4 ) == r4active )  // can't unlock in this instance
-         #else
             // AS If the file is opened temporary we can also go ahead and close it.
             if ( data->dataFile->file.isReadOnly == 0 && trans != 0 && trans->currentTranStatus == r4active && data->dataFile->file.isTemporary == 0 )
-         #endif
          {
             l4remove( tran4dataList( data->trans ), data ) ;
             l4add( &(trans->closedDataFiles), data ) ;
@@ -427,7 +402,7 @@ int S4FUNCTION d4close( DATA4 *data )
             saveRc = error4set( c4, 0 ) ;
          // AS Feb 17/03 - Detect any left locks in debug
          // AS May 20/03 - compile fix for client
-         #if !defined(S4CLIENT) && defined(__cplusplus)
+         #if  defined(__cplusplus)
             assert5( data->lockedRecords.next() == 0 ) ;
          #endif
       #endif  /* S4SINGLE */
@@ -474,14 +449,12 @@ int S4FUNCTION d4close( DATA4 *data )
          {
             for ( int memoFieldIndex = 0 ; memoFieldIndex < data->dataFile->nFieldsMemo ; memoFieldIndex++ )
             {
-               #ifndef S4CLIENT
                   // AS Jun 2/03 - Was failing to properly update indexes on memo fields.  Need to keep a copy of the old key around.
                   if ( data->fieldsMemo[memoFieldIndex].contentsOld != 0 )
                   {
                      u4free( data->fieldsMemo[memoFieldIndex].contentsOld ) ;
                      data->fieldsMemo[memoFieldIndex].contentsOld = 0 ;
                   }
-               #endif
 
                if ( data->fieldsMemo[memoFieldIndex].contents != (char *)(&f4memoNullChar) )
                {
@@ -501,7 +474,6 @@ int S4FUNCTION d4close( DATA4 *data )
             data->dataFile->exclusiveOpen = 0 ;
       #endif
 
-      #ifndef S4CLIENT
          #ifndef S4OFF_MULTI
             /* AS 02/02/99 - If from a failed open, the link might not be added yet, so check first... */
             if ( data->dataFileLink.n != 0 )
@@ -511,13 +483,7 @@ int S4FUNCTION d4close( DATA4 *data )
                assert5( data->dataFileLink.n == 0 ) ;
             }
          #endif
-      #endif
 
-      #ifdef S4CLIENT
-         if ( c4getDoRemove( c4 ) == 1 )
-            rc = dfile4remove( data->dataFile ) ;
-         else
-      #endif
          rc = dfile4close( data->dataFile ) ;
       if ( rc < 0 )
          saveRc = rc ;
@@ -537,11 +503,6 @@ int S4FUNCTION d4close( DATA4 *data )
          u4free( data->recordOld ) ;
          u4free( data->fields )  ;
          u4free( data->recordBlank ) ;
-         #ifdef S4CLIENT
-            /* AS Apr 10/02 - New function for advance-reading client/server */
-            if ( data->batchRead.recordExtra != 0 )
-               u4free( data->batchRead.recordExtra ) ;
-         #endif
       }
 
       if ( data->trans != 0 )

@@ -21,11 +21,10 @@
    #include <time.h>
 #endif
 
-#ifndef S4CLIENT
 #ifndef S4OFF_WRITE
 #ifndef S4OFF_INDEX
 
-/* not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* not S4OFF_INDEX, not S4OFF_WRITE */
 int tfile4remove( TAG4FILE *tagFile, const unsigned char *ptr, const unsigned long rec )
 {
    #ifdef E4PARM_LOW
@@ -96,7 +95,7 @@ int tfile4remove( TAG4FILE *tagFile, const unsigned char *ptr, const unsigned lo
 
 
 
-/* not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* not S4OFF_INDEX, not S4OFF_WRITE */
 int tfile4removeCalc( TAG4FILE *tagFile, unsigned long rec )
 {
    unsigned char *ptr ;
@@ -129,7 +128,7 @@ int tfile4removeCalc( TAG4FILE *tagFile, unsigned long rec )
 
 
 #ifdef S4FOX
-/* S4FOX, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4FOX, not S4OFF_INDEX, not S4OFF_WRITE */
 int tfile4removeBranch( TAG4FILE *tagFile, B4BLOCK *blockOn )
 {
    /* remove the (current) branch block */
@@ -282,7 +281,7 @@ int tfile4removeBranch( TAG4FILE *tagFile, B4BLOCK *blockOn )
 
 
 #ifndef S4CLIPPER
-/* not S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* not S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 int tfile4removeCurrent( TAG4FILE *tagFile )
 {
    /* Remove the current key */
@@ -515,12 +514,12 @@ int tfile4removeCurrent( TAG4FILE *tagFile )
 
 #ifdef S4CLIPPER
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceBranch( TAG4FILE *, B4BLOCK * ) ;
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static void tfile4removeBlock( TAG4FILE *tagFile, B4BLOCK *block )
 {
    // this routine assumes that the block being removed is on the 'saved' chain...
@@ -533,7 +532,7 @@ static void tfile4removeBlock( TAG4FILE *tagFile, B4BLOCK *block )
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4removeRefResetBlock( TAG4FILE *tagFile, B4BLOCK *block )
 {
    /* reset the block */
@@ -548,7 +547,7 @@ static int tfile4removeRefResetBlock( TAG4FILE *tagFile, B4BLOCK *block )
 }
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static B4KEY_DATA *tfile4removeRefGetKeyData( TAG4FILE *tagFile, B4BLOCK *block )
 {
    B4KEY_DATA *myKeyData = (B4KEY_DATA *)u4allocEr( tagFile->codeBase, tagFile->header.groupLen ) ;
@@ -566,7 +565,7 @@ static B4KEY_DATA *tfile4removeRefGetKeyData( TAG4FILE *tagFile, B4BLOCK *block 
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4removeRefReplaceRoot( TAG4FILE *tagFile, B4BLOCK *block )
 {
    /* LY 00/02/18 : HP-UX */
@@ -584,7 +583,7 @@ static int tfile4removeRefReplaceRoot( TAG4FILE *tagFile, B4BLOCK *block )
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4removeRefMoveLeftNeighbourRightMaxBlock( TAG4FILE *tagFile, B4BLOCK *blockOn, B4BLOCK *siblingBlock, B4BLOCK *blockUp )
 {
    #ifdef S4DATA_ALIGN  /* LY 00/02/18 : HP */
@@ -618,7 +617,7 @@ static int tfile4removeRefMoveLeftNeighbourRightMaxBlock( TAG4FILE *tagFile, B4B
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4removeRefEnsureParentValid( TAG4FILE *tagFile, B4BLOCK *blockOn, B4BLOCK *siblingBlock, B4BLOCK *blockUp )
 {
    if ( blockUp->nKeys == 0 )
@@ -651,7 +650,7 @@ static int tfile4removeRefEnsureParentValid( TAG4FILE *tagFile, B4BLOCK *blockOn
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4removeRefMoveLeftNeighbourRightRegularBlock
 (
    TAG4FILE *tagFile,
@@ -690,7 +689,7 @@ static int tfile4removeRefMoveLeftNeighbourRightRegularBlock
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4removeRefMoveLeftNeighbourRight( TAG4FILE *tagFile, B4BLOCK *blockOn, B4BLOCK *blockUp )
 {
    /* move one right neighbour into left */
@@ -724,7 +723,7 @@ static int tfile4removeRefMoveLeftNeighbourRight( TAG4FILE *tagFile, B4BLOCK *bl
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4removeRefMoveToRightNeighbourMaxBlock( TAG4FILE *tagFile, B4BLOCK *blockOn, B4BLOCK *siblingBlock, B4BLOCK *blockUp )
 {
    /* LY 00/02/18 : HP-UX */
@@ -751,7 +750,7 @@ static int tfile4removeRefMoveToRightNeighbourMaxBlock( TAG4FILE *tagFile, B4BLO
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4removeRefMoveToRightNeighbourRightRegularBlock
 (
    TAG4FILE *tagFile,
@@ -795,7 +794,7 @@ static int tfile4removeRefMoveToRightNeighbourRightRegularBlock
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4removeRefMoveToRightNeighbour( TAG4FILE *tagFile, B4BLOCK *blockOn, B4BLOCK *blockUp )
 {
    /* move to left neighbor */
@@ -826,7 +825,7 @@ static int tfile4removeRefMoveToRightNeighbour( TAG4FILE *tagFile, B4BLOCK *bloc
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4removeRefOneKey( TAG4FILE *tagFile, B4BLOCK *blockOn )
 {
    /*
@@ -874,7 +873,7 @@ static int tfile4removeRefOneKey( TAG4FILE *tagFile, B4BLOCK *blockOn )
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4removeRef( TAG4FILE *tagFile )
 {
    /*
@@ -938,7 +937,7 @@ static int tfile4removeRef( TAG4FILE *tagFile )
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 enum Balance5mode
 {
    nodeBalanced = 0,
@@ -948,7 +947,7 @@ enum Balance5mode
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceMergeLeafsLeftSibling( TAG4FILE *tagFile, B4BLOCK *block, B4BLOCK *siblingBlock )
 {
    /*
@@ -989,7 +988,7 @@ static int tfile4balanceMergeLeafsLeftSibling( TAG4FILE *tagFile, B4BLOCK *block
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceMergeBranchesLeftSibling( TAG4FILE *tagFile, B4BLOCK *parentBlock, B4BLOCK *block, B4BLOCK *siblingBlock )
 {
    /* LY 00/02/18 : HP-UX */
@@ -1043,7 +1042,7 @@ static int tfile4balanceMergeBranchesLeftSibling( TAG4FILE *tagFile, B4BLOCK *pa
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceMergeLeafsRightSibling( TAG4FILE *tagFile, B4BLOCK *parentBlock, B4BLOCK *block, B4BLOCK *siblingBlock )
 {
    /*
@@ -1135,7 +1134,7 @@ static int tfile4balanceMergeLeafsRightSibling( TAG4FILE *tagFile, B4BLOCK *pare
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceMergeBranchesRightSibling( TAG4FILE *tagFile, B4BLOCK *parentBlock, B4BLOCK *block, B4BLOCK *siblingBlock )
 {
    /*
@@ -1190,7 +1189,7 @@ static int tfile4balanceMergeBranchesRightSibling( TAG4FILE *tagFile, B4BLOCK *p
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static void tfile4balanceBlockRedistributeLeftSibling
 (
    B4BLOCK *parentBlock,
@@ -1306,7 +1305,7 @@ static void tfile4balanceBlockRedistributeLeftSibling
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static void tfile4balanceBlockRedistributeRightSibling
 (
    TAG4FILE *tagFile,
@@ -1403,7 +1402,7 @@ static void tfile4balanceBlockRedistributeRightSibling
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceBlockRedistribute
 (
    TAG4FILE *tagFile,
@@ -1429,7 +1428,7 @@ static int tfile4balanceBlockRedistribute
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceBlock
 (
    TAG4FILE *tagFile,
@@ -1474,7 +1473,7 @@ static int tfile4balanceBlock
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceBranchLeaf( TAG4FILE *tagFile, B4BLOCK *parentBlock, B4BLOCK *branch, B4BLOCK *leaf, Bool5 rightIsLeaf )
 {
    /*
@@ -1561,7 +1560,7 @@ static int tfile4balanceBranchLeaf( TAG4FILE *tagFile, B4BLOCK *parentBlock, B4B
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceEnsureSiblingsAreLeafs( TAG4FILE *tagFile, B4BLOCK **parentBlock, B4BLOCK **block )
 {
    /* make sure siblings are also leafs.  If a sibling is not a leaf, it means that we should
@@ -1627,7 +1626,7 @@ static int tfile4balanceEnsureSiblingsAreLeafs( TAG4FILE *tagFile, B4BLOCK **par
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceEnsureLeftSiblingIsBranch( TAG4FILE *tag, B4BLOCK *parentBlock, B4BLOCK *block )
 {
    /* make sure left sibling is also a branch.  If a sibling is not a branch, it means that we should
@@ -1679,7 +1678,7 @@ static int tfile4balanceEnsureLeftSiblingIsBranch( TAG4FILE *tag, B4BLOCK *paren
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceEnsureRightSiblingIsBranch( TAG4FILE *tagFile, B4BLOCK *parentBlock, B4BLOCK *block )
 {
    /* make sure left right is also a branch.  If a sibling is not a branch, it means that we should
@@ -1745,7 +1744,7 @@ static int tfile4balanceEnsureRightSiblingIsBranch( TAG4FILE *tagFile, B4BLOCK *
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceEnsureSiblingsAreBranches( TAG4FILE *tagFile, B4BLOCK **parentBlock, B4BLOCK **block )
 {
    /* make sure siblings are also branches
@@ -1818,7 +1817,7 @@ static int tfile4balanceEnsureSiblingsAreBranches( TAG4FILE *tagFile, B4BLOCK **
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceFullGetSibling
 (
    TAG4FILE *tagFile,
@@ -1915,7 +1914,7 @@ static int tfile4balanceFullGetSibling
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceRootBlock( TAG4FILE *tagFile )
 {
    /* Bascially, be definition, the root block may be in an unbalanced state
@@ -1972,7 +1971,7 @@ static int tfile4balanceRootBlock( TAG4FILE *tagFile )
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceNotFullGetSibling
 (
    TAG4FILE *tagFile,
@@ -2058,7 +2057,7 @@ static int tfile4balanceNotFullGetSibling
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static B4KEY_DATA *tfile4balanceSavePositionForAfterSeek
 (
    TAG4FILE *tagFile,
@@ -2111,7 +2110,7 @@ static B4KEY_DATA *tfile4balanceSavePositionForAfterSeek
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceRepositionAfterSeek
 (
    TAG4FILE *tagFile,
@@ -2171,7 +2170,7 @@ static int tfile4balanceRepositionAfterSeek
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceWithSibling
 (
    TAG4FILE *tagFile,
@@ -2260,7 +2259,7 @@ static int tfile4balanceWithSibling
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 int tfile4balance( TAG4FILE *tagFile, B4BLOCK *block, int doFull )
 {
    /* if doFull is true, the whole branch set will be balanced,
@@ -2361,7 +2360,7 @@ int tfile4balance( TAG4FILE *tagFile, B4BLOCK *block, int doFull )
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 int tfile4getReplaceEntry( TAG4FILE *tagFile, B4KEY_DATA *insertSpot, B4BLOCK *saveBlock )
 {
    // purpose of this function is to perform a remove on a branch block.  Basically, this involves
@@ -2401,7 +2400,7 @@ int tfile4getReplaceEntry( TAG4FILE *tagFile, B4KEY_DATA *insertSpot, B4BLOCK *s
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 static int tfile4balanceBranch( TAG4FILE *tagFile, B4BLOCK *b4 )
 {
    #ifdef E4ANALYZE
@@ -2477,7 +2476,7 @@ static int tfile4balanceBranch( TAG4FILE *tagFile, B4BLOCK *b4 )
 
 
 
-/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE, not S4CLIENT */
+/* S4CLIPPER, not S4OFF_INDEX, not S4OFF_WRITE */
 int tfile4removeCurrent( TAG4FILE *tagFile )
 {
    #ifndef S4CLIPPER
@@ -2528,4 +2527,3 @@ int tfile4removeCurrent( TAG4FILE *tagFile )
 
 #endif /* !S4OFF_WRITE */
 #endif /* !S4OFF_INDEX */
-#endif /* !S4CLIENT */

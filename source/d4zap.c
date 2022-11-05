@@ -21,11 +21,6 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
 {
    int rc ;
    CODE4 *c4 ;
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      CONNECTION4ZAP_INFO_IN *info ;
-      CONNECTION4ZAP_INFO_OUT *out ;
-   #endif
 
    if ( r2 < r1 )   /* simple no records to remove -- get before parm check */
       return 0 ;
@@ -49,64 +44,6 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
    if ( d4->readOnly == 1 )
       return error4describe( c4, e4write, E80606, d4alias( d4 ), 0, 0 ) ;
 
-   #ifdef S4CLIENT
-      rc = d4update( d4 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-      if ( rc )
-         return rc ;
-
-      // AS Nov 1/05 - keep track of additional information for the tag...low level tag functions
-      d4tagInvalidateAll( d4 ) ;
-
-      // Apr 25/02 - ensure batched writes get flushed first
-      code4writeBufferFlush( c4 ) ;
-      if ( error4code( c4 ) < 0 )  // check if write buffer flush returned an error
-         return error4code( c4 ) ;
-
-      connection = d4->dataFile->connection ;
-      if ( connection == 0 )
-         return e4connection ;
-
-      d4->count = -1 ;
-      d4->dataFile->numRecs = -1 ;
-
-      connection4assign( connection, CON4ZAP, data4clientId( d4 ), data4serverId( d4 ) ) ;
-      connection4addData( connection, NULL, sizeof( CONNECTION4ZAP_INFO_IN ), (void **)&info ) ;
-      info->recStart = htonl5(r1) ;
-      info->recStop = htonl5(r2) ;
-      rc = connection4repeat( connection ) ;
-      if ( rc == r4locked )
-         return r4locked ;
-      if ( rc < 0 )
-         return connection4error( connection, c4, rc, E94604 ) ;
-
-      if ( connection4len( connection ) != sizeof( CONNECTION4ZAP_INFO_OUT ) )
-         return error4( c4, e4packetLen, E95702 ) ;
-      out = (CONNECTION4ZAP_INFO_OUT *)connection4data( connection ) ;
-      if ( out->lockedDatafile  )
-      {
-         // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-         // d4->dataFile->fileLock = d4 ;
-         d4->dataFile->fileLockServerId = data4serverId( d4 ) ;
-         d4->dataFile->fileLockLockId = data4lockId( d4 ) ;
-      }
-
-      if ( rc == 0 )
-      {
-         if ( d4recCount( d4 ) == 0L )
-            d4->bofFlag = d4->eofFlag = 1 ;
-         else
-            d4->bofFlag = d4->eofFlag = 0 ;
-      }
-
-      d4->recNum = -1 ;
-      d4->recNumOld = -1 ;
-      /* BCR 11/10/00 -- Fields should be set to null as in the non-client case,
-         instead of just spaces */
-      d4blankLow( d4, d4->record ) ;
-      //memset( d4->record, ' ', dfile4recWidth( d4->dataFile ) ) ;
-
-      return rc ;
-   #else
       #ifndef S4SINGLE
          rc = d4lockAllInternal( d4, 1 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
          if ( rc )
@@ -134,19 +71,15 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
       }
 
       return rc ;
-   #endif
 }
 
-#ifndef S4CLIENT
    /* AS Nov 13/02 - export for dot */
    int S4FUNCTION d4zapData( DATA4 *data, const long startRec, const long endRec )
    {
       int rc ;
       #ifndef S4OFF_TRAN
-         #ifndef S4CLIENT
             TRAN4 *trans ;
             long connectionId ;
-         #endif
       #endif
 
       #ifdef E4PARM_HIGH
@@ -167,7 +100,6 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
          return rc ;
 
       #ifndef S4OFF_TRAN
-         #ifndef S4CLIENT
             // AS 02/16/01 - base on whether the data file is being logged, not transaction logging
             // if ( code4transEnabled( data->codeBase ) )
             if ( d4transEnabled( data, 0 ) )   // always log if data logging is on, not just if 'active'
@@ -192,7 +124,6 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
                if ( rc < 0 )
                   return rc ;
             }
-         #endif  /* S4CLIENT */
       #endif  /* S4OFF_TRAN */
 
       rc = dfile4zapData( data->dataFile, startRec, endRec ) ;
@@ -290,7 +221,7 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
          if ( d4->compatibility != 30 )  /* 3.0 file */
             file4seqWrite( &wr, "\032", 1 ) ;
       #else
-         #if defined( S4PREPROCESS_FILE ) && !defined( S4CLIENT )  // LY Nov 24/04 : avoid compiler error
+         #if defined( S4PREPROCESS_FILE )   // LY Nov 24/04 : avoid compiler error
             if ( d4->file.preprocessed == 0 )
                file4seqWrite( &wr, "\032", 1 ) ;
          #endif
@@ -316,12 +247,12 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
          if ( d4->compatibility != 30 )  /* 3.0 file */
             file4longAdd( &len, 1 ) ;
       #else
-         #if defined( S4PREPROCESS_FILE ) && !defined( S4CLIENT )  // LY Nov 22/04 : avoid compiler error
+         #if defined( S4PREPROCESS_FILE )   // LY Nov 22/04 : avoid compiler error
             if ( d4->file.preprocessed == 0 )
                file4longAdd( &len, 1 ) ;
          #endif
       #endif
       return file4lenSetLow( &d4->file, len ) ;
    }
-#endif /* !S4CLIENT */
+
 #endif /* S4OFF_WRITE */

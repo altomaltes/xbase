@@ -652,7 +652,7 @@ int S4FUNCTION file4optimizeWrite( FILE4 *file, int optFlag )
          return rc ;
 
       // LY Jan 19/05 : added switches to avoid compiler error
-      #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+      #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
          // AS Sep 16/04 - Don't support write-optimization of compressed write files...there are sequencing problems
          // which need to be solved first.
          if ( file->compressInfo != 0 )

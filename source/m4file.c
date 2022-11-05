@@ -33,7 +33,7 @@
    // #define COMPRESS4MEMO_DEFAULT_LEVEL 7
 #endif
 
-#if !defined( S4CLIENT ) && !defined( S4OFF_MEMO )
+#if  !defined( S4OFF_MEMO )
    #if !defined( S4OFF_MULTI ) && !defined( S4CLIPPER )
       /* clipper version has no free chain--do not lock memo file */
       /* the lock is forced since a memo file lock only lasts if the .dbf file is locked */
@@ -1107,4 +1107,4 @@
          #endif /* S4MNDX */
       #endif /* !S4MFOX */
    #endif /* !S4OFF_WRITE */
-#endif /* !S4OFF_MEMO && !S4CLIENT */
+#endif /* !S4OFF_MEMO  */

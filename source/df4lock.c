@@ -16,7 +16,7 @@
 
 #include "d4all.h"
 
-#if !defined( S4OFF_MULTI ) && !defined( S4CLIENT )
+#if !defined( S4OFF_MULTI )
    #ifndef S4INDEX_OFF
       int S4FUNCTION d4lockTestIndexExport( DATA4 *data )
       {
@@ -34,63 +34,6 @@
 #endif
 
 #ifndef S4SINGLE
-   #ifdef S4CLIENT
-      // AS Apr 15/03 - support for new lockId for shared clone locking
-      int dfile4lock( DATA4FILE *data, const long lockId, const long serverId, const long rec, Lock4type lockType )
-      {
-         int rc ;
-         CODE4 *c4 ;
-         CONNECTION4 *connection ;
-         CONNECTION4LOCK_INFO_IN *info ;
-         long recNum ;
-         #ifdef S4FOX
-            FILE4LONG pos2 ;
-         #endif
-
-         #ifdef E4PARM_LOW
-            if ( data == 0 || rec < 1L || lockId == 0 || ( lockType != lock4read && lockType != lock4write && lockType != lock4any )
-                 #ifdef S4SERVER
-                    || serverId == 0
-                 #endif
-               )
-               return error4( (data == 0 ? 0 : data->c4 ), e4parm, E91102 ) ;
-         #endif
-
-         c4 = data->c4 ;
-
-         if ( error4code( c4 ) < 0 )
-            return e4codeBase ;
-
-         // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-         if ( data->lockTestLockId != 0 && code4unlockAuto( c4 ) != LOCK4ALL )
-         {
-            if ( c4->lockAttempts == WAIT4EVER )
-               return error4( c4, e4lock, E81523 ) ;
-            else
-               return r4locked ;
-         }
-
-         connection = data->connection ;
-         if ( connection == 0 )
-            rc = e4connection ;
-         else
-         {
-            connection4assign( connection, CON4LOCK, lockId, data->serverId ) ;
-            connection4addData( connection, NULL, sizeof( CONNECTION4LOCK_INFO_IN ), (void **)&info ) ;
-            info->type = htons5(LOCK4RECORD) ;
-            // AS Nov 30/01 - The lock type needs to be put into byte order
-            // info->lockType = lockType ;
-            info->lockType = htonl5(lockType) ;
-            recNum = htonl5(rec) ;
-            connection4addData( connection, &recNum, sizeof( recNum ), NULL ) ;
-            rc = connection4repeat( connection ) ;
-
-            if ( rc < 0 )
-               connection4error( connection, c4, rc, E91102 ) ;
-         }
-         return rc ;
-      }
-   #else
       // AS Apr 15/03 - support for new lockId for shared clone locking
       int dfile4lock( DATA4FILE *data, const long lockId, const long serverId, const long rec )
       {
@@ -184,9 +127,8 @@
          #endif
          return 0 ;
       }
-   #endif /* S4CLIENT */
 
-   #if !defined( S4CLIENT ) && !defined( S4CLIPPER ) && !defined( S4OFF_MEMO )
+   #if  !defined( S4CLIPPER ) && !defined( S4OFF_MEMO )
       int dfile4lockMemo( DATA4FILE *data )
       {
          return memo4fileLock( &data->memoFile ) ;
@@ -195,52 +137,7 @@
 
 
 
-   #ifdef S4CLIENT
-      // AS Apr 15/03 - support for new lockId for shared clone locking
-      int dfile4lockAppend( DATA4FILE *data, const long lockId, const long serverId )
-      {
-         int rc ;
-         CODE4 *c4 ;
-         CONNECTION4LOCK_INFO_IN *info ;
-         CONNECTION4 *connection ;
 
-         #ifdef E4PARM_LOW
-            if ( data == 0 || lockId == 0 )
-               return error4( 0, e4parm, E91102 ) ;
-         #endif
-
-         c4 = data->c4 ;
-         if ( error4code( c4 ) < 0 )
-            return -1 ;
-
-         // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-         if ( data->lockTestLockId != 0 && code4unlockAuto( c4 ) != LOCK4ALL )
-         {
-            if ( c4->lockAttempts == WAIT4EVER )
-               return error4( c4, e4lock, E81523 ) ;
-            else
-               return r4locked ;
-         }
-
-         connection = data->connection ;
-         if ( connection == 0 )
-            return e4connection ;
-         connection4assign( connection, CON4LOCK, lockId, data->serverId ) ;
-         connection4addData( connection, NULL, sizeof( CONNECTION4LOCK_INFO_IN ), (void **)&info ) ;
-         info->type = htons5(LOCK4APPEND) ;
-         // AS Nov 30/01 - The lock type needs to be put into byte order
-         // info->lockType = lock4write ;
-         info->lockType = htonl5(lock4write) ;
-         rc = connection4repeat( connection ) ;
-         if ( rc < 0 )
-            return connection4error( connection, c4, rc, E91102 ) ;
-
-         return rc ;
-      }
-   #endif /* S4CLIENT */
-
-
-   #ifndef S4CLIENT
       // AS Apr 15/03 - support for new lockId for shared clone locking
       int dfile4lockAppend( DATA4FILE *data, const long lockId, const long serverId )
       {
@@ -295,15 +192,12 @@
          #endif
          return rc ;
       }
-   #endif /* !S4CLIENT */
-
 
 
    #ifdef S4USE_ADDITIVE_LOCK
       #error additive locks no longer supported
    #endif
 
-   #ifndef S4CLIENT
       // AS Apr 15/03 - support for new lockId for shared clone locking
       int dfile4lockTestFileInternal( DATA4FILE *data, const long lockId, const long serverId, Lock4type lockType )
       {
@@ -428,100 +322,6 @@
             return retVal ;  // CS 2000/12/01 fix Borland warning
          #endif /* S4SINGLE */
       }
-   #endif /* S4CLIENT */
-
-
-
-   #ifdef S4CLIENT
-      // AS Apr 15/03 - support for new lockId for shared clone locking
-      int dfile4lockFile( DATA4FILE *data, const long lockId, const long serverId, DATA4 *d4, Lock4type lockType )
-      {
-         int rc = 0 ;
-         CODE4 *c4 ;
-         CONNECTION4LOCK_INFO_IN *info=0 ;
-         CONNECTION4 *connection ;
-
-         // AS Mar 13/06 - don't memset this to null at this point, not set yet...
-         // memset( &info, 0, sizeof( CONNECTION4LOCK_INFO_IN ) ) ;
-
-         #ifdef E4PARM_LOW
-            if ( data == 0 || lockId == 0 || ( lockType != lock4read && lockType != lock4write && lockType != lock4any )
-                 #ifndef S4CLIENT
-                    || serverId == 0
-                 #endif
-               )
-               return error4( 0, e4parm, E91102 ) ;
-         #endif
-
-         c4 = data->c4 ;
-         if ( error4code( c4 ) < 0 )
-            return e4codeBase ;
-
-         // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-         if ( data->lockTestLockId != 0 && code4unlockAuto( c4 ) != LOCK4ALL )
-         {
-            if ( c4->lockAttempts == WAIT4EVER )
-               return error4( c4, e4lock, E81523 ) ;
-            else
-               return r4locked ;
-         }
-         connection = data->connection ;
-         if ( connection == 0 )
-            return e4connection ;
-         connection4assign( connection, CON4LOCK, lockId, data->serverId ) ;
-         connection4addData( connection, NULL, sizeof( CONNECTION4LOCK_INFO_IN ), (void **)&info ) ;
-         // AS Mar 13/06 - null out in case of new items
-         memset( info, 0, sizeof( CONNECTION4LOCK_INFO_IN ) ) ;
-         info->type = htons5(LOCK4FILE) ;
-         // CJ July 17/01-lockType is no longer an enumerator in CONNECTION4LOCK_INFO_IN problem with mac client
-         info->lockType = htonl5( lockType ) ;
-         rc = connection4repeat( connection ) ;
-         if ( rc < 0 )
-            connection4error( connection, c4, rc, E91102 ) ;
-         if ( rc == 0 )
-         {
-            // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-            data->fileLockServerId = data4serverId( d4 ) ;
-            data->fileLockLockId = data4lockId( d4 ) ;
-         }
-         return rc ;
-      }
-
-
-
-      // AS Apr 15/03 - support for new lockId for shared clone locking
-      int dfile4lockAll( DATA4FILE *data, const long lockId, const long serverId )
-      {
-         CONNECTION4LOCK_INFO_IN *info ;
-         CONNECTION4 *connection ;
-         int rc ;
-         CODE4 *c4 ;
-
-         #ifdef E4PARM_LOW
-            if ( data == 0 )
-               return error4( 0, e4parm_null, E91102 ) ;
-         #endif
-
-         c4 = data->c4 ;
-         if ( error4code( c4 ) < 0 )
-            return e4codeBase ;
-
-         connection = data->connection ;
-         if ( connection == 0 )
-            return e4connection ;
-         connection4assign( connection, CON4LOCK, lockId, data->serverId ) ;
-         connection4addData( connection, NULL, sizeof( CONNECTION4LOCK_INFO_IN ), (void **)&info ) ;
-         info->type = htons5(LOCK4ALL) ;
-         // AS Nov 30/01 - The lock type needs to be put into byte order
-         // info->lockType = lock4write ;
-         info->lockType = htonl5(lock4write) ;
-         rc = connection4repeat( connection ) ;
-         if ( rc < 0 )
-            connection4error( connection, c4, rc, E91102 ) ;
-         return rc ;
-      }
-   #else
-
 
 
       // AS Apr 15/03 - support for new lockId for shared clone locking
@@ -532,9 +332,7 @@
 
          #ifdef E4PARM_LOW
             if ( data == 0 || lockId == 0 || ( lockType != lock4read && lockType != lock4write && lockType != lock4any )
-                 #ifndef S4CLIENT
                     || serverId == 0
-                 #endif
                )
                return error4( 0, e4parm, E91102 ) ;
          #endif
@@ -645,7 +443,7 @@
             data->fileClientWriteLock = lockId ;
             data->fileServerWriteLock = serverId ;
             // LY Jan 18/05 : added #ifdef (avoid compiler errors)
-            #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+            #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
                // AS Jul 9/04 - For compressed writing to tables, if the data file is locked, the compression area is also considered locked
                if ( data->file.compressInfo != 0 )
                   data->file.compressInfo->isLocked = 1 ;
@@ -766,77 +564,7 @@
             return 0 ;
          #endif
       }
-   #endif /* S4CLIENT */
 
-
-
-   #ifdef S4CLIENT
-      // AS Apr 15/03 - support for new lockId for shared clone locking
-      int dfile4lockTest( DATA4FILE *data, DATA4 *dataIn, const long lockId, const long serverId, const long rec, Lock4type lockType )
-      {
-         /* if rec == -1, then any lock is checked */
-         /* for client, if lockId == 0, then any d4 with a lock will return success */
-         /* for server, if lockId == 0 and serverId == 0, then any d4 with a lock will return success */
-         /* for server, if lockId == 0  then any d4 with a serverId lock will return success */
-         int rc ;
-         LOCK4LINK *lock ;
-
-         #ifdef E4PARM_LOW
-            if ( data == 0 || ( lockType != lock4read && lockType != lock4write && lockType != lock4any ) )
-               return error4( 0, e4parm_null, E91102 ) ;
-         #endif
-
-         rc = dfile4lockTestFile( data, lockId, serverId, lock4write ) ;
-         if ( rc )
-            return rc ;
-
-         // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-         if ( data->fileLockLockId != 0 )
-         {
-            data->lockTestServerId = data->fileLockServerId ;
-            data->lockTestLockId = data->fileLockLockId ;
-            return 0 ;
-         }
-
-         for( lock = (LOCK4LINK *)(data->lockedRecords.initIterate()) ;; )
-         {
-            if ( lock == 0 )
-               break ;
-            if ( lock->recNo == rec || rec == -1L )
-            {
-               #ifdef E4DEBUG
-                  /*
-                     AS 03/24/99 -- this code no longer works for testing, removed.
-
-                     We want to do some special checking of the server here.  Namely, the client here
-                     has reported that a lock does exist.  We want to bypass the clients check of the
-                     lock and request the results from the server.  Basically, this tests that the
-                     server is correctly recording locks (i.e. in the 'normal' case, the server status
-                     is not verified that it is correct, here we hope that a test program will fail
-                     suitably if the mismatch is not noticed).
-                  if ( lock->lockType != lockType )  // r4locked for sure - return failure
-                     return 0 ;
-                  */
-               #endif
-               if ( lockId == 0 )   /* if clintId == 0 then any lock is considered success */
-                  return 1 ;
-               // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-               // if ( lock->data->lockId == lockId )
-               if ( lock->lockId == lockId )
-                  return 1 ;
-               else
-               {
-                  // data->lockTest = lock->data ;
-                  data->lockTestServerId = lock->serverId ;
-                  data->lockTestLockId = lock->lockId ;
-                  return 0 ;
-               }
-            }
-            lock = (LOCK4LINK *)single4next( &lock->link ) ;
-         }
-         return 0 ;
-      }
-   #else
 
 
 
@@ -967,7 +695,6 @@
          #endif
          return 1 ;
       }
-   #endif  /* S4CLIENT */
 #endif /* S4SINGLE */
 
 
@@ -975,35 +702,6 @@
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
-#ifdef S4CLIENT
-   // AS Apr 15/03 - support for new lockId for shared clone locking
-   int S4FUNCTION dfile4lockTestAppend( DATA4FILE *data, const long lockId, const long serverId )
-   {
-      #ifdef S4SINGLE
-         return 1 ;
-      #else
-         // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-         data->lockTestServerId = 0 ;
-         data->lockTestLockId = 0 ;
-         if ( data->appendLockLockId != 0 )
-         {
-            if ( data->appendLockLockId == lockId && data->appendLockServerId == serverId )
-               return 1 ;
-            data->lockTestServerId = data->appendLockServerId ;
-            data->lockTestLockId = data->appendLockLockId ;
-            return 0 ;
-         }
-
-         if ( data->fileLockLockId )
-            return ( data->fileLockLockId == lockId ) ;
-
-         return 0 ;
-      #endif /* S4SINGLE */
-   }
-
-
-
-#else
    // AS Apr 15/03 - support for new lockId for shared clone locking
    int S4FUNCTION dfile4lockTestAppend( DATA4FILE *data, const long lockId, const long serverId )
    {
@@ -1040,7 +738,6 @@
          return r4locked ;
       #endif /* S4SINGLE */
    }
-#endif /* S4CLIENT */
 
 
 
@@ -1061,26 +758,6 @@ int S4FUNCTION dfile4lockTestFile( DATA4FILE *data, const long lockId, const lon
             return error4( 0, e4parm_null, E91102 ) ;
       #endif
 
-      #ifdef S4CLIENT
-         // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-         data->lockTestServerId = 0 ;
-         data->lockTestLockId = 0 ;
-         // AS 01/25/00 -- changed - in order to properly support isolation levels, etc.
-         // we must be able to perform these locks, even if file not open in exclusive
-         // if ( data->accessMode != OPEN4DENY_NONE )
-         //    return 1 ;
-         if ( data->accessMode == OPEN4DENY_RW )
-            return 1 ;
-         if ( data->fileLockLockId != 0 )
-         {
-            if ( data->fileLockLockId == lockId && data->fileLockServerId == serverId )
-               return 1 ;
-            data->lockTestLockId = data->fileLockLockId ;
-            data->lockTestServerId = data->fileLockServerId ;
-            return 0 ;
-         }
-         return 0 ;
-      #else
          #ifdef S4SERVER
             if ( data->exclusiveOpen != 0 )
             {
@@ -1181,7 +858,6 @@ int S4FUNCTION dfile4lockTestFile( DATA4FILE *data, const long lockId, const lon
 
             iterate = (Lock4 *)(Single4lock *)((Single4lock *)iterate)->next() ;
          }
-      #endif /* S4CLIENT */
    #endif /* S4SINGLE */
 }
 

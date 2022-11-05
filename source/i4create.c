@@ -26,43 +26,15 @@
          // CS 2008/02/22 This function runs in a thread and
          // polls the CODE4 at certain intervals for index
          // create status and calls the callback function.
-         #ifdef S4CLIENT
-            int rc ;
-            CODE4 c4 ;
-            CODE4 *cb = &c4 ;
-            CODE4 *cbReindex = ((REINDEX4CALLBACK*)callbackInfo)->data->codeBase ;
-         #else
             CODE4 *cb = ((REINDEX4CALLBACK*)callbackInfo)->data->codeBase ;
-         #endif
          short( __stdcall *callback )( double ) = ((REINDEX4CALLBACK*)callbackInfo)->callback ;
          long sleepInterval = ((REINDEX4CALLBACK*)callbackInfo)->sleepInterval ;
          short *reindexDone = &( ((REINDEX4CALLBACK*)callbackInfo)->reindexDone ) ;
          short *callbackStarted = &( ((REINDEX4CALLBACK*)callbackInfo)->callbackStarted ) ;
 
-         #ifdef S4CLIENT  // in client/server, the server is polled with a separate connection
-            rc = code4init(cb);
-            // AS Apr 13/06 - also may need to send the application stamp...
-            if ( cbReindex->applicationVerify != 0 )
-               code4verifySet( cb, cbReindex->applicationVerify ) ;
-            if (rc == r4success)
-               rc = code4connect(cb, cb->defaultServer.serverName, cb->defaultServer.port, cb->defaultServer.userName, cb->defaultServer.password, DEF4PROTOCOL);
-            else
-               cb = 0 ;
-         #endif
 
          *callbackStarted = 1 ;  // tell the calling process that this thread has started
 
-         #ifdef S4CLIENT  // if the 2nd connection could not be established, send rc to callback
-            if (rc != r4success)
-            {
-               callback( (double)rc ) ;
-               if (cb)
-               {
-                  code4initUndo(cb);
-                  cb = 0;
-               }
-            }
-         #endif
 
          #ifdef S4STAND_ALONE  // wait for reindex to start
             while ( cb->actionCode != ACTION4REINDEX && !(*reindexDone) )
@@ -89,10 +61,6 @@
          callback( 1.0 );
 
          u4free( callbackInfo ) ;
-         #ifdef S4CLIENT
-            if (cb)
-               code4initUndo( cb ) ;
-         #endif
       }
 
       void __cdecl i4createThread( void *info )
@@ -104,16 +72,6 @@
          const char *indexFileName = ((REINDEX4CALLBACK*)info)->indexFileName ;
          const TAG4INFO *tags = ((REINDEX4CALLBACK*)info)->tags ;
 
-         #ifdef S4CLIENT
-            short *callbackStarted = &( ((REINDEX4CALLBACK*)info)->callbackStarted ) ;
-
-            while ( *callbackStarted == 0 )  // wait for callback thread to connect to the server
-            {
-               // AS Apr 5/07 - adjust...don't sleep unless the code4 is running as high priority
-               // AS Jan 19/07 - create a u4sleep() which will delay a short period (fix problem when CodeBase run as a high-priority thread)
-               u4sleep( data->codeBase ) ;
-            }
-         #endif
          i4create( data, indexFileName, tags ) ;
          *reindexDone = 1;
       }
@@ -248,12 +206,12 @@
 
 
    // !S4OFF_INDEX, !S4OFF_WRITE
-   INDEX4 *S4FUNCTION i4create( DATA4 *d4, const char *fileName, const TAG4INFO *tagData )
-   {
-      #ifdef E4VBASIC
+INDEX4 *S4FUNCTION i4create( DATA4 *d4, const char *fileName, const TAG4INFO *tagData )
+{
+#ifdef E4VBASIC
          if ( c4parm_check( d4, 2, E95301 ) )
             return 0 ;
-      #endif
+#endif
 
       #ifdef E4PARM_HIGH
          if ( d4 == 0 || tagData == 0 )
@@ -284,10 +242,8 @@
          }
       #endif
 
-      #ifndef S4CLIENT
          // AS Jun 2/03 - Added recording if data file has a tag with an expression referring to a memo field
          d4->hasMemoExpr = r4uninitializedMemoTagExpression ;  // just reset, it gets set automatically if required
-      #endif
 
       // AS Jun 12/02 - Added support for re-use of deleted records if a tag name called 'DEL4REUSE' is created.
       // We look through the tag data here and change it if that tag name is found.
@@ -352,7 +308,7 @@
          }
       #endif
 
-      #if !defined( S4OFF_OPTIMIZE ) && !defined( S4CLIENT )
+      #if !defined( S4OFF_OPTIMIZE )
          #ifdef S4LOW_MEMORY
             int hasOpt ;
             if ( c4->hasOpt )
@@ -382,12 +338,10 @@
       #endif
 
       // AS Dec 15/03 - not supported in clipper because the tag file name issue (end up with many files of same name)
-      #if !defined( S4CLIENT ) && !defined( S4CLIPPER )
          if ( index != 0 && reuseTag != -1 )
             d4->dataFile->appendTag = dfile4tag( d4->dataFile, DEL4REUSE_TAG_NAME ) ;  // it should exist, don't error
-      #endif
 
-      #if !defined( S4OFF_OPTIMIZE ) && !defined( S4CLIENT )
+      #if !defined( S4OFF_OPTIMIZE )
          #ifndef S4CLIPPER
             if ( index != 0 )
                file4optimizeLow( &index->indexFile->file, c4->optimize, OPT4INDEX, 0, index->indexFile ) ;
@@ -405,7 +359,7 @@
 
 
       #ifndef S4CLIPPER
-         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, !S4CLIPPER
+         // !S4OFF_INDEX, !S4OFF_WRITE !S4CLIPPER
          static int i4canCreateIndex( DATA4 *d4, const char *fileName, const char *fileNameFormatted )
          {
             CODE4 *c4 = d4->codeBase ;
@@ -455,7 +409,7 @@
 
 
 
-         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, !S4CLIPPER
+         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIPPER
          static void i4formatFileName( DATA4 *d4, char *nameOut, int nameOutLen, const char *nameIn )
          {
             if ( nameIn )
@@ -467,7 +421,7 @@
 
 
 
-         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, !S4CLIPPER
+         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIPPER
          static int i4createIndexStructures( DATA4 *d4, INDEX4 **i4, INDEX4FILE **indexFile )
          {
             CODE4 *c4 = d4->codeBase ;
@@ -500,7 +454,7 @@
 
 
          #ifdef S4STAND_ALONE
-            // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, !S4CLIPPER, S4STAND_ALONE
+            // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIPPER, S4STAND_ALONE
             // AS Nov 1/2013 - allow access of i4setFileName for access from d4data.c
             int i4setFileName( INDEX4 *i4, DATA4 *d4, const char *fileName )
             {
@@ -528,7 +482,7 @@
 
 
          #ifdef S4FOX
-            // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, !S4CLIPPER, S4FOX
+            // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIPPER, S4FOX
             static int i4setupIndexMemory( INDEX4FILE *indexFile, CODE4 *c4 )
             {
                // AS Jul 6/06 - fix for client/server
@@ -561,7 +515,7 @@
 
 
 
-            // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, !S4CLIPPER, S4FOX
+            // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIPPER, S4FOX
             static int i4initTagIndex( TAG4FILE *tagIndex, DATA4 *d4, INDEX4FILE *indexFile, char *indexName )
             {
                CODE4 *c4 = d4->codeBase ;
@@ -618,7 +572,7 @@
 
 
 
-            // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, !S4CLIPPER, S4FOX
+            // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIPPER, S4FOX
             static int i4initTagRegular( const TAG4INFO *tagInfo, TAG4 **tagPtr, DATA4 *d4, INDEX4 *i4 )
             {
                /*
@@ -816,7 +770,7 @@
 
 
 
-         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, !S4CLIPPER
+         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIPPER
          static int i4createReindex( INDEX4 *i4, CODE4 *c4 )
          {
             int rc = i4reindex( i4 ) ;
@@ -849,7 +803,7 @@
 
 
 
-         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, !S4CLIPPER
+         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIPPER
          /* static JACS */ INDEX4 *i4createLow( DATA4 *d4, const char *fileName, const TAG4INFO *tagData )
          {
             char buf[258] ;
@@ -1183,7 +1137,7 @@
 
 
 
-         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, !S4CLIPPER
+         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIPPER
          TAG4 *S4FUNCTION t4create( DATA4 *d4, const TAG4INFO *tagData, INDEX4 *i4ndx, int useTempTagFileNames )
          {
             error4( 0, e4notSupported, E95302 ) ;
@@ -1192,7 +1146,7 @@
       #else
 
 
-         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, S4CLIPPER
+         // !S4OFF_INDEX, !S4OFF_WRITE, S4CLIPPER
          static INDEX4 *i4createLow( DATA4 *d4, const char *fileName, const TAG4INFO *tagData )
          {
             #ifdef E4PARM_HIGH
@@ -1359,7 +1313,7 @@
 
 
 
-         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, S4CLIPPER
+         // !S4OFF_INDEX, !S4OFF_WRITE, S4CLIPPER
          TAG4 *S4FUNCTION t4create( DATA4 *d4, const TAG4INFO *tagData, INDEX4 *i4ndx, int useTempTagFileNames )
          {
             /* this function does not reindex if an 'i4ndx' is passed as a parameter */
@@ -1716,7 +1670,7 @@
 
       #ifdef __WIN32  // CS 2000/04/12
          /* AS 07/21/99 - added parm for win 95/98 to avoid endless laze writes */
-         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, __WIN32
+         // !S4OFF_INDEX, !S4OFF_WRITE, __WIN32
          INDEX4 * S4FUNCTION I4createOpen
          (
             DATA4 *data,
@@ -1728,8 +1682,8 @@
             char fileFlush,
             char readOnly,
             short collatingSequence,
-            Collate4name collateName,
-            Collate4name collateNameUnicode
+            enum Collate4name collateName,
+            enum Collate4name collateNameUnicode
          )
          {
             if ( I4create( data, name, tagInfo, accessMode, safety, createTemp, readOnly, fileFlush, collatingSequence, collateName, collateNameUnicode ) != 0 )
@@ -1770,7 +1724,7 @@
 
 
          /* AS 07/21/99 - added parm for win 95/98 to avoid endless laze writes */
-         // !S4OFF_INDEX, !S4OFF_WRITE, !S4CLIENT, __WIN32
+         // !S4OFF_INDEX, !S4OFF_WRITE, __WIN32
          int I4create
          (
             DATA4 *data,
@@ -1782,8 +1736,8 @@
             char readOnly,
             int fileFlush,
             short collatingSequence,
-            Collate4name collateName,
-            Collate4name collateNameUnicode
+            enum Collate4name collateName,
+            enum Collate4name collateNameUnicode
          )
          {
             #ifndef S4OFF_SECURITY
@@ -1803,8 +1757,8 @@
             int oldFileFlush = c4->fileFlush ;
             #ifdef S4FOX
                short oldCollatingSequence = c4->collatingSequence ;
-               Collate4name oldCollateName = c4->collateName ;
-               Collate4name oldCollateNameUnicode = c4->collateNameUnicode ;
+               enum Collate4name oldCollateName = c4->collateName ;
+               enum Collate4name oldCollateNameUnicode = c4->collateNameUnicode ;
             #endif
 
             c4->createTemp = createTemp ;

@@ -1058,7 +1058,7 @@ int S4FUNCTION file4createInternal( FILE4 *file, CODE4 *c4, S4CONST char *name, 
    #endif
 
    file->type = fileType ;
-   #if defined( S4PREPROCESS_FILE ) && !defined( S4CLIENT )
+   #if defined( S4PREPROCESS_FILE )
       #ifdef S4ENCRYPT_DLL // LY Jul 19/04
          if ( c4->encrypt == 0 ) // not enabled
       #else
@@ -1108,7 +1108,7 @@ int S4FUNCTION file4compressCreate( FILE4 *newFile, FILE4 *sourceFile, S4CONST c
 {
    // AS Mar 23/04 - only in fox...
    // AS May 17/04 - client/server functionality to copmress the data file...
-   #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+   #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
       #ifdef E4PARM_HIGH
          if ( newFile == 0 || sourceFile == 0 || name == 0 || blockSize < 0 )
             return error4( 0, e4parm, E90602 ) ;

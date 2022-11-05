@@ -18,7 +18,7 @@
 
 unsigned short S4FUNCTION tfile4isDescending( TAG4FILE *tag )
 {
-   #if defined( S4CLIENT ) || defined( S4OFF_INDEX )
+   #if  defined( S4OFF_INDEX )
       error4( tag->codeBase, e4notSupported, 0 ) ;
       return 0 ;
    #else
@@ -49,24 +49,7 @@ int S4FUNCTION tfile4keyLenExport( TAG4FILE *tag )
    #ifdef S4OFF_INDEX
       return e4notSupported ;
    #else
-      #ifdef S4CLIENT
-         if ( tag->keyLen == 0 )
-         {
-            TAG4 *t4 = d4tag( tag->refData, tag->alias ) ;
-            if ( t4 == 0 )
-               return -1 ;
-            TAG4INFO *temp = i4tagInfo( t4->index ) ;
-            if ( temp == 0 )
-               return -1 ;
-            u4free( temp ) ;
-            temp = 0 ;
-         }
-
-         assert5( tag->keyLen != 0 ) ;
-         return tag->keyLen ;
-      #else
          return tfile4keyLen( tag ) ;
-      #endif
    #endif
 }
 
@@ -101,181 +84,11 @@ int S4FUNCTION tfile4keyLenExport( TAG4FILE *tag )
 
    short S4FUNCTION t4descending( TAG4 *tag )
    {
-      #ifndef S4CLIENT
          return tfile4isDescending( tag->tagFile ) ;
-      #else
-         /* CS 1999/04/22 In C/S, can't directly get
-            descending info on tag so scan TAG4INFO array. */
-         int rc ;
-         TAG4INFO *tagInfo = i4tagInfo( tag->index );
-         char *tagName = t4alias( tag ) ;
-
-         for ( int i = 0 ; tagInfo[i].name ; i++ )
-         {
-            #ifdef S4CLIPPER
-               rc = u4namecmp(tagName,tagInfo[i].name) ;
-            #else
-               #ifdef __unix__
-                  rc = strcasecmp(tagName,tagInfo[i].name) ;
-               #else
-                  rc = stricmp(tagName,tagInfo[i].name) ;
-               #endif
-            #endif
-            if ( rc == 0 )
-            {
-               short desc = tagInfo[i].descending ;
-               u4free(tagInfo) ;
-               return desc ;
-            }
-         }
-
-         u4free(tagInfo) ;
-         return error4( tag->index->codeBase, e4result, 0 ) ;  // The tag was not found in the array.
-      #endif
    }
 
-   /*
-   #ifdef S4CLIENT
-      int t4type( TAG4 *t4 )
-      {
-         if ( t4->tagFile->keyType != 0 )
-            return t4->tagFile->keyType ;
-
-         TAG4INFO *tagInfo = i4tagInfo( tag->index );
-         char *tagName = t4alias( t4 ) ;
-
-         for ( int i = 0 ; tagInfo[i].name ; i++ )
-         {
-            if ( stricmp(tagName,tagInfo[i].name) == 0 )
-            {
-               t4->tagFile->keyType = tagInfo[i].descending ;
-               u4free(tagInfo) ;
-               return t4->tagFile->keyType ;
-            }
-         }
-
-         u4free(tagInfo) ;
-         return error4( t4->index->codeBase, e4result, 0 ) ;  // The tag was not found in the array.
-      }
-   #endif
-   */
 
 
-   #ifdef S4CLIENT
-      S4CONST char *S4FUNCTION t4exprLow( TAG4 *t4 )
-      {
-         #ifdef E4VBASIC
-            #ifdef S4CB51
-               if ( c4parm_check( t4, 4, E40148 ) ) return 0 ;
-            #else
-               if ( c4parm_check( t4, 4, E91641 ) ) return 0 ;
-            #endif
-         #endif
-
-         #ifdef E4PARM_HIGH
-            if ( t4 == 0 )
-            {
-               error4( 0, e4parm_null, E91641 ) ;
-               return 0 ;
-            }
-            if ( t4->tagFile == 0 )
-            {
-               error4( 0, e4parm, E91641 ) ;
-               return 0 ;
-            }
-         #endif
-
-         if ( t4->tagFile->exprPtr == 0 )
-         {
-            TAG4INFO *temp = i4tagInfo( t4->index ) ;
-            if ( temp == 0 )
-               return 0 ;
-            u4free( temp ) ;
-            temp = 0 ;
-            #ifdef E4ANALYZE
-               if ( t4->tagFile->exprPtr == 0 )
-               {
-                  error4( 0, e4info, E91641 ) ;
-                  return 0 ;
-               }
-            #endif
-         }
-
-         return t4->tagFile->exprPtr ;
-      }
-
-
-      int S4FUNCTION t4keyLenExported( TAG4 *tag )
-      {
-         assert5( tag != 0 ) ;
-
-         if ( tag->tagFile->keyLen == 0 )
-         {
-            TAG4INFO *temp = i4tagInfo( tag->index ) ;
-            if ( temp == 0 )
-               return -1 ;
-            u4free( temp ) ;
-            temp = 0 ;
-         }
-
-         assert5( tag->tagFile->keyLen != 0 ) ;
-         return tag->tagFile->keyLen ;
-      }
-   #endif /* S4CLIENT */
-
-   #ifdef S4CLIENT
-      extern unsigned short f4memoNullChar ;
-
-      S4CONST char *S4FUNCTION t4filterLow( TAG4 *t4 )
-      {
-         TAG4INFO *temp ;
-
-         #ifdef E4VBASIC
-            #ifdef S4CB51
-               if ( c4parm_check( t4, 4, E40149 ) )
-                  return 0 ;
-            #else
-               if ( c4parm_check( t4, 4, E91641 ) )
-                  return 0 ;
-            #endif
-         #endif
-
-         #ifdef E4PARM_HIGH
-            if ( t4 == 0 )
-            {
-               error4( 0, e4parm_null, E91641 ) ;
-               return 0 ;
-            }
-
-            if ( t4->tagFile == 0 )
-            {
-               error4( 0, e4parm, E91641 ) ;
-               return 0 ;
-            }
-         #endif
-
-         if ( t4->tagFile->filterPtr == 0 )
-         {
-            temp = i4tagInfo( t4->index ) ;
-            if ( temp == 0 )
-            {
-               error4( 0, e4memory, E91641 ) ;
-               return 0 ;
-            }
-            u4free( temp ) ;
-            temp = 0 ;
-         }
-
-         if ( t4->tagFile->filterPtr == 0 )
-            return (char *)(&f4memoNullChar) ;   /* pointer to empty string */
-         else
-            return t4->tagFile->filterPtr ;
-      }
-   #endif /* S4CLIENT */
-
-
-
-   #ifndef S4CLIENT
       TAG4INFO *S4FUNCTION i4tagInfo( INDEX4 *i4 )
       {
          #ifdef E4PARM_HIGH
@@ -319,5 +132,4 @@ int S4FUNCTION tfile4keyLenExport( TAG4FILE *tag )
             tagInfo[i].descending = tfile4isDescending( tagOn->tagFile ) ;
          }
       }
-   #endif  /* S4CLIENT */
 #endif  /* S4OFF_INDEX */

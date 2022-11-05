@@ -16,7 +16,6 @@
 
 #include "d4all.h"
 
-#ifndef S4CLIENT
 #ifndef S4INDEX_OFF
 
 static void bitmaps4free( BITMAP4 * ) ;

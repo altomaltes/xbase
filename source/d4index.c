@@ -28,19 +28,14 @@ int S4FUNCTION d4freeBlocks( DATA4 *data )
    #ifdef S4INDEX_OFF
       return 0 ;
    #else
-      #ifndef S4CLIENT
          int rc ;
          TAG4 *tagOn ;
-      #endif
 
       #ifdef E4PARM_HIGH
          if ( data == 0 )
             return error4( 0, e4parm_null, E93001 ) ;
       #endif
 
-      #ifdef S4CLIENT
-         return 0 ;
-      #else
 
          rc = 0 ;
          for( tagOn = 0 ;; )
@@ -51,7 +46,6 @@ int S4FUNCTION d4freeBlocks( DATA4 *data )
             if ( tfile4freeAll( tagOn->tagFile ) < 0 )
                rc = -1 ;
          }
-      #endif /* S4CLIENT */
    #endif
 }
 
@@ -66,9 +60,7 @@ INDEX4 *S4FUNCTION d4index( DATA4 *data, const char *indexName )
    #else
       char *current ;
       char indexLookup[258], ext[4] = { 0, 0, 0, 0 } ;
-      #ifndef S4CLIENT
          char indexLookup2[258] ;
-      #endif
       CODE4* c4 ;
       INDEX4 *indexOn ;
       unsigned int i, extIndex ;
@@ -145,9 +137,6 @@ INDEX4 *S4FUNCTION d4index( DATA4 *data, const char *indexName )
          indexOn = (INDEX4 *)l4next( &data->indexes, indexOn) ;
          if ( indexOn == 0 )
             return 0 ;
-         #ifdef S4CLIENT
-            current = indexOn->alias ;
-         #else
             current = indexOn->accessName ;
             if ( current[0] == 0 )  /* use data file name */
             {
@@ -161,7 +150,6 @@ INDEX4 *S4FUNCTION d4index( DATA4 *data, const char *indexName )
                   u4nameExt( indexLookup2, sizeof(indexLookup2), code4indexExtension( c4 ), 0 ) ;  // AS 12/19/00 use code4indexExtension, not 'ntx'
                current = indexLookup2 ;
             }
-         #endif
 
          if ( !u4namecmp( current, indexLookup, c4->ignoreCase ) )    /* check out data->alias? */
             return indexOn ;
@@ -212,30 +200,14 @@ INDEX4FILE *dfile4index( DATA4FILE *data, const char *indexName )
          }
       #endif
 
-      #ifdef S4CLIENT
-         #ifdef E4ANALYZE
-            if ( strlen( indexName ) >= sizeof( indexLookup ) )
-            {
-               error4( 0, e4struct, E91102 ) ;
-               return 0 ;
-            }
-         #endif
-         u4ncpy( indexLookup, indexName, sizeof( indexLookup ) ) ;
-      #else
          u4nameCurrent( indexLookup, sizeof( indexLookup ), indexName ) ;
-      #endif
       for( indexOn = 0 ;; )
       {
          indexOn = (INDEX4FILE *)l4next( &data->indexes, indexOn ) ;
          if ( indexOn == 0 )
             return 0 ;
-         #ifdef S4CLIENT
-            if ( !u4namecmp( indexLookup, indexOn->accessName, data->c4->ignoreCase ) )    /* check out data->alias? */
-               return indexOn ;
-         #else
             if ( !u4namecmp( indexLookup, indexOn->file.name, data->c4->ignoreCase ) )    /* check out data->alias? */
                return indexOn ;
-         #endif
       }
    #endif
 }
@@ -251,43 +223,15 @@ INDEX4FILE *dfile4index( DATA4FILE *data, const char *indexName )
          // CS 2001/01/15 This function runs in a thread and polls
          // the CODE4 at certain intervals for reindex status
          // and calls the callback function.
-         #ifdef S4CLIENT
-            int rc ;
-            CODE4 c4 ;
-            CODE4 *cb = &c4 ;
-            CODE4 *cbReindex = ((REINDEX4CALLBACK*)callbackInfo)->data->codeBase ;
-         #else
             CODE4 *cb = ((REINDEX4CALLBACK*)callbackInfo)->data->codeBase ;
-         #endif
+
          short( __stdcall *callback )( double ) = ((REINDEX4CALLBACK*)callbackInfo)->callback ;
          long sleepInterval = ((REINDEX4CALLBACK*)callbackInfo)->sleepInterval ;
          short *reindexDone = &( ((REINDEX4CALLBACK*)callbackInfo)->reindexDone ) ;
          short *callbackStarted = &( ((REINDEX4CALLBACK*)callbackInfo)->callbackStarted ) ;
 
-         #ifdef S4CLIENT  // in client/server, the server is polled with a separate connection
-            rc = code4init(cb);
-            // AS Apr 13/06 - also may need to send the application stamp...
-            if ( cbReindex->applicationVerify != 0 )
-               code4verifySet( cb, cbReindex->applicationVerify ) ;
-            if (rc == r4success)
-               rc = code4connect(cb, cb->defaultServer.serverName, cb->defaultServer.port, cb->defaultServer.userName, cb->defaultServer.password, DEF4PROTOCOL);
-            else
-               cb = 0 ;
-         #endif
 
          *callbackStarted = 1 ;  // tell the calling process that this thread has started
-
-         #ifdef S4CLIENT  // if the 2nd connection could not be established, send rc to callback
-            if (rc != r4success)
-            {
-               callback( (double)rc ) ;
-               if (cb)
-               {
-                  code4initUndo(cb);
-                  cb = 0;
-               }
-            }
-         #endif
 
          #ifdef S4STAND_ALONE  // wait for reindex to start
             while ( cb->actionCode != ACTION4REINDEX && !(*reindexDone) )
@@ -314,10 +258,6 @@ INDEX4FILE *dfile4index( DATA4FILE *data, const char *indexName )
          callback( 1.0 );
 
          u4free( callbackInfo ) ;
-         #ifdef S4CLIENT
-            if (cb)
-               code4initUndo( cb ) ;
-         #endif
       }
 
       void __cdecl d4reindexThread( void *info )
@@ -328,16 +268,6 @@ INDEX4FILE *dfile4index( DATA4FILE *data, const char *indexName )
          short *reindexDone = &( ((REINDEX4CALLBACK*)info)->reindexDone ) ;
          DATA4 *data = ((REINDEX4CALLBACK*)info)->data ;
 
-         #ifdef S4CLIENT
-            short *callbackStarted = &( ((REINDEX4CALLBACK*)info)->callbackStarted ) ;
-
-            while ( *callbackStarted == 0 )  // wait for callback thread to connect to the server
-            {
-               // AS Apr 5/07 - adjust...don't sleep unless the code4 is running as high priority
-               // AS Jan 19/07 - create a u4sleep() which will delay a short period (fix problem when CodeBase run as a high-priority thread)
-               u4sleep( data->codeBase ) ;
-            }
-         #endif
          d4reindex( data ) ;
          *reindexDone = 1;
       }
@@ -417,10 +347,6 @@ int S4FUNCTION d4reindex( DATA4 *data )
    #else
       int rc ;
       CODE4 *c4 ;
-      #ifdef S4CLIENT
-         CONNECTION4 *connection ;
-         CONNECTION4REINDEX_INFO_OUT *out ;
-      #else
          INDEX4 *indexOn ;
          int oldSchemaCreate ;
          #ifdef S4LOW_MEMORY
@@ -428,7 +354,6 @@ int S4FUNCTION d4reindex( DATA4 *data )
                int hasOpt ;
             #endif
          #endif
-      #endif
 
       #ifdef E4VBASIC
          if ( c4parm_check( data, 2, E93004 ) )
@@ -455,63 +380,6 @@ int S4FUNCTION d4reindex( DATA4 *data )
 
       rc = 0 ;
 
-      #ifdef S4CLIENT
-         // Apr 25/02 - ensure batched writes get flushed first
-         code4writeBufferFlush( c4 ) ;
-         if ( error4code( c4 ) < 0 )  // check if write buffer flush returned an error
-            return error4code( c4 ) ;
-
-         connection = data->dataFile->connection ;
-         if ( connection == 0 )
-         {
-            #ifdef TIME4STATUS
-               c4->actionCode = ACTION4NONE ;
-            #endif
-            return e4connection ;
-         }
-
-         #ifdef TIME4STATUS
-            c4->actionCode = ACTION4REINDEX ;
-         #endif
-         connection4assign( connection, CON4REINDEX, data4clientId( data ), data4serverId( data ) ) ;
-         rc = connection4repeat( connection ) ;
-         // AS Jan 25/06 - if the code > 0, don't create an error, just set error4 and return  .. r4unique codes
-         if ( rc > 0 )
-         {
-            #ifdef TIME4STATUS
-               c4->actionCode = ACTION4NONE ;
-            #endif
-            error4set( c4, rc ) ;
-            return rc ;
-         }
-         if ( rc != 0 )
-         {
-            #ifdef TIME4STATUS
-               c4->actionCode = ACTION4NONE ;
-            #endif
-            return connection4error( connection, c4, rc, E93004) ;
-         }
-
-         if ( connection4len( connection ) != sizeof( CONNECTION4REINDEX_INFO_OUT ) )
-         {
-            #ifdef TIME4STATUS
-               c4->actionCode = ACTION4NONE ;
-            #endif
-            return error4( c4, e4packetLen, E93004 ) ;
-         }
-         out = (CONNECTION4REINDEX_INFO_OUT *)connection4data( connection ) ;
-         if ( out->lockedDatafile )
-         {
-            // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-            // data->dataFile->fileLock = data ;
-            data->dataFile->fileLockServerId = data4serverId( data ) ;
-            data->dataFile->fileLockLockId = data4lockId( data ) ;
-         }
-
-         data->recNum = -1 ;
-         data->recNumOld = -1 ;
-         d4blankLow( data, data->record ) ;
-      #else
          #ifdef S4LOW_MEMORY
             #ifndef S4OFF_OPTIMIZE
                hasOpt = c4->hasOpt && c4->opt.numBuffers ;
@@ -539,7 +407,6 @@ int S4FUNCTION d4reindex( DATA4 *data )
                   code4optRestart( c4 ) ;
             #endif
          #endif
-      #endif /* S4CLIENT */
 
       #ifdef TIME4STATUS
          c4->actionCode = ACTION4NONE ;

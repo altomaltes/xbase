@@ -1362,14 +1362,14 @@ int opt4fileWrite( FILE4 *file, FILE4LONG pos, unsigned len, const void *data, c
                FILE4LONG newLen = pos ;
                file4longAdd( &newLen, lenWritten ) ;
                // LY Jan 19/05 : added switches to avoid compiler error
-               #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+               #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
                   if ( file->compressInfo != 0 && file->compressInfo->writeCompress != 0 )
                      file4compressSetLenDo( file, newLen ) ;
                #endif
                file4longAssignLong( file->len, newLen ) ;
                #ifdef S4TESTING
                   // LY Feb 2/05 : added #if's to avoid compiler errors
-                  #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+                  #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
                      if ( file->compressInfo != 0 && file->compressInfo->writeCompress != 0 )
                      {
                         if ( !file4longEqualLong( file->compressInfo->writeCompress->fileLen, file->len ) )
@@ -1385,7 +1385,7 @@ int opt4fileWrite( FILE4 *file, FILE4LONG pos, unsigned len, const void *data, c
                   if ( file->fileCreated )
                   {
                      // LY Feb 2/05 : added #if's to avoid compiler errors
-                     #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+                     #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
                      // AS Jul 9/04 - can't use u4filelength on compressed files becuase the real file length won't match (is compressed)
                      if ( file->compressInfo == 0 )
                      {
@@ -1399,7 +1399,7 @@ int opt4fileWrite( FILE4 *file, FILE4LONG pos, unsigned len, const void *data, c
                            return error4( file->codeBase, e4info, E92508 ) ;
                         }
                      // LY Feb 2/05 : added #if's to avoid compiler errors
-                     #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+                     #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
                      }
                      else
                      {

@@ -68,51 +68,13 @@
          // This function runs in a thread and polls
          // the CODE4 at certain intervals for pack status
          // and calls the callback function.
-         #ifdef S4CLIENT
-            int rc ;
-            CODE4 c4 ;
-            CODE4 *cb = &c4 ;
-            CODE4 *cbReindex = ((REINDEX4CALLBACK*)callbackInfo)->data->codeBase ;
-         #else
             CODE4 *cb = ((REINDEX4CALLBACK*)callbackInfo)->data->codeBase ;
-         #endif
          short( __stdcall *callback )( double ) = ((REINDEX4CALLBACK*)callbackInfo)->callback ;
          long sleepInterval = ((REINDEX4CALLBACK*)callbackInfo)->sleepInterval ;
          short *reindexDone = &( ((REINDEX4CALLBACK*)callbackInfo)->reindexDone ) ;
          short *callbackStarted = &( ((REINDEX4CALLBACK*)callbackInfo)->callbackStarted ) ;
 
-         #ifdef S4CLIENT  // in client/server, the server is polled with a separate connection
-            rc = code4init(cb);
-            // AS Apr 13/06 - also may need to send the application stamp...
-            if ( cbReindex->applicationVerify != 0 )
-               code4verifySet( cb, cbReindex->applicationVerify ) ;
-            if (rc == r4success)
-            {
-               // AS Aug 28/06 - wrong settings for server
-               rc = code4connect(cb, cbReindex->defaultServer.serverName, cbReindex->defaultServer.port, cbReindex->defaultServer.userName, cbReindex->defaultServer.password, DEF4PROTOCOL);
-               if ( rc != 0 )  // couldn't connect
-               {
-                  *callbackStarted = 1 ;  // indicate we can continue anyway
-                  return ;
-               }
-            }
-            else
-               cb = 0 ;
-         #endif
-
          *callbackStarted = 1 ;  // tell the calling process that this thread has started
-
-         #ifdef S4CLIENT  // if the 2nd connection could not be established, send rc to callback
-            if (rc != r4success)
-            {
-               callback( (double)rc ) ;
-               if (cb)
-               {
-                  code4initUndo(cb);
-                  cb = 0;
-               }
-            }
-         #endif
 
          #ifdef S4STAND_ALONE  // wait for reindex to start
             while ( cb->actionCode != ACTION4REINDEX && !(*reindexDone) )
@@ -139,10 +101,6 @@
          callback( 1.0 );
 
          u4free( callbackInfo ) ;
-         #ifdef S4CLIENT
-            if (cb)
-               code4initUndo( cb ) ;
-         #endif
       }
 
       // AS Jun 30/03 - support d4packWithProgress
@@ -154,16 +112,6 @@
          short *reindexDone = &( ((REINDEX4CALLBACK*)info)->reindexDone ) ;
          DATA4 *data = ((REINDEX4CALLBACK*)info)->data ;
 
-         #ifdef S4CLIENT
-            short *callbackStarted = &( ((REINDEX4CALLBACK*)info)->callbackStarted ) ;
-
-            while ( *callbackStarted == 0 )  // wait for callback thread to connect to the server
-            {
-               // AS Jan 19/07 - create a u4sleep() which will delay a short period (fix problem when CodeBase run as a high-priority thread)
-               // AS Apr 5/07 - adjust...don't sleep unless the code4 is running as high priority
-               u4sleep( data->codeBase ) ;
-            }
-         #endif
          d4pack( data ) ;
          *reindexDone = 1;
       }
@@ -239,13 +187,8 @@
 
 int S4FUNCTION d4pack( DATA4 *d4 )
 {
-   #ifdef S4CLIENT
       int rc ;
-      CONNECTION4PACK_INFO_OUT *out ;
-      CONNECTION4 *connection ;
-   #else
-      int rc ;
-   #endif
+
    CODE4 *c4 ;
 
    #ifdef E4VBASIC
@@ -266,51 +209,6 @@ int S4FUNCTION d4pack( DATA4 *d4 )
    if ( d4->readOnly == 1 )
       return error4describe( c4, e4write, E80606, d4alias( d4 ), 0, 0 ) ;
 
-   #ifdef S4CLIENT
-      rc = d4update( d4 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-      if ( rc )
-         return rc ;
-
-      // AS Nov 1/05 - keep track of additional information for the tag...low level tag functions
-      d4tagInvalidateAll( d4 ) ;
-
-      // Apr 25/02 - ensure batched writes get flushed first
-      code4writeBufferFlush( c4 ) ;
-      if ( error4code( c4 ) < 0 )  // check if write buffer flush returned an error
-         return error4code( c4 ) ;
-
-      connection = d4->dataFile->connection ;
-      if ( connection == 0 )
-         return error4stack( c4, e4connection, E94601 ) ;
-
-      d4->count = -1 ;
-      d4->dataFile->numRecs = -1 ;
-      connection4assign( connection, CON4PACK, data4clientId( d4 ), data4serverId( d4 ) ) ;
-      rc = connection4repeat( connection ) ;
-      if ( rc == r4locked )
-         return r4locked ;
-      if ( rc < 0 )
-         return connection4error( connection, c4, rc, E94601 ) ;
-
-      if ( connection4len( connection ) != sizeof( CONNECTION4PACK_INFO_OUT ) )
-         return error4( c4, e4packetLen, E94601 ) ;
-      out = (CONNECTION4PACK_INFO_OUT *)connection4data( connection ) ;
-      if ( out->lockedDatafile )
-      {
-         // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-         // d4->dataFile->fileLock = d4 ;
-         d4->dataFile->fileLockServerId = data4serverId( d4 ) ;
-         d4->dataFile->fileLockLockId = data4lockId( d4 ) ;
-      }
-
-      d4->recNum = -1 ;
-      d4->recNumOld = -1 ;
-      // AS Jun 28/02 - not doing a proper blank - sometimes null data is present
-      // memset( d4->record, ' ', dfile4recWidth( d4->dataFile ) ) ;
-      d4blankLow( d4, d4->record ) ;
-
-      return rc ;
-   #else
       #ifndef S4SINGLE
          rc = d4lockAllInternal( d4, 1 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
          if ( rc )
@@ -351,12 +249,10 @@ int S4FUNCTION d4pack( DATA4 *d4 )
       #endif
 
       return rc ;
-   #endif  /* S4CLIENT */
 }
 
 
 
-#ifndef S4CLIENT
    /* AS Nov 13/02 - export for dot */
    int S4FUNCTION d4packData( DATA4 *d4 )
    {
@@ -495,7 +391,7 @@ int S4FUNCTION d4pack( DATA4 *d4 )
          if ( d4->compatibility != 30 )  /* 3.0 file */
             file4seqWrite( &wr, "\032", 1 ) ;
       #else
-         #if defined( S4PREPROCESS_FILE ) && !defined( S4CLIENT )
+         #if defined( S4PREPROCESS_FILE )
             if ( d4->file.preprocessed == 0 )
                file4seqWrite( &wr, "\032", 1 ) ;
          #endif
@@ -519,12 +415,12 @@ int S4FUNCTION d4pack( DATA4 *d4 )
          if ( d4->compatibility != 30 )  /* 3.0 file */
             file4longAdd( &len, 1 ) ;
       #else
-         #if defined( S4PREPROCESS_FILE ) && !defined( S4CLIENT )  // LY Nov 24/04 : avoid compiler error
+         #if defined( S4PREPROCESS_FILE )   // LY Nov 24/04 : avoid compiler error
             if ( d4->file.preprocessed == 0 )
                file4longAdd( &len, 1 ) ;
          #endif
       #endif
       return file4lenSetLow( &d4->file, len ) ;
    }
-#endif /* !S4CLIENT */
+
 #endif /* S4OFF_WRITE */

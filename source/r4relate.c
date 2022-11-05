@@ -46,30 +46,7 @@ static int relate4skipInternal( RELATE4 *relate, const long numSkip ) ;
 // AS Apr 5/02 - added support for leaving the relation status unchanged, to allow positioning within relat4edoAll
 static int relate4sortSeek( RELATION4 *relation ) ;
 
-#ifdef S4CLIENT
-   static int relate4flush( RELATE4 *root )
-   {
-      RELATE4 *relateOn ;
-      int rc ;
 
-      for( relateOn = root ;; )
-      {
-         rc = d4updateRecord( relateOn->data, 0, 1 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-         if ( rc )
-            return rc ;
-
-         if ( relate4next( &relateOn ) == 2 )
-            break ;
-      }
-
-      return 0 ;
-   }
-#endif /* S4CLIENT */
-
-
-
-#ifndef S4CLIENT
-   /* !S4CLIENT */
    static int f4flagIsSetFlip( F4FLAG *flagPtr, const unsigned long r )
    {
       if ( flagPtr->flags == 0 )
@@ -81,9 +58,6 @@ static int relate4sortSeek( RELATION4 *relation ) ;
          return f4flagIsSet( flagPtr, r ) ;
    }
 
-
-
-   /* !S4CLIENT */
    static unsigned long f4flagGetNextFlip( F4FLAG *f4, const unsigned long startPos, const signed char direction )
    {
       /* returns the number of positions to the next flipped bit in the bitmap - start at startPos (inclusive) */
@@ -276,9 +250,6 @@ static int relate4sortSeek( RELATION4 *relation ) ;
       }
    }
 
-
-
-   /* !S4CLIENT */
    int r4dataListAdd( LIST4 *l4, DATA4 *data, RELATE4 *relate )
    {
       R4DATA_LIST *r4 ;
@@ -305,9 +276,6 @@ static int relate4sortSeek( RELATION4 *relation ) ;
       return 0 ;
    }
 
-
-
-   /* !S4CLIENT */
    int r4dataListFind( LIST4 *l4, RELATE4 *r4 )
    {
       R4DATA_LIST *link ;
@@ -322,9 +290,6 @@ static int relate4sortSeek( RELATION4 *relation ) ;
       }
    }
 
-
-
-   /* !S4CLIENT */
    void r4dataListFree( LIST4 *l4 )
    {
       R4DATA_LIST *r4data, *r4data2 ;
@@ -339,9 +304,6 @@ static int relate4sortSeek( RELATION4 *relation ) ;
       }
    }
 
-
-
-   /* !S4CLIENT */
    static int r4dataListMassage( LIST4 *l4 )
    {
       /* this function takes a completed sort list, and adds data members in the
@@ -405,9 +367,6 @@ static int relate4sortSeek( RELATION4 *relation ) ;
       return 0 ;
    }
 
-
-
-   /* !S4CLIENT */
    int r4dataListBuild( LIST4 *l4, RELATE4 *relate, EXPR4 *expr, int checkType )
    {
       /* 1 - database added, 0 - database not added, -1 - error */
@@ -468,9 +427,6 @@ static int relate4sortSeek( RELATION4 *relation ) ;
       return mustAdd ;
    }
 
-
-
-   /* !S4CLIENT */
    static int relate4blankSet( RELATE4 *relate, const signed char direction )
    {
       /* direction : -1 = look backwards, 0 = lookup only, 1 = look forwards */
@@ -523,170 +479,7 @@ static int relate4sortSeek( RELATION4 *relation ) ;
             return rc ;
       }
    }
-#endif /* !S4CLIENT */
 
-
-
-#ifdef S4CLIENT
-   /* S4CLIENT */
-   int relation4unpack( RELATION4 *relation, CONNECTION4 *connection )
-   {
-      CONNECTION4RELATION_DATA_OUT *info ;
-      RELATE4 *relate ;
-      unsigned int pos ;
-      long recCount ;
-      #ifndef S4OFF_MEMO
-         int i ;
-      #endif
-
-      long len = connection4len( connection ) ;
-      const char *data = connection4data( connection ) ;
-      if ( len < sizeof( CONNECTION4RELATION_DATA_OUT ) )
-         return error4( relation->relate.codeBase, e4packetLen, E94425 ) ;
-      info = (CONNECTION4RELATION_DATA_OUT *)data ;
-      if ( ntohl5(info->relationId) != relation->relationId )
-         return error4( relation->relate.codeBase, e4connection, E84305 ) ;
-
-      pos = sizeof( CONNECTION4RELATION_DATA_OUT ) ;
-      for( relate = &relation->relate ;; )
-      {
-         DATA4 *d4 = relate->data ;
-         #ifndef S4OFF_MEMO
-            if ( d4->dataFile->nFieldsMemo > 0 )
-            {
-               for ( i = 0; i < d4->dataFile->nFieldsMemo; i++ )
-                  f4memoReset( d4->fieldsMemo[i].field ) ;
-            }
-         #endif
-         if ( len < (long)pos + (long)dfile4recWidth( d4->dataFile ) + (long)sizeof( d4->recNum ) + (long)sizeof(S4LONG) )
-            return error4( relation->relate.codeBase, e4packetLen, E94425 ) ;
-         memcpy( &d4->recNum, data + pos, sizeof( d4->recNum ) ) ;
-         d4->recNum = ntohl5(d4->recNum) ;
-         pos += sizeof( d4->recNum ) ;
-         recCount = ntohl5(*((long *)( data + pos ))) ;
-         pos += sizeof(S4LONG ) ;
-         if ( recCount < 0 )
-            return error4( relation->relate.codeBase, e4result, E84305 ) ;
-         // AS Aug 22/02 - if recCount is 0, we are always at eof as well - was failing on empty tables
-         if ( d4->recNum > recCount || recCount == 0 )
-            d4->eofFlag = 1 ;
-         else
-            d4->eofFlag = 0 ;
-         // AS Nov 27/01 - Was failing in some cases where skipping backwards...
-         if ( recCount == 0 || d4->recNum == 0 || d4->recNum == -1)
-            d4->bofFlag = 1 ;
-         else
-            d4->bofFlag = 0 ;
-         memcpy( d4->record, data + pos, dfile4recWidth( d4->dataFile ) ) ;
-         pos += dfile4recWidth( d4->dataFile ) ;
-         // AS May 21/02 - code to support auto-transfer of memo fields
-         assert5port( "added optional transfer of memo fields with client/server communications" ) ;
-         if ( relation->includeMemos )
-         {
-            int numMemos = d4->dataFile->nFieldsMemo ;
-            for ( int memoLoop = 0 ; memoLoop < numMemos ; memoLoop++ )
-            {
-               FIELD4 *field = d4->fieldsMemo[memoLoop].field ;
-               long memoLen = ntohl5( *((long *)(data + pos)) ) ;
-               pos += sizeof( long ) ;
-               int rc2 = f4memoReadSet( field, memoLen, data + pos ) ;
-               if ( rc2 != 0 )
-                  return rc2 ;
-               pos += memoLen ;
-            }
-
-         }
-         if ( relate4next( &relate ) == 2 )
-            break ;
-      }
-
-      if ( len != (long)pos )
-         return error4( relation->relate.codeBase, e4packetLen, E94425 ) ;
-
-      return 0 ;
-   }
-
-
-
-   /* S4CLIENT */
-   int relation4unpackMultiple( RELATION4 *relation, char *buf )
-   {
-      assert5port( "client/server support for batch reading of related records" ) ;
-      // AS Apr 12/02 block reading of records for relate skip...
-      // retrieves 1 relate record from the socket
-      // buffer is set out as follows:
-      //   <relate rc> plus for each DATA4:
-      //       <bof marker><eof marker><rec num><record>
-      //
-
-      RELATE4 *relate = &relation->relate ;
-      CODE4 *c4 = relate->codeBase ;
-
-      CONNECT4 *connect = c4getClientConnect( c4 ) ;
-      int memoOn = 0 ;
-
-      for( ;; )
-      {
-         DATA4 *data = relate->data ;
-         long recNum = connect4receiveLong( connect ) ;
-         long recCount = connect4receiveLong( connect ) ;
-         short eofFlag = 0 ;
-         short bofFlag = 0 ;
-
-         if ( recNum > recCount )
-            eofFlag = 1 ;
-
-         if ( recCount == 0 || recNum == 0 || recNum == -1)
-            bofFlag = 1 ;
-
-         memcpy( buf, &bofFlag, sizeof( short ) ) ;
-         buf += sizeof( short ) ;
-         memcpy( buf, &eofFlag, sizeof( short ) ) ;
-         buf += sizeof( short ) ;
-         memcpy( buf, &recNum, sizeof( long ) ) ;
-         buf += sizeof( long ) ;
-
-         long recWidth = dfile4recWidth( data->dataFile ) ;
-         connect4receive( connect, buf, recWidth, code4timeoutVal( c4 ) ) ;
-         buf += recWidth ;
-
-         if ( relation->doMemos )
-         {
-            int numMemos = data->dataFile->nFieldsMemo ;
-            for ( int memoLoop = 0 ; memoLoop < numMemos ; memoLoop++ )
-            {
-               assert5( memoOn < relation->numMemos ) ;   // should be enough space for each memo
-               MEMO4BATCH_ENTRY *entry = &relation->memos[relation->readBufNum].memos[memoOn] ;
-               long memoLen = connect4receiveLong( connect ) ;
-               if ( memoLen > 0 )
-               {
-                  if ( (long)entry->contentsAllocLen < memoLen )
-                  {
-                     if ( entry->contents != 0 )
-                     {
-                        u4free( entry->contents ) ;
-                        entry->contents = 0 ;
-                        entry->contentsAllocLen = 0 ;
-                     }
-                     entry->contents = (char *)u4allocFree( data->codeBase, memoLen ) ;
-                     if ( entry->contents == 0 )
-                        return e4memory ;
-                     entry->contentsAllocLen = memoLen ;
-                  }
-                  connect4receive( connect, entry->contents, memoLen, code4timeoutVal( c4 ) ) ;
-               }
-               entry->contentsLen = memoLen ;
-               memoOn++ ;
-            }
-
-         }
-         if ( relate4next( &relate ) == 2 )
-            break ;
-      }
-
-      return 0 ;
-   }
-#endif
 
 
 
@@ -703,11 +496,6 @@ static int relate4sortSeek( RELATION4 *relation ) ;
       inCount = 1 ;
 
       relate->relation->countAccurate = 0 ;  // for testing, ensure we do the count from scratch every time...
-
-      #if defined( S4TESTING ) && defined( S4CLIENT )
-         // AS Sep 3/03 - client/server, with S4TESTING defined code was failing due to c4->expectedCount not being set to -1
-         relate->codeBase->expectedCount = -1 ;
-      #endif
 
       #ifdef __WIN32
          // AS Jul 25/05 - con't perform callbacks during this special count process (debugging only)
@@ -755,15 +543,10 @@ int S4FUNCTION relate4bottom( RELATE4 *relate )
 {
    RELATION4 *relation ;
    int rc, rc2 ;
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      CONNECTION4RELATE_BOTTOM_INFO_IN *info ;
-   #else
       #ifndef S4OFF_MULTI
          char oldReadLock ;
       #endif
       long rec ;
-   #endif
 
    #ifdef E4VBASIC
       if ( c4parm_check( relate, 5, E94401 ) )
@@ -923,7 +706,6 @@ int S4FUNCTION relate4bottom( RELATE4 *relate )
 
 
 
-#ifndef S4CLIENT
    static int relate4buildScanList( RELATE4 *master, RELATE4 *relate, RELATION4 *relation )
    {
       RELATE4 *relateOn ;
@@ -964,7 +746,6 @@ int S4FUNCTION relate4bottom( RELATE4 *relate )
 
       return 0 ;
    }
-#endif
 
 
 
@@ -997,9 +778,7 @@ int S4FUNCTION relate4changed( RELATE4 *relate )
 {
    RELATION4 *relation ;
    CODE4 *c4 ;
-   #ifndef S4CLIENT
       int j ;
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( relate == 0 )
@@ -1014,10 +793,8 @@ int S4FUNCTION relate4changed( RELATE4 *relate )
    if ( error4code( c4 ) < 0 )
       return -1 ;
 
-   #ifndef S4CLIENT
       u4free( relate->scanValue ) ;
       relate->scanValue = 0 ;
-   #endif
    relation = relate->relation ;
 
    relation->isInitialized = 0 ;
@@ -1027,7 +804,6 @@ int S4FUNCTION relate4changed( RELATE4 *relate )
 
    relate4freeRelateList( &(relation->relate) ) ;
 
-   #ifndef S4CLIENT
       u4free( relation->relate.set.flags ) ;
       c4memset( (void *)&relation->relate.set, 0, sizeof( F4FLAG ) ) ;
 
@@ -1062,7 +838,6 @@ int S4FUNCTION relate4changed( RELATE4 *relate )
 
       // AS Jun 24/02 - New functionality to skip forward in the master table only
       // relation->masterSkipStatus = 0 ;  // indicate we need to reanalyze this if to use it
-   #endif
 
    return 0 ;
 }
@@ -1247,7 +1022,6 @@ RELATE4 *S4FUNCTION relate4createSlave( RELATE4 *master, DATA4 *slaveData, const
    #endif
    */
 
-   #ifndef S4CLIENT
       #ifndef S4OFF_INDEX
          if ( slaveTag != 0 )
             if ( tfile4type( slaveTag->tagFile ) != expr4type( slave->masterExpr ) )
@@ -1262,7 +1036,6 @@ RELATE4 *S4FUNCTION relate4createSlave( RELATE4 *master, DATA4 *slaveData, const
                   mem4free( c4->relateMemory, slave ) ;
                   return 0 ;
                }
-      #endif
    #endif
 
    slave->dataTag = slaveTag ;
@@ -1461,11 +1234,9 @@ int S4FUNCTION relate4eof( RELATE4 *relate )
       return -1 ;
    }
 
-   #ifndef S4CLIENT
       if ( relate->relation->inSort == relate4sortDone )
          return relate->relation->sortEofFlag ;
       else
-   #endif
       return d4eof( relate->relation->relate.data ) ;
 }
 
@@ -1550,10 +1321,8 @@ int S4FUNCTION relate4freeRelate( RELATE4 *relate, const int closeFiles )
       expr4free( relate->masterExpr ) ;
    u4free( relate->scanValue ) ;
    relate->scanValue = 0 ;
-   #ifndef S4CLIENT
       u4free( relate->set.flags ) ;
       relate->set.flags = 0 ;
-   #endif
 
    l4remove( &relate->master->slaves, relate ) ;
    mem4free( c4->relateMemory, relate ) ;
@@ -1637,14 +1406,14 @@ int S4FUNCTION relate4free( RELATE4 *relate, const int closeFiles )
 
    relate4sortFree( relation, 1 ) ;
    u4free( relation->exprSource ) ;
-  
+
       if ( relation->sortedKeyBufferLen != 0 )
       {
          u4free( relation->sortedKeyBuffer2 ) ;
          relation->sortedKeyBuffer2 = 0 ;
          relation->sortedKeyBufferLen = 0 ;
       }
-   
+
 
    mem4free( c4->relationMemory, relation ) ;
 
@@ -1890,98 +1659,11 @@ int S4FUNCTION relate4lock( RELATE4 *relate )
 
 
 
-#ifdef S4CLIENT
-#ifdef S4CB51
-#ifdef S4OLD_RELATE_LOCK
-
-/* S4OLD_RELATE_LOCK, S4CB51, S4CLIENT */
-int S4FUNCTION relate4lock( RELATE4 *relate )
-{
-   CONNECTION4 *connection ;
-   CONNECTION4RELATE_LOCK_INFO_IN *info ;
-   CONNECTION4RELATE_LOCK_INFO_OUT *out ;
-   CONNECTION4RELATE_LOCK_SUB_DATA *subData ;
-   int rc, count ;
-   CODE4 *c4 ;
-   DATA4 *data ;
-   short countN ;
-
-   #ifdef E4PARM_HIGH
-      if ( relate == 0 )
-         return error4( 0, e4parm_null, E94411 ) ;
-   #endif
-   #ifdef E4VBASIC
-      if ( c4parm_check( relate, 5, E94408 ) )
-         return -1 ;
-   #endif
-
-   c4 = relate->codeBase ;
-
-   /* must ensure that client relation is registered before requesting a lock */
-   if ( relate->relation->isInitialized == 0 || relate->dataTag != relate->data->tagSelected )
-   {
-      relate->dataTag = relate->data->tagSelected ;
-      rc = relate4clientInit( relate ) ;
-      if ( rc != 0 )
-         return rc ;
-   }
-
-   connection = relate->data->dataFile->connection ;
-   #ifdef E4ANALYZE
-      if ( connection == 0 )
-      {
-         error4( c4, e4struct, E94411 ) ;
-         return 0 ;
-      }
-   #endif
-
-   connection4assign( connection, CON4RELATE_LOCK, 0, 0 ) ;
-   connection4addData( connection, 0, sizeof( CONNECTION4RELATE_LOCK_INFO_IN ), &info ) ;
-   info->relationId = htonl5(relate->relation->relationId) ;
-   rc = connection4repeat( connection, -2, -1, -1, 0 ) ;
-   if ( rc == r4locked )
-      return r4locked ;
-   if ( rc < 0 )
-      return connection4error( connection, c4, rc, E94411 ) ;
-
-   if ( rc == 0 )  /* add locks */
-   {
-      if ( connection4len( connection ) < sizeof(CONNECTION4RELATE_LOCK_INFO_OUT) )
-         return error4( c4, e4packetLen, E94411 ) ;
-      out = (CONNECTION4RELATE_LOCK_INFO_OUT *)connection4data( connection ) ;
-      countN = ntohs5(out->count) ;
-      if ( connection4len( connection ) != (long)sizeof(CONNECTION4RELATE_LOCK_INFO_OUT) + countN * sizeof( CONNECTION4RELATE_LOCK_SUB_DATA ) )
-         return error4( c4, e4packetLen, E94411 ) ;
-      subData = (CONNECTION4RELATE_LOCK_SUB_DATA *)( (char *)connection4data( connection ) + sizeof( CONNECTION4RELATE_LOCK_INFO_OUT ) ) ;
-      for( count = countN ; count > 0 ; count-- )
-      {
-         data = tran4data( code4trans( c4 ), ntohl5(subData->serverId), ntohl5(subData->clientId) ) ;
-         if ( data == 0 )
-            return error4( c4, e4relate, E94411 ) ;
-         if ( data->dataFile->fileLock != 0 )
-         {
-            if ( data->dataFile->fileLock != data )
-               return error4( c4, e4info, E94411 ) ;
-         }
-         else
-            data->dataFile->fileLock = data ;
-         subData++ ;
-      }
-   }
-
-   return rc ;
-}
-
-#endif /* S4OLD_RELATE_LOCK */
-#endif /* S4CB51 */
-
-#else /* S4CLIENT else */
-
 
 
 #ifdef S4OLD_RELATE_LOCK
 
-/* S4OLD_RELATE_LOCK, not S4CLIENT */
+/* S4OLD_RELATE_LOCK */
 int S4FUNCTION relate4lock( RELATE4 *relate )
 {
    #ifdef S4SINGLE
@@ -2145,7 +1827,7 @@ static int relate4lookupRecno( RELATE4 *relate, const signed char direction, S4L
 
 #ifndef S4OFF_INDEX
 
-/* not S4OFF_INDEX, not S4CLIENT */
+/* not S4OFF_INDEX */
 static int relate4updateScanValue( RELATE4 *slaveRelate, void *ptr, int len )
 {
    /* updates the value being used for scanning.  This is done either when a lookup is
@@ -2182,7 +1864,7 @@ static int relate4updateScanValue( RELATE4 *slaveRelate, void *ptr, int len )
 
 
 
-/* not S4OFF_INDEX, not S4CLIENT */
+/* not S4OFF_INDEX */
 static int relate4evaluateMasterExpression( RELATE4 *relate, char **ptr )
 {
    /* evaluates the master expression and returns the result in ptr and returns the
@@ -2192,10 +1874,6 @@ static int relate4evaluateMasterExpression( RELATE4 *relate, char **ptr )
     */
 
    // AS Oct 12/06 - ensure the context is set...
-   #ifndef S4CLIENT
-      expr4context( relate->masterExpr, relate->master->data ) ;
-   #endif
-
    int len = expr4key( relate->masterExpr, ptr, relate->dataTag->tagFile ) ;
    if ( len < 0 )
       return -1 ;
@@ -2205,9 +1883,7 @@ static int relate4evaluateMasterExpression( RELATE4 *relate, char **ptr )
       // used may or may not be nullable, and the tag we are seeking on may or may not be nullable.
       // we need these to be consistent, so modify the key as appropriate...
       // AS Nov 15/07 - also need to set the expression context for the Tag's expression...
-      #ifndef S4CLIENT
          expr4context( relate->dataTag->tagFile->expr, relate->data ) ;
-      #endif
 
       if ( expr4nullLow( relate->masterExpr, 0 ) )
       {
@@ -2430,7 +2106,7 @@ static int relate4tagSeek( RELATE4 *relate, TAG4FILE *tagFile, const char *seekK
 
 
 
-/* not S4OFF_INDEX, not S4CLIENT */
+/* not S4OFF_INDEX */
 /* LY 2001/07/21 : changed recno to S4LONG for 64-bit */
 static int relate4lookupTag( RELATE4 *relate, const signed char direction, S4LONG *recno )
 {
@@ -2641,9 +2317,6 @@ static int relate4lookup( RELATE4 *relate, const signed char direction )
    return relate4lookupError( relate, direction, recno ) ;
 }
 
-#endif /* S4CLIENT else */
-
-
 
 RELATE4 *relate4lookupRelate( RELATE4 *relate, const DATA4 *d4 )
 {
@@ -2681,9 +2354,6 @@ int S4FUNCTION relate4matchLen( RELATE4 *relate, const int matchLenIn )
       return e4codeBase ;
 
    matchLen = matchLenIn ;
-   #ifndef S4CLIENT
-      expr4context( relate->masterExpr, relate->master->data ) ;
-   #endif
    /* AS 03/01/99 --> if tag len is less than master expr len, scan relations do not work
       correctly becuase the key len is less than the compared length after the first match.
       Also see docs, where match len is the least of the 2 lengths...
@@ -2691,9 +2361,6 @@ int S4FUNCTION relate4matchLen( RELATE4 *relate, const int matchLenIn )
       len = expr4keyLen( relate->masterExpr ) ;
    */
 
-   #ifdef S4CLIENT
-      len = expr4keyLen( relate->masterExpr ) ;
-   #else
       #ifndef S4OFF_INDEX
          if ( relate->dataTag != 0 )
          {
@@ -2715,7 +2382,6 @@ int S4FUNCTION relate4matchLen( RELATE4 *relate, const int matchLenIn )
          else
       #endif
             len = expr4keyLen( relate->masterExpr ) ;
-   #endif
 
    #ifdef S4CLIPPER
       if ( matchLen <= 0 )
@@ -2732,7 +2398,6 @@ int S4FUNCTION relate4matchLen( RELATE4 *relate, const int matchLenIn )
       }
    #endif
 
-   #ifndef S4CLIENT
       #ifndef S4OFF_INDEX
          #ifndef S4CLIPPER
             if ( relate->dataTag )
@@ -2740,12 +2405,10 @@ int S4FUNCTION relate4matchLen( RELATE4 *relate, const int matchLenIn )
                   return error4( relate->codeBase, e4relate, E84412 ) ;
          #endif
       #endif
-   #endif
 
    if ( matchLen > len )
       matchLen = len ;
 
-   #ifndef S4CLIENT
       #ifndef S4OFF_INDEX
          if ( relate->dataTag )
          {
@@ -2755,7 +2418,6 @@ int S4FUNCTION relate4matchLen( RELATE4 *relate, const int matchLenIn )
                matchLen = len ;
          }
       #endif
-   #endif
 
    relate->matchLen = matchLen ;
    relate4changed( relate ) ;
@@ -2825,7 +2487,6 @@ int S4FUNCTION relate4next( RELATE4 **ptrPtr )
 
 
 
-#ifndef S4CLIENT
    static int relate4nextRecordInScan( RELATE4 *relate )
    {
       S4LONG nextRec ;  /* LY 2001/07/21 : changed from long for 64-bit */
@@ -3045,8 +2706,6 @@ int S4FUNCTION relate4next( RELATE4 **ptrPtr )
    }
 
 
-
-   /* !S4CLIENT */
    static int relate4currentIsChild( RELATE4 *parent )
    {
       /* returns 1 if the current relation set is a child (or is itself) of the input relation */
@@ -3067,9 +2726,6 @@ int S4FUNCTION relate4next( RELATE4 **ptrPtr )
       }
    }
 
-
-
-   /* !S4CLIENT */
    static int relate4parent( RELATE4 *parent, RELATE4 *child )
    {
       /* returns 1 if the parent is above the child at any level (grandparent, etc) */
@@ -3086,9 +2742,6 @@ int S4FUNCTION relate4next( RELATE4 **ptrPtr )
       }
    }
 
-
-
-   /* !S4CLIENT */
    static int relate4nextRelationList( RELATION4 *relation, int setup )
    {
       /* returns 1 if done, 0 if positioned to a new relate */
@@ -3161,9 +2814,6 @@ int S4FUNCTION relate4next( RELATE4 **ptrPtr )
       return relate4nextRelationList( relation, setup ) ;
    }
 
-
-
-   /* !S4CLIENT */
    static int relate4nextScanRecord( RELATION4 *relation )
    {
       RELATE4 *relate ;
@@ -3229,9 +2879,6 @@ int S4FUNCTION relate4next( RELATE4 **ptrPtr )
       }
    }
 
-
-
-   /* !S4CLIENT */
    static int relate4prevRelationList( RELATION4 *relation, int setup )
    {
       /* returns 1 if done, 0 if positioned to a new relate */
@@ -3327,9 +2974,6 @@ int S4FUNCTION relate4next( RELATE4 **ptrPtr )
       return relate4prevRelationList( relation, setup ) ;
    }
 
-
-
-   /* !S4CLIENT */
    static int relate4prevRecordInScan( RELATE4 *relate )
    {
       S4LONG nextRec ;  /* LY 2001/07/21 : changed from long for 64-bit */
@@ -3529,8 +3173,6 @@ int S4FUNCTION relate4next( RELATE4 **ptrPtr )
    }
 
 
-
-   /* !S4CLIENT */
    static int relate4prevScanRecord( RELATION4 *relation )
    {
       RELATE4 *relate ;
@@ -3698,7 +3340,6 @@ int S4FUNCTION relate4next( RELATE4 **ptrPtr )
          }
       }
    }
-#endif /* !S4CLIENT */
 
 
 
@@ -3788,7 +3429,6 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
 
 
 
-#ifndef S4CLIENT
    int relate4readIn( RELATE4 *relate )
    {
       int rc ;
@@ -3810,7 +3450,6 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
 
 
 
-   /* !S4CLIENT */
    static int relate4readRest( RELATE4 *relate, signed char direction )
    {
       /* direction : -1 = look backwards, 0 = lookup only, 1 = look forwards */
@@ -3949,8 +3588,6 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
    }
 
 
-
-   /* !S4CLIENT */
    static void relate4setNotRead( RELATE4 *relate )
    {
       RELATE4 *slaveOn ;
@@ -3967,7 +3604,6 @@ int S4FUNCTION relate4querySet( RELATE4 *relate, const char *expr )
          }
       }
    }
-#endif
 
 
 
@@ -4192,7 +3828,6 @@ static int relate4skipInternal( RELATE4 *relate, const long numSkip )
 {
    int rc ;
    long numskip ;
-   #ifndef S4CLIENT
       int sortStatus, rc2 ;
       signed char sign ;
       #ifdef S4REPORT
@@ -4205,7 +3840,6 @@ static int relate4skipInternal( RELATE4 *relate, const long numSkip )
       #ifndef S4SINGLE
          char oldReadLock ;
       #endif
-   #endif
 
    CODE4 *c4 = relate->codeBase ;
    if ( error4code( c4 ) < 0 )
@@ -4220,68 +3854,6 @@ static int relate4skipInternal( RELATE4 *relate, const long numSkip )
          return error4( c4, e4relate, E84417 ) ;
    }
 
-   #ifdef S4CLIENT
-      #ifdef E4ANALYZE
-         if ( relate->data == 0 )
-            return error4( c4, e4struct, E94418 ) ;
-         if ( relate->data->dataFile == 0 )
-            return error4( c4, e4struct, E94418 ) ;
-      #endif
-
-      rc = relate4flush( relate ) ;
-      if ( rc )
-         return rc ;
-
-      assert5port( "new client/server functionality to fetch relation records in batches" ) ;
-      // AS Apr 12/02 block reading of records for relate skip...
-      if ( relation->readRecsToBuf > 0 )
-      {
-         // check to see if the buffers have been allocated
-         if ( relation->readAdvanceBuf == 0 )
-            relation4readBufferAlloc( relation, relation->doMemos ) ;
-
-         long skipOffset = 0 ;
-         // check if we have the record bufferred
-         long curPos = relation->readBufPos ;
-         // AS Apr 23/03 - Was not considering case where relate4readBuffer() was called after relate4top()
-         // check to see if we are valid at this point
-         if ( curPos != -1 )    // -1 means buffer has been reset, and is empty.  Don't need to recalculate
-         {
-            if ( relation->readBufDirection == 1 )  // reading forwards...
-               curPos += numSkip ;
-            else
-               curPos -= numSkip ;
-
-            if ( curPos < relation->readBufNum && curPos >= 0 )  // in buffer
-               return relation4skipFetchFromBuffer( relation, curPos ) ;
-
-            int direction = 1 ;
-            if ( numSkip < 0 )
-               direction = -1 ;
-            if ( relate->relation->readBufDirection != direction )
-            {
-               // case where we read the buffer in one direction but we are now skipping in the other
-               // direction.  This is a special case because we don't want to continue reading the next
-               // set in the same direction in the buffer.  Instead what we need to do is to skip
-               // in the other direction in the buffer and then change direction...
-               // AS Aug 26/02 - Not correct - if we change directions, we also need to
-               // adjust the skipOffset by 1 less to ensure that we fetch the row we need
-               // otherwise, since we normally start fetching AFTER the row, we will miss a record
-               skipOffset = (relate->relation->readBufNum - 1) * direction ;
-               numskip += relation->readBufPos ;   // adjust by subtracting the size of the input buffer from the amount to skip
-            }
-            else  // AS Apr 24/07 - wasn't taking into account that if we are skipping > 1, we don't need to fetch as many forward into the relation
-            {
-               numskip -= (relation->readBufNum - relation->readBufPos - 1 ) ;   // adjust by subtracting the size of the input buffer from the amount to skip
-            }
-
-            relation4readBufferReset( relation, 0 ) ;
-         }
-         return relation4skipFetchMultiple( relation, numskip, 0, skipOffset ) ;
-      }
-      else
-         return relation4skipFetchSingle( relation, numskip ) ;
-   #else
       if ( numskip < 0 )
          sign = -1 ;
       else
@@ -4454,22 +4026,17 @@ static int relate4skipInternal( RELATE4 *relate, const long numSkip )
       {
          if ( rc == r4eof )
          {
-            #ifndef S4CLIENT
                // AS 10/23/00 - in client/server, the client registers EOF if the
                // data recNum is > than the # of recs in the table, so put the recnum
                // forward to this value in the server case so it is returned out correctly
                d4goEof( relate->data ) ;
-            #endif
             relate->relation->sortEofFlag = r4eof ;
          }
-         #ifndef S4CLIENT
             if ( rc == r4bof )
                d4goBof( relate->data ) ;
-         #endif
       }
 
       return rc ;
-   #endif
 }
 
 
@@ -4527,38 +4094,33 @@ static void relate4sortFree( RELATION4 *relation, const int deleteSort )
    if ( relation == 0 )
       return ;
 
-   #ifndef S4CLIENT
       sort4free( &relation->sort ) ;
       u4free( relation->otherData ) ;
       relation->otherData = 0 ;
       // AS Sep 3/03 - If the file handle is invalid but the file exists (is temporary in-memory) close as well.
-      if ( relation->sortedFile.hand != INVALID4HANDLE || ( relation->sortedFile.isTemporary == 1
+      if ( relation->sortedFile.hand != INVALID4HANDLE
+      || ( relation->sortedFile.isTemporary == 1
          #ifndef S4OFF_OPTIMIZE  // LY Dec 9/03
             && relation->sortedFile.fileCreated == 0
          #endif
-         ) )
+        ) )
          file4close( &relation->sortedFile ) ;
       r4dataListFree( &relation->sortDataList ) ;
       relation->inSort = 0 ;
-   #endif
    if ( deleteSort )
    {
       u4free( relation->sortSource ) ;
       relation->sortSource = 0 ;
-      #ifndef S4CLIENT
          if ( relation->sortExpr != 0 )
          {
             expr4free( relation->sortExpr ) ;
             relation->sortExpr = 0 ;
          }
-      #endif
    }
 }
 
 
 
-#ifndef S4CLIENT
-   /* !S4CLIENT */
    static int relate4sort( RELATE4 *relate )
    {
       int rc, i, sortLen ;
@@ -4793,9 +4355,6 @@ static void relate4sortFree( RELATION4 *relation, const int deleteSort )
       return 0 ;
    }
 
-
-
-   /* !S4CLIENT */
    static int relate4sortGetRecord( RELATION4 *relation, const long num, char *sortedKey, Bool5 repositionTables, long *masterRecno )
    {
       // AS Apr 5/02 - added support for leaving the relation status unchanged, to allow positioning within relate4doAll
@@ -4956,8 +4515,6 @@ static void relate4sortFree( RELATION4 *relation, const int deleteSort )
       return 0 ;
    }
 
-
-
    // AS Jun 24/02 - New function to skip forward in the master table only
    static int relate4sortSkipMaster( RELATION4 *relation, long numSkip )
    {
@@ -4994,8 +4551,6 @@ static void relate4sortFree( RELATION4 *relation, const int deleteSort )
       // and now do the sort with actually position the records
       return relate4sortGetRecord( relation, relation->sortRecOn, 0, 1, 0 ) ;
    }
-
-
 
    /* !S4CLIENT */
    static int relate4sortSeek( RELATION4 *relation )
@@ -5136,8 +4691,6 @@ static void relate4sortFree( RELATION4 *relation, const int deleteSort )
       return r4eof ;  // not found and reached end of sort...
    }
 
-
-
    /* !S4CLIENT */
    static int relate4sortNextRecord( RELATION4 *relation )
    {
@@ -5154,8 +4707,6 @@ static void relate4sortFree( RELATION4 *relation, const int deleteSort )
       return rc ;
    }
 
-
-
    /* !S4CLIENT */
    static int relate4sortPrevRecord( RELATION4 *relation )
    {
@@ -5169,7 +4720,6 @@ static void relate4sortFree( RELATION4 *relation, const int deleteSort )
          relation->sortRecOn-- ;
       return rc ;
    }
-#endif
 
 
 
@@ -5196,14 +4746,12 @@ int S4FUNCTION relate4sortSet( RELATE4 *relate, const char *expr )
    u4free( relation->sortSource ) ;
    relation->sortSource = 0 ;
 
-   #ifndef S4CLIENT  /* LY 2002/06/27 */
       // AS Jun 21/02 - After timmerman change's, free sorts...
       if ( relation->sortExpr != 0 )
       {
          expr4free( relation->sortExpr ) ;
          relation->sortExpr = 0 ;
       }
-   #endif
 
    if ( expr )
    {
@@ -5243,7 +4791,6 @@ int S4FUNCTION relate4sortSetTag( RELATE4 *relate, TAG4 *tag )
 
 
 
-#ifndef S4CLIENT
    static int relate4topInit( RELATE4 *relate )
    {
       RELATION4 *relation ;
@@ -5336,8 +4883,6 @@ int S4FUNCTION relate4sortSetTag( RELATE4 *relate, TAG4 *tag )
 
       return 0 ;
    }
-#endif
-
 
 
 int S4FUNCTION relate4top( RELATE4 *relate )
@@ -5530,7 +5075,7 @@ int S4FUNCTION relate4top( RELATE4 *relate )
          relate4log( relate, buf ) ;
       #endif
       return rc ;
-   #endif
+//   #endif JACS !!!
 }
 
 
@@ -5622,212 +5167,6 @@ int S4FUNCTION relate4retain( RELATE4 *relate, int flag )
 #endif
 
 
-
-#ifdef S4CLIENT
-   static void relation4batchReadFree( RELATION4 *relation )
-   {
-      if ( relation->readAdvanceBuf != 0 )
-      {
-         u4free( relation->readAdvanceBuf ) ;
-         relation->readAdvanceBuf = 0 ;
-      }
-      if ( relation->memos != 0 )
-      {
-         MEMO4BATCH *relateOn = relation->memos ;
-         for ( int onEntry = relation->readRecsToBuf - 1 ; onEntry >= 0 ; onEntry-- )
-         {
-            if ( relation->memos != 0 )
-            {
-               for ( int onMemo = relation->numMemos - 1 ; onMemo >= 0 ; onMemo -- )
-               {
-                  if ( relateOn->memos[onMemo].contents != 0 )
-                  {
-                     u4free( relateOn->memos[onMemo].contents ) ;
-                     relateOn->memos[onMemo].contents = 0 ;
-                     relateOn->memos[onMemo].contentsLen = 0 ;
-                     relateOn->memos[onMemo].contentsAllocLen = 0 ;
-                  }
-               }
-            }
-            relateOn++ ;
-         }
-
-         u4free( relation->memos ) ;
-         relation->memos = 0 ;
-         if ( relation->memoBatchEntry != 0 )
-         {
-            u4free( relation->memoBatchEntry ) ;
-            relation->memoBatchEntry = 0 ;
-         }
-         relation->numMemos = 0 ;
-      }
-   }
-
-
-
-   static int relation4readBufferAlloc( RELATION4 *relation, short doMemos )
-   {
-      // used to set up the buffers for read-bufferrring
-      long len = sizeof( long ) ;
-
-      int numMemos = 0 ;
-
-      CODE4 *c4 = relation->relate.codeBase ;
-
-      // calculate the length of the relate record (combines all slaves...)
-      for( RELATE4 *relateOn = &relation->relate ;; )
-      {
-         len += dfile4recWidth( relateOn->data->dataFile ) + sizeof( long ) + 2 * sizeof( short ) ;  // also store the record number and bof/eof markers ...
-         if ( doMemos == 1 )
-            numMemos += relateOn->data->dataFile->nFieldsMemo ;
-         if ( relate4next( &relateOn ) == 2 )
-            break ;
-      }
-
-      relation->readRecLen = len ;
-      relation->readAdvanceBuf = (char *)u4allocFree( c4, len * relation->readRecsToBuf ) ;
-      if ( relation->readAdvanceBuf == 0 )
-         return e4memory ;
-
-      if ( doMemos != 0 && numMemos != 0 )
-      {
-         relation->numMemos = numMemos ;
-         // allocate memory for memo fields
-         relation->memos = (MEMO4BATCH *)u4allocFree( c4, relation->readRecsToBuf * sizeof( MEMO4BATCH ) ) ;
-         if ( relation->memos == 0 )
-         {
-            relation4batchReadFree( relation ) ;
-            return e4memory ;
-         }
-
-         relation->memoBatchEntry = (MEMO4BATCH_ENTRY *)u4allocFree( c4, relation->readRecsToBuf * sizeof( MEMO4BATCH_ENTRY ) * numMemos ) ;
-         if ( relation->memoBatchEntry == 0 )
-         {
-            relation4batchReadFree( relation ) ;
-            return e4memory ;
-         }
-         // and set up the memo entries
-         for ( int memoLoop = 0 ; memoLoop < relation->readRecsToBuf ; memoLoop++ )
-         {
-            relation->memos[memoLoop].memos = relation->memoBatchEntry + (numMemos * memoLoop) ;
-         }
-      }
-
-      return 0 ;
-   }
-
-
-
-   void relation4readBufferReset( RELATION4 *relation, Bool5 doFree )
-   {
-      // used to reset the read buffer to indicate not-read (but leave buffers in place)
-      relation->readBufNum = 0 ;
-      relation->readBufPos = -1 ;
-//      relation->readBufRecNoOn = -1 ;
-      relation->readBufDirection = 0 ;
-      if ( doFree == 1 )
-      {
-         if ( relation->readAdvanceBuf != 0 )
-         {
-            relation4batchReadFree( relation ) ;
-            relation->readAdvanceBuf = 0 ;
-            relation->readRecLen = 0 ;
-         }
-      }
-      // data->readBufRcSave = 0 ;
-   }
-
-
-/* AS Apr 11/02 - New function for advance-reading client/server */
-S4EXPORT long S4FUNCTION relate4readBuffer( RELATE4 *relate, long numRecsToBuf, short doMemos )
-{
-   // LY Jul 20/04 : added !S4MACINTOSH
-   #if !defined( S4LUPACH ) && !defined( S4MACINTOSH )   /* LY July 7/03 */
-      assert5port( "new client/server function for batch reading of relate records" ) ;
-   #endif
-
-   // LY Jul 20/04 : added !S4MACINTOSH
-   /* LY July 7/03 : added !S4LUPACH */
-   #if defined( S4CLIENT ) && !defined( S4LUPACH ) && !defined( S4MACINTOSH )
-      #ifdef E4PARM_HIGH
-         if ( relate == 0 )
-            return error4( 0, e4parm_null, E94410 ) ;
-         if ( numRecsToBuf < -1 )
-            return error4( 0, e4parm, E94410 ) ;
-      #endif
-      #ifdef E4VBASIC
-         if ( c4parm_check( relate, 5, E94410 ) )
-            return -1 ;
-      #endif
-
-      RELATION4 *relation = relate->relation ;
-
-      if ( error4code( relate->codeBase ) < 0 )
-         return e4codeBase ;
-
-      // AS May 2/02  - Relax This Constraint
-      // if ( code4indexFormat( relate->codeBase ) != r4cdx )
-      //    return error4( relate->codeBase, e4notSupported, E90913 ) ;
-
-      if ( numRecsToBuf == -1 )
-         return relation->readRecsToBuf ;
-
-      // AS May 22/02 - New functionality, if numRecsToBuf == 1, doMemos indicates what should happen
-      // for memo field transferrance on single record read transfers (relate4skip/relate4top/relate4bottom)
-      // in this case, only this functionality is affected
-      if ( numRecsToBuf == 1 )
-      {
-         relation->includeMemos = 1 ;
-         return 0 ;
-      }
-
-      if ( numRecsToBuf == 0 )
-      {
-         if ( relation->readRecsToBuf != 0 )
-         {
-            assert5( relation->readRecsToBuf != 0 ) ;
-            relation4batchReadFree( relation ) ;
-            relation->readAdvanceBuf = 0 ;
-            // relation->readAdvanceBufRecs = 0 ;
-            relation->readRecsToBuf = 0 ;
-            relation4readBufferReset( relation, 0 ) ;
-         }
-         assert5( relation->readRecsToBuf == 0 ) ;
-         return relation->readRecsToBuf ;
-      }
-
-      if ( relation->readRecsToBuf != 0 )  // posibly need to reset buffer
-      {
-         if( relation->readRecsToBuf < numRecsToBuf )  // if >= just re-use existing buffer
-         {
-            // in this instance we need to set up the bufferring...
-            relation4batchReadFree( relation ) ;
-            relation->readAdvanceBuf = 0 ;
-         }
-      }
-
-      relation->readRecsToBuf = numRecsToBuf ;
-      if ( relation->readAdvanceBuf == 0 )
-      {
-         int rc = relation4readBufferAlloc( relation, doMemos ) ;
-         if ( rc != 0 )
-         {
-            relation->readRecsToBuf = 0 ;
-            return rc ;
-         }
-      }
-
-      relation->doMemos = (unsigned char)doMemos ;
-      relation4readBufferReset( relation, 0 ) ;
-      return relation->readRecsToBuf ;
-   #else
-      return 0 ;  // CS 2002/04/24 Always export this function
-   #endif
-}
-
-
-
-#ifndef S4CLIENT
    Bool5 relate4countCanApprox( RELATE4 *relate )
    {
       // returns whether or not can approximate count without doing real count.
@@ -5861,11 +5200,9 @@ S4EXPORT long S4FUNCTION relate4readBuffer( RELATE4 *relate, long numRecsToBuf, 
 
       return 1 ;
    }
-#endif /* !S4CLIENT */
 
 
 
-#ifndef S4CLIENT
    // AS Jun 24/02 - New optimized function to count the number of records in the relation
    static unsigned long S4FUNCTION relate4countDo( RELATE4 *relate )
    {
@@ -6005,46 +5342,12 @@ S4EXPORT long S4FUNCTION relate4readBuffer( RELATE4 *relate, long numRecsToBuf, 
 
       return count ;
    }
-#endif /* !S4CLIENT */
 
 
 
 // AS Jun 24/02 - New optimized function to count the number of records in the relation
 unsigned long S4FUNCTION relate4count( RELATE4 *relate )
 {
-   #ifdef S4CLIENT
-      CODE4 *c4 = relate->codeBase ;
-      if ( relate->dataTag != relate->data->tagSelected )
-         relate4changed( relate ) ;
-
-      if ( relate->relation->isInitialized == 0 )
-      {
-         // AS Sept 3/02 - Failing to select tag if relate4bottom() is called instead of relate4top()
-         relate->dataTag = relate->data->tagSelected ;
-         int rc = relate4clientInit( relate ) ;
-         if ( rc != 0 )
-            return rc ;
-      }
-
-      CONNECT4 *connect = c4getClientConnect( c4 ) ;
-
-      connect4sendShort( connect, MSG5RELATE_COUNT ) ;
-      #ifdef S4TESTING
-         // AS Nov 18/02 - allow to not include for tests not using...
-         if ( c4->expectedCount != -1 )
-         {
-            // request a count
-            connect4sendLong( connect, -2L ) ;
-            connect4sendLong( connect, c4->expectedCount ) ;
-         }
-      #endif
-      connect4sendLong( connect, relate->relation->relationId ) ;
-      connect4sendFlush( connect ) ;
-      long count = connect4receiveLong( connect ) ;
-      if ( count < 0 )  // if S4TESTING is defined, sends e4result in case of count mismatch
-         error4( relate->codeBase, count, E94431 ) ;
-      return count ;
-   #else
       RELATION4 *relation = relate->relation ;
 
       if ( relation->countAccurate == 1 )  // count optimization
@@ -6141,7 +5444,6 @@ unsigned long S4FUNCTION relate4count( RELATE4 *relate )
       }
 
       return count ;
-   #endif
 }
 
 
@@ -6157,10 +5459,6 @@ int S4FUNCTION relate4skipMaster( RELATE4 *relate, long numSkip )
    // 1. has a sort - in which case we use special sort skipping functions
    // 2. no sort, but has a query involving a slave or a slave such that master records may be excluded
    // 3. no sort, and no exclusion.
-   #ifdef S4CLIENT
-      CODE4 *c4 = relate->codeBase ;
-      return error4( c4, e4notSupported, E94431 ) ;
-   #else
       #ifdef E4PARM_HIGH
          if ( relate == 0 )
             return error4( 0, e4parm_null, E94431 ) ;
@@ -6244,7 +5542,6 @@ int S4FUNCTION relate4skipMaster( RELATE4 *relate, long numSkip )
       }
 
       return 0 ;
-   #endif
 }
 
 

@@ -32,7 +32,7 @@ int S4FUNCTION code4memoCompress( CODE4 *c4, short flag )
       #endif
 
       // AS Dec 17/03 - both server and stand/alone return non supported in this case
-      #if defined( S4OFF_MEMO ) || ( !defined( S4CLIENT ) && !defined( S4FOX ) ) || !defined( S4COMPRESS )
+      #if defined( S4OFF_MEMO ) || (  !defined( S4FOX ) ) || !defined( S4COMPRESS )
          return error4( c4, e4notSupported, E91020 ) ;
       #else
          c4->compressedMemos = (Bool5)flag ;
@@ -44,56 +44,8 @@ int S4FUNCTION code4memoCompress( CODE4 *c4, short flag )
 
 
 
-#if !defined( S4OFF_MEMO ) && defined( S4CLIENT ) && !defined( S4OFF_WRITE )
-   int S4FUNCTION d4memoCompress( DATA4 *data )
-   {
-      #ifdef E4VBASIC
-         if ( c4parm_check( data, 2, E95201 ) )
-            return -1 ;
-      #endif
 
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parm_null, E95201 ) ;
-      #endif
-
-      CODE4 *c4 = data->codeBase ;
-      if ( error4code( c4 ) < 0 )
-         return e4codeBase ;
-
-      if ( data->readOnly == 1 )
-         return error4describe( c4, e4write, E80606, d4alias( data ), 0, 0 ) ;
-
-      if ( data->dataFile->nFieldsMemo == 0 )
-         return 0 ;
-
-      int rc = d4update( data ) ;
-      if ( rc )
-         return rc ;
-
-      // Apr 25/02 - ensure batched writes get flushed first
-      code4writeBufferFlush( c4 ) ;
-      if ( error4code( c4 ) < 0 )  // check if write buffer flush returned an error
-         return error4code( c4 ) ;
-
-      CONNECTION4 *connection = data->dataFile->connection ;
-      if ( connection == 0 )
-         return error4stack( c4, e4connection, E95201 ) ;
-
-      data->count = -1 ;
-      data->dataFile->numRecs = -1 ;
-      connection4assign( connection, CON4MEMO_COMPRESS, data4clientId( data ), data4serverId( data ) ) ;
-      rc = connection4repeat( connection ) ;
-      if ( rc < 0 )
-         connection4error( connection, c4, rc, E95201 ) ;
-
-      return rc ;
-   }
-#endif /* #if !defined( S4OFF_MEMO ) && defined( S4CLIENT ) && !defined( S4OFF_WRITE ) */
-
-
-
-#if !defined( S4CLIENT ) && !defined( S4OFF_MEMO ) && defined( S4MFOX )
+#if  !defined( S4OFF_MEMO ) && defined( S4MFOX )
    // AS 09/06/99 --> update to unsigned long for large files...
    unsigned long memo4lenPart( MEMO4FILE *f4memo, long memoId )
    {
@@ -117,11 +69,11 @@ int S4FUNCTION code4memoCompress( CODE4 *c4, short flag )
          return x4reverseLong( (void *)&memoBlock.numChars ) ;
       #endif
    }
-#endif /* #if !defined( S4CLIENT ) && !defined( S4OFF_MEMO ) && defined( S4MFOX ) */
+#endif /* #if  !defined( S4OFF_MEMO ) && defined( S4MFOX ) */
 
 
 
-#if !defined( S4CLIENT ) && !defined( S4OFF_MEMO ) && !defined( S4OFF_WRITE )
+#if  !defined( S4OFF_MEMO ) && !defined( S4OFF_WRITE )
    int S4FUNCTION d4memoCompress( DATA4 *data )
    {
       #ifdef E4VBASIC
@@ -419,11 +371,11 @@ int S4FUNCTION code4memoCompress( CODE4 *c4, short flag )
 
       return rc ;
    }
-#endif /* !defined( S4CLIENT ) && !defined( S4OFF_MEMO ) && !defined( S4OFF_WRITE ) */
+#endif /*  !defined( S4OFF_MEMO ) && !defined( S4OFF_WRITE ) */
 
 
 
-#if !defined( S4CLIENT ) && !defined( S4OFF_MEMO ) && !defined( S4MFOX ) && !defined( S4MNDX )
+#if  !defined( S4OFF_MEMO ) && !defined( S4MFOX ) && !defined( S4MNDX )
    int memo4fileChainFlush( MEMO4FILE *f4memo, MEMO4CHAIN_ENTRY *chain )
    {
       if ( chain->toDisk )
@@ -492,11 +444,11 @@ int S4FUNCTION code4memoCompress( CODE4 *c4, short flag )
 
       return 0 ;
    }
-#endif /* if !defined( S4CLIENT ) && !defined( S4OFF_MEMO ) && !defined( S4MFOX ) && !defined( S4MNDX ) */
+#endif /* !defined( S4OFF_MEMO ) && !defined( S4MFOX ) && !defined( S4MNDX ) */
 
 
 
-#if !defined( S4CLIENT ) && !defined( S4OFF_MEMO ) && !defined( S4OFF_MULTI )
+#if  !defined( S4OFF_MEMO ) && !defined( S4OFF_MULTI )
    int d4validateMemoIds( DATA4 *data )
    {
       /* Make the memo file entries current */
@@ -539,4 +491,4 @@ int S4FUNCTION code4memoCompress( CODE4 *c4, short flag )
       data->memoValidated = 1 ;
       return 0 ;
    }
-#endif /* #if !defined( S4CLIENT ) && !defined( S4OFF_MEMO ) && !defined( S4OFF_MULTI ) */
+#endif /* #if  !defined( S4OFF_MEMO ) && !defined( S4OFF_MULTI ) */

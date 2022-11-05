@@ -1488,11 +1488,9 @@ void *encrypt4encryptInitHook( PREPROCESS4 *encrypt, CODE4 *c4, const void *key,
    encrypt->c4 = c4 ;
    encrypt->isInitialized = 1 ;
    // AS Sep 2/03 - not available in client
-   #ifndef S4CLIENT
       #ifdef S4ENCRYPT_FILE
          InitializeCriticalSection( &(encrypt->fileEncryptedCritical) ) ;
       #endif
-   #endif
    return rijn ;
 }
 
@@ -1512,14 +1510,11 @@ void encrypt4encryptInitUndoHook( PREPROCESS4 *encrypt, void *encryptInit )
    if ( encrypt->isInitialized == 1 )
    {
       // AS Sep 2/03 - not available in client
-      #ifndef S4CLIENT
          #ifdef S4ENCRYPT_FILE
             DeleteCriticalSection( &(encrypt->fileEncryptedCritical) ) ;
          #endif
-      #endif
       delete ((CRijndael *)encryptInit) ;
       // AS Sep 2/03 - not available in client
-      #ifndef S4CLIENT
          #ifdef S4ENCRYPT_FILE
             if ( encrypt->fileEncryptedBuffer != 0 )
             {
@@ -1528,7 +1523,6 @@ void encrypt4encryptInitUndoHook( PREPROCESS4 *encrypt, void *encryptInit )
                encrypt->fileEncryptedBufferLen = 0 ;
             }
          #endif
-      #endif
       encrypt->isInitialized = 0 ;
    }
 }

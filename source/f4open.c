@@ -938,7 +938,7 @@ int S4FUNCTION file4openInternal( FILE4 *file, CODE4 *c4, S4CONST char *name, co
    #endif
 
    file->type = (char)fileType ;
-   #if defined( S4PREPROCESS_FILE ) && !defined( S4CLIENT )
+   #if defined( S4PREPROCESS_FILE )
       #ifdef S4ENCRYPT_DLL // LY Jul 19/04
          if ( c4->encrypt != 0 )
       #else
@@ -991,7 +991,7 @@ int S4FUNCTION file4compressOpen( FILE4 *file, CODE4 *c4, S4CONST char *name )
 {
    // AS Mar 23/04 - only in fox...
    // AS May 17/04 - client/server functionality to copmress the data file...
-   #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+   #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
       int rc = file4openInternal( file, c4, name, 0, OPT4OTHER ) ;  // also checks input paramaters
       if ( rc != 0 )
          return rc ;

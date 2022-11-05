@@ -32,12 +32,12 @@ typedef short BOOL4  ;
 /* the various collation types in terms of their characteristics */
 /* this can either be used as the entry directly or as a bit mask. */
 enum Collate4type
-{ collate4machineByteOrder = 0
-, collate4simple = 1
-, collate4subSort = 2
-, collate4compress = 4
+{ collate4machineByteOrder= 0
+, collate4simple          = 1
+, collate4subSort         = 2
+, collate4compress        = 4
 , collate4subSortCompress = 6   /* subSort + compress */
-, collate4unknown = 16        /* unloaded/unknow sequences */
+, collate4unknown         = 16        /* unloaded/unknow sequences */
 } ;
 
 
@@ -58,8 +58,9 @@ typedef struct /* 1 entry of this struct object for every collation we support *
    // note that we need # of chars, not # bytes else cannot support expansion properly.
    unsigned short keySizeCharPerCharAdd ;
 
-   // the character which indicates expansion/compression
-   unsigned short expandOrCompressChar ;
+
+   unsigned short expandOrCompressChar ; // the character which indicates expansion/compression
+
    // unsigned short expandOrCompressUnicode ; - not needed.  For both char/unicode, use the char
    // value becuase it will be otherwise unused.  For unicode, only unicode value use
 
@@ -85,32 +86,33 @@ typedef struct /* 1 entry of this struct object for every collation we support *
 
 
 
+/*   these numbers must correspond 1 to 1 with the array entry # in collationArray and
+ *
+ *     the record # in the collation info table.
+ *     the formula is:  Collate4name == record # in collation info table
+ *                      Collaet4name - 1 == array entry number in collationArray
+ *     functions are available for this (i.e. #defines):
+ *        collate4arrayIndex( Collate4name collateName )
+ *        collate4infoTableRecno( Collate4name collateName )
+ */
 enum Collate4name
-{
-   /* these numbers must correspond 1 to 1 with the array entry # in collationArray and
-      the record # in the collation info table.
-      the formula is:  Collate4name == record # in collation info table
-                       Collaet4name - 1 == array entry number in collationArray
-      functions are available for this (i.e. #defines):
-         collate4arrayIndex( Collate4name collateName )
-         collate4infoTableRecno( Collate4name collateName )
-   */
-   collate4none = 0,           // if no collation in particular is set...
-   collate4machine = 1,
+{ collate4none    = 0           // if no collation in particular is set...
+, collate4machine = 1
 
-   /* NOTE:  For Unicode, the first 256 characters are identical as CodePage 1252 (i.e. Windows ANSI)
-      Therefore, it is most preferable to use collate4generalCp1252 to sort the first 256 unicode
-      characters in sequence.  The remaining characters get sorted in machine sequence.
-   */
-   collate4generalCp1252 = 2,  // general collation for CodePage 1252
-   collate4generalCp437 = 3,   // general collation for CodePage 437 or 0
-   collate4test = 4,           // test collation.  Users may use this one for customized ones...
-   collate4croatianCp1250     = 5, // Croatian Collation for CodeBase 1250
-   collate4croatianUpperCp1250= 6,  // Upper Case Croatian Collation for CodeBase 1250
-   collate4generalCp850       = 7,     // general collation for CodePage 850
-   collate4avaya1252          = 8,  // LY Nov 29/04 : custom collation for Avaya (case-insensitive & accent-insensitive)
-   collate4spanishCp1252      = 9,          // 2nd test collation (if multiple code pages required as an example).  Users may use this one for customized ones...
-   collate4spanishCp850       = 10,          // 2nd test collation (if multiple code pages required as an example).  Users may use this one for customized ones...
+/* NOTE:  For Unicode, the first 256 characters are identical as CodePage 1252 (i.e. Windows ANSI)
+    Therefore, it is most preferable to use collate4generalCp1252 to sort the first 256 unicode
+    characters in sequence.  The remaining characters get sorted in machine sequence.
+*/
+
+, collate4generalCp1252      =  2  // general collation for CodePage 1252
+, collate4generalCp437       =  3  // general collation for CodePage 437 or 0
+, collate4test               =  4  // test collation.  Users may use this one for customized ones...
+, collate4croatianCp1250     =  5  // Croatian Collation for CodeBase 1250
+, collate4croatianUpperCp1250=  6  // Upper Case Croatian Collation for CodeBase 1250
+, collate4generalCp850       =  7  // general collation for CodePage 850
+, collate4avaya1252          =  8  // LY Nov 29/04 : custom collation for Avaya (case-insensitive & accent-insensitive)
+, collate4spanishCp1252      =  9  // 2nd test collation (if multiple code pages required as an example).  Users may use this one for customized ones...
+, collate4spanishCp850       = 10  // 2nd test collation (if multiple code pages required as an example).  Users may use this one for customized ones...
 } ;
 
 
@@ -118,19 +120,17 @@ enum Collate4name
 #ifdef S4CLIENT_OR_FOX
    // array model used for single character with subsort
    typedef struct
-   {
-      unsigned char headChar ;  // special character to indicate expansion/compression
+   {  unsigned char headChar ;  // special character to indicate expansion/compression
       unsigned char tailChar ;  // if expansion/compression, an index into the
-                       // expansion/compression array, else valid tail
-                       // character or special character to indicate to tail
-                       // character
+                                // expansion/compression array, else valid tail
+                                // character or special character to indicate to tail
+                                // character
    } Translate4arrayChar ;
 
 
 
    typedef struct
-   {
-      unsigned short headChar ;  // special character to indicate expansion/compression
+   {  unsigned short headChar ;  // special character to indicate expansion/compression
       unsigned char tailChar ;  // if expansion/compression, an index into the
                        // expansion/compression array, else valid tail
                        // character or special character to indicate to tail
@@ -140,8 +140,7 @@ enum Collate4name
 
 
    enum Expansion4orCompression
-   {
-      expand4 = 1,     // means the character expands out to 2 characters (eg. german esstset)
+   {  expand4 = 1,     // means the character expands out to 2 characters (eg. german esstset)
       compress4 = 2,   // means the character if followed by another special character, compresses to 1 character (eg. spanish 'll' and 'ch')
       done4 = 3        // means reached end of array - sometimes need to count # elements of array.
    } ;
@@ -754,7 +753,7 @@ typedef struct FILE4LONG_EXTENDSt
 
 // AS Nov 26/02 - for data file compression
 // AS May 17/04 - server support for data file compression
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+#if defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
    typedef struct
    {
       // the header
@@ -1001,13 +1000,13 @@ typedef struct FILE4St
       int space33 ;
    #endif
 
-   #if defined( S4PREPROCESS_FILE ) && !defined( S4CLIENT )
+   #if defined( S4PREPROCESS_FILE )
       short preprocessed ;     // true if the file is using preprocessing
    #else
       short space34 ;
    #endif
    // AS May 17/04 - server support for data file compression
-   #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+   #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
       // AS Jul 31/03 - support for generic handling of compression
       COMPRESS4HANDLER *compressInfo ;
       Bool5 freeCompressInfo ;  // AS Jan 16/03 - for generic file compression
@@ -1196,12 +1195,9 @@ typedef struct S4CLASS TRAN4St
 
    LIST4 closedDataFiles ;  /* during a transaction */
 
-   #ifdef S4CLIENT
-      int dataIdCount ;    /* client keeps an id on each data4 */
-   #else
       char userId[LEN4TRANS_USERID+1] ;
       char netId[LEN4TRANS_NETID+1] ;
-   #endif
+
 } TRAN4 ;
 
 
@@ -1235,7 +1231,7 @@ typedef struct S4CLASS CODE4TRANSSt
 
    #ifndef S4OFF_TRAN
       int enabled ;
-      #if !defined( S4OFF_WRITE ) && !defined( S4CLIENT )
+      #if !defined( S4OFF_WRITE )
          struct TRAN4FILESt *transFile ;
       #else
          struct TRAN4FILESt *space1 ;
@@ -1710,9 +1706,6 @@ enum TRAN4FILE_STATUS
          /* sturcture used to communicate with the communications thread */
          CONNECT4BUFFER connectBuffer ;
          #ifndef S4OFF_BLAST
-            #ifdef S4CLIENT
-               short numBlasts ; /* Only client needs to know how many */
-            #endif
             LIST4 blastList ; /* currently unused blast connections (CONNECT4BUFFER)*/
          #endif
          #ifdef S4SERVER
@@ -1905,12 +1898,6 @@ typedef void (*ERROR_CALLBACK)
          VOID4PTR_SHORT *conLowSetEncryptRead ;
          SHORT4PTR *conLowGetEncryptWrite ;
          VOID4PTR_SHORT *conLowSetEncryptWrite ;
-         #ifdef S4CLIENT
-            INT4PTR_INT_INT_PTR_PTRPTR_PTRPTR *encryptConnection ;
-         #endif
-      #endif
-      #ifdef S4CLIENT
-         INT4PTR_CPTR_CPTR_PTR_PTRPTR_PTRPTR *serverEncryptInit ;
       #endif
       #ifdef S4PREPROCESS_FILE
          // short encryptFileFlag ;        // should the next open/create use encryption?
@@ -2169,10 +2156,6 @@ typedef struct CODE4St
          int macVol ;
       #endif
 
-      #ifdef S4CLIENT
-         char serverName[S4SERVER_NAME_SIZE] ;  /* name of server client is connected to */
-      #endif
-
       #if defined(E4ANALYZE) || defined(E4VBASIC)  // CS 2000/10/10
          int debugInt ;               /* used to check structure integrity (set to 0x5281) */
       #else
@@ -2365,11 +2348,7 @@ typedef struct CODE4St
             char *lockedNetNameBuf ;
             char *lockedUserName ;
             char *lockedUserNameBuf ;
-            #ifdef S4CLIENT
-               char *lockedFileName ;
-            #else
                const char *lockedFileName ;
-            #endif
             char *lockedFileNameBuf ;
             unsigned int lockedFileNameLen ;
             unsigned int lockedUserNameLen ;
@@ -2380,11 +2359,7 @@ typedef struct CODE4St
             char *space_lockedNetNameBuf ;
             char *space_lockedUserName ;
             char *space_lockedUserNameBuf ;
-            #ifdef S4CLIENT
-               char *space_lockedFileName ;
-            #else
                const char *space_lockedFileName ;
-            #endif
             char *space_lockedFileNameBuf ;
             unsigned int space_lockedFileNameLen ;
             unsigned int space_lockedUserNameLen ;
@@ -2404,17 +2379,12 @@ typedef struct CODE4St
 
       // AS Nov 27/02 - need to track open-for-create for data file compression (do we initialize)
       short openForCreate ;
-      #ifdef S4CLIENT
-         enum index4format indexFormat ;
-         long serverOS ;   // bit mask: OS4UNKNOWN, O__WIN32, OS4LINUX...
-      #else
          int doIndexVerify ;       /* for internal purposes only at this point */
          struct RELATION4St S4PTR *currentRelation ;
 
          // AS Jun 4/04 - Support for index key sizes > I4MAX_KEY_SIZE - make dynamic
          char *savedKey ;  // [I4MAX_KEY_SIZE + 2 * sizeof(S4LONG)] ;       /* used by i4remove.c, i4tag.c and i4addtag.c, i4versionCheck, t4versionCheck */
          unsigned savedKeyLen ;
-      #endif
 
       #ifdef S4OPTIMIZE_STATS
          struct DATA4St *statusDbf ;
@@ -2429,14 +2399,6 @@ typedef struct CODE4St
             LIST4 servers ;       /* list of connected servers */
          #endif
 
-         #ifdef S4CLIENT
-            CONNECTION4 defaultServer ;
-            CONNECT4 clientConnect ;
-            char *savedData ;
-            unsigned savedDataLen ;
-            // AS May 13/02 - communications compression coding
-            Bool5 doCompression;   // true if communications data is being compressed (server drives this)
-         #endif
          int ver4 ;
 
          #ifndef S4OFF_THREAD
@@ -2516,9 +2478,6 @@ typedef struct CODE4St
 
       // AS Jan 9/02 - code written for use via OLE-DB to timeout on accepting a connection (was previously a define
       // set to 300 seconds).
-      #if defined( __WIN32 ) && !defined( S4OFF_THREAD ) && defined( S4CLIENT )
-         long acceptTimeOut ;   // amount of time to wait for server to accept our connection before timing out.
-      #endif
 
       #ifdef TIMER5OUT
          /* case where we want to perform timing of server operations */
@@ -2560,15 +2519,6 @@ typedef struct CODE4St
             // AS Mar 25/04 - requires change for C++ build
             struct REINDEX4STATUSSt *packStatus ;  // if set we are doing a pack status, not a reindex status
          #endif
-      #endif
-
-      #ifdef S4CLIENT
-         // AS 08/22/00 - code for client to client messaging
-         void *recvMessage ;
-         unsigned long recvMessageLen ;
-         // short msgWaitForReceipt ;
-         // short msgTimeout ;
-         // short msgIncludeSelf ;
       #endif
 
       short ignoreCase ;
@@ -2626,11 +2576,6 @@ typedef struct CODE4St
             // AS May 30/03 - enable/disable log flushing - default is enabled. - improves performance (esp. ODBC), maybe cannot recover from crash.
             short logFlush ;
          #endif
-         #ifdef S4CLIENT
-            // special log file for this info
-            FILE4 connLogFile ;
-            Bool5 connLogFileOpen ;
-         #endif
       #endif
 
       #if defined( S4CLIENT_OR_FOX ) && defined( S4COMPRESS )
@@ -2647,18 +2592,12 @@ typedef struct CODE4St
       #endif
 
       // AS Oct 22/02 - make available to be called in multi-user (if user calls directly)
-      #if !defined( S4CLIENT )
          /* AS Sept 14/01 new functionality for validating the tables when CODE4 is initialized */
          struct DATA4St *validationTable ;
-      #endif
       Bool5 odbc ;  // AS Feb 7/03 - New flag to indicate if is odbc at runtime.
       #if ( defined( S4TESTING ) || defined( E4ANALYZE ) ) && !defined( S4SERVER )
          // AS Jun 24/02 - to perform data movement counting for testing
-         #ifdef S4CLIENT
-            unsigned long expectedCount ;
-         #else
             unsigned long testCount ;
-         #endif
       #else
          unsigned long countDummy ;  // AS Aug 12/05 - keep same size...
       #endif
@@ -2696,7 +2635,7 @@ typedef struct CODE4St
    #endif
    // AS Jun 24/04 - support for compress write
    short compressWrite ;                     // set to true to support writing to compressed tables
-   #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+   #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
       unsigned short compressArrayAllocCount ;   // the number of array entries to add when expanding out the write block array - default to 64k worth
    #endif
    // AS Oct 3/06 - need to have a default encryption key for odbc...
@@ -2932,7 +2871,6 @@ typedef struct FIELD4St /* Internal Structure and Field Routines. */
       unsigned int len ;
       S4CONV( unsigned int lenMax, unsigned int len_max ) ;
       FIELD4  S4PTR *field ;
-      #ifndef S4CLIENT
          // AS Jun 23/03 - For ODBC purposes we want to track the id associated with the read field.  In particular
          // this allows us to check, for a read memo, if the FIELD4 is pointing to our memo.
          long memoOffset ;
@@ -2945,7 +2883,6 @@ typedef struct FIELD4St /* Internal Structure and Field Routines. */
          // AS Mar 28/05 - issue here, if the status is set to 0 (memo read), we were not saving the memo.  What we really want to
          // track is whether or not we have already saved the memo...
          Bool5 savedMemo ;
-      #endif
    } F4MEMO ;
 #endif
 
@@ -3027,9 +2964,7 @@ typedef struct
       #endif
       struct DATA4St *data ;
       long recNum ;
-      #ifndef S4CLIENT
          Lock4type lockType ;   // either LOCK4READ or LOCK4WRITE
-      #endif
    } ;
 
 
@@ -3127,11 +3062,9 @@ typedef struct DATA4FILESt
    /**** the next set of lines must remain in order as they are a file view ****/
       /* Database Header Information */
       char version ;               /* 0x31 in file is transformed to 0x30 in memory for easy handling like 0x30 files */
-      #ifndef S4CLIENT
          char     yy ;             /* Last Update */
          char     mm ;
          char     dd ;
-      #endif
       S4LONG   numRecs ;
       unsigned short headerLen ; /* Header Length, Indicates start of data */
       unsigned short recordLen;
@@ -3167,7 +3100,7 @@ typedef struct DATA4FILESt
          MEMO4FILE   memoFile ;   /* Memo file handle */
       #endif
 
-      #if defined( S4FILE_EXTENDED ) && !defined( S4CLIENT )
+      #if defined( S4FILE_EXTENDED )
          // AS 09/13/99 --> track # records before file becomes large...
          unsigned long numRecsBeforeFileLong ;
       #endif
@@ -3218,7 +3151,7 @@ typedef struct DATA4FILESt
    #ifdef S4LOCK_HASH
       Hash4lock *lockHash ;
    #endif
-   #if defined( S4FOX ) && !defined( S4CLIENT )
+   #if defined( S4FOX )
       Bool5 autoIncrementSupported ;
       // AS Mar 11/03 - support for new feature r4autoTimestamp
       Bool5 autoTimestampSupported ;
@@ -3264,11 +3197,32 @@ typedef struct DATA4FILESt
    #endif
    // AS Nov 26/02 - for data file compression
    // AS May 17/04 - server support for data file compression
-   #if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+   #if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
       // AS Jul 31/03 - support for generic handling of compression
       COMPRESS4HANDLER *compressInfo ;
    #endif
 } DATA4FILE ;
+
+// JACS
+
+typedef struct
+{ int contentsAllocLen;
+  void * contents; int contentsLen;
+  void * memos[ 4096 ];
+} MEMO4BATCH_ENTRY;
+
+
+typedef struct
+{ int curRecsToBuf;
+  int writeRecsToBuf;
+
+  int writeDelayBuf;
+  int curWriteBufCount;
+
+  MEMO4BATCH_ENTRY memos[ 4096 ];
+
+} DATA4BATCH_WRITE;
+
 
 
 
@@ -3322,7 +3276,11 @@ typedef struct DATA4St
 
    #ifndef S4OFF_TRAN
       char transChanged ;
+      char logVal  ; // JACS
    #endif
+
+   char useOldMemo;
+   char hasMemoExpr;        // JACS
 
    #ifdef E4VBASIC
       int debugInt ;      /* used to check structure integrity (set to 0x5281) */
@@ -3357,7 +3315,7 @@ typedef struct DATA4St
       // normally lockId == clientId, but for a cloned table the lockId == clientId of the master table
       long lockId ;
    #endif
-   #if !defined(S4OFF_MULTI) && !defined(S4CLIENT) && defined(__cplusplus)
+   #if !defined(S4OFF_MULTI) &&  defined(__cplusplus)
       Single4 lockedRecords ; /* list of LOCK4LINK's in client version, Lock4's in stand-alone/server */
    #endif
    // AS 02/01/01 - Mark in data4 whether was logged so know if need to log the close message
@@ -3371,6 +3329,14 @@ typedef struct DATA4St
    #endif
    // AS Jun 2/03 - If a tag is based on a memo entry and only the memo entry has
    // changed, the record will match.  In that case we want to continue.
+
+// JACS
+   int autoIncrementField;
+   int autoTimestampField;
+   DATA4BATCH_WRITE batchWrite;
+
+   void * nullFlags;
+
 } DATA4 ;
 
 
@@ -3439,7 +3405,6 @@ typedef struct e4exprSt
 
 
 
-#ifndef S4CLIENT
    #ifdef S4CLIPPER
       typedef struct
       {
@@ -3744,9 +3709,6 @@ typedef struct e4exprSt
          /*       'exprFilter[220]' comes at position 0x2FA */
       }  T4HEADER ;
    #endif /* S4MDX */
-#endif /* S4CLIENT */
-
-
 
 
 
@@ -3832,12 +3794,10 @@ typedef struct TAG4FILESt
 
    // AS Sep 15/04 - support removedKeys between TAG4 structures (at least in stand-alone)
    #ifdef SHARE4TAG_REMOVE
-      #ifndef S4CLIENT
          #ifndef S4OFF_TRAN
             LIST4 removedKeys ;     /* list of temporarily removed keys for r4unique and e4unique cases */
          #endif
          int added, removed ;             /* was an entry added, removed */
-      #endif
    #endif
    // AS Oct 12/04 - We need to track the index access name associated with the TAG4FILE in case the indexfile gets opened again.
    // in particular in client/server to keep the index associated with the correct structure in case it is opened again by another client.
@@ -3865,12 +3825,10 @@ typedef struct TAG4St
    #endif
    // AS Sep 15/04 - support removedKeys between TAG4 structures (at least in stand-alone)
    #ifndef SHARE4TAG_REMOVE
-      #ifndef S4CLIENT
          #ifndef S4OFF_TRAN
             LIST4 removedKeys ;     /* list of temporarily removed keys for r4unique and e4unique cases */
          #endif
          int added, removed ;             /* was an entry added, removed */
-      #endif
    #endif
 } TAG4 ;
 
@@ -3954,7 +3912,7 @@ typedef struct INDEX4St
 
 
 
-#if !defined(S4OFF_TRAN) && !defined(S4CLIENT)
+#if !defined(S4OFF_TRAN)
    typedef struct
    {
       LINK4 link ;
@@ -3982,7 +3940,6 @@ typedef struct INDEX4St
 
 
 
-#ifndef S4CLIENT
    /* Memo File Structures */
    typedef struct
    {
@@ -4032,8 +3989,6 @@ typedef struct INDEX4St
          #endif
       } MEMO4BLOCK ;
    #endif  /*  ifndef S4MNDX  */
-#endif  /*  ifndef S4CLIENT  */
-
 
 
 typedef struct
@@ -4113,17 +4068,17 @@ typedef struct ENTRYINFO5st
 #endif
 
 
-#if defined(S4WINCE) || !defined(__oledb_h__)  /* CS 2001/06/20 Win CE defines __oledb_h__ but not DBDATE and DBTIME
-   /* CJ - 03/22/99 - Using OLEDB structures inside the CodeBase DLL normally
-   included by oledb.h instead defined here for convenience */
-   /* CS - 1999/04/05 Changed structure members from USHORT etc. to
-      unsigned short etc. to compile in 16-bit. */
+#if defined(S4WINCE) || !defined(__oledb_h__)
+   /* CS 2001/06/20 Win CE defines __oledb_h__ but not DBDATE and DBTIME */
+   /* CJ - 03/22/99 - Using OLEDB structures inside the CodeBase DLL normally included by oledb.h instead defined here for convenience */
+   /* CS - 1999/04/05 Changed structure members from USHORT etc. to unsigned short etc. to compile in 16-bit. */
 
    typedef struct  tagDBDATE
    {
       short year;
       unsigned short month;
       unsigned short day;
+
    } DBDATE;
 
 
@@ -4133,6 +4088,7 @@ typedef struct ENTRYINFO5st
       unsigned short hour;
       unsigned short minute;
       unsigned short second;
+
    } DBTIME;
 
 

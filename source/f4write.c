@@ -45,7 +45,7 @@
 #endif
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE )
+#if  defined( S4FOX ) && !defined( S4OFF_WRITE )
    #include "zlib.h"
 #endif
 
@@ -115,7 +115,7 @@ unsigned file4writeLowDoInternal( FILE4 *f4, FILE4LONG pos, const void *ptr, uns
          return 0 ;
       }
 
-   #if defined( S4PREPROCESS_FILE ) && !defined( S4CLIENT )
+   #if defined( S4PREPROCESS_FILE )
       CODE4 *c4 = f4->codeBase ;
 
       if ( f4->preprocessed )
@@ -197,7 +197,7 @@ unsigned file4writeLowDoInternal( FILE4 *f4, FILE4LONG pos, const void *ptr, uns
    }
 
    // AS Dec 11/02 - Needed whether delay write or not
-   #if defined( S4PREPROCESS_FILE ) && !defined( S4CLIENT )
+   #if defined( S4PREPROCESS_FILE )
       if ( f4->preprocessed )
          code4filePreprocessDone( f4 ) ;
    #endif
@@ -207,7 +207,7 @@ unsigned file4writeLowDoInternal( FILE4 *f4, FILE4LONG pos, const void *ptr, uns
 
 
 // LY Jan 19/05 : added switches to avoid compiler errors
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+#if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
 static unsigned file4writeCompressDo( FILE4 *f4, FILE4LONG pos, const void *ptr, unsigned len )
 {
    CODE4 *c4 = f4->codeBase ;
@@ -745,7 +745,7 @@ int file4compressUnlock( FILE4 *f4 )
 
 
 // LY Jan 19/05 : added switches, changed #if-else order, to avoid compiler errors
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
+#if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && defined( S4COMPRESS )
    // AS Jun 28/04 - support for compressed writing
    static unsigned file4writeCompress( FILE4 *f4, FILE4LONG pos, const void *ptr, unsigned len )
    {
@@ -778,7 +778,7 @@ static unsigned file4writeLowDo( FILE4 *f4, FILE4LONG pos, const void *ptr, unsi
       critical4sectionEnter( &f4->critical4file ) ;
    #endif
 
-   #if defined( S4PREPROCESS_FILE ) && !defined( S4CLIENT )
+   #if defined( S4PREPROCESS_FILE )
       CODE4 *c4 = f4->codeBase ;
       short blockSize = 0 ;
       if ( f4->preprocessed == 1 )
@@ -1225,15 +1225,11 @@ int file4writeInternal( FILE4 *f4, FILE4LONG pos, const void *ptr, unsigned len 
       if ( f4->codeBase == 0 || file4longError( pos ) < 0 || ( ptr == 0 && len > 0 ) )
          return error4( f4->codeBase, e4parm, E90619 ) ;
       // AS Sep 3/03 - may be invalid if temporary
-      #ifdef S4CLIENT
-         if ( f4->hand == INVALID4HANDLE )
-      #else
          if ( f4->hand == INVALID4HANDLE && ( f4->isTemporary == 0
             #ifndef S4OFF_OPTIMIZE  // LY Dec 9/03
                || f4->fileCreated == 1
             #endif
             ) )
-      #endif
             return error4( f4->codeBase, e4parm, E90619 ) ;
    #endif
 
@@ -1561,7 +1557,7 @@ int file4writeDelayFlush( FILE4 *file, const int doWrite )
 // AS Nov 26/02 - New function for data file compression
 /* LY July 7/03 : added !defined( S4LUPACH ) */
 // AS May 17/04 - client functionality to copmress the data file...
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_WRITE ) && !defined( S4LUPACH )
+#if  defined( S4FOX ) && !defined( S4OFF_WRITE ) && !defined( S4LUPACH )
    int file4copy( FILE4 *to, FILE4 *from )
    {
       // both files must be created and open.

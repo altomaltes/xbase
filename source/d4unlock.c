@@ -21,36 +21,6 @@
    static int d4hasLocks( DATA4 *data, long lockId, long serverId )
    {
       assert5( data != 0 ) ;
-      #ifdef S4CLIENT
-         LOCK4LINK *lock ;
-
-         #ifdef L4LOCK_CHECK
-            at return time, make sure call server to see if the expected lock matches...
-         #endif
-
-         if ( serverId == 0 )   /* likely failed open */
-            return 0 ;
-
-         DATA4FILE *d4file = data->dataFile ;
-         assert5( d4file != 0 ) ;
-         // AS May 27/03 - change for cloned locking, store the lockid/serverid, not the data4 itself
-         // if ( d4file->fileLock != data && d4file->appendLock != data )
-         if ( (d4file->fileLockLockId != data4lockId( data ) || d4file->fileLockServerId != data4serverId( data )) &&
-              (d4file->appendLockLockId != data4lockId( data ) || d4file->appendLockServerId != data4serverId( data )) )
-         {
-            for ( lock = (LOCK4LINK *)(d4file->lockedRecords.initIterate()) ;; )
-            {
-               if ( lock == 0 )
-                  return 0 ;
-               // if ( lock->data == data )
-               if ( lock->serverId == data4serverId( data ) && lock->lockId == data4lockId( data ) )
-                  return 1 ;
-               lock = (LOCK4LINK *)single4next( &lock->link ) ;
-            }
-         }
-
-         return 1 ;
-      #else
          Single4lock *lock ;
 
          if ( serverId == 0 )   /* likely failed open */
@@ -97,7 +67,6 @@
          #else
             return ( (lock == 0) ? 0 : 1 ) ;
          #endif
-      #endif
    }
 #endif /* !S4OFF_MULTI */
 
@@ -110,12 +79,7 @@
       /* lockId if set to 0 will unlock all client instance of the data file,
          if set to a value will only unlock the given client instance */
       CODE4 *c4 ;
-      #ifdef S4CLIENT
-         int rc ;
-         CONNECTION4 *connection ;
-      #else
          int rc, saveUnlockAuto ;
-      #endif
 
       c4 = data->codeBase ;
 
@@ -225,14 +189,7 @@
             return 0 ;
       #endif
 
-      #ifdef S4CLIENT
-         int oldLock = code4unlockAuto( data->codeBase ) ;
-         code4unlockAutoSet( data->codeBase, LOCK4DATA ) ;
-      #endif
       rc = d4unlockDo( data, lockId, doReqdUpdate ) ;
-      #ifdef S4CLIENT
-         code4unlockAutoSet( data->codeBase, oldLock ) ;
-      #endif
 
       return rc ;
    }
@@ -304,13 +261,12 @@ int S4FUNCTION d4unlockAppendInternal( DATA4 *data, long lockId )
 
 
 
-#ifndef S4CLIENT
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
    /* AS Nov 13/02 - export for dot */
    // AS Apr 15/03 - support for new lockId for shared clone locking
-   // !S4CLIENT
+
    int S4FUNCTION d4unlockData( DATA4 *data, long lockId )
    {
       #ifndef S4OFF_MULTI
@@ -343,7 +299,7 @@ int S4FUNCTION d4unlockAppendInternal( DATA4 *data, long lockId )
    #endif
    /* AS Nov 13/02 - export for dot */
    // AS Apr 15/03 - support for new lockId for shared clone locking
-   // !S4CLIENT
+
    int S4FUNCTION d4unlockFile( DATA4 *data, long lockId )
    {
       #ifndef S4OFF_MULTI
@@ -406,7 +362,7 @@ int S4FUNCTION d4unlockAppendInternal( DATA4 *data, long lockId )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
-   // !S4CLIENT
+
    int S4FUNCTION d4unlockRecord( DATA4 *data, long rec )
    {
       #ifndef S4OFF_MULTI
@@ -469,14 +425,12 @@ int S4FUNCTION d4unlockAppendInternal( DATA4 *data, long lockId )
    #endif
    /* AS Nov 13/02 - export for dot */
    // AS Apr 15/03 - support for new lockId for shared clone locking
-   // !S4CLIENT
+
    int S4FUNCTION d4unlockRecords( DATA4 *data, long lockId )
    {
       #ifndef S4OFF_MULTI
-         #ifndef S4CLIENT
             Lock4 *lock ;
             Single4distant singleDistant ;
-         #endif
          #ifdef E4PARM_HIGH
             if ( data == 0 )
                return error4( 0, e4parm_null, E92806 ) ;
@@ -495,9 +449,6 @@ int S4FUNCTION d4unlockAppendInternal( DATA4 *data, long lockId )
             data->memoValidated =  0 ;
          #endif
 
-         #ifdef S4CLIENT
-            return dfile4unlockRecords( data->dataFile, data4lockId( data ), data4serverId( data ) ) ;
-         #else
             if ( lockId == -1 )
                lockId = data4lockId( data ) ;
 
@@ -533,12 +484,10 @@ int S4FUNCTION d4unlockAppendInternal( DATA4 *data, long lockId )
                #endif
             }
             return 0 ;
-         #endif /* S4CLIENT */
       #else
          return 0 ;
       #endif
    }
-#endif /* S4CLIENT */
 
 
 
@@ -547,9 +496,6 @@ int S4FUNCTION d4unlockAppendInternal( DATA4 *data, long lockId )
    {
       DATA4 *dataOn ;
       CODE4 *c4 ;
-      #ifdef S4CLIENT
-         int oldLock ;
-      #endif
 
       c4 = 0 ;
 
@@ -558,28 +504,6 @@ int S4FUNCTION d4unlockAppendInternal( DATA4 *data, long lockId )
             return error4( 0, e4parm_null, E92807 ) ;
       #endif
 
-      #ifdef S4CLIENT
-         /* for client, any request with LOCK4ALL should cause complete
-            unlocking of everything at the lower level.
-            Therefore, only need to call on a single database--but that
-            database better have a lock.  if none have locks, call is
-            avioded. */
-         for( dataOn = 0 ;; )
-         {
-            dataOn = (DATA4 *)l4next( dataList, dataOn ) ;
-            if ( dataOn == 0 )
-               break ;
-            if ( d4hasLocks( dataOn, data4lockId( dataOn ), data4serverId( dataOn ) ) != 0 )
-            {
-               c4 = dataOn->codeBase ;
-               oldLock = code4unlockAuto( c4 ) ;
-               code4unlockAutoSet( c4, LOCK4ALL ) ;
-               d4unlockDo( dataOn, data4lockId(dataOn), 1 ) ;
-               code4unlockAutoSet( c4, oldLock ) ;
-               break ;
-            }
-         }
-      #else
          for ( dataOn = 0 ;; )
          {
             dataOn = (DATA4 *)l4next( dataList, dataOn ) ;
@@ -589,7 +513,6 @@ int S4FUNCTION d4unlockAppendInternal( DATA4 *data, long lockId )
             d4unlockLow( dataOn, 0, 0 ) ;  // 0 for lockId to ensure all get unlocked
             c4 = dataOn->codeBase ;
          }
-      #endif
 
       if ( c4 != 0 )
       {

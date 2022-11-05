@@ -309,9 +309,7 @@ extern char   S4PTR *expr4constants ; /* Points to constant info */
 #ifdef __cplusplus
    extern "C" {
 #endif
-#ifndef S4CLIENT
    S4EXPORT int S4FUNCTION expr4context( EXPR4 *, DATA4 * ) ;
-#endif
 
 /* EXTERNAL FUNCTIONS : */
 
@@ -358,10 +356,8 @@ int expr4reset( EXPR4 * ) ;
 int expr4reset( EXPR4 * ) ;
 S4EXPORT int S4FUNCTION expr4keyLen( EXPR4 S4PTR * ) ;
 S4EXPORT int S4FUNCTION expr4keyLenFromType( int, int, CODE4 S4PTR * ) ;
-#ifndef S4CLIENT
    S4EXPORT int S4FUNCTION expr4key( EXPR4 S4PTR *, char S4PTR * S4PTR *, TAG4FILE * ) ;
    int expr4keyConvert( EXPR4 *, char **, const int, const int, TAG4FILE * ) ;
-#endif
 S4EXPORT short S4FUNCTION expr4nullLow( const EXPR4 S4PTR *, const short ) ;
 #define expr4null( e4 ) ( expr4nullLow( (e4), 1 ) )
 

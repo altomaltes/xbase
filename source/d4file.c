@@ -16,7 +16,6 @@
 
 #include "d4all.h"
 
-#ifndef S4CLIENT
    /* fromDisk set to 1 if ensure that a disk read is done, instead of a buffer read */
    #ifdef P4ARGS_USED
       #pragma argsused
@@ -54,7 +53,6 @@
 
       return 0 ;
    }
-#endif  /* S4CLIENT */
 
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -174,11 +172,7 @@ S4CONST char *dfile4name( S4CONST DATA4FILE *data )
          return 0 ;
       }
    #endif
-   #ifdef S4CLIENT
-      return data->accessName ;
-   #else
       return data->file.name ;
-   #endif
 }
 
 
@@ -191,7 +185,7 @@ S4CONST char * S4FUNCTION d4fullPath( S4CONST DATA4 *d4 )
 
 
 
-#if !defined(S4CLIENT) && !defined(S4OFF_WRITE) && !defined( S4OFF_MULTI )
+#if  !defined(S4OFF_WRITE) && !defined( S4OFF_MULTI )
    double dfile4getAutoIncrementValue( DATA4FILE *data )
    {
       // returns the current autoIncrementValue...
@@ -208,11 +202,11 @@ S4CONST char * S4FUNCTION d4fullPath( S4CONST DATA4 *d4 )
          return val ;
       #endif
    }
-#endif  /* !S4OFF_WRITE && !S4CLIENT */
+#endif  /* !S4OFF_WRITE  */
 
 
 
-#if !defined(S4CLIENT) && !defined(S4OFF_WRITE)
+#if  !defined(S4OFF_WRITE)
    int dfile4updateHeader( DATA4FILE *data, int doTimeStamp, int doCount, Bool5 doAutoIncrement )
    {
       FILE4LONG pos ;
@@ -297,7 +291,7 @@ S4CONST char * S4FUNCTION d4fullPath( S4CONST DATA4 *d4 )
             // auto-increment value in that case...
             if ( !doCount || data->numRecs < 0 )
                len -= (sizeof( data->numRecs ) + sizeof( data->headerLen ) ) ;
-            #if defined( S4FOX ) && !defined( S4CLIENT )
+            #if defined( S4FOX )
                else
                {
                   if ( doAutoIncrement && data->autoIncrementSupported )  // update the auto-increment value...
@@ -353,11 +347,10 @@ S4CONST char * S4FUNCTION d4fullPath( S4CONST DATA4 *d4 )
       data->fileChanged = 0 ;
       return 0 ;
    }
-#endif  /* !S4OFF_WRITE && !S4CLIENT */
+#endif  /* !S4OFF_WRITE  */
 
 
 
-#ifndef S4CLIENT
    #ifndef __WIN32
       FILE4LONG S4FUNCTION dfile4recordPosition( DATA4FILE *d4, long rec )
       {
@@ -371,4 +364,3 @@ S4CONST char * S4FUNCTION d4fullPath( S4CONST DATA4 *d4 )
          return val ;
       }
    #endif
-#endif /* not S4CLIENT */

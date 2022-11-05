@@ -22,6 +22,28 @@
 
 #include "d4all.h"
 
+
+// JACS #if !defined( S4SERVER )
+   short S4FUNCTION code4getErrorCode( const CODE4 *cb )
+   {
+      #ifdef E4PARM_HIGH
+         if ( cb == 0 )
+            return error4( 0, e4parm_null, E96702 ) ;
+      #endif
+      return (short)cb->errorCode ;
+   }
+
+   long S4FUNCTION code4getErrorCode2( const CODE4 *cb )
+   {
+      #ifdef E4PARM_HIGH
+         if ( cb == 0 )
+            return error4( 0, e4parm_null, E96702 ) ;
+      #endif
+      return cb->errorCode2 ;
+   }
+//#endif /* #if !defined( S4SERVER ) */
+
+
 #ifndef S4SERVER
    void S4FUNCTION code4autoIncrementStart( CODE4 *c4, double val )
    {
@@ -195,14 +217,6 @@ short c4indexMultiplierGet( CODE4 *c4 )
    }
 #endif /* !S4SERVER */
 
-
-
-#ifdef S4CLIENT
-   CONNECT4 *S4FUNCTION c4getClientConnect( CODE4 *c4 )
-   {
-      return &c4->clientConnect ;
-   }
-#endif /* S4CLIENT */
 
 
 
@@ -560,12 +574,10 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
 
 
-   #ifndef S4CLIENT
       void S4FUNCTION c4setMinCountOff( CODE4 *c4, int val )
       {
          c4->minCountOff = val ;
       }
-   #endif
 
 
 
@@ -785,7 +797,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
 
 
-   void S4FUNCTION code4collateNameSet( CODE4 *c4, Collate4name val )
+   void S4FUNCTION code4collateNameSet( CODE4 *c4, enum Collate4name val )
    {
       #ifdef S4CLIENT_OR_FOX
          c4->collateName = val ;
@@ -793,7 +805,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
    }
 
 
-   Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
+enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
    {
       #ifdef S4CLIENT_OR_FOX
          return c4->collateName ;
@@ -803,7 +815,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
    }
 
 
-   void S4FUNCTION code4collateNameUnicodeSet( CODE4 *c4, Collate4name val )
+   void S4FUNCTION code4collateNameUnicodeSet( CODE4 *c4, enum Collate4name val )
    {
       #ifdef S4CLIENT_OR_FOX
          c4->collateNameUnicode = val ;
@@ -811,7 +823,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
    }
 
 
-   Collate4name S4FUNCTION code4collateNameUnicode ( CODE4 *c4 )
+   enum Collate4name S4FUNCTION code4collateNameUnicode ( CODE4 *c4 )
    {
       #ifdef S4CLIENT_OR_FOX
          return c4->collateNameUnicode ;
@@ -868,30 +880,6 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
 
 
-#if !defined( S4SERVER )
-   short S4FUNCTION code4getErrorCode( const CODE4 *cb )
-   {
-      #ifdef E4PARM_HIGH
-         if ( cb == 0 )
-            return error4( 0, e4parm_null, E96702 ) ;
-      #endif
-      return (short)cb->errorCode ;
-   }
-#endif /* #if !defined( S4SERVER ) */
-
-
-
-#if !defined( S4SERVER )
-   long S4FUNCTION code4getErrorCode2( const CODE4 *cb )
-   {
-      #ifdef E4PARM_HIGH
-         if ( cb == 0 )
-            return error4( 0, e4parm_null, E96702 ) ;
-      #endif
-      return cb->errorCode2 ;
-   }
-#endif /* #if !defined( S4SERVER ) */
-
 
 #ifdef S4SERVER
    void S4FUNCTION c4setRunAsService( CODE4 *c4, int val )
@@ -939,7 +927,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
 
 // AS Jun 24/02 - function to perform data movement counting for testing
-#if !defined( S4CLIENT ) && (defined( E4ANALYZE ) || defined( S4TESTING ))
+#if  (defined( E4ANALYZE ) || defined( S4TESTING ))
    void S4FUNCTION code4countPosReset( CODE4 *c4 )
    {
       #ifdef E4PARM_HIGH

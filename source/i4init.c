@@ -16,7 +16,7 @@
 
 #include "d4all.h"
 
-#if !defined( S4CLIENT ) && defined( S4MDX )
+#if  defined( S4MDX )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -48,11 +48,11 @@
          return -1 ;
       return r4success ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4MDX ) */
+#endif /*  defined( S4MDX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4MDX )
+#if  defined( S4MDX )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -60,11 +60,11 @@
    {
       return -1 * t4cmpDoub( dataPtr, searchPtr, 0 ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4MDX ) */
+#endif /*  defined( S4MDX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4MDX )
+#if  defined( S4MDX )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -72,29 +72,28 @@
    {
       return -1 * c4bcdCmp( dataPtr, searchPtr, 0 ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4MDX ) */
+#endif /*  defined( S4MDX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4MDX )
+#if  defined( S4MDX )
    int S4CALL t4descMemcmp( S4CMP_PARM dataPtr, S4CMP_PARM searchPtr, size_t len )
    {
       return -1 * u4memcmp( dataPtr, searchPtr, len ) ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4MDX ) */
+#endif /*  defined( S4MDX ) */
 
 
 
-#if !defined( S4CLIENT ) && ( defined( S4MDX ) || defined( S4CLIPPER ) )
+#if  ( defined( S4MDX ) || defined( S4CLIPPER ) )
    void t4noChangeDouble( char *result, const double d )
    {
       c4memcpy( result, (void *)&d, sizeof(double) ) ;
    }
-#endif /* !defined( S4CLIENT ) && ( defined( S4MDX ) || defined( S4CLIPPER ) ) */
+#endif /*  ( defined( S4MDX ) || defined( S4CLIPPER ) ) */
 
 
 
-#if !defined( S4CLIENT )
    void t4noChangeStr( COLLATE4 *collate, char *a, const char *b, const int l, int *lenOut )
    {
       c4memcpy( a, b, (unsigned int)l ) ;
@@ -102,10 +101,9 @@
          *lenOut = l ;
       #endif
    }
-#endif
 
 
-#if !defined( S4CLIENT ) && defined( S4MDX ) && !defined( S4OFF_INDEX )
+#if  defined( S4MDX ) && !defined( S4OFF_INDEX )
    int tfile4init( TAG4FILE *t4, INDEX4 *i4, T4DESC *tagInfo )
    {
       // CODE4 *c4 ;
@@ -197,11 +195,11 @@
       }
       return 0 ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4MDX ) && !defined( S4OFF_INDEX ) */
+#endif /*  defined( S4MDX ) && !defined( S4OFF_INDEX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4MDX ) && !defined( S4OFF_INDEX )
+#if  defined( S4MDX ) && !defined( S4OFF_INDEX )
    int tfile4initSeekConv( TAG4FILE *t4, int keyType )
    {
       int isDesc ;
@@ -255,11 +253,11 @@
 
       return 0 ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4MDX ) && !defined( S4OFF_INDEX ) */
+#endif /* defined( S4MDX ) && !defined( S4OFF_INDEX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX )
+#if  defined( S4FOX ) && !defined( S4OFF_INDEX )
    #ifdef S4LANGUAGE
       extern unsigned char v4map[256];
    #else
@@ -267,11 +265,11 @@
          extern unsigned char v4map[256];
       #endif
    #endif
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) */
+#endif /* defined( S4FOX ) && !defined( S4OFF_INDEX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX )
+#if  defined( S4FOX ) && !defined( S4OFF_INDEX )
    int S4CALL t4cdxCmp( S4CMP_PARM dataPtr, S4CMP_PARM searchPtr, size_t len )
    {
       unsigned char *data = (unsigned char *)dataPtr ;
@@ -293,11 +291,11 @@
 
       return on ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) */
+#endif /*  defined( S4FOX ) && !defined( S4OFF_INDEX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX )
+#if  defined( S4FOX ) && !defined( S4OFF_INDEX )
    int tfile4init( TAG4FILE *t4, INDEX4 *i4, FILE4LONG filePos, unsigned char *name )
    {
       #ifdef E4PARM_LOW
@@ -544,11 +542,11 @@
 
       return 0 ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) */
+#endif /*  defined( S4FOX ) && !defined( S4OFF_INDEX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX )
+#if  defined( S4FOX ) && !defined( S4OFF_INDEX )
    int tfile4initSeekConv( TAG4FILE *t4, int type )
    {
       t4->cmp = (S4CMP_FUNCTION *)t4cdxCmp ;
@@ -746,11 +744,11 @@
 
       return 0 ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4FOX ) && !defined( S4OFF_INDEX ) */
+#endif /*  defined( S4FOX ) && !defined( S4OFF_INDEX ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4CLIPPER )
+#if  defined( S4CLIPPER )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -770,11 +768,11 @@
       if ( dif < -E4ACCURACY ) return -1 ;
       return r4success ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4CLIPPER ) */
+#endif /*  defined( S4CLIPPER ) */
 
 
 
-#if !defined( S4CLIENT ) && defined( S4CLIPPER ) && !defined( S4OFF_INDEX )
+#if  defined( S4CLIPPER ) && !defined( S4OFF_INDEX )
    int tfile4initSeekConv( TAG4FILE *t4, int keyType )
    {
       switch( keyType )
@@ -821,4 +819,4 @@
       }
       return 0 ;
    }
-#endif /* !defined( S4CLIENT ) && defined( S4CLIPPER ) && !defined( S4OFF_INDEX ) */
+#endif /*  defined( S4CLIPPER ) && !defined( S4OFF_INDEX ) */
