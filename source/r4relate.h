@@ -76,11 +76,7 @@ typedef struct RELATE4St
          int freeData ;         /* did the relate create the data structure */
       #endif
 
-   #ifdef S4SERVER
-      long dataId ;    /* used for client identification purposes (locking) */
-   #else
       S4CONV( char S4PTR *oldRecord, char S4PTR *old_record ) ;
-   #endif
 
    #ifdef S4WINDOWS
       HWND hWnd;
@@ -129,10 +125,6 @@ typedef struct RELATION4St
    unsigned long relationId ;
 
    RELATE4 *currentRelateLevel ;   /* current pos for scans */
-   #ifdef S4SERVER
-      LIST4 localDataList ;
-      unsigned short int relateIdCount ;
-   #endif
 
 /*   MEM4 S4PTR *relateMemory ;                  */
 /*   MEM4 S4PTR *relateListMemory ;              */
@@ -193,11 +185,7 @@ PUBLIC int S4FUNCTION relate4doOne( RELATE4 S4PTR * ) ;
 PUBLIC int S4FUNCTION relate4eof( RELATE4 S4PTR * ) ;
 PUBLIC int S4FUNCTION relate4errorAction( RELATE4 S4PTR *, const int ) ;  /* Set the error action */
 PUBLIC int S4FUNCTION relate4free( RELATE4 S4PTR *, const int ) ;
-#ifdef S4SERVER
-PUBLIC RELATE4 S4PTR * S4FUNCTION relate4init( DATA4 S4PTR *, char S4PTR * ) ;
-#else
 PUBLIC RELATE4 S4PTR * S4FUNCTION relate4init( DATA4 S4PTR * ) ;
-#endif
 PUBLIC int S4FUNCTION relate4matchLen( RELATE4 S4PTR *, const int ) ;
 PUBLIC int S4FUNCTION relate4next( RELATE4 S4PTR * S4PTR * ) ;
 PUBLIC int S4FUNCTION relate4querySet( RELATE4 S4PTR *, const char S4PTR * ) ;

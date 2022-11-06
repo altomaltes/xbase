@@ -130,10 +130,6 @@ public:
    void lockClear()           { code4lockClear( this ) ; }
    const char *lockFileName() {return code4lockFileName( this ); }
    long lockItem()            { return code4lockItem( this ) ; }
-   #ifdef S4SERVER
-      const char S4PTR* lockUserId()    { return code4lockUserId( this ) ; }
-      const char S4PTR* lockNetworkId() { return code4lockNetworkId( this ) ; }
-   #endif
    #ifdef S4STAND_ALONE
       #ifndef S4OFF_WRITE
          #ifndef S4OFF_TRAN

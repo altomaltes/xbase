@@ -175,36 +175,12 @@ int S4FUNCTION tran4lowAppend( TRAN4 *t4, void *dta, int doImmediateFlushing )
 static int tran4fileClose( TRAN4FILE *t4 )
 {
    int rc, saveRc, saveErr ;
-   #ifdef S4SERVER
-      SERVER4CLIENT *client ;
-   #endif
 
    if ( t4->file.hand == INVALID4HANDLE )
       return 0 ;
 
    saveRc = 0 ;
 
-   #ifdef S4SERVER
-      /* ensure there are no active transactions */
-
-      /* reserve the client list during this process */
-      list4mutexWait( &t4->c4trans->c4->server->clients ) ;
-
-      client = (SERVER4CLIENT *)l4first( &t4->c4trans->c4->server->clients.list ) ;
-      for ( ;; )
-      {
-         if ( client == 0 )
-            break ;
-         if ( client->trans.currentTranStatus == r4active )
-         {
-            if ( error4code( t4->c4trans->c4 ) == 0 )
-               saveRc = error4( t4->c4trans->c4, e4trans, E93801 ) ;
-            t4->validState = 0 ;
-         }
-      }
-
-      list4mutexRelease( &t4->c4trans->c4->server->clients ) ;
-   #endif
 
    saveErr = error4code( t4->c4trans->c4 ) ;
    error4set( t4->c4trans->c4, 0 ) ;
@@ -464,32 +440,6 @@ static long tran4fileGetNextTransId( TRAN4FILE *t4, TRAN4 *trans )
 
       if ( ( rc = tran4fileVerify( t4, 1 ) ) < 0 )
          return rc ;
-   #endif
-
-   #ifdef S4SERVER
-      if ( t4->transId > 0 )
-      {
-         if ( t4->transId == LONG_MAX )
-            t4->transId = 0 ;
-         ++t4->transId ;
-      }
-      else
-      {
-         if ( tran4bottom( trans ) < 0 )  /* no entries */
-            return 0 ;
-
-         while ( trans->header.transId == 0 )
-            if ( tran4skip( trans, TRAN4BACKWARDS ) != 0 )
-               break ;
-
-         if ( trans->header.transId < 0 )
-            return e4trans ;
-
-         if ( trans->header.transId == LONG_MAX )
-            t4->transId = 0 ;
-         else
-            t4->transId = trans->header.transId + 1 ;
-      }
    #endif
 
    #ifdef S4STAND_ALONE
@@ -1262,13 +1212,8 @@ int S4FUNCTION tran4lowRollback( TRAN4 *trans, long id, const int doInvalidate )
    if ( rc == 0 )
       trans->c4trans->transFile->status = tran4notRollbackOrCommit ;
    tran4lowCloseDelayed( trans ) ;
-   #ifdef S4SERVER
-      if ( code4unlockAuto( trans->c4trans->c4 ) == 1 )
-         rc = code4unlock( trans->c4trans->c4 ) ;
-   #else
       if ( doInvalidate )
          code4invalidate( c4 ) ;
-   #endif
    return rc ;
 }
 
@@ -1510,64 +1455,6 @@ int S4FUNCTION tran4lowCommitPhaseTwo( TRAN4 *trans, long id, int doUnlock )
 }
 
 
-#ifdef S4SERVER
-#ifndef S4INLINE
-/* S4SERVER */
-int S4FUNCTION code4tranCommitPhaseOne( CODE4 *c4 )
-{
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93828 ) ;
-   #endif
-
-   return tran4lowCommitPhaseOne( &c4->currentClient->trans, c4->currentClient->id, 1 ) ;
-}
-
-/* S4SERVER */
-int S4FUNCTION code4tranStart( CODE4 *c4 )
-{
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93828 ) ;
-   #endif
-
-   return tran4lowStart( &c4->currentClient->trans, c4->currentClient->id, 0 ) ;
-}
-
-/* S4SERVER */
-int S4FUNCTION code4tranStartSingle( CODE4 *c4 )
-{
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93828 ) ;
-   #endif
-
-   return tran4lowStart( &c4->currentClient->trans, c4->currentClient->idc4)->currentClient->id, 0 ) ;
-}
-
-/* S4SERVER */
-int S4FUNCTION code4tranCommitPhaseTwo( CODE4 *c4, int doUnlock )
-{
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93828 ) ;
-   #endif
-
-   return tran4lowCommitPhaseTwo( &c4->currentClient->trans, c4->currentClient->id, doUnlock ) ;
-}
-
-/* S4SERVER */
-int S4FUNCTION code4tranRollback( CODE4 *c4 )
-{
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93828 ) ;
-   #endif
-
-   return tran4lowRollback( &c4->currentClient->trans, c4->currentClient->id, 1 ) ;
-}
-#endif  /* S4INLINE */
-#endif  /* S4SERVER */
 
 int S4FUNCTION code4tranCommit( CODE4 *c4 )
 {
@@ -1780,37 +1667,21 @@ int code4transFileEnable( CODE4TRANS *c4trans, const char *logName, const int do
 
          if( c4->transFileName != 0 )
          {
-            #ifdef S4SERVER
-               rc = tran4fileInit( &c4->server->transFile, c4trans ) ;
-            #else
                rc = tran4fileInit( &c4->transFile, c4trans ) ;
-            #endif
             if ( rc == 0 )
             {
                if ( doCreate == 0 )
                {
-                  #ifdef S4SERVER
-                     rc = tran4fileOpen( &c4->server->transFile, c4->transFileName ) ;
-                  #else
                      rc = tran4fileOpen( &c4->transFile, c4->transFileName ) ;
-                  #endif
                }
                else
                {
-                  #ifdef S4SERVER
-                     rc = tran4fileCreate( &c4->server->transFile, c4->transFileName ) ;
-                  #else
                      rc = tran4fileCreate( &c4->transFile, c4->transFileName ) ;
-                  #endif
                }
                if ( rc == 0 )
                {
                   c4trans->enabled = 1 ;
-                  #ifdef S4SERVER
-                     c4trans->transFile = &c4->server->transFile ;
-                  #else
                      c4trans->transFile = &c4->transFile ;
-                  #endif
                }
             }
          }
@@ -1871,16 +1742,8 @@ int tran4addUser( TRAN4 *trans, const long clientId, const char *charId, const u
          len = sizeof( trans->userId ) - 1 ;
       memcpy( trans->userId, charId, len ) ;
       trans->userId[len] = 0 ;
-      #ifdef S4SERVER
-         netId = 0 ;
-         if ( netId == 0 )
-            netIdLen = 0 ;
-         else
-            netIdLen = strlen( netId ) ;
-      #else
          netId = (char *)0 ;
          netIdLen = 0 ;
-      #endif
       rc = tran4set( trans, trans->currentTranStatus, -1L, clientId, TRAN4INIT, len + netIdLen + sizeof( len ) + sizeof( netIdLen), 0L, 0L ) ;
       if ( rc < 0 )
          return rc ;
@@ -2040,42 +1903,6 @@ int S4FUNCTION code4lock( CODE4 *c4 )
    #endif  /* S4OFF_MULTI */
 }
 
-#ifdef S4SERVER
-int tran4closeAll( TRAN4 *trans )
-{
-   DATA4 *dataOn, *dataNext ;
-   int rc ;
-   LIST4 *list ;
-
-   #ifdef E4PARM_LOW
-      if ( trans == 0 )
-         return error4( 0, e4parm_null, E93801 ) ;
-   #endif
-
-   rc = 0 ;
-   list = tran4dataList( trans ) ;
-   #ifdef E4ANALYZE
-      if ( list == 0 )
-         return error4( trans->c4trans->c4, e4struct, E93801 ) ;
-   #endif
-   for ( dataNext = (DATA4 *)l4first( list ) ;; )
-   {
-      dataOn = dataNext ;
-      if ( !dataOn )
-         break ;
-      dataNext = (DATA4 *)l4next( list, dataNext ) ;
-
-      if ( d4close( dataOn ) < 0 )
-         rc = -1 ;
-   }
-
-   if ( error4code( trans->c4trans->c4 ) < 0 )
-      return -1 ;
-
-   return rc ;
-}
-#endif  /* S4SERVER */
-
 #ifdef E4ANALYZE
 static int code4transVerify( CODE4TRANS *c4trans, int subs )
 {
@@ -2150,10 +1977,6 @@ int code4tranInitLow( TRAN4 *t4, CODE4TRANS *c4trans )
       t4->pos = (unsigned long)-1 ;
    #endif
 
-   #ifdef S4SERVER
-      t4->unlockAuto = 1 ;
-   #endif
-
    #ifndef S4OFF_WRITE
       t4->currentTranStatus = r4inactive ;
    #endif
@@ -2199,66 +2022,6 @@ int S4FUNCTION code4transInitUndo( CODE4TRANS *c4trans )
    #endif
 }
 
-#ifdef S4SERVER
-int code4transInit( CODE4TRANS *c4trans, CODE4 *c4 )
-{
-      int rc ;
-
-   #ifdef E4PARM_LOW
-      if ( c4trans == 0 || c4 == 0 )
-         return error4( 0, e4parm_null, E93836 ) ;
-   #endif
-
-   #ifndef S4OFF_TRAN
-         #ifdef E4ANALYZE
-            if ( c4trans->enabled != 0 )
-               return error4( 0, e4struct, E93836 ) ;
-         #endif
-   #endif
-
-   memset( c4trans, 0, sizeof( c4trans ) ) ;
-
-   #ifdef E4ANALYZE
-      if ( c4->debugInt != E4DEBUG_INT )   /* not initialized */
-         return error4( 0, e4struct, E81301 ) ;
-   #endif
-   c4trans->c4 = c4 ;
-
-      rc = code4tranInitLow( &c4trans->trans, c4trans ) ;
-      if ( rc < 0 )
-         return rc ;
-
-   #ifdef E4ANALYZE
-      return code4transVerify( c4trans, 0 ) ;
-   #else
-      return 0 ;
-   #endif
-}
-#endif
-
-#ifdef S4SERVER
-/*
-int d4tagUniqueSync( DATA4 *data )
-{
-   TAG4 *tag ;
-
-   #ifdef E4PARM_LOW
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E96501 ) ;
-   #endif
-
-   for ( tag = 0 ;; )
-   {
-      tag = d4tagNext( data, tag ) ;
-      if ( tag == 0 )
-         break ;
-      tag->tagFile->uniqueError = tag->uniqueError ;
-   }
-
-   return 0 ;
-}
-*/
-#endif /* S4SERVER */
 
 #ifndef S4OFF_MULTI
 #ifndef S4OFF_TRAN
@@ -2369,14 +2132,10 @@ int tran4lock( TRAN4 *trans )
             lock = (LOCK4 *)single4distantToItem( &trans->toLock ) ;
             break ;
          case r4locked:
-            #ifdef S4SERVER
-               tran4unlock( &trans->toLock, &locked ) ;
-               return r4locked ;
-            #else
                single4distantInitIterate( &trans->toLock, single4distantToItem( &trans->toLock ) ) ;
                lock = (LOCK4 *)single4distantToItem( &trans->toLock ) ;
-               break ;
-            #endif
+         break ;
+
          default:
             saveErr = error4set( trans->c4trans->c4, 0 ) ;
             tran4unlock( &trans->toLock, &locked ) ;
@@ -2405,34 +2164,6 @@ static DATA4 *tran4dataFull( TRAN4 *trans, const long serverId, const long clien
    return data ;
 }
 
-#ifdef S4SERVER
-/* to get a DATA4 based on id instead of TRAN4 */
-DATA4 *code4idData( CODE4 *c4, const long serverId, const long clientId )
-{
-   SERVER4CLIENT *client ;
-   DATA4 *data ;
-
-   /* reserve the client list during this process */
-   list4mutexWait( &c4->server->clients ) ;
-
-   for( client = 0 ;; )
-   {
-      client = (SERVER4CLIENT *)l4next( &c4->server->clients.list, client ) ;
-      if ( client == 0 )
-         break ;
-      data = tran4data( &client->trans, serverId, clientId ) ;
-      if ( data != 0 )
-      {
-         list4mutexRelease( &c4->server->clients ) ;
-         return data ;
-      }
-   }
-
-   list4mutexRelease( &c4->server->clients ) ;
-   return 0 ;
-}
-#endif
-
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -2456,10 +2187,6 @@ int tran4active( CODE4 *c4, DATA4 *data )
             return 0 ;
       #endif
 
-      #ifdef S4SERVER
-         if ( data->accessMode != OPEN4DENY_NONE )  /* if denying others write access, then can proceed */
-            return 0 ;
-      #endif
       #ifdef S4OFF_MULTI
          return 0 ;
       #else
@@ -2522,13 +2249,8 @@ void S4FUNCTION code4lockClear( CODE4 *c4 )
             return ;
          }
       #endif
-      #ifdef S4SERVER
-         single4distantInitIterate( &(c4->currentClient->trans.toLock), &(c4->currentClient->trans.locks ) ) ;
-         tran4freeLocks( c4, &(c4->currentClient->trans.toLock) ) ;
-      #else
          single4distantInitIterate( &(c4->c4trans.trans.toLock), &(c4->c4trans.trans.locks ) ) ;
          tran4freeLocks( c4, &(c4->c4trans.trans.toLock) ) ;
-      #endif
    #endif
 
 }

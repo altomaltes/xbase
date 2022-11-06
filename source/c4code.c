@@ -403,20 +403,6 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
       c4->lockAttemptsSingle = 1 ;
    #endif
 
-   #ifdef S4SERVER
-      #ifdef S4DEBUG_LOG
-         c4->logFile.hand = INVALID4HANDLE ;
-      #endif
-      c4->lockAttempts = 1 ;
-      c4->memStartClient = 5 ;
-      c4->memExpandClient = 5 ;
-      #ifdef N4OTHER
-         c4->memStartIndex = 10 ;
-         c4->memStartTag = 10 ;
-         c4->memExpandIndex = 5 ;
-         c4->memExpandTag = 10 ;
-      #endif
-   #else
       c4->errGo = 1 ;
       c4->errSkip = 1 ;
       c4->errRelate = 1 ;
@@ -450,7 +436,6 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
          c4->memExpandIndex = 5 ;
          c4->memExpandTag = 10 ;
       #endif
-   #endif
 
       c4->doIndexVerify = 1 ;
 
@@ -632,11 +617,7 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
     ***********************************************************************/
    #ifndef S4OFF_OPTIMIZE
       c4->hadOpt = 1 ;
-      #ifdef S4SERVER
-         c4->memMaxPercent = -1 ;   /* use server configuration file */
-      #else
          c4->memMaxPercent = 25 ;   /* default use 25% of available memory */
-      #endif
       #ifdef S4OS2
          c4->memStartMax = 0xF0000L ;
       #else
@@ -664,11 +645,6 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
       }
       c4->readMessageBufferLen = READ4MESSAGE_BUFFER_LEN ;
 
-      #ifdef S4SERVER
-         c4->maxSockets = WSAData.iMaxSockets ;
-         list4mutexInit(&c4->connectsToService) ;
-/*         list4mutexInit(&c4->connectListMutex) ;  -- not used? */
-      #endif
 
       #ifndef S4OFF_THREAD
          list4mutexInit(&c4->writeBuffersAvail) ;
@@ -703,11 +679,6 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
             return error4( 0, e4result, E91001 ) ;
          }
       #endif
-   #endif
-
-   #ifdef S4SERVER
-      c4->accessMutex = CreateMutex(NULL, FALSE, NULL ) ;
-      semaphore4init( &c4->workerSemaphore ) ;
    #endif
 
    #ifdef S4FOX
@@ -757,11 +728,7 @@ void S4FUNCTION expr4calcDelete( EXPR4CALC *calc )
          l4remove( &c4->totalList, calc->total ) ;
          mem4free( c4->totalMemory, calc->total ) ;
       }
-   #ifdef S4SERVER
-      l4remove( &c4->currentClient->calcList, calc ) ;
-   #else
       l4remove( &c4->calcList, calc ) ;
-   #endif
    expr4free( calc->expr ) ;
    mem4free( c4->calcMemory, calc ) ;
 }
@@ -778,11 +745,7 @@ void S4FUNCTION code4calcReset( CODE4 *c4 )
       }
    #endif
 
-   #ifdef S4SERVER
-      list = &c4->currentClient->calcList ;
-   #else
       list = &c4->calcList ;
-   #endif
 
    if( list != 0 )
    {
@@ -832,9 +795,6 @@ static int code4initUndo2( CODE4 *c4, int doClose )
       code4optSuspend( c4 ) ;
    #endif
 
-   #ifdef S4SERVER
-      CloseHandle( c4->accessMutex ) ;
-   #else
       #ifndef S4OFF_TRAN
             if ( code4transEnabled( c4 ) )
          if ( code4tranStatus( c4 ) == r4active )
@@ -857,7 +817,6 @@ static int code4initUndo2( CODE4 *c4, int doClose )
       #ifndef S4OFF_TRAN
          code4tranInitUndo( c4 ) ;
       #endif
-   #endif
 
    #ifdef S4OPTIMIZE_STATS
       if ( c4->statusDbf != 0 )
@@ -961,16 +920,6 @@ static int code4initUndo2( CODE4 *c4, int doClose )
    mem4release( c4->calcMemory ) ;
    c4->calcMemory = 0 ;
 
-   #ifdef S4SERVER
-      if ( c4->catalogClient != 0 )
-      {
-         mem4free( c4->clientMemory, c4->catalogClient ) ;
-         c4->catalogClient = 0 ;
-      }
-      mem4release( c4->clientMemory ) ;
-      c4->clientMemory = 0 ;
-   #endif
-
    mem4release( c4->bitmapMemory ) ;
    c4->bitmapMemory = 0 ;
 
@@ -1007,11 +956,6 @@ static int code4initUndo2( CODE4 *c4, int doClose )
       c4->debugInt = 0 ; /* Some random value for double checking. */
    #endif
 
-   #ifdef S4DEBUG_LOG
-      #ifdef S4SERVER
-         code4logInitUndo( c4 ) ;
-      #endif
-   #endif
 
    #ifndef S4OFF_TRAN
       if ( c4->tranData != 0 )
@@ -1055,9 +999,6 @@ static int code4initUndo2( CODE4 *c4, int doClose )
 
    #ifndef S4STAND_ALONE
       #ifndef S4OFF_THREAD
-         #ifdef S4SERVER
-            list4mutexInitUndo(&c4->connectsToService) ;
-         #endif
          list4mutexInitUndo(&c4->writeBuffersAvail) ;
          list4mutexInitUndo(&c4->connectBufferListMutex) ;
       #endif
@@ -1093,11 +1034,7 @@ static int code4initUndo2( CODE4 *c4, int doClose )
    if ( numCode4 == 0 && resetInProgress == 0)   /* reset memory */
       mem4reset() ;
 
-   #ifdef S4SERVER
-      return 0 ;
-   #else
       return errCode ;
-   #endif
 }
 
 void S4FUNCTION code4exit( CODE4 *c4 )
@@ -1129,11 +1066,7 @@ void S4FUNCTION code4exit( CODE4 *c4 )
 
 int S4FUNCTION code4initUndo( CODE4 *c4 )
 {
-   #ifdef S4SERVER
-      return code4initUndo2( c4, 0 ) ;
-   #else
       return code4initUndo2( c4, 1 ) ;
-   #endif
 }
 
 int S4FUNCTION code4close( CODE4 *c4 )
@@ -1274,10 +1207,6 @@ DATA4 *tran4dataName( TRAN4 *trans, const char *name, const long clientId, const
          break ;
       if ( strcmp( name, d4alias( dataOn ) ) == 0 )  /* try simple alias check */
       {
-         #ifdef S4SERVER
-            if ( clientId != 0 )
-               dataOn->clientId = clientId ;
-         #endif
          #ifdef E4MISC
             if ( dataResult != 0 )
             {
@@ -1296,10 +1225,6 @@ DATA4 *tran4dataName( TRAN4 *trans, const char *name, const long clientId, const
          if ( doPath )
             if ( strcmp( name1, dataOn->dataFile->file.name ) == 0 )
             {
-               #ifdef S4SERVER
-                  if ( clientId != 0 )
-                     dataOn->clientId = clientId ;
-               #endif
                #ifdef E4MISC
                   if ( dataResult != 0 )
                   {
@@ -1326,9 +1251,6 @@ DATA4 *tran4data( TRAN4 *trans, const long serverId, const long clientId )
    #ifdef E4MISC
       DATA4 *dataResult ;
    #endif
-   #ifdef S4SERVER
-      int rc = 0 ;
-   #endif
 
    #ifdef E4ANALYZE
       if ( tran4verify( trans, 1 ) < 0 )
@@ -1351,9 +1273,6 @@ DATA4 *tran4data( TRAN4 *trans, const long serverId, const long clientId )
       if ( data4serverId( dataOn ) == serverId )
             if ( data4clientId( dataOn ) == clientId )
          {
-            #ifdef S4SERVER
-               dataOn->clientId = clientId ;
-            #endif
             #ifdef E4MISC
                if ( dataResult != 0 )
                {
@@ -1380,9 +1299,6 @@ DATA4 *tran4data( TRAN4 *trans, const long serverId, const long clientId )
 DATA4 *S4FUNCTION code4data( CODE4 *c4, const char *aliasName )
 {
    char buf[LEN4DATA_ALIAS+2] ;
-   #ifdef S4SERVER
-      RELATE4 *relate ;
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( c4, 1, E91102 ) )
@@ -1402,23 +1318,7 @@ DATA4 *S4FUNCTION code4data( CODE4 *c4, const char *aliasName )
       c4upper( buf ) ;
    #endif
 
-   #ifdef S4SERVER
-      if ( c4->currentRelation == 0 )
-         return tran4dataName( code4trans( c4 ), buf, 0L, 1 ) ;
-
-      relate = &(c4->currentRelation->relate) ;
-      for ( ;; )
-      {
-         if ( relate == 0 )
-            return 0 ;
-         if ( strcmp( aliasName, d4alias( relate->data ) ) == 0 )
-            return relate->data ;
-         if ( relate4next( &relate ) == 2 )
-            return 0 ;
-      }
-   #else
       return tran4dataName( code4trans( c4 ), buf, 0L, 0 ) ;
-   #endif
 }
 
 #ifdef P4ARGS_USED
@@ -2124,41 +2024,6 @@ void S4FUNCTION ctrl4setServerName( HINSTANCE hInst,char *serverName ) /*5 oh so
 #endif /* S4WINCE */
 #endif /* S4DLL_BUILD */
 
-#ifdef S4SERVER
-/* when shutdown, doDelay is 0, continue with shutdown even
-   without exclusive access */
-void code4enterExclusive( CODE4 *c4, SERVER4CLIENT *client, int doDelay )
-{
-   WaitForSingleObject( c4->accessMutex, doDelay ? INFINITE : 0 ) ;
-   #ifdef E4ANALYZE
-      if ( doDelay )
-         if ( c4->accessMutexCount != 0 )
-            if ( c4->currentClient != client )
-               error4( c4, e4parm, E93801 ) ;
-   #endif
-   if ( doDelay == 0 )
-   {
-      c4->currentClient = 0 ;  /* ensure we don't get ourselves fried */
-      if ( c4->accessMutexCount != 0 )
-         if ( c4->currentClient != client )   /* reset the access count to '1' since we are taking over control */
-            c4->accessMutexCount = 0 ;
-   }
-   c4->accessMutexCount++ ;
-   c4->currentClient = client ;
-}
-
-void code4exitExclusive( CODE4 *c4, SERVER4CLIENT *client )
-{
-   if ( c4->currentClient != client )  /* we do not have access anyway */
-      return ;
-   --c4->accessMutexCount ;
-/*
-   if ((c4->accessMutexCount) == 0)   in case of no delay on enter exclusive, leave this be... (i.e. don't reset current client)
-      c4->currentClient = 0 ;
-*/
-   ReleaseMutex( c4->accessMutex ) ;
-}
-#else
 /* functions used to set and get CODE4 flags from outside of a DLL in cases
    where the structures are unknown (eg. index independent program) */
 /* cannot be defines */
@@ -2373,7 +2238,6 @@ void S4FUNCTION c4setErrDefaultUnique( CODE4 *c4, short val )
 {
    c4->errDefaultUnique = val ;
 }
-#endif /* S4SERVER */
 
 #ifndef S4STAND_ALONE
 int S4FUNCTION code4osVersion(void)

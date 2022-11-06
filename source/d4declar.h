@@ -64,14 +64,6 @@ PUBLIC int S4FUNCTION code4unlock( CODE4 S4PTR * ) ;
 #ifdef S4UTIL
    PUBLIC int S4FUNCTION code4passwordSet( CODE4 S4PTR *, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;  /* for utility only */
 #endif
-#ifdef S4SERVER
-   PUBLIC int S4FUNCTION code4unlockAuto( CODE4 * ) ;
-   #ifdef S4INLINE
-      #define code4unlockAutoSet( c4, val ) ( (c4)->currentClient->trans.unlockAuto = (val) )
-   #else
-      PUBLIC void S4FUNCTION code4unlockAutoSet( CODE4 *, int ) ;
-   #endif
-#else
    PUBLIC int S4FUNCTION code4close( CODE4 S4PTR * ) ;
    PUBLIC int S4FUNCTION code4connect( CODE4 S4PTR *, const char S4PTR *, const char S4PTR *, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
    PUBLIC const char S4PTR *S4FUNCTION code4dateFormat( CODE4 S4PTR * ) ;
@@ -99,7 +91,7 @@ PUBLIC int S4FUNCTION code4unlock( CODE4 S4PTR * ) ;
       PUBLIC void S4FUNCTION code4unlockAutoSet( CODE4 *, int ) ;
       int S4FUNCTION code4unlockAuto( CODE4 * ) ;
    #endif
-#endif
+
 #ifndef S4STAND_ALONE
    PUBLIC DATA4 S4PTR *S4FUNCTION code4connectionStatus( CODE4 S4PTR * ) ;
 #endif
@@ -140,11 +132,7 @@ PUBLIC int S4FUNCTION d4fieldNumber( DATA4 S4PTR *, const char S4PTR * ) ;
 PUBLIC DATA4 S4PTR * S4FUNCTION d4fieldsAdd( DATA4 S4PTR *, int, FIELD4INFO S4PTR * ) ;
 PUBLIC DATA4 S4PTR * S4FUNCTION d4fieldsRemove( DATA4 S4PTR * S4PTR *, int, char S4PTR * S4PTR * ) ;
 PUBLIC const char S4PTR *S4FUNCTION d4fileName( DATA4 S4PTR * ) ;
-#ifdef S4SERVER
-   #define d4flush( d4 ) ( dfile4flush( (d4)->dataFile ) )
-#else
 PUBLIC int S4FUNCTION d4flush( DATA4 S4PTR * ) ;
-#endif
 PUBLIC int S4FUNCTION d4freeBlocks( DATA4 S4PTR * ) ;
 PUBLIC int S4FUNCTION d4go( DATA4 S4PTR *, const long ) ;
 PUBLIC int S4FUNCTION d4goBof( DATA4 S4PTR * ) ;
@@ -237,9 +225,6 @@ PUBLIC int S4FUNCTION d4deleted( DATA4 S4PTR * ) ;
 PUBLIC FIELD4INFO S4PTR * S4FUNCTION d4fieldInfo( DATA4 S4PTR * ) ;
 PUBLIC int S4FUNCTION d4remove( DATA4 S4PTR * ) ;
 #define d4write( a, b ) ( d4writeLow( a, b, 0 ) )
-#ifdef S4SERVER
-   PUBLIC long S4FUNCTION d4positionSet( DATA4 S4PTR *, const double ) ;
-#else
    PUBLIC int S4FUNCTION d4changed( DATA4 S4PTR *, int ) ;
    PUBLIC int S4FUNCTION d4optimize( DATA4 S4PTR *, const int ) ;
    PUBLIC int S4FUNCTION d4positionSet( DATA4 S4PTR *, const double ) ;
@@ -248,7 +233,6 @@ PUBLIC int S4FUNCTION d4remove( DATA4 S4PTR * ) ;
    #ifdef S4CB51
       PUBLIC int S4FUNCTION d4lock_group( DATA4 S4PTR *, const long S4PTR *, const int ) ;
    #endif
-#endif /* S4SERVER */
 #ifndef S4OFF_MULTI
    PUBLIC int S4FUNCTION dfile4lockTestAppend( DATA4FILE S4PTR *, const long, const long ) ;
    PUBLIC int S4FUNCTION dfile4unlockRecord( DATA4FILE *, const long, const long, const long ) ;
@@ -536,156 +520,82 @@ PUBLIC long S4FUNCTION u4switch( void ) ;  /* used for example start-up verifica
    PUBLIC void S4FUNCTION u4yymmdd( char S4PTR * ) ;
 #endif
 
-#ifdef S4SERVER
-#define c4getDoRemove( c4 ) ( (c4)->currentClient->doRemove )
-#define c4setDoRemove( c4, i ) ( (c4)->currentClient->doRemove = (i) )
-#define c4getSafety( c4 ) ( (c4)->safety )
-#define c4setSafety( c4, i ) ( (c4)->safety = (i) )
-#define i4getIndexFile( i4 ) ((i4)->indexFile)
-#define c4setErrDefaultUnique( c4, val ) ( (c4)->errDefaultUnique = val )
-#define c4setErrOpen( c4, val ) ( (c4)->errOpen = val )
-#define c4setLockAttempts( c4, val ) ( (c4)->lockAttempts = val )
-#define c4setErrTagName( c4, val ) ( (c4)->errTagName = val )
-#define c4setErrFieldName( c4, val ) ( (c4)->errFieldName = val )
-#define c4getErrDefaultUnique( c4 ) ( (c4)->errDefaultUnique )
-#else
-#define c4getDoRemove( c4 ) ( (c4)->doRemove )
-#define c4setDoRemove( c4, i ) ( (c4)->doRemove = (i) )
-#define c4getErrCreate( c4 )      ( (c4)->errCreate )
-#define c4setErrCreate( c4, val ) ( (c4)->errCreate = (val) )
-#ifdef S4DLL_BUILD
-   #define i4getIndexFile( i4 )     ((i4)->indexFile)
-   #define c4getReadLock( c4 )      ( (c4)->readLock )
-   #define c4setReadLock( c4, val ) ( (c4)->readLock = (val) )
-   #define c4getReadOnly( c4 )      ( (c4)->readOnly )
-   #define c4setReadOnly( c4, val ) ( (c4)->readOnly = (val) )
-#else
-   #define i4getIndexFile( i4 )     i4getIndexFileDo(i4)
-   #define c4getReadLock( c4 )      c4getReadLockDo( (c4) )
-   #define c4setReadLock( c4, val ) c4setReadLockDo( (c4), (val) )
-   #define c4getReadOnly( c4 )      c4getReadOnlyDo( (c4) )
-   #define c4setReadOnly( c4, val ) c4setReadOnlyDo( (c4), (val) )
-#endif
+ #define c4getDoRemove( c4 ) ( (c4)->doRemove )
+ #define c4setDoRemove( c4, i ) ( (c4)->doRemove = (i) )
+ #define c4getErrCreate( c4 )      ( (c4)->errCreate )
+ #define c4setErrCreate( c4, val ) ( (c4)->errCreate = (val) )
+ #ifdef S4DLL_BUILD
+    #define i4getIndexFile( i4 )     ((i4)->indexFile)
+    #define c4getReadLock( c4 )      ( (c4)->readLock )
+    #define c4setReadLock( c4, val ) ( (c4)->readLock = (val) )
+    #define c4getReadOnly( c4 )      ( (c4)->readOnly )
+    #define c4setReadOnly( c4, val ) ( (c4)->readOnly = (val) )
+ #else
+    #define i4getIndexFile( i4 )     i4getIndexFileDo(i4)
+    #define c4getReadLock( c4 )      c4getReadLockDo( (c4) )
+    #define c4setReadLock( c4, val ) c4setReadLockDo( (c4), (val) )
+    #define c4getReadOnly( c4 )      c4getReadOnlyDo( (c4) )
+    #define c4setReadOnly( c4, val ) c4setReadOnlyDo( (c4), (val) )
+ #endif
 
 /* functions used to set and get CODE4 flags from outside of a DLL in cases
    where the structures are unknown (eg. index independent program) */
 /* cannot be defines */
 
-PUBLIC int S4FUNCTION c4getAccessMode( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getAutoOpen( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getErrorCode( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getErrExpr( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getErrFieldName( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getErrGo( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getErrOpen( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getErrRelate( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getErrSkip( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getErrTagName( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getLockAttempts( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getLockEnforce( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getOptimize( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getOptimizeWrite( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getReadLockDo( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getReadOnlyDo( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getSafety( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getSingleOpen( const CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION c4getErrDefaultUnique( const CODE4 S4PTR * ) ;
-#ifndef S4CLIPPER
-PUBLIC INDEX4FILE S4PTR *S4FUNCTION i4getIndexFileDo( const INDEX4 S4PTR * ) ;
-#endif
+ PUBLIC int S4FUNCTION c4getAccessMode( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getAutoOpen( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getErrorCode( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getErrExpr( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getErrFieldName( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getErrGo( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getErrOpen( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getErrRelate( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getErrSkip( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getErrTagName( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getLockAttempts( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getLockEnforce( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getOptimize( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getOptimizeWrite( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getReadLockDo( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getReadOnlyDo( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getSafety( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getSingleOpen( const CODE4 S4PTR * ) ;
+ PUBLIC int S4FUNCTION c4getErrDefaultUnique( const CODE4 S4PTR * ) ;
+ #ifndef S4CLIPPER
+ PUBLIC INDEX4FILE S4PTR *S4FUNCTION i4getIndexFileDo( const INDEX4 S4PTR * ) ;
+ #endif
 
-PUBLIC const char *S4FUNCTION t4getExprSource( TAG4 S4PTR * ) ;
+ PUBLIC const char *S4FUNCTION t4getExprSource( TAG4 S4PTR * ) ;
 
-PUBLIC void S4FUNCTION c4setAccessMode( CODE4 S4PTR *, char ) ;
-PUBLIC void S4FUNCTION c4setAutoOpen( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setErrorCode( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setErrExpr( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setErrFieldName( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setErrGo( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setErrOpen( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setErrRelate( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setErrSkip( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setErrTagName( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setLockAttempts( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setLockEnforce( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setOptimize( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setOptimizeWrite( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setReadLockDo( CODE4 S4PTR *, char ) ;
-PUBLIC void S4FUNCTION c4setReadOnlyDo( CODE4 S4PTR *, int ) ;
-PUBLIC void S4FUNCTION c4setSafety( CODE4 S4PTR *, char ) ;
-PUBLIC void S4FUNCTION c4setSingleOpen( CODE4 S4PTR *, short ) ;
-PUBLIC void S4FUNCTION c4setErrDefaultUnique( CODE4 S4PTR *, short ) ;
-#endif /* S4SERVER */
+ PUBLIC void S4FUNCTION c4setAccessMode( CODE4 S4PTR *, char ) ;
+ PUBLIC void S4FUNCTION c4setAutoOpen( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrorCode( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrExpr( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrFieldName( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrGo( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrOpen( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrRelate( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrSkip( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrTagName( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setLockAttempts( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setLockEnforce( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setOptimize( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setOptimizeWrite( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setReadLockDo( CODE4 S4PTR *, char ) ;
+ PUBLIC void S4FUNCTION c4setReadOnlyDo( CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setSafety( CODE4 S4PTR *, char ) ;
+ PUBLIC void S4FUNCTION c4setSingleOpen( CODE4 S4PTR *, short ) ;
+ PUBLIC void S4FUNCTION c4setErrDefaultUnique( CODE4 S4PTR *, short ) ;
 
-#ifdef S4SERVER
-#ifdef S4COMTHREADS
-   unsigned __stdcall d4server( void * ) ;
-#else
-   int d4server( void * ) ;
-#endif
-#ifdef __WIN32
-   PUBLIC long FAR PASCAL MainWndProc( HWND, UINT, UINT, LONG ) ;
-#else
-   long FAR PASCAL _export MainWndProc( HWND, UINT, UINT, LONG ) ;
-#endif
-#define c4getErrCreate( c4 )      ( (c4)->currentClient->errCreate )
-#define c4setErrCreate( c4, val ) ( (c4)->currentClient->errCreate = (val) )
-#define c4setReadLock( c4, val )  ( (c4)->currentClient->readLock = (val) )
-#define c4getReadLock( c4 )       ( (c4)->currentClient->readLock )
-#define c4getReadOnly( c4 )       ( (c4)->currentClient == 0 ? (c4)->readOnlyDefault : (c4)->currentClient->readOnly )
-#define c4setReadOnly( c4, val )  ( (c4)->currentClient == 0 ? ((c4)->readOnlyDefault = (val)) : ((c4)->currentClient->readOnly = (val)) )
-
-int PASCAL WinMain( HANDLE, HANDLE, LPSTR, int ) ;
-BOOL InitApplication( HANDLE ) ;
-BOOL InitInstance( HANDLE, int ) ;
-LRESULT CALLBACK AboutProc( HWND, UINT, WPARAM, LPARAM ) ;
-
-int I4reindex( INDEX4 * ) ;
-DATA4 *D4createOpen( CODE4 *, const char *, const FIELD4INFO *, TAG4INFO *, char, char ) ;
-int D4check( DATA4 * ) ;
-int I4tagAdd( INDEX4 *, TAG4INFO * ) ;
-int D4remove( DATA4 * ) ;
-int D4zap( DATA4 *, long, long ) ;
-int D4memoCompress( DATA4 * ) ;
-long D4recCount( DATA4 * ) ;
-int D4close( DATA4 * ) ;
-int D4bottom( DATA4 * ) ;
-int D4top( DATA4 * ) ;
-int D4pack( DATA4 * ) ;
-double D4position( DATA4 * ) ;
-int D4positionSet( DATA4 *, double ) ;
-int D4go( DATA4 *, const long ) ;
-DATA4 *D4open( CODE4 *, const char *, short, short, short, short, int, unsigned short ) ;
-int D4create( CODE4 *, const char *, const FIELD4INFO *, TAG4INFO *, DATA4 * *, char, char ) ;
-int D4reindex( DATA4 * ) ;
-int D4seekN( DATA4 *, TAG4 *, const char *, const short, unsigned short int ) ;
-int D4seekDouble( DATA4 *, TAG4 *, const double, unsigned short int ) ;
-int D4tagSync( DATA4 *, TAG4 * ) ;
-int D4skip( DATA4 *, TAG4 *, const long, short int *, long ) ;
-int D4unlock( DATA4 * ) ;
-int D4write( DATA4 *, const long, const int, long, long ) ;
-int D4append( DATA4 *, long, long ) ;
-int Server4clientTranAddUser( struct SERVER4CLIENTSt *, long, const long, const char *, const unsigned short int, const char *, TCP4ADDRESS ) ;
-int Client4unlock( struct SERVER4CLIENTSt * ) ;
-INDEX4 *I4open( DATA4 *, const char *, char, int, char, char, char, char ) ;
-int I4create( DATA4 *, char *, TAG4INFO *, char, char, char, char ) ;
-DATA4 *D4fieldsRemove( DATA4 **, int, char * ) ;
-int D4indexesRemove( DATA4 * ) ;
-INDEX4 *I4createOpen( DATA4 *, char *, TAG4INFO *, char, char, char, char ) ;
-#define c4systemPath( c4 ) ( (c4)->server->systemPath )
-#define D4appendCurrent( d4 ) ( D4append( (d4), (d4)->clientId, (d4)->serverId ) )
-#define D4writeCurrent( d4, i1 ) ( D4write( (d4), (i1), 0, (d4)->clientId, (d4)->serverId ) )
-#else
-#define c4systemPath( c4 ) ( "" )
-#define D4close( d4 ) ( d4close( d4 ) )
-#define D4recCount( d4 ) ( d4recCount( d4 ) )
-#define D4fieldsRemove( d4, n, nm ) ( d4fieldsRemove( (d4), (n), &(nm) ) )
-#define D4appendCurrent( d4 ) ( d4append( d4 ) )
-#define D4writeCurrent( d4, rec ) ( d4write( (d4), (rec) ) )
-#define D4go( d4, rec ) ( d4go( (d4), (rec) ) )
-#define D4remove( d4 ) ( d4remove( d4 ) )
-#define D4indexesRemove( d4 ) ( d4indexesRemove( d4 ) )
-#endif /* S4SERVER */
+ #define c4systemPath( c4 ) ( "" )
+ #define D4close( d4 ) ( d4close( d4 ) )
+ #define D4recCount( d4 ) ( d4recCount( d4 ) )
+ #define D4fieldsRemove( d4, n, nm ) ( d4fieldsRemove( (d4), (n), &(nm) ) )
+ #define D4appendCurrent( d4 ) ( d4append( d4 ) )
+ #define D4writeCurrent( d4, rec ) ( d4write( (d4), (rec) ) )
+ #define D4go( d4, rec ) ( d4go( (d4), (rec) ) )
+ #define D4remove( d4 ) ( d4remove( d4 ) )
+ #define D4indexesRemove( d4 ) ( d4indexesRemove( d4 ) )
 
 
 /* INTERNAL FUNCTIONS : */
@@ -782,12 +692,6 @@ PUBLIC void S4FUNCTION c4lower( char * ) ;
 PUBLIC void S4FUNCTION c4ltoa45( long, char *, int ) ;
 PUBLIC void S4FUNCTION c4upper( char * ) ;
 
-#ifndef S4STAND_ALONE
-   #ifdef S4SERVER
-      void code4enterExclusive( CODE4 *, struct SERVER4CLIENTSt *, int doDelay = 1 ) ;
-      void code4exitExclusive( CODE4 *, struct SERVER4CLIENTSt * ) ;
-   #endif
-#endif
 
 void code4memStartMaxSet( CODE4 *, const int ) ;
 int code4numCodeBase( void ) ;
@@ -796,12 +700,7 @@ int code4unlockDo( LIST4 * ) ;
 int code4verify( CODE4 *, int ) ;
 PUBLIC long S4FUNCTION code4version( CODE4 S4PTR * ) ;
 
-#ifdef S4SERVER
-   int code4dataFileCloseAll( CODE4 * ) ;
-   DATA4 *code4idData( CODE4 *, const long, const long ) ;
-#else
    #define code4idData( a, b, c ) ( tran4data( code4trans((a)), (b), (c) ) )
-#endif
 
 #ifdef S4LOCK_HOOK
    int code4lockHook( CODE4 *, const char *, const char *, const char *, long, int ) ;
@@ -929,13 +828,9 @@ int d4verify( DATA4 *, const int ) ;
       #define d4lockTestIndex( d4 ) ( dfile4lockTestIndex( (d4)->dataFile, 1L ) )
    #endif
 #endif
-#ifdef S4SERVER
-   long d4skipRecno( DATA4 *, long ) ;
-#else
    #ifndef S4OFF_WRITE
       int d4flushData( DATA4 * ) ;
    #endif
-#endif
 
 long S4FUNCTION error4number2( const long ) ;
 void error4logAppend( CODE4 *c4, int, long, const char *, const char *, const char * ) ;
@@ -1121,11 +1016,7 @@ int mem4reset( void ) ;
 #endif /* S4OFF_MEMO */
 
 #ifndef S4OFF_INDEX
-   #ifdef S4SERVER
-      #define t4uniqueSetLow( t4, val, dum ) ( (t4)->errUnique = ( val ) )
-   #else
       PUBLIC int S4FUNCTION t4uniqueSetLow( TAG4 *, const short, const char ) ;
-   #endif
 
       /* #ifdef S4HAS_DESCENDING */  /* removed from switch to facilatate index independant code */
       PUBLIC void S4FUNCTION tfile4descending( TAG4FILE *, const unsigned short int ) ;
@@ -1211,11 +1102,6 @@ int mem4reset( void ) ;
 #ifdef S4MAX
    long u4allocated( void ) ;
    long u4max( void ) ;
-#else
-   #ifdef S4SERVER
-      long u4allocated( void ) ;
-      unsigned short u4openFiles( void ) ;
-   #endif
 #endif
 
 #ifdef S4MEM_PRINT

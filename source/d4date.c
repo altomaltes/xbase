@@ -211,11 +211,7 @@ const char *S4FUNCTION code4dateFormat( CODE4 *c4 )
       }
    #endif
 
-   #ifdef S4SERVER
-      return c4->currentClient->trans.dateFormat ;
-   #else
       return c4->c4trans.trans.dateFormat ;
-   #endif
 }
 
 int S4FUNCTION code4dateFormatSet( CODE4 *c4, const char *str )
@@ -228,11 +224,7 @@ int S4FUNCTION code4dateFormatSet( CODE4 *c4, const char *str )
          return error4( c4, e4parm, E96302 ) ;
    #endif
 
-   #ifdef S4SERVER
-      strcpy( c4->currentClient->trans.dateFormat, str ) ;
-   #else
       strcpy( c4->c4trans.trans.dateFormat, str ) ;
-   #endif
 
    return 0 ;
 }

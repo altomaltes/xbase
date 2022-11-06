@@ -22,24 +22,6 @@
    thread is being used
 */
 
-#ifdef S4SERVER
-void connect4threadRegisterShutdown( CONNECT4THREAD *connectThread )
-{
-/*
-   DESCRIPTION
-
-   Change the workState to CONNECT4SHUTDOWN.  This has the effect of
-     new incoming commands being ignored by the server.
-*/
-
-   if ( connectThread->readMessageCompletedList.isValid )  /* if it is not valid, maybe - not initialized */
-      list4mutexWait( &connectThread->readMessageCompletedList ) ;
-   if ( connectThread->connectBuffer != 0 )
-      connectThread->connectBuffer->connect->workState = CONNECT4SHUTDOWN ;
-   if ( connectThread->readMessageCompletedList.isValid )
-      list4mutexRelease( &connectThread->readMessageCompletedList ) ;
-}
-#endif
 
 void connect4threadCompleteRequest( CONNECT4THREAD *connectThread )
 {
@@ -71,11 +53,6 @@ void connect4threadCompleteRequest( CONNECT4THREAD *connectThread )
       }
    #endif
 
-   #ifdef S4SERVER
-      connect4threadRegisterShutdown( connectThread ) ;
-      if ( connectThread->link.n )
-         list4mutexRemoveLink( &connectThread->cb->connectsToService, ( LINK4 * )connectThread ) ;
-   #endif
    inter4completeRequested( connectThread->inter, connectThread ) ;
    semaphore4wait( &connectThread->completedSemaphore, WAIT4EVER ) ;
 }
@@ -142,17 +119,6 @@ int connect4threadInit( CONNECT4THREAD *connectThread, CODE4 *c4, CONNECT4BUFFER
    connectThread->connectBuffer = connectBuffer ;
 
    /* connectThread->connectLow = connectLow ; */
-   #ifdef S4SERVER
-/*
-      if ( connect == 0 )
-         connectThread->workState = CONNECT4SPECIAL ;
-      else
-      {
-         connectThread->connect = connect ;
-         connectThread->workState = CONNECT4IDLE ;
-      }
-*/
-   #endif
    rc = semaphore4init( &connectThread->readMessageCompletedListSemaphore ) ;
    if ( rc )
       return error4( c4, rc, E96925 ) ;
@@ -323,17 +289,6 @@ void connect4threadReadStore( CONNECT4THREAD *connectThread, NET4MESSAGE *messag
    #endif
    list4mutexAdd( &connectThread->readMessageCompletedList, message ) ;
    semaphore4release( &connectThread->readMessageCompletedListSemaphore ) ;
-   #ifdef S4SERVER
-      list4mutexWait( &connectThread->readMessageCompletedList ) ;
-      if ( connectThread->connectBuffer->connect->workState == CONNECT4IDLE )
-      {
-         list4mutexAdd( &connectThread->cb->connectsToService, connectThread->connectBuffer->connect ) ;
-         connectThread->connectBuffer->connect->workState = CONNECT4WORKING ;
-         semaphore4release( &connectThread->cb->workerSemaphore ) ;
-      }
-      list4mutexRelease( &connectThread->readMessageCompletedList ) ;
-   #endif
-
 
 }
 int connect4threadReadRequest( CONNECT4THREAD *connectThread, NET4MESSAGE *message )
