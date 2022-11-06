@@ -97,16 +97,8 @@ static DATA4 *d4openInit( CODE4 *c4 )
    #endif
    d4->codeBase = c4 ;
 
-   #ifdef S4SERVER
-      d4->clientId = 1L ;  /* should get overridden at a later point, unless this is a server-only data file */
-      d4->serverId = c4->server->serverDataCount ;
-      c4->server->serverDataCount++ ;
-      d4->trans = &c4->currentClient->trans ;
-      l4add( tran4dataList( d4->trans ), d4 ) ;
-   #else
       d4->trans = &c4->c4trans.trans ;
       l4add( tran4dataList( (&(c4->c4trans.trans)) ), d4 ) ;
-   #endif
 
    return d4 ;
 }
@@ -354,22 +346,9 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
                }
                else
                {
-                  #ifdef S4SERVER
-                     /* if a temp file, tags already available... */
-                     if ( d4->dataFile->file.isTemp == 1 )
-                     {
-                        if ( i4setup( c4, d4, nameBuf, 1 ) < 0 )
-                           return -1 ;
-                     }
-                  #endif
                   i4 = i4open( d4, 0 ) ;
-                  #ifdef S4SERVER
-                     if ( i4 == 0 )  /* server version, if no .cgp file then don't open index */
-                        error4set( c4, 0 ) ;
-                  #else
                      if ( i4 == 0 )
                         return -1 ;
-                  #endif
                }
             }
          #else
@@ -461,14 +440,6 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
       #endif /* S4OFF_TRAN */
    #endif /* S4OFF_WRITE */
 
-   #ifdef S4SERVER
-      d4->accessMode = c4->singleClient ;
-      if ( d4->accessMode == OPEN4DENY_RW )
-      {
-         d4->dataFile->exclusiveOpen = d4 ;
-         d4->dataFile->singleClient = c4->currentClient ;
-      }
-   #endif
 
       /* 07/30/96 AS --> previously just check c4 setting.  should instead
          check file read only as well (but still allow read-only override
@@ -634,118 +605,6 @@ DATA4 *S4FUNCTION d4openClone( DATA4 *dataOld )
 #ifndef S4OFF_INDEX
 #endif  /* not S4OFF_INDEX */
 
-#ifdef S4SERVER
-/* what is the maximal read and access setting on the data file */
-/* does not report results for current client */
-static void dfile4accesses( DATA4FILE *d4, int *readMode, int *accessMode, int *otherUsers )
-{
-   SERVER4CLIENT *client ;
-   DATA4 *data ;
-
-   *readMode = 1 ;
-   *accessMode = OPEN4DENY_NONE ;
-   *otherUsers = 0 ;
-
-   /* reserve the client list during this process */
-   list4mutexWait( &d4->c4->server->clients ) ;
-
-   for ( client = 0 ;; )
-   {
-      client = (SERVER4CLIENT *)l4next( &d4->c4->server->clients.list, client ) ;
-      if ( client == 0 )
-         break ;
-      if ( client == d4->c4->currentClient )
-         continue ;
-      for ( data = 0 ;; )
-      {
-         data = (DATA4 *)l4next( tran4dataList( &client->trans ), data ) ;
-         if ( data == 0 )
-            break ;
-         if ( data->dataFile == d4 )
-         {
-            *otherUsers = 1 ;
-            if ( data->readOnly == 0 )
-               *readMode = 0 ;
-            if ( *accessMode != OPEN4DENY_RW)
-               if ( data->accessMode != *accessMode )
-                  if ( data->accessMode != OPEN4DENY_NONE )
-                     *accessMode = data->accessMode ;
-            if ( *readMode == 0 && *accessMode == OPEN4DENY_RW )  /* maximal already */
-            {
-               list4mutexRelease( &d4->c4->server->clients ) ;
-               return ;
-            }
-         }
-      }
-   }
-
-   list4mutexRelease( &d4->c4->server->clients ) ;
-   return ;
-}
-
-/* returns 1 if file can be accessed in desired mode */
-static int dfile4checkAccess( DATA4FILE *d4, int accessRequested, int readOnly )
-{
-   int maxAccess, maxRead, otherUsers ;
-
-   if ( d4->userCount == 0 )
-      return 1 ;
-
-   /* first get maximal access and read modes of other users */
-   dfile4accesses( d4, &maxRead, &maxAccess, &otherUsers ) ;
-
-   if ( otherUsers == 0 )   /* no other users, so any requests are ok */
-      return 1 ;
-
-   if ( accessRequested == OPEN4DENY_RW )   /* others users accessing, so no */
-      return 0 ;
-
-   if ( maxAccess == OPEN4DENY_RW )   /* other user is disallowing our access */
-      return 0 ;
-
-   if ( readOnly == 0 )   /* need write access */
-   {
-      if ( maxAccess != OPEN4DENY_NONE )
-         return 0 ;
-      /* maxAccess is DENY_NONE, so continue */
-      switch( accessRequested )
-      {
-         case OPEN4DENY_NONE:
-            return 1 ;
-         case OPEN4DENY_WRITE:
-            if ( maxRead == 1 )   /* others only reading, so ok */
-               return 1 ;
-         /* fall through, and any other case, access denied */
-         default:
-            return 0 ;
-      }
-   }
-
-   /* is readOnly, so deny_write allowable by others */
-   switch( maxAccess )
-   {
-      case OPEN4DENY_RW:
-         return 0 ;
-      case OPEN4DENY_WRITE:
-         switch ( accessRequested )
-         {
-            case OPEN4DENY_NONE:
-               return 1 ;
-            case OPEN4DENY_WRITE:
-               if ( maxRead == 1 )
-                  return 1 ;
-            /* fall through or default, no access */
-            default:
-               return 0 ;
-         }
-      default:
-         break ;
-   }
-
-   return 1 ;
-}
-#endif  /* S4SERVER */
-
 static DATA4FILE *data4reopen( DATA4FILE *d4, char **info )
 {
       #ifndef S4OFF_MULTI
@@ -908,15 +767,6 @@ static DATA4FILE *data4reopen( DATA4FILE *d4, char **info )
          }
       #endif /* S4OFF_MULTI */
 
-      #ifdef S4SERVER
-         /* singleClient is the client's requested access mode */
-         if ( d4 != 0 )
-            if ( dfile4checkAccess( d4, c4->singleClient, c4getReadOnly( c4 ) ) == 0 )  /* access denied */
-            {
-               error4describe( c4, e4instance, E91102, dfile4name( d4 ), 0, 0 ) ;
-               return 0 ;
-            }
-      #endif
       }
 
    if ( d4 != 0 )
@@ -961,11 +811,6 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
       DATA4HEADER_FULL fullHeader ;
       #ifndef S4OFF_MEMO
          int hasMemo ;
-      #endif
-      #ifdef S4SERVER
-         #ifndef S4OFF_CATALOG
-            int i ;
-         #endif
       #endif
 
    #ifdef S4VBASIC
@@ -1037,21 +882,6 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
          d4->memoFile.file.hand = INVALID4HANDLE ;
       #endif
 
-      #ifdef S4SERVER
-         #ifndef S4OFF_CATALOG
-            if ( cat4avail( c4->catalog ) )
-            {
-               u4ncpy( nameBuf, cat4pathName( c4->catalog ), (unsigned int)cat4pathNameLen( c4->catalog ) ) ;
-               for ( i = 0 ; i < cat4pathNameLen( c4->catalog ) ; i++ )
-                  if ( nameBuf[i] == ' ' )
-                  {
-                     nameBuf[i] = 0 ;
-                     break ;
-                  }
-
-            }
-         #endif  /* S4OFF_CATALOG */
-      #endif /* S4SERVER */
       rc = file4open( &d4->file, c4, nameBuf, 1 ) ;
 
       if ( rc )
@@ -1254,11 +1084,7 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
                   if ( d4->version != 0x30 )  /* 2.5 data files disallowed these fields */
                   {
                      dfile4close( d4 ) ;
-                     #ifdef S4SERVER
-                        error4describe( c4, e4data, E80501, nameBuf, dfile4name( d4 ), 0 ) ;
-                     #else
                         error4describe( c4, e4data, E80501, name, dfile4name( d4 ), 0 ) ;
-                     #endif
                      return 0 ;
                   }
                #endif
@@ -1271,11 +1097,7 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
                if ( d4->version != 0x30 )  /* 2.5 data files disallowed these fields */
                {
                   dfile4close( d4 ) ;
-                  #ifdef S4SERVER
-                     error4describe( c4, e4data, E80501, nameBuf, dfile4name( d4 ), 0 ) ;
-                  #else
                      error4describe( c4, e4data, E80501, name, dfile4name( d4 ), 0 ) ;
-                  #endif
                   return 0 ;
                }
                d4->recWidth += image->len ;
@@ -1284,11 +1106,7 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
                if ( ( d4->version != 0x30 ) || ( memcmp( image->name, "_NullFlags", 10 ) != 0 ) )  /* not visual FP 3.0 */
                {
                   dfile4close( d4 ) ;
-                  #ifdef S4SERVER
-                     error4describe( c4, e4data, E80501, nameBuf, dfile4name( d4 ), 0 ) ;
-                  #else
                      error4describe( c4, e4data, E80501, name, dfile4name( d4 ), 0 ) ;
-                  #endif
                }
                d4->recWidth += image->len ;
                break ;
@@ -1310,36 +1128,19 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
                      break ;
                   default:
                      dfile4close( d4 ) ;
-                     #ifdef S4SERVER
-                        error4describe( c4, e4data, E80501, nameBuf, dfile4name( d4 ), 0 ) ;
-                     #else
                         error4describe( c4, e4data, E80501, name, dfile4name( d4 ), 0 ) ;
-                     #endif
                      return 0 ;
                }
             }
             else
             {
                dfile4close( d4 ) ;
-               #ifdef S4SERVER
-                  error4describe( c4, e4data, E80501, nameBuf, dfile4name( d4 ), 0 ) ;
-               #else
                   error4describe( c4, e4data, E80501, name, dfile4name( d4 ), 0 ) ;
-               #endif
                return 0 ;
             }
       }
    }
 
-   #ifdef S4SERVER
-      if ( c4->largeFileOffset == 0 )   /* for large files, allow large record widths */
-         if ( d4->recWidth != fullHeader.recordLen )
-         {
-            dfile4close( d4 ) ;
-            error4describe( c4, e4data, E91102, nameBuf, dfile4name( d4 ), 0 ) ;
-            return 0 ;
-         }
-   #endif
 
       d4->valid = 1 ;   /* valid, so low closes will leave open. */
 

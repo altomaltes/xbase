@@ -186,9 +186,6 @@ int S4FUNCTION file4close( FILE4 *file )
    #endif
 
    if ( c4 != 0 )
-      #ifdef S4SERVER
-         if ( c4->currentClient != 0 )
-      #endif
          if ( error4code( c4 ) < 0 )
             return -1 ;
 

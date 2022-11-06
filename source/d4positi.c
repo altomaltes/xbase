@@ -67,11 +67,7 @@ int S4FUNCTION d4position2( DATA4 *data, double *result )
    return 0;
 }
 
-#ifdef S4SERVER
-long S4FUNCTION d4positionSet( DATA4 *data, const double per )
-#else
 int S4FUNCTION d4positionSet( DATA4 *data, const double per )
-#endif
 {
    int rc ;
    CODE4 *c4 ;
@@ -141,11 +137,7 @@ int S4FUNCTION d4positionSet( DATA4 *data, const double per )
                   if ( rc == 0 )
                      if ( code4transEnabled( c4 ) )
                         if ( t4unique( tag ) != 0 )
-                           #ifdef S4SERVER
-                              if ( !dfile4lockTestFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) )
-                           #else
                               if ( !d4lockTestFile( data ) )
-                           #endif
                               rc = d4tagSyncDo( data, tag, -1 ) ;
                #endif
             #endif

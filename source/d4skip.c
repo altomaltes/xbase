@@ -2,162 +2,6 @@
 
 #include "d4all.h"
 
-#ifdef S4SERVER
-/* -2 means eof, -3 means bof */
-long d4skipRecno( DATA4 *data, long n )
-{
-   #ifndef S4OFF_INDEX
-      TAG4 *tag ;
-      TAG4FILE *tagFile ;
-   #endif
-   long startRec, newRec ;
-   #ifndef S4OFF_INDEX
-      unsigned char *keyValue ;
-      int rc ;
-      long recno, nSkipped ;
-   #endif
-   CODE4 *c4 ;
-
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E94801 ) )
-         return -1 ;
-   #endif
-
-   #ifdef E4PARM_LOW
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E94801 ) ;
-   #endif
-
-   c4 = data->codeBase ;
-   if ( c4 == 0 )
-      return e4info ;
-   if ( error4code( c4 ) < 0 )
-      return error4code( c4 ) ;
-
-   if ( data->recNum < 1L )
-   {
-         if ( c4->errSkip )
-            return error4( c4, e4info, E84801 ) ;
-      return e4info ;
-   }
-
-   #ifndef S4OFF_INDEX
-      tag = data->tagSelected ;  /* avoid function call */
-      if ( tag == 0 )
-      {
-   #endif
-      if ( n != 0L )
-         if ( d4recCountLessEq( data, 1L ) == 0 )  /* count == 0 */
-            return -4L ;
-
-      data->bofFlag = 0 ;
-      startRec = data->recNum ;
-      newRec = startRec + n ;
-
-      if ( newRec > 0L )
-      {
-         if ( d4recCountLessEq( data, newRec ) == 0 )
-            return -2L ;
-         return newRec ;
-      }
-      else
-         return -3L ;
-   #ifndef S4OFF_INDEX
-      }
-      else
-      {
-         tagFile = tag->tagFile ;
-         if ( data->eofFlag )
-         {
-            if ( n >= 0L )
-               return -2L ;
-
-            rc = d4bottom( data ) ;
-            if ( rc && rc != r4eof )
-               return rc ;
-            if ( rc == r4eof )
-               return -2L ;
-            n++ ;
-            data->recNum = tfile4recNo( tagFile ) ;
-         }
-
-         data->bofFlag = 0 ;
-
-         #ifndef S4OFF_WRITE
-            if ( data->recordChanged )
-            {
-               /* AS 04/22/97 causes problems with t4seek, unlock reset to 0 */
-               rc = d4updateRecord( data, 0 ) ;
-               if ( rc < 0 )
-                  return rc ;
-            }
-         #endif
-
-         t4versionCheck( tag, 1, 0 ) ;
-
-         if ( n == 0 )
-            return data->recNum ;
-
-         if ( tfile4recNo( tagFile ) != data->recNum )
-         {
-            if ( d4lockTest( data, data->recNum ) == 0 )  /* ensure latest from disk */
-            {
-               rc = d4go( data, data->recNum ) ;
-               if ( rc < 0 )
-                  return rc ;
-            }
-
-            expr4context( tagFile->expr, data ) ;
-            tfile4exprKey( tagFile, &keyValue ) ;
-
-            rc = tfile4go( tagFile, keyValue, data->recNum, 0 ) ;
-            if ( rc < 0 )
-               return rc ;
-
-            if ( tfile4empty( tagFile ) )
-               return -4L ;
-
-            if ( tfile4eof( tagFile ) && n >= 0L )
-               return -2L ;
-
-            #ifdef S4HAS_DESCENDING
-               if ( tagFile->header.descending )
-               {
-                  if ( (rc > 0) && (n < 0) )
-                     n-- ;
-               }
-               else
-                  if ( (rc > 0) && (n > 0) )
-                     n-- ;
-            #else
-               if ( (rc > 0) && (n > 0) )
-                  n-- ;
-            #endif
-         }
-         else
-         {
-            if ( tfile4eof( tagFile ) )
-               return -2L ;
-         }
-
-         nSkipped = tfile4dskip( tagFile, n ) ;
-
-         if ( n > 0 && nSkipped != n )
-            return -2L ;
-         if ( n < 0 && nSkipped != n )
-            return -3L ;
-
-         if ( tfile4eof( tagFile ) )
-            return -2L ;
-
-         recno = tfile4recNo( tagFile ) ;
-         if ( recno < 0 )
-            return recno ;
-         return recno ;
-      }
-   #endif
-}
-#endif /* S4SERVER */
 
 /* flush the current record to disk, and update the data pointer to point
    to a valid tag location (in case the current record has been filtered out */
@@ -271,11 +115,7 @@ int d4tagSyncDo( DATA4 *data, TAG4 * const tag, int direction )
    }
 
    #ifndef S4OFF_MULTI
-      #ifdef S4SERVER
-         if ( !dfile4lockTestFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) )
-      #else
          if ( !d4lockTestFile( data ) )
-      #endif
          for( verifyReccount = 1, done = 0 ; done == 0 ; )
          {
             #ifndef S4OFF_TRAN
@@ -571,11 +411,7 @@ int S4FUNCTION d4skip( DATA4 *data, const long nSkip )
                #ifndef S4OFF_TRAN
                   if ( code4transEnabled( c4 ) )
                      if ( t4unique( tag ) != 0 )
-                        #ifdef S4SERVER
-                           if ( !dfile4lockTestFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) )
-                        #else
                            if ( !d4lockTestFile( data ) )
-                        #endif
                         {
                            rc = d4tagSyncDo( data, tag, n > 0 ? 1 : -1 ) ;
                            if ( rc != 0 )

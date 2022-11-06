@@ -75,11 +75,7 @@ int d4zapData( DATA4 *data, const long startRec, const long endRec )
    #endif
 
    #ifndef S4SINGLE
-      #ifdef S4SERVER
-         rc = dfile4lockFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
-      #else
          rc = d4lockFile( data ) ;
-      #endif
       if ( rc )
          return rc ;
    #endif

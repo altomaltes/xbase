@@ -64,11 +64,7 @@ int S4FUNCTION d4writeLow( DATA4 *d4, const long recIn, const int unlock )
 
    /* set lock before transaction handling since cannot otherwise rollback */
    #ifndef S4OFF_MULTI
-      #ifdef S4SERVER
-         rc = dfile4lock( d4->dataFile, data4clientId( d4 ), data4serverId( d4 ), rec ) ;
-      #else
          rc = d4lock( d4, rec ) ;
-      #endif
       if ( rc )
       {
          d4->recordChanged = old ;
@@ -347,10 +343,6 @@ int S4FUNCTION d4writeLow( DATA4 *d4, const long recIn, const int unlock )
 
    if ( unlock && code4unlockAuto( c4 ) != 0 ) /* unlock records (unless entire file is locked)... */
    {
-      #ifdef S4SERVER
-         if ( dfile4lockTestFile( d4->dataFile, data4clientId( d4 ), data4serverId( d4 ) ) == 0 )
-            return dfile4unlockData( d4->dataFile, data4clientId( d4 ), data4serverId( d4 ) ) ;
-      #else
          #ifndef S4OFF_TRAN
             if ( code4transEnabled( c4 ) )
                if ( code4tranStatus( c4 ) == r4active )
@@ -365,7 +357,6 @@ int S4FUNCTION d4writeLow( DATA4 *d4, const long recIn, const int unlock )
                return rc ;
             }
          #endif
-      #endif
    }
 
    return finalRc ;
@@ -388,11 +379,7 @@ int d4writeData( DATA4 *data, const long rec )
       return e4codeBase ;
 
    #ifndef S4OFF_MULTI
-      #ifdef S4SERVER
-         rc = dfile4lock( data->dataFile, data4clientId( data ), data4serverId( data ), rec ) ;
-      #else
          rc = d4lock( data, rec ) ;
-      #endif
       if ( rc )
          return rc ;
    #endif  /* S4OFF_MULTI */
@@ -479,11 +466,7 @@ int d4writeKeys( DATA4 *d4, const long rec )
 
       #ifdef S4CB51
          #ifndef S4OFF_MULTI
-            #ifdef S4SERVER
-               rc = dfile4lock( d4->dataFile, data4clientId( d4 ), data4serverId( d4 ), rec, d4 ) ;
-            #else
                rc = d4lock( d4, rec ) ;
-            #endif
             if ( rc )
                return rc ;
          #endif  /* S4OFF_MULTI */
@@ -504,11 +487,7 @@ int d4writeKeys( DATA4 *d4, const long rec )
       saveRecBuffer = d4->record ;
       rc = 0 ;
       #ifndef S4OFF_MULTI
-         #ifdef S4SERVER
-            indexLocked = dfile4lockTestIndex( d4->dataFile, data4serverId( d4 ) ) ? 2 : 0 ;  /* 2 means was user locked */
-         #else
             indexLocked = d4lockTestIndex( d4 ) ? 2 : 0 ;  /* 2 means was user locked */
-         #endif
       #endif
 
       for( tagOn = 0 ;; )
@@ -595,11 +574,7 @@ int d4writeKeys( DATA4 *d4, const long rec )
             if ( indexLocked == 0 )
             {
                indexLocked = 1 ;
-               #ifdef S4SERVER
-                  rc = dfile4lockIndex( d4->dataFile, data4serverId( d4 ) ) ;
-               #else
                   rc = d4lockIndex( d4 ) ;
-               #endif
                if ( rc )
                   break ;
             }
@@ -891,11 +866,7 @@ static int d4unwriteKeys( DATA4 *d4, const long rec )
 
       rc = 0 ;
       #ifndef S4OFF_MULTI
-         #ifdef S4SERVER
-            indexLocked = dfile4lockTestIndex( d4->dataFile, data4serverId( d4 ) ) ? 2 : 0 ;  /* 2 means was user locked */
-         #else
             indexLocked = d4lockTestIndex( d4 ) ? 2 : 0 ;  /* 2 means was user locked */
-         #endif
       #endif
 
       for( tagOn = 0 ;; )
@@ -983,11 +954,7 @@ static int d4unwriteKeys( DATA4 *d4, const long rec )
             if ( indexLocked == 0 )
             {
                indexLocked = 1 ;
-               #ifdef S4SERVER
-                  rc = dfile4lockIndex( d4->dataFile, data4serverId( d4 ) ) ;
-               #else
                   rc = d4lockIndex( d4 ) ;
-               #endif
                if ( rc )
                   break ;
             }

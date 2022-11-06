@@ -72,11 +72,7 @@ int d4packData( DATA4 *d4 )
       return rc ;
 
    #ifndef S4SINGLE
-      #ifdef S4SERVER
-         rc = dfile4lockFile( d4->dataFile, data4clientId( d4 ), data4serverId( d4 ) ) ;
-      #else
          rc = d4lockFile( d4 ) ;
-      #endif
       if ( rc )
          return rc ;
    #endif

@@ -52,34 +52,11 @@ int S4FUNCTION code4freeBlocks( CODE4 *c4 )
 static int code4freeBlocks( CODE4 *c4 )
 #endif
 {
-   #ifdef S4SERVER
-      SERVER4CLIENT *client ;
-   #endif
       DATA4 *data ;
 
    #ifdef E4PARM_HIGH
       if ( c4 == 0 )
          return error4( 0, e4parm_null, E92510 ) ;
-   #endif
-
-   #ifdef S4SERVER
-      /* reserve the client list during this process */
-      list4mutexWait( &c4->server->clients ) ;
-
-      for( client = 0 ;; )
-      {
-         client = (SERVER4CLIENT *)l4next( &c4->server->clients.list, client ) ;
-         if ( client == 0 )
-            break ;
-         for ( data = 0 ;; )
-         {
-            data = (DATA4 *)l4next( tran4dataList( &client->trans ), data ) ;
-            if ( data == 0 )
-               break ;
-            d4freeBlocks( data ) ;
-         }
-      }
-      list4mutexRelease( &c4->server->clients ) ;
    #endif
 
    #ifdef S4STAND_ALONE
