@@ -18,6 +18,11 @@
 /* d4bottom.c  */
 
 #include "d4all.h"
+#ifndef S4UNIX
+   #ifdef __TURBOC__
+      #pragma hdrstop
+   #endif  /* __TUROBC__ */
+#endif  /* S4UNIX */
 
 #ifdef S4CLIENT
 

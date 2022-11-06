@@ -552,28 +552,18 @@ PREPORT4 report ;
 
                if( report->for_dbf && report->output_group == group_on )
                {
-                  #ifdef S4CLIENT
-                     d4append( report->data_file ) ;
-                     d4appendStart( report->data_file, 0 ) ;
-                  #else
                      file4seqWrite( &report->dfile_seq, d4record(report->data_file),
                         (unsigned)(d4recWidth(report->data_file)) ) ;
                      report->rcount++ ;
-                  #endif
                }
                goto GOODRET ;
             }
 
             if( report->for_dbf && report->output_group == group_on )
             {
-               #ifdef S4CLIENT
-                  d4append( report->data_file ) ;
-                  d4appendStart( report->data_file, 0 ) ;
-               #else
                   file4seqWrite( &report->dfile_seq, d4record(report->data_file),
                      (unsigned)(d4recWidth(report->data_file)) ) ;
                   report->rcount++ ;
-               #endif
             }
 
             if( group_on == group_first )

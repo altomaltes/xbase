@@ -72,11 +72,6 @@ struct DATA4FILESt ;
 #else
    struct CODE4St ;
 #endif
-#ifndef S4OFF_COMMUNICATIONS
-   #ifdef S4CLIENT
-      struct CONNECTION4St ;
-   #endif
-#endif
 
 #ifdef S4CBPP
    class S4CLASS Code4 ;
@@ -643,12 +638,8 @@ typedef struct S4CLASS TRAN4St
 
    LIST4 closedDataFiles ;  /* during a transaction */
 
-   #ifdef S4CLIENT
-      int dataIdCount ;    /* client keeps an id on each data4 */
-   #else
       char userId[LEN4USERID+1] ;
       char netId[LEN4NETID+1] ;
-   #endif
 } TRAN4 ;
 
 typedef struct S4CLASS CODE4TRANSSt
@@ -977,12 +968,7 @@ typedef struct CONNECT4St
 
    /* sturcture used to communicate with the communications thread */
    CONNECT4BUFFER connectBuffer ;
-   #ifndef S4OFF_BLASTS
-      #ifdef S4CLIENT
-         short numBlasts ; /* Only client needs to know how many */
-      #endif
-      LIST4 blastList ; /* currently unused blast connections (CONNECT4BUFFER)*/
-   #endif
+
    #ifdef S4SERVER
       struct SERVER4CLIENTSt *client ;
       int workState ; /* is this connection being serviced? How ?
@@ -1347,20 +1333,9 @@ typedef struct CODE4St
       long clientDataCount ;
    #endif
 
-   #ifdef S4CLIENT
-      char serverName[S4MAX_SERVER_NAME_SIZE] ;  /* name of server client is connected to */
-      int indexFormat ;
-      short openForCreate ;  /* 2 means no index, 1 means index, 0 means non-create related open */
-      CONNECTION4 defaultServer ;
-      CONNECT4 clientConnect ;
-      /* LIST4 availConnects; list of CONNECT4s currently not used */
-      char *savedData ;
-      unsigned savedDataLen ;
-   #else
       int doIndexVerify ;       /* for internal purposes only at this point */
       struct RELATION4St S4PTR *currentRelation ;
       char savedKey[I4MAX_KEY_SIZE + 2 * sizeof(S4LONG)] ;       /* used by i4remove.c, i4tag.c and i4addtag.c, i4versionCheck, t4versionCheck */
-   #endif
 
    #ifdef S4OPTIMIZE_STATS
       struct DATA4St *statusDbf ;
@@ -1676,22 +1651,9 @@ typedef struct DATA4FILESt
       void S4PTR *space6 ;
       time_t space7 ;
    #endif
-   #ifdef S4CLIENT
-      struct DATA4St S4PTR *fileLock ;
-      struct DATA4St S4PTR *appendLock ;
-      struct DATA4St S4PTR *lockTest ;
-   #else
       struct DATA4St S4PTR *space9 ;
       struct DATA4St S4PTR *space10 ;
-   #endif
 
-   #ifdef S4CLIENT
-      char accessName[LEN4PATH+1] ;
-      SINGLE4 lockedRecords ;
-      struct CONNECTION4St S4PTR *connection ;
-      long serverId ;
-      int accessMode ;
-   #endif
       FILE4    file ;
       char hasMdxMemo ;        /* Has an MDX and/or a memo file attached to it */
 
@@ -1779,10 +1741,6 @@ typedef struct DATA4St
       #ifndef S4OFF_MULTI
          char memoValidated ; /* Can we be sure memo id #'s are up to date. */
       #endif
-   #endif
-
-   #ifdef S4CLIENT
-      int aliasSet ;
    #endif
 
    #ifndef S4OFF_TRAN
@@ -2091,11 +2049,6 @@ typedef struct TAG4FILESt
       int space2 ;
    #endif
 
-   #ifdef S4CLIENT
-      char S4PTR *exprPtr ;
-      char S4PTR *filterPtr ;
-      short int errUniqueHold ;
-   #else
       EXPR4   S4PTR  *expr ;
       EXPR4   S4PTR  *filter ;
       S4CMP_FUNCTION *cmp ;
@@ -2151,7 +2104,6 @@ typedef struct TAG4FILESt
       #ifdef __unix__
          int keyType ;
       #endif
-   #endif
 } TAG4FILE ;
 
 typedef struct TAG4St
@@ -2189,16 +2141,6 @@ typedef struct INDEX4FILESt
    CODE4 S4PTR *codeBase ;
    DATA4FILE S4PTR *dataFile ;
 
-   #ifdef S4CLIENT
-      char accessName[LEN4PATH+1] ;
-      int autoOpened ;
-      long clientId, serverId ;
-      #ifdef S4VBASIC
-         short int debugInt ;         /* used to check structure integrity (set to 0x5281) */
-      #else
-         short int space1 ;
-      #endif
-   #else
       FILE4  file ;
       MEM4 S4PTR *blockMemory ;
       long fileLocked ;
@@ -2222,7 +2164,6 @@ typedef struct INDEX4FILESt
       #ifndef S4OFF_OPTIMIZE
          TAG4FILE *readBlockTag ;    /* used for optimization -- is a block-read request occurring? */
       #endif
-   #endif
    int isValid ;
 } INDEX4FILE ;
 #endif
@@ -2243,9 +2184,6 @@ typedef struct INDEX4St
    #else
       long space4;
    #endif
-   #ifdef S4CLIENT
-      char alias[LEN4PATH+1] ;
-   #else
       char accessName[LEN4PATH+1] ;
       #ifdef S4CLIPPER
          FILE4 file ;
@@ -2257,7 +2195,6 @@ typedef struct INDEX4St
          char S4PTR *space2 ;
          long space3 ;
       #endif
-   #endif
 } INDEX4 ;
 
 #ifndef S4OFF_TRAN
@@ -2336,23 +2273,11 @@ typedef struct
 typedef struct LOCK4St
 {
    SINGLE4 link ;
-   #ifdef S4CLIENT
-      DATA4 *data ;
-   #else
       DATA4FILE *data ;
-   #endif
 
    LOCK4ID id ;
 } LOCK4 ;
 
-#ifdef S4CLIENT
-typedef struct
-{
-   SINGLE4 link ;
-   DATA4 *data ;
-   long   recNo ;
-} LOCK4LINK ;
-#endif
 #endif
 
 #ifdef S4FILE_EXTENDED

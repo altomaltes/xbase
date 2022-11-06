@@ -1043,11 +1043,6 @@ static int code4initUndo2( CODE4 *c4, int doClose )
       c4->writeMemory = 0 ;
    #endif
 
-   #ifdef S4CLIENT
-      if ( c4->savedData != 0 )
-         u4free( c4->savedData ) ;
-   #endif
-
    #ifdef S4TESTING
       if ( s4test.codeBase == c4 )
       {
@@ -1458,80 +1453,6 @@ long S4FUNCTION code4version( CODE4 *c4 )
    return (long)S4VERSION ;
 }
 
-#ifdef S4CLIENT
-
-const char *S4FUNCTION code4serverName( CODE4 *c4 )
-{
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-      {
-         error4( 0, e4parm_null, E91112 ) ;
-         return 0 ;
-      }
-   #endif
-
-   #ifdef S4OFF_COMMUNICATIONS
-      return 0 ;
-   #else
-      if ( !c4->defaultServer.connected )
-         return 0 ;
-      return c4->serverName ;
-   #endif
-}
-
-int S4FUNCTION code4indexFormat( CODE4 *c4 )
-{
-   #ifdef S4OFF_INDEX
-      return 0 ;
-   #else
-// JACS      CONNECTION4 *connection ;
-      int rc ;
-
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-            return error4( 0, e4parm_null, E91110 ) ;
-      #endif
-
-      if ( c4->indexFormat != 0 )
-         return c4->indexFormat ;
-
-      if ( !c4->defaultServer.connected )
-         return r4unknown ;
-
-      connection = &c4->defaultServer ;
-      if ( connection == 0 )
-         return r4unknown ;
-      connection4assign( connection, CON4INDEX_FORMAT, 0L, 0L ) ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-         return error4stack( c4, rc, E91110 ) ;
-
-      rc = connection4status( connection ) ;
-      if ( rc < 0 )
-         return connection4error( connection, c4, rc, E91110 ) ;
-
-      #ifdef E4MISC
-         switch( rc )
-         {
-            case r4ndx:
-            case r4mdx:
-            case r4cdx:
-            case r4ntx:
-               break ;
-            default:
-               return error4( c4, e4info, E81102 ) ;
-         }
-      #endif
-
-      c4->indexFormat = rc ;
-
-      return rc ;
-   #endif
-}
-
-#else /* S4CLIENT */
-
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -1559,7 +1480,6 @@ int S4FUNCTION code4indexFormat( CODE4 *c4 )
       #endif
    #endif
 }
-#endif
 
 void S4FUNCTION code4largeOn( CODE4 *c4 )
 {
@@ -1767,21 +1687,9 @@ const char *S4FUNCTION code4indexExtension( CODE4 *c4 )
    #define S4FORMAT 4
 #endif
 
-#ifdef S4CLIENT
-   #ifndef S4FORMAT
-      #define S4FORMAT 0
-   #endif
-#else
    #ifndef S4FORMAT
       #error You must define either S4FOX, S4CLIPPER or S4MDX
    #endif
-#endif
-
-#ifdef S4CLIENT
-   #define S4CLIENT_VAL 0x8
-#else
-   #define S4CLIENT_VAL 0x0
-#endif
 
 #ifdef S4DOS
    #define S4OPERATING 0x10
@@ -1983,14 +1891,17 @@ const char *S4FUNCTION code4indexExtension( CODE4 *c4 )
 
 long S4FUNCTION u4switch()
 {
-   return (long) ( S4FORMAT + S4OPERATING + S4CB51_VAL + S4SAFE_VAL +
-          S4LOCK_HOOK_VAL + S4MAX_VAL + S4TIMEOUT_HOOK_VAL + E4ANALYZE_VAL +
-          E4DEBUG_VAL + E4HOOK_VAL + E4LINK_VAL + E4MISC_VAL + E4OFF_VAL +
-          E4OFF_STRING_VAL + E4PARM_HIGH_VAL + E4PAUSE_VAL + E4STOP_VAL +
+   return (long)
+          ( S4FORMAT + S4OPERATING + S4CB51_VAL + S4SAFE_VAL
+          + S4LOCK_HOOK_VAL + S4MAX_VAL + S4TIMEOUT_HOOK_VAL + E4ANALYZE_VAL
+          + E4DEBUG_VAL + E4HOOK_VAL + E4LINK_VAL + E4MISC_VAL + E4OFF_VAL
+          + E4OFF_STRING_VAL + E4PARM_HIGH_VAL + E4PAUSE_VAL + E4STOP_VAL +
           E4STOP_CRITICAL_VAL + S4OFF_INDEX_VAL + S4OFF_MEMO_VAL +
           S4OFF_MULTI_VAL + S4OFF_OPTIMIZE_VAL +
-/*          S4OFF_REPORT_VAL + S4OFF_TRAN_VAL + S4OFF_WRITE_VAL +  no room */
-          S4CLIENT_VAL + S4STAND_ALONE_VAL ) ;
+/*          S4OFF_REPORT_VAL + S4OFF_TRAN_VAL + S4OFF_WRITE_VAL +  S4CLIENT_VAL +  no room */
+
+
+           S4STAND_ALONE_VAL ) ;
 }
 
 #ifdef S4VB_DOS
@@ -2019,10 +1930,6 @@ typedef   struct ctrl4code_tag
    CODE4       *code ;
    int         alloc ;
    LIST4       form ;
-
-#ifdef S4CLIENT
-   char        ServerName[CTRL4SERVERNAMESIZE] ;
-#endif
 
 
 }CTRL4CODE ;
@@ -2211,74 +2118,12 @@ void S4FUNCTION ctrl4initVBX( CODE4 *code, HINSTANCE hInstance, int initialize )
 
          if ( initialize )
          {
-            #ifdef S4CLIENT
-               char setProtocol = 0 ;
-
-               /* must choose a default protocol for C/C++ client/server dll
-                  if user will be calling ctrl4init() */
-               #ifndef S4VBASIC
-                  #ifndef S4PASCAL
-                     setProtocol = 1 ;
-                  #endif
-               #endif
-
-               if( setProtocol )
-                  code4initLow( code, "C4SPX.DLL", S4VERSION, sizeof( CODE4 ) ) ;
-               else
-                  #ifdef S4SPX
-                     code4initLow( code, "C4SPX.DLL", S4VERSION, sizeof( CODE4 ) ) ;
-                  #else
-                     code4initLow( code, "C4SOCK.DLL", S4VERSION, sizeof( CODE4 ) ) ;
-                  #endif
-            #else
                code4init( code ) ;
-            #endif
          }
       }
    }
 }
 
-#ifdef S4CLIENT
-
-void  S4FUNCTION ctrl4getServerName( HINSTANCE hInst,char *serverName,int strLen ) /*5 oh something*/
-{
-   CTRL4CODE   *code = NULL ;
-
-   if ( !hInst )
-      return ;
-
-   if ( !serverName || strLen <= 0 )
-      return ;
-
-   memset( serverName,0,strLen ) ;
-   code = ctrl4getCtrlCode( hInst ) ;
-
-   if ( code )
-   {
-      memcpy( serverName,code->ServerName,min( strLen,CTRL4SERVERNAMESIZE ) ) ;
-   }
-   return ;
-}
-
-void S4FUNCTION ctrl4setServerName( HINSTANCE hInst,char *serverName ) /*5 oh something*/
-{
-   CTRL4CODE   *code = NULL ;
-
-   if ( !hInst )
-      return ;
-
-   if ( !serverName )
-      return ;
-
-   code = ctrl4getCtrlCode( hInst ) ;
-
-   if ( code )
-   {
-      memcpy( code->ServerName,serverName,CTRL4SERVERNAMESIZE ) ;
-   }
-   return ;
-}
-#endif /* S4CLIENT */
 
 #ifdef S4STAND_ALONE
 #ifdef P4ARGS_USED
@@ -2582,49 +2427,10 @@ int S4FUNCTION code4osVersion(void)
 }
 #endif /* S4CLIENT */
 
-#ifdef S4CLIENT
-int S4FUNCTION code4tranInit( CODE4 *c4 )
-{
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93802 ) ;
-   #endif
-
-   #ifndef S4OFF_TRAN
-      if ( code4transEnabled( c4 ) )
-         return 0 ;
-   #endif
-
-   c4->c4trans.c4 = c4 ;
-   c4->c4trans.trans.c4trans = &c4->c4trans ;
-   #ifndef S4OFF_TRAN
-      c4->c4trans.enabled = 1 ;
-   #endif
-   tran4dataListSet( &c4->c4trans.trans, &c4->c4trans.trans.localDataList ) ;
-   return 0 ;
-}
-#endif /* S4CLIENT */
 
 #ifndef S4OFF_TRAN
 #ifndef S4OFF_WRITE
 
-#ifdef S4CLIENT
-#ifndef S4INLINE
-int S4FUNCTION code4tranInit2( CODE4 *c4, const char *fileName, const char *charId )
-{
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 || fileName == 0 )
-         return error4( 0, e4parm_null, E93801 ) ;
-   #endif
-
-   return 0 ;
-}
-void code4tranInitUndo( CODE4 *c4 )
-{
-   return ;
-}
-#endif
-#else
 int code4tranInitUndoLow( TRAN4 *t4, const long clientId )
 {
    int rc ;
@@ -2646,7 +2452,6 @@ int code4tranInitUndoLow( TRAN4 *t4, const long clientId )
 
    return 0 ;
 }
-#endif /* S4CLIENT */
 
 #ifdef S4STAND_ALONE
 void code4tranInitUndo( CODE4 *c4 )

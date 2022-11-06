@@ -2,79 +2,6 @@
 
 #include "d4all.h"
 
-#ifdef S4CLIENT
-int d4localLockSet( DATA4 *data, const long rec )
-{
-   LOCK4LINK *lock, *lockOn ;
-   CODE4 *c4 ;
-   DATA4FILE *dfile ;
-   SINGLE4DISTANT singleDistant ;
-   #ifdef E4MISC
-      long recSave ;
-   #endif
-
-   #ifdef E4PARM_LOW
-      if ( data == 0 || rec < 1L )
-         return error4( 0, e4parm_null, E92723 ) ;
-   #endif
-
-   if ( d4lockTest( data, rec ) == 1 )
-      return 0 ;
-
-   c4 = data->codeBase ;
-   dfile = data->dataFile ;
-
-   #ifdef E4MISC
-      /* verify the order of the list */
-      lock = (LOCK4LINK *)single4initIterate( &dfile->lockedRecords ) ;
-      if ( lock != 0 )
-         for ( ;; )
-         {
-            recSave = lock->recNo ;
-            lock = (LOCK4LINK *)single4next( &lock->link ) ;
-            if ( lock == 0 )
-               break ;
-            if ( lock->recNo <= recSave )
-               return error4( c4, e4info, E91102 ) ;
-         }
-   #endif
-
-   for ( lock = (LOCK4LINK *)single4initIterate( &dfile->lockedRecords ) ;; )
-   {
-      if ( lock == 0 )
-         break ;
-      if ( lock->data == data && lock->recNo == rec )
-         return 0 ;
-      lock = (LOCK4LINK *)single4next( &lock->link ) ;
-   }
-
-   if ( c4->lockLinkMemory == 0 )
-   {
-      c4->lockLinkMemory = mem4create( c4, c4->memStartLock, sizeof(LOCK4LINK), c4->memExpandLock, 0 ) ;
-      if ( c4->lockLinkMemory == 0 )
-         return e4memory ;
-   }
-   lock = (LOCK4LINK *)mem4alloc( c4->lockLinkMemory ) ;
-   if ( lock == 0 )
-      return e4memory ;
-   lock->data = data ;
-   lock->recNo = rec ;
-
-   single4distantInitIterate( &singleDistant, &dfile->lockedRecords ) ;
-   for ( ;; )
-   {
-      lockOn = (LOCK4LINK *)single4distantToItem( &singleDistant ) ;
-      if ( lockOn == 0 || lockOn->recNo > rec )
-      {
-         single4add( single4distantToSingle( &singleDistant ), &lock->link ) ;
-         break ;
-      }
-      single4distantNext( &singleDistant ) ;
-   }
-
-   return 0 ;
-}
-#endif
 
 #ifdef S4CB51
 int S4FUNCTION d4lock_group( DATA4 *data, const long *recs, const int n_recs )
@@ -155,16 +82,6 @@ int S4FUNCTION d4lock( DATA4 *data, const long rec )
       if ( d4lockTest( data, rec ) > 0 )  /* if record or file already locked */
          return 0 ;
 
-      #ifdef S4CLIENT
-         /* verify that this app doesn't have it locked elsewhere */
-         if ( data->dataFile->lockTest != 0 && code4unlockAuto( c4 ) != LOCK4ALL )
-         {
-            if ( c4->lockAttempts == WAIT4EVER )
-               return error4( c4, e4lock, E81523 ) ;
-            else
-               return r4locked ;
-         }
-      #else
          rc = 0 ;
          switch( code4unlockAuto( c4 ) )
          {
@@ -188,13 +105,8 @@ int S4FUNCTION d4lock( DATA4 *data, const long rec )
          }
          if( rc < 0 )
             return error4stack( c4, rc, E92701 ) ;
-      #endif
 
       rc = dfile4lock( data->dataFile, data4clientId( data ), data4serverId( data ), rec ) ;
-      #ifdef S4CLIENT
-         if ( rc == 0 )
-            rc = d4localLockSet( data, rec ) ;
-      #endif
 
       return rc ;
    #else
@@ -233,11 +145,7 @@ int S4FUNCTION d4lockAddAppend( DATA4 *d4 )
       if ( lock == 0 )
          return error4stack( c4, e4memory, E92719 ) ;
 
-      #ifdef S4CLIENT
-         lock->data = d4 ;
-      #else
          lock->data = d4->dataFile ;
-      #endif
       lock->id.type = LOCK4APPEND ;
       lock->id.serverId = data4serverId( d4 ) ;
       lock->id.clientId = data4clientId( d4 ) ;
@@ -278,11 +186,7 @@ int S4FUNCTION d4lockAddAll( DATA4 *d4 )
       if ( lock == 0 )
          return error4stack( c4, e4memory, E92725 ) ;
 
-      #ifdef S4CLIENT
-         lock->data = d4 ;
-      #else
          lock->data = d4->dataFile ;
-      #endif
       lock->id.type = LOCK4ALL ;
       lock->id.serverId = data4serverId( d4 ) ;
       lock->id.clientId = data4clientId( d4 ) ;
@@ -323,11 +227,7 @@ int S4FUNCTION d4lockAddFile( DATA4 *d4 )
       if ( lock == 0 )
          return error4stack( c4, e4memory, E92720 ) ;
 
-      #ifdef S4CLIENT
-         lock->data = d4 ;
-      #else
          lock->data = d4->dataFile ;
-      #endif
       lock->id.type = LOCK4FILE ;
       lock->id.serverId = data4serverId( d4 ) ;
       lock->id.clientId = data4clientId( d4 ) ;
@@ -368,11 +268,7 @@ int S4FUNCTION d4lockAdd( DATA4 *d4, long rec )
       if ( lock == 0 )
          return error4stack( c4, e4memory, E92721 ) ;
 
-      #ifdef S4CLIENT
-         lock->data = d4 ;
-      #else
          lock->data = d4->dataFile ;
-      #endif
       lock->id.type = LOCK4RECORD ;
       lock->id.recNum = rec ;
       lock->id.serverId = data4serverId( d4 ) ;
@@ -384,30 +280,6 @@ int S4FUNCTION d4lockAdd( DATA4 *d4, long rec )
    return 0 ;
 }
 
-#ifdef S4CLIENT
-int S4FUNCTION d4lockAll( DATA4 *data )
-{
-   int rc ;
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parm, E92702 ) ;
-   #endif
-
-   if ( error4code( data->codeBase ) < 0 )
-      return e4codeBase ;
-
-   if ( d4lockTestFile( data ) == 0 )
-   {
-      rc = dfile4lockAll( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
-      if ( rc == 0 )
-         data->dataFile->fileLock = data ;
-      return rc ;
-   }
-
-   return 0 ;
-}
-#else
 /* locks database, memo, and index files */
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -464,7 +336,6 @@ int S4FUNCTION d4lockAll( DATA4 *data )
       return 0 ;
    #endif
 }
-#endif
 
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -690,31 +561,3 @@ int S4FUNCTION d4lockTestAppendLow( DATA4 *data )
 }
 #endif
 
-#ifdef S4CLIENT
-int S4FUNCTION d4lockTestFileLow( DATA4 *data )
-{
-   #ifndef S4SINGLE
-      int rc ;
-
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parm_null, E92705 ) ;
-      #endif
-
-         if ( data->accessMode != OPEN4DENY_NONE )
-            return 1 ;
-
-      rc = dfile4lockTestFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
-
-      #ifdef S4CLIENT
-         #ifdef E4LOCK
-            return request4lockTest( data, LOCK4FILE, 0L, rc ) ;
-         #endif
-      #endif
-
-      return rc ;
-   #else
-      return 1 ;
-   #endif
-}
-#endif /* S4CLIENT */

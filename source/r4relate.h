@@ -125,9 +125,6 @@ typedef struct RELATION4St
    int isInitialized ;
    char skipBackwards ;   /* is backwards skipping enabled? */
 
-   #ifdef S4CLIENT
-      int needsFreeing ;
-   #endif
 
    unsigned long relationId ;
 

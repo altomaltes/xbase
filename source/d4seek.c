@@ -174,87 +174,6 @@ static int d4seekCheck( DATA4 *data, TAG4FILE *tag, const int rc, const char *bu
    #endif
 }
 
-#ifdef S4CLIENT
-static int d4seekServer( DATA4 *data, const void *searchData, const short len, const int fromCurrentPos, const short seekType )
-{
-   CONNECTION4 *connection ;
-   CONNECTION4GO_INFO_OUT *out ;
-   CONNECTION4SEEK_INFO_IN *infoIn ;
-   int rc, saveRc ;
-   TAG4 *tag ;
-   CODE4 *c4 ;
-   #ifdef E4ANALYZE
-      int e4anLen ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 || searchData == 0 || len < 0 || fromCurrentPos < 0 || fromCurrentPos > 1 ||
-         ( seekType != CON4SEEK && seekType != CON4SEEK_DBL ) )
-         return error4( 0, e4parm, E92906 ) ;
-   #endif
-
-   c4 = data->codeBase ;
-
-   tag = d4tagDefault( data ) ;
-   if ( tag == 0 )
-      return r4noTag ;
-
-   #ifndef S4OFF_WRITE
-      /* AS 04/22/97 causes problems with t4seek, unlock reset to 0 */
-      rc = d4updateRecord( data, 0 ) ;
-      if ( rc )
-         return rc ;
-   #endif
-
-   connection = data->dataFile->connection ;
-   if ( connection == 0 )
-      return error4stack( c4, rc, E92906 ) ;
-
-   connection4assign( connection, seekType, data4clientId( data ), data4serverId( data ) ) ;
-   connection4addData( connection, NULL, sizeof(CONNECTION4SEEK_INFO_IN), (void **)&infoIn ) ;
-   #ifdef E4ANALYZE
-      e4anLen = sizeof( infoIn->tagName ) ;
-      if (  e4anLen != even4up( LEN4TAG_ALIAS + 1 ) || e4anLen != even4up( sizeof( tag->tagFile->alias ) ) )
-         return error4( c4, e4struct, E92906 ) ;
-   #endif
-   memcpy( infoIn->tagName, tag->tagFile->alias, LEN4TAG_ALIAS ) ;
-   infoIn->keyLen = htons(len) ;
-   infoIn->fromCurrentPos = fromCurrentPos ;
-   if ( fromCurrentPos )   /* verify at valid position, first */
-   {
-      if ( d4eof( data ) || d4bof( data ) )
-         infoIn->startPos = 0 ;
-      else
-         infoIn->startPos = htonl(d4recNo( data )) ;   /* for seek next */
-   }
-   connection4addData( connection, searchData, len, NULL ) ;
-   connection4addData( connection, "", 1, NULL ) ;  /* null end for character double seeks */
-   saveRc = connection4repeat( connection ) ;
-   if ( saveRc < 0 )
-      return connection4errorDescribe( connection, c4, saveRc, E92906, tag->tagFile->alias, 0, 0 ) ;
-   if ( saveRc == r4locked )
-      return r4locked ;
-   if ( saveRc == r4eof )
-   {
-      rc = d4goEof( data ) ;
-      if ( rc == 0 )
-         rc = r4eof ;
-      return rc ;
-   }
-   if ( connection4len( connection ) != (long)sizeof( CONNECTION4GO_INFO_OUT ) + (long)d4recWidth( data ) )
-      return error4( c4, e4packetLen, E92906 ) ;
-   out = (CONNECTION4GO_INFO_OUT *)connection4data( connection ) ;
-
-   if ( saveRc == r4entry )
-      rc = r4entry ;
-   else rc = 0 ;
-   rc = d4goVirtual( data, ntohl(out->recNo), rc, out, connection ) ;
-   if ( rc != 0 )
-      return rc ;
-   return saveRc ;
-}
-#endif
-
 int S4FUNCTION d4seek( DATA4 *data, const char *str )
 {
    #ifdef E4PARM_HIGH
@@ -262,38 +181,18 @@ int S4FUNCTION d4seek( DATA4 *data, const char *str )
          return error4( 0, e4parm_null, E92907 ) ;
    #endif
 
-   #ifdef S4CLIENT
-      return d4seekServer( data, str, (short)strlen( str ), 0, CON4SEEK ) ;
-   #else
       return d4seekN( data, str, (short)strlen( str ) ) ;
-   #endif
 }
 
 #ifndef S4CB51
 int S4FUNCTION d4seekNext( DATA4 *data, const char *str )
 {
-   #ifdef S4CLIENT
-      int oldErrGo, rc ;
-      CODE4 *c4 ;
-   #endif
-
    #ifdef E4PARM_HIGH
       if ( data == 0 || str == 0 )
          return error4( 0, e4parm_null, E92908 ) ;
    #endif
 
-   #ifdef S4CLIENT
-      c4 = data->codeBase ;
-      oldErrGo = c4->errGo ;   /* avoid for r4entry */
-      c4->errGo = 0 ;
-      rc = d4seekServer( data, str, (short)strlen( str ), 1, CON4SEEK ) ;
-      c4->errGo = oldErrGo ;
-      if ( rc < 0 && error4code( c4 ) == 0 )
-         return error4( c4, rc, E92908 ) ;
-      return rc ;
-   #else
       return d4seekNextN( data, str, (const short)strlen( str ) ) ;
-   #endif
 }
 
 int S4FUNCTION d4seekNextN( DATA4 *data, const char *str, const short l )
@@ -321,16 +220,6 @@ int S4FUNCTION d4seekNextN( DATA4 *data, const char *str, const short l )
          return error4( 0, e4parm_null, E92905 ) ;
    #endif
 
-   #ifdef S4CLIENT
-      c4 = data->codeBase ;
-      oldErrGo = c4->errGo ;   /* avoid for r4entry */
-      c4->errGo = 0 ;
-      rc = d4seekServer( data, str, l, 1, CON4SEEK ) ;
-      c4->errGo = oldErrGo ;
-      if ( rc < 0 && error4code( c4 ) == 0 )
-         return error4( c4, rc, E92908 ) ;
-      return rc ;
-   #else
       len = l ;
       c4 = data->codeBase ;
       if ( c4 == 0 )
@@ -513,7 +402,6 @@ int S4FUNCTION d4seekNextN( DATA4 *data, const char *str, const short l )
       if ( rc != 0 )
          return r4entry ;
       return rc2 ;
-   #endif
 }
 #endif /* S4CB51 */
 
@@ -535,9 +423,6 @@ int S4FUNCTION d4seekN( DATA4 *data, const char *str, const short l )
          return error4( 0, e4parm_null, E92903 ) ;
    #endif
 
-   #ifdef S4CLIENT
-      return d4seekServer( data, str, l, 0, CON4SEEK ) ;
-   #else
       len = l ;
       c4 = data->codeBase ;
       if ( c4 == 0 )
@@ -663,7 +548,6 @@ int S4FUNCTION d4seekN( DATA4 *data, const char *str, const short l )
       rc = tfile4seek( tfile, buf, len ) ;
 
       return d4seekCheck( data, tfile, rc, buf, len ) ;  /* return a valid value */
-   #endif
 }
 
 int S4FUNCTION d4seekDouble( DATA4 *data, const double dkey )
@@ -687,10 +571,6 @@ int S4FUNCTION d4seekDouble( DATA4 *data, const double dkey )
          return error4( 0, e4parm_null, E92904 ) ;
    #endif
 
-   #ifdef S4CLIENT
-      temp = htond(dkey) ;
-      return d4seekServer( data, &temp, sizeof( double ), 0, CON4SEEK_DBL ) ;
-   #else
       c4 = data->codeBase ;
       if ( c4 == 0 )
          return e4info ;
@@ -786,7 +666,6 @@ int S4FUNCTION d4seekDouble( DATA4 *data, const double dkey )
       rc = tfile4seek( tfile, buf, tfile->header.keyLen ) ;
 
       return d4seekCheck( data, tfile, rc, buf, tfile->header.keyLen ) ;  /* return a valid value */
-   #endif
 }
 
 #ifndef S4CB51
@@ -818,17 +697,6 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
          return error4( 0, e4parm_null, E92909 ) ;
    #endif
 
-   #ifdef S4CLIENT
-      c4 = data->codeBase ;
-      oldErrGo = c4->errGo ;   /* avoid for r4entry */
-      c4->errGo = 0 ;
-      temp = htond(dkey) ;
-      rc = d4seekServer( data, &temp, sizeof( double ), 1, CON4SEEK_DBL ) ;
-      c4->errGo = oldErrGo ;
-      if ( rc < 0 && error4code( c4 ) == 0 )
-         return error4( c4, rc, E92908 ) ;
-      return rc ;
-   #else
       c4 = data->codeBase ;
       if ( c4 == 0 )
          return e4info ;
@@ -1008,7 +876,6 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
       if ( rc != 0 )
          return r4entry ;
       return rc2 ;
-   #endif
 }
 #endif  /* S4CB51 */
 

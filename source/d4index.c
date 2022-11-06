@@ -18,9 +18,6 @@ int S4FUNCTION d4freeBlocks( DATA4 *data )
             return error4( 0, e4parm_null, E93001 ) ;
       #endif
 
-      #ifdef S4CLIENT
-         return 0 ;
-      #else
 
          rc = 0 ;
          for( tagOn = 0 ;; )
@@ -31,7 +28,6 @@ int S4FUNCTION d4freeBlocks( DATA4 *data )
             if ( tfile4freeAll( tagOn->tagFile ) < 0 )
                rc = -1 ;
          }
-      #endif /* S4CLIENT */
    #endif
 }
 
@@ -119,16 +115,12 @@ INDEX4 *S4FUNCTION d4index( DATA4 *data, const char *indexName )
          indexOn = (INDEX4 *)l4next( &data->indexes, indexOn) ;
          if ( indexOn == 0 )
             return 0 ;
-         #ifdef S4CLIENT
-            current = indexOn->alias ;
-         #else
             current = indexOn->accessName ;
             if ( current[0] == 0 )  /* use data file name */
             {
                u4namePiece( indexLookup2, sizeof(indexLookup2), data->dataFile->file.name, hasPath, 0 ) ;
                current = indexLookup2 ;
             }
-         #endif
          if ( !strcmp( current, indexLookup ) )    /* check out data->alias? */
             return indexOn ;
          if ( doAlias == 1 )   /* check with just alias (no extension) */
@@ -180,18 +172,7 @@ INDEX4FILE *dfile4index( DATA4FILE *data, const char *indexName )
          }
       #endif
 
-      #ifdef S4CLIENT
-         #ifdef E4ANALYZE
-            if ( strlen( indexName ) >= sizeof( indexLookup ) )
-            {
-               error4( 0, e4struct, E91102 ) ;
-               return 0 ;
-            }
-         #endif
-         u4ncpy( indexLookup, indexName, sizeof( indexLookup ) ) ;
-      #else
          u4nameCurrent( indexLookup, sizeof( indexLookup ), indexName ) ;
-      #endif
       #ifndef S4CASE_SEN
          c4upper( indexLookup ) ;
       #endif
@@ -200,13 +181,8 @@ INDEX4FILE *dfile4index( DATA4FILE *data, const char *indexName )
          indexOn = (INDEX4FILE *)l4next( &data->indexes, indexOn ) ;
          if ( indexOn == 0 )
             return 0 ;
-         #ifdef S4CLIENT
-            if ( !strcmp( indexLookup, indexOn->accessName ) )    /* check out data->alias? */
-               return indexOn ;
-         #else
             if ( !strcmp( indexLookup, indexOn->file.name ) )    /* check out data->alias? */
                return indexOn ;
-         #endif
       }
    #endif
 }
@@ -220,10 +196,6 @@ int S4FUNCTION d4reindex( DATA4 *data )
    #else
       int rc ;
       CODE4 *c4 ;
-      #ifdef S4CLIENT
-         CONNECTION4 *connection ;
-         CONNECTION4REINDEX_INFO_OUT *out ;
-      #else
          INDEX4 *indexOn ;
          int oldSchemaCreate ;
          #ifdef S4LOW_MEMORY
@@ -231,7 +203,6 @@ int S4FUNCTION d4reindex( DATA4 *data )
                int hasOpt ;
             #endif
          #endif
-      #endif
 
       #ifdef S4VBASIC
          if ( c4parm_check( data, 2, E93004 ) )
@@ -258,30 +229,6 @@ int S4FUNCTION d4reindex( DATA4 *data )
 
       rc = 0 ;
 
-      #ifdef S4CLIENT
-         connection = data->dataFile->connection ;
-         if ( connection == 0 )
-            return e4connection ;
-
-         connection4assign( connection, CON4REINDEX, data4clientId( data ), data4serverId( data ) ) ;
-         rc = connection4repeat( connection ) ;
-         if ( rc == r4locked )
-            return r4locked ;
-         if ( rc != 0 )
-            return connection4error( connection, c4, rc, E93004) ;
-
-         if ( connection4len( connection ) != sizeof( CONNECTION4REINDEX_INFO_OUT ) )
-            return error4( c4, e4packetLen, E93004 ) ;
-         out = (CONNECTION4REINDEX_INFO_OUT *)connection4data( connection ) ;
-         if ( out->lockedDatafile )
-            data->dataFile->fileLock = data ;
-
-         data->recNum = -1 ;
-         data->recNumOld = -1 ;
-         d4blankLow( data, data->record ) ;
-
-         return rc ;
-      #else
          #ifdef S4LOW_MEMORY
             #ifndef S4OFF_OPTIMIZE
                hasOpt = c4->hasOpt && c4->opt.numBuffers ;
@@ -310,7 +257,6 @@ int S4FUNCTION d4reindex( DATA4 *data )
             #endif
          #endif
          return rc ;
-      #endif /* S4CLIENT */
    #endif
 }
 #endif  /* S4OFF_WRITE */

@@ -687,7 +687,6 @@
 /* #define S4LSEEK        */ /* use if lseek() cannot seek past EOF */
    #define S4CASE_SEN
    #define S4STRUCT_PAD
-   #define S4OFF_BLAST
    #define S4NO_INET_ATON
 
    #define S4OFF_REPORT

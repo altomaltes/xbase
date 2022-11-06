@@ -199,14 +199,6 @@ static int d4doAppend( DATA4 *data )
    int rc ;
    CODE4 *c4 ;
    DATA4FILE *d4file ;
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      CONNECTION4APPEND_INFO_IN *info ;
-      CONNECTION4APPEND_INFO_OUT *out ;
-      #ifndef S4OFF_MEMO
-         CONNECTION4MEMO *memo ;
-      #endif
-   #else
       #ifndef S4OFF_MEMO
          long newId ;
       #endif
@@ -218,7 +210,6 @@ static int d4doAppend( DATA4 *data )
             int indexLocked ;
          #endif
       #endif
-   #endif
    #ifndef S4OFF_MEMO
       F4MEMO *mfield ;
       short i ;
@@ -276,82 +267,6 @@ static int d4doAppend( DATA4 *data )
    if ( data->readOnly == 1 )
       return error4describe( c4, e4write, E80606, d4alias( data ), 0, 0 ) ;
 
-   #ifdef S4CLIENT
-      #ifdef E4MISC
-         if ( data->recNum )
-            return error4( c4, e4result, E81103 ) ;
-      #endif
-
-      connection = d4file->connection ;
-      if ( connection == 0 )
-         return e4connection ;
-      connection4assign( connection, CON4APPEND, clientId, serverId ) ;
-      connection4addData( connection, NULL, sizeof( CONNECTION4APPEND_INFO_IN ), (void **)&info ) ;
-      #ifndef S4OFF_MEMO
-         for ( i = 0 ; i < d4file->nFieldsMemo ; i++ )
-         {
-            mfield = data->fieldsMemo + i ;
-            if ( mfield->len > 0 )
-               info->numMemoFields++ ;
-         }
-         info->numMemoFields = htons(info->numMemoFields) ;
-      #endif
-      connection4addData( connection, data->record, dfile4recWidth( d4file ), NULL ) ;
-      #ifndef S4OFF_MEMO
-         for ( i = 0 ; i < d4file->nFieldsMemo ; i++ )
-         {
-            mfield = data->fieldsMemo + i ;
-            if ( mfield->len > 0 )
-            {
-               connection4addData( connection, NULL, sizeof( CONNECTION4MEMO ), (void **)&memo ) ;
-               memo->fieldNum = htons(i) ;
-               memo->memoLen = htonl(mfield->len) ;
-               if ( mfield->len > 0 )
-                  connection4addData( connection, mfield->contents, mfield->len, NULL ) ;
-            }
-         }
-      #endif
-      rc = connection4repeat( connection ) ;
-      if ( rc < 0 )
-         return rc ;
-      if ( connection4len( connection ) != sizeof( CONNECTION4APPEND_INFO_OUT ) )
-         return error4( c4, e4packetLen, 91103 ) ;
-      out = (CONNECTION4APPEND_INFO_OUT *)connection4data( connection ) ;
-      data->bofFlag = out->bofFlag ;
-      data->eofFlag = out->eofFlag ;
-      data->recordChanged = out->recordChanged ;
-      data->recNum = ntohl(out->recNum) ;
-      if ( d4lockTestAppend( data ) == 1 && rc == 0 )
-      {
-         d4file->numRecs = data->recNum ;
-         if ( code4tranStatus( c4 ) != r4active )
-            d4file->minCount = data->recNum ;
-      }
-      else
-         d4file->numRecs = - 1 ;
-      rc = connection4status( connection ) ;
-      if ( rc != 0 )
-      {
-         if ( rc < 0 )
-            connection4error( connection, c4, rc, E91103 ) ;
-         return rc ;
-      }
-      if ( out->recordLocked  )
-         d4localLockSet( data, data->recNum ) ;
-      if ( out->appendLocked  )
-      {
-         d4file->numRecs = data->recNum ;
-         d4file->appendLock = data ;
-      }
-      #ifndef S4OFF_MEMO
-         for ( i = 0 ; i < d4file->nFieldsMemo ; i++ )
-         {
-            mfield = data->fieldsMemo + i ;
-            mfield->isChanged = 0 ;
-         }
-      #endif
-      return 0 ;
-   #else
       /* 1. Update index file
          2. Update memo File
          3. Update data file */
@@ -502,7 +417,6 @@ static int d4doAppend( DATA4 *data )
       #endif  /* S4OFF_MULTI */
 
       return rc ;
-   #endif  /* S4CLIENT */
 }
 
 int S4FUNCTION d4append( DATA4 *data )
@@ -824,19 +738,11 @@ int S4FUNCTION d4appendStart( DATA4 *data, int useMemoEntries )
                   savePtr = data->record ;
                   data->record = data->recordOld ;
 
-                  #ifdef S4CLIENT
-                     d4go( data, data->recNum ) ;
-                  #else
                      d4goData( data, data->recNum ) ;
-                  #endif
 
                   for ( i = 0 ; i < data->dataFile->nFieldsMemo ; i++ )
                   {
-                     #ifdef S4CLIENT
-                        f4memoRead( data->fieldsMemo[i].field ) ;
-                     #else
                         f4memoReadLow( data->fieldsMemo[i].field ) ;
-                     #endif
                      data->fieldsMemo[i].status = 0 ;
                   }
 

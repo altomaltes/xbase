@@ -51,11 +51,7 @@
    S4EXPORT int S4FUNCTION code4tranCommitPhaseTwo( CODE4 S4PTR *, int ) ;
    S4EXPORT int S4FUNCTION code4tranInit( CODE4 S4PTR * ) ;
    #ifdef S4OFF_TRAN
-      #ifdef S4CLIENT
-         #define code4tranStatus( c4 ) ( (c4)->c4trans.trans.currentTranStatus )
-      #else
          #define code4tranStatus( c4 ) ( 0 )
-      #endif
    #else
       #ifndef S4OFF_WRITE
          S4EXPORT int S4FUNCTION code4tranStartSingle( CODE4 S4PTR * ) ;
@@ -68,10 +64,6 @@
       #endif
    #endif
    #ifndef S4INLINE
-      #ifdef S4CLIENT
-         int code4tranInit2( CODE4 *, const char *, const char * ) ;
-         void code4tranInitUndo( CODE4 * ) ;
-      #endif
    #endif
    #ifdef S4STAND_ALONE
       S4EXPORT int S4FUNCTION code4tranInit2( CODE4 S4PTR *, const char S4PTR *, const char S4PTR * ) ;

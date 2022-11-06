@@ -357,16 +357,7 @@ void u4setField( const char *serverId, const char *database, const long recno, c
    code4init( &cb ) ;
    cb.errOff = 1 ;
 
-   #ifdef S4CLIENT
-      if( code4connect( &cb, serverId, 0, "S4TESTING", "S4TESTING", 0 ) != r4success )
-      {
-         code4close(&cb) ;
-         code4initUndo(&cb) ;
-         return ;
-      }
-   #else
       code4logOpenOff( &cb ) ;
-   #endif
 
    #ifndef S4OFF_MULTI
       cb.accessMode = OPEN4DENY_RW ;       /* open exclusively */
@@ -465,9 +456,6 @@ S4EXPORT void S4FUNCTION ats4setSuiteStatus( const char *newValue )
    ATS4RECINFO info ;
    const char *fieldStatus = "STATUS" ;
    const char *fieldRDate = "RDATE" ;
-   #ifdef S4CLIENT
-      char buf[100] ;
-   #endif
    char *serverId, rdate[8] ;
 
    if ( newValue == 0 )
@@ -475,15 +463,6 @@ S4EXPORT void S4FUNCTION ats4setSuiteStatus( const char *newValue )
 
    serverId = 0 ;
 
-   #ifdef S4CLIENT
-   if ( getenv( "CSNAME" ) )
-      serverId = getenv( "CSNAME" ) ;
-   else
-   {
-      if ( ats4readInfo( ATS_FILENAME_CS, buf, sizeof( buf ) ) )
-         serverId = buf ;
-   }
-   #endif
 
    date4today( rdate ) ;
 

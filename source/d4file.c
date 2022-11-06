@@ -8,9 +8,6 @@
 #endif
 int dfile4read( DATA4FILE *data, long recNum, char *ptr, int fromDisk )
 {
-   #ifdef S4CLIENT
-      return dfile4goData( data, recNum, ptr, 1 ) ;
-   #else
       unsigned len ;
 
       #ifdef E4PARM_LOW
@@ -41,7 +38,6 @@ int dfile4read( DATA4FILE *data, long recNum, char *ptr, int fromDisk )
          return r4entry ;
 
       return 0 ;
-   #endif
 }
 
 /* set serverId to -2 to get the actual count if possible for example,
@@ -51,14 +47,8 @@ int dfile4read( DATA4FILE *data, long recNum, char *ptr, int fromDisk )
 #endif
 long S4FUNCTION dfile4recCount( DATA4FILE *data, const long serverId )
 {
-   #ifdef S4CLIENT
-      int rc ;
-      CONNECTION4 *connection ;
-      CONNECTION4RECCOUNT_INFO_OUT *info ;
-   #else
       unsigned len ;
       FILE4LONG pos ;
-   #endif
    S4LONG tmpCount ;
 
    #ifdef E4PARM_HIGH
@@ -83,32 +73,6 @@ long S4FUNCTION dfile4recCount( DATA4FILE *data, const long serverId )
                return data->numRecs ;
       }
 
-   #ifdef S4CLIENT
-      connection = data->connection ;
-      if ( connection == 0 )
-         return e4connection ;
-
-      connection4assign( connection, CON4RECCOUNT, 0, data->serverId ) ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-         return rc ;
-      rc = connection4status( connection ) ;
-      if ( rc != 0 )
-         return connection4error( connection, data->c4, rc, E91102 ) ;
-
-      if ( connection4len( connection ) != sizeof( CONNECTION4RECCOUNT_INFO_OUT ) )
-         return error4( data->c4, e4packetLen, E91102 ) ;
-      info = (CONNECTION4RECCOUNT_INFO_OUT *)connection4data( connection ) ;
-      tmpCount = ntohl(info->recCount) ;
-      if ( tmpCount < 0 )
-         return -1L ;
-      data->minCount = tmpCount ;
-      #ifndef S4SINGLE
-         if ( info->appendLocked )
-      #endif  /* S4SINGLE */
-            data->numRecs = tmpCount ;
-   #else  /* S4CLIENT */
       file4longAssign( pos, 4, 0 ) ;
       len = file4readInternal( &data->file, pos, &tmpCount, sizeof(S4LONG) ) ;
       #ifdef S4BYTE_SWAP
@@ -126,7 +90,6 @@ long S4FUNCTION dfile4recCount( DATA4FILE *data, const long serverId )
          transactions are taking place and the append bytes are locked, and
          data handles of other datafiles are performing the access */
       data->minCount = tmpCount ;    /* used for multi-user ensured sequencing */
-   #endif  /* !S4CLIENT */
 
    return tmpCount ;
 }
@@ -162,11 +125,7 @@ S4CONST char *dfile4name( S4CONST DATA4FILE *data )
          return 0 ;
       }
    #endif
-   #ifdef S4CLIENT
-      return data->accessName ;
-   #else
       return data->file.name ;
-   #endif
 }
 
 FILE4LONG dfile4recordPosition( DATA4FILE *d4, long rec )

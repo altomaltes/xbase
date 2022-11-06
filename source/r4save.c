@@ -793,11 +793,7 @@ int relate4save_relate( RELATE4 *relate, FILE4SEQ_WRITE *seq, int path )
       {
          tag_on = d4tagSelected( relate_on->data );
          if( tag_on )
-            #ifdef S4CLIENT
-               rc = save4string( seq, t4alias(tag_on) ) ;
-            #else
                rc = save4string( seq, tag_on->tagFile->alias );
-            #endif
          else
             rc = save4string( seq, "\0" );
          if( rc < 0 )
@@ -806,11 +802,7 @@ int relate4save_relate( RELATE4 *relate, FILE4SEQ_WRITE *seq, int path )
       else
       {
          if( relate_on->dataTag != NULL )
-            #ifdef S4CLIENT
-               rc = save4string( seq, t4alias(relate_on->dataTag) ) ;
-            #else
                rc = save4string( seq, relate_on->dataTag->tagFile->alias );
-            #endif
          else
             rc = save4string( seq, "\0" );
          if( rc < 0 )
