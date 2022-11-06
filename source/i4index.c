@@ -598,9 +598,7 @@ INDEX4FILE *index4open( DATA4 *d4, const char *fileName, INDEX4 *index )
       int iTag ;
       FILE4LONG pos ;
    #endif
-   #ifndef S4SERVER
       INDEX4 *indexLoop ;
-   #endif
 
    #ifdef E4PARM_LOW
       if ( d4 == 0 )
@@ -643,7 +641,6 @@ INDEX4FILE *index4open( DATA4 *d4, const char *fileName, INDEX4 *index )
    i4 = dfile4index( dfile, (char *)buf ) ;
    if ( i4 != 0 )
    {
-      #ifndef S4SERVER
          /* allowed if current data4 does not have a pointer to index */
          for ( indexLoop = 0 ;; )
          {
@@ -656,7 +653,6 @@ INDEX4FILE *index4open( DATA4 *d4, const char *fileName, INDEX4 *index )
                return 0 ;
             }
          }
-      #endif
       i4->userCount++ ;
       i4->isValid = 1 ;
       return i4 ;

@@ -155,12 +155,10 @@ int dfile4updateHeader( DATA4FILE *data, int doTimeStamp, int doCount )
 
    #ifdef E4ANALYZE
       #ifndef S4SINGLE
-         #ifndef S4SERVER
             /* note that the server doesn't need it locked since that is a data level, not
                a data4file level lock for server --> can't make this check */
             if  ( doCount && ( dfile4lockTestAppend( data, 0, 0 ) == 0 ) )
                return error4( data->c4, e4info, E83201 ) ;
-         #endif
       #endif
    #endif
 

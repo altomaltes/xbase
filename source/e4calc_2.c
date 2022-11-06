@@ -2,8 +2,6 @@
 
 #include "d4all.h"
 
-#ifndef S4SERVER
-
 int S4FUNCTION expr4calcRemove( EXPR4CALC *calc, int removeAll )
 {
    LIST4 saveCalcList, tempCalcList ;
@@ -148,4 +146,3 @@ int S4FUNCTION expr4calcModify( EXPR4CALC *calc, char *exprSource )
         return 0 ;
 }
 
-#endif /* S4SERVER */

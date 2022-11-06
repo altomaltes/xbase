@@ -36,10 +36,8 @@ long d4skipRecno( DATA4 *data, long n )
 
    if ( data->recNum < 1L )
    {
-      #ifndef S4SERVER
          if ( c4->errSkip )
             return error4( c4, e4info, E84801 ) ;
-      #endif
       return e4info ;
    }
 
@@ -397,9 +395,7 @@ int S4FUNCTION d4skip( DATA4 *data, const long nSkip )
          TAG4FILE *tagFile ;
       #endif
       long n ;
-      #ifndef S4SERVER
          int saveFlag ;
-      #endif
       long startRec, newRec ;
       int oldEofFlag, c1 ;
    #ifndef S4OFF_INDEX
@@ -422,10 +418,8 @@ int S4FUNCTION d4skip( DATA4 *data, const long nSkip )
 
    if ( data->recNum < 1L )
    {
-      #ifndef S4SERVER
          if ( c4->errSkip )
             error4( c4, e4info, E84801 ) ;
-      #endif
       return e4info ;
    }
 
@@ -441,10 +435,8 @@ int S4FUNCTION d4skip( DATA4 *data, const long nSkip )
          newRec = startRec + n ;
          if ( newRec > 0L )
          {
-            #ifndef S4SERVER
                saveFlag = c4->errGo ;
                c4->errGo = 0 ;
-            #endif
             #ifndef S4OFF_OPTIMIZE
                data->dataFile->hiPrio = -1 ;  /* indicate d4skip - data level */
             #endif
@@ -452,9 +444,7 @@ int S4FUNCTION d4skip( DATA4 *data, const long nSkip )
             #ifndef S4OFF_OPTIMIZE
                data->dataFile->hiPrio = 0 ;
             #endif
-            #ifndef S4SERVER
                c4->errGo = saveFlag ;
-            #endif
             if ( rc >= 0 && rc != r4entry )
                return rc ;
          }

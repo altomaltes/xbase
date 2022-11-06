@@ -35,10 +35,8 @@ int dfile4lock( DATA4FILE *data, const long clientId, const long serverId, const
       if ( dfile4lockTest( data, 0L, 0L, rec ) > 0 )  /* if record or file already locked */
       {
          dfile4registerLocked( data, rec, 1 ) ;
-         #ifndef S4SERVER
             if ( c4->lockAttempts == WAIT4EVER )
                return error4( c4, e4lock, E81523 ) ;
-         #endif
          return r4locked ;
       }
 
@@ -157,10 +155,8 @@ int dfile4lockAppend( DATA4FILE *data, const long clientId, const long serverId 
       if ( dfile4lockTestAppend( data, 0L, 0L ) )
       {
          dfile4registerLocked( data, 0L, 1 ) ;
-         #ifndef S4SERVER
             if ( c4->lockAttempts == WAIT4EVER )
                return error4( c4, e4lock, E81523 ) ;
-         #endif
          return r4locked ;
       }
 
@@ -216,10 +212,8 @@ int dfile4lockFile( DATA4FILE *data, const long clientId, const long serverId )
       if ( dfile4lockTestFile( data, 0L, 0L ) )
       {
          dfile4registerLocked( data, -1L, 1 ) ;
-         #ifndef S4SERVER
             if ( c4->lockAttempts == WAIT4EVER )
                return error4( c4, e4lock, E81523 ) ;
-         #endif
          return r4locked ;
       }
 
@@ -227,20 +221,16 @@ int dfile4lockFile( DATA4FILE *data, const long clientId, const long serverId )
       if ( dfile4lockTestAppend( data, 0L, 0L ) )
       {
          dfile4registerLocked( data, 0L, 1 ) ;
-         #ifndef S4SERVER
             if ( c4->lockAttempts == WAIT4EVER )
                return error4( c4, e4lock, E81523 ) ;
-         #endif
          return r4locked ;
       }
 
       if ( dfile4lockTest( data, 0L, 0L, 0L ) )
       {
          dfile4registerLocked( data, -2L, 1 ) ;
-         #ifndef S4SERVER
             if ( c4->lockAttempts == WAIT4EVER )
                return error4( c4, e4lock, E81523 ) ;
-         #endif
          return r4locked ;
       }
 

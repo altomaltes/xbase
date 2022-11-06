@@ -158,11 +158,9 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
       #endif
       #ifndef S4OFF_INDEX
          INDEX4 *i4 ;
-         #ifndef S4SERVER
             #ifndef S4CLIPPER
                int oldSingleOpen ;
             #endif
-         #endif
       #endif
 
    #ifndef S4OFF_MEMO
@@ -378,14 +376,10 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
             d4->dataFile->openMdx = 0 ;
             if ( ( d4->dataFile->hasMdxMemo & 0x01 ) && c4->autoOpen )
             {
-               #ifndef S4SERVER
                   oldSingleOpen = c4->singleOpen ;
                   c4->singleOpen = OPEN4SPECIAL ;
-               #endif
                i4 = i4open( d4, 0 ) ;
-               #ifndef S4SERVER
                   c4->singleOpen = oldSingleOpen ;
-               #endif
                if ( i4 == 0 )
                   return -1 ;
                #ifdef S4MDX
@@ -397,10 +391,8 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
          #endif
    #endif  /* S4OFF_INDEX */
 
-   #ifndef S4SERVER
       c4->clientDataCount++ ;
       d4->clientId = c4->clientDataCount ;
-   #endif
    #ifndef S4OFF_WRITE
       #ifndef S4OFF_TRAN
             if ( code4transEnabled( c4 ) )
@@ -551,9 +543,7 @@ DATA4 *S4FUNCTION d4openClone( DATA4 *dataOld )
             INDEX4 *i4 ;
          #endif
    #endif
-   #ifndef S4SERVER
       int oldSingleOpen ;
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( dataOld == 0 )
@@ -567,23 +557,17 @@ DATA4 *S4FUNCTION d4openClone( DATA4 *dataOld )
    d4 = d4openInit( c4 ) ;
    if ( d4 == 0 )
       return 0 ;
-   #ifndef S4SERVER
       oldSingleOpen = c4->singleOpen ;
       c4->singleOpen = OPEN4DENY_NONE ;
-   #endif
    d4->dataFile = data4reopen( dataOld->dataFile, &info ) ;
    if ( d4->dataFile == 0 )
    {
-      #ifndef S4SERVER
          c4->singleOpen = oldSingleOpen ;
-      #endif
       d4close( d4 ) ;
       return 0 ;
    }
    rc = d4openConclude( d4, dfile4name( d4->dataFile ), info ) ;
-   #ifndef S4SERVER
       c4->singleOpen = oldSingleOpen ;
-   #endif
    if ( rc < 0 )
    {
       d4close( d4 ) ;
@@ -780,12 +764,10 @@ static DATA4FILE *data4reopen( DATA4FILE *d4, char **info )
          #endif
       #endif
 
-   #ifndef S4SERVER
       #ifndef S4OFF_TRAN
          DATA4 *data4 ;
          LIST4 *list ;
       #endif
-   #endif
    CODE4 *c4 ;
 
    if ( d4 == 0 )
@@ -844,10 +826,8 @@ static DATA4FILE *data4reopen( DATA4FILE *d4, char **info )
       }
       else
       {
-      #ifndef S4SERVER
          if ( c4->singleOpen != OPEN4DENY_NONE )   /* only one instance allowed... */
          {
-            #ifndef S4SERVER
                #ifndef S4OFF_TRAN
                   /* verify that data4 not on the closed data list if within a
                      transaction (which is allowed) */
@@ -883,13 +863,11 @@ static DATA4FILE *data4reopen( DATA4FILE *d4, char **info )
                   }
                   else
                #endif /* S4OFF_TRAN */
-            #endif /* S4STAND_ALONE */
             {
                error4describe( c4, e4instance, E91102, dfile4name( d4 ), 0, 0 ) ;
                return 0 ;
             }
          }
-      #endif
       #ifdef E4ANALYZE
          if ( d4->info == 0 )
          {

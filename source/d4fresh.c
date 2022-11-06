@@ -66,7 +66,6 @@ int dfile4refresh( DATA4FILE *data )
    return 0 ;
 }
 
-#ifndef S4SERVER
 
 #ifdef S4STAND_ALONE
    #ifndef S4SINGLE
@@ -168,4 +167,4 @@ int S4FUNCTION d4refreshRecord( DATA4 *data )
    #undef S4DO_REFRESH
 #endif
 
-#endif /* S4SERVER */
+

@@ -54,7 +54,6 @@ void S4FUNCTION f4assignInt( FIELD4 *field, const int iValue )
    if ( error4code( c4 ) < 0 )
       return ;
 
-   #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( c4->lockEnforce && field->data->recNum > 0L )
             if ( d4lockTest( field->data, field->data->recNum ) != 1 )
@@ -63,7 +62,6 @@ void S4FUNCTION f4assignInt( FIELD4 *field, const int iValue )
                return ;
             }
       #endif
-   #endif
 
    switch( field->type )
    {

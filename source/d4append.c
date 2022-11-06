@@ -234,12 +234,10 @@ static int d4doAppend( DATA4 *data )
          return -1 ;
    #endif  /* S4VBASIC */
 
-   #ifndef S4SERVER
       #ifdef E4PARM_HIGH
          if ( data == 0 )
             return error4( 0, e4parm_null, E91103 ) ;
       #endif
-   #endif
 
    #ifdef E4MISC
       if ( data->record[0] != ' ' && data->record[0] != '*' )
@@ -658,17 +656,11 @@ int S4FUNCTION d4appendBlank( DATA4 *data )
 int S4FUNCTION d4appendStart( DATA4 *data, int useMemoEntries )
 {
    CODE4 *c4 ;
-   #ifndef S4SERVER
       int rc ;
       #ifndef S4OFF_MEMO
          char *savePtr ;
          int i, oldLockEnforce ;
       #endif
-   #else
-      #ifndef S4OFF_MEMO
-         int i ;
-      #endif
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( data, 2, E91107 ) )

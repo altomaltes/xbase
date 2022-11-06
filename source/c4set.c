@@ -44,7 +44,6 @@
 //#endif /* #if !defined( S4SERVER ) */
 
 
-#ifndef S4SERVER
    void S4FUNCTION code4autoIncrementStart( CODE4 *c4, double val )
    {
       c4->autoIncrementStart = val ;
@@ -110,7 +109,6 @@
          return c4->foxCreateIndexBlockSize ;
       #endif
    }
-#endif /* !S4SERVER */
 
 
 #ifdef S4FOX
@@ -158,7 +156,6 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
 
 
-#ifndef S4SERVER
    // CS 1999/08/26 return short for VB
    short S4FUNCTION code4indexBlockSizeSet( CODE4 *c4, short val )
    {
@@ -206,21 +203,17 @@ short c4indexMultiplierGet( CODE4 *c4 )
          return error4( c4, e4notSupported, E96701 ) ;
       #endif
    }
-#endif /* !S4SERVER */
 
 
 
-#ifndef S4SERVER
    int S4FUNCTION c4getAutoOpen( const CODE4 *c4 )
    {
       return c4->autoOpen ;
    }
-#endif /* !S4SERVER */
 
 
 
 
-#ifndef S4SERVER
    short S4FUNCTION c4getCompatibility( const CODE4 *c4 )
    {
       return c4->compatibility ;
@@ -831,7 +824,6 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
          return collate4none ;
       #endif
    }
-#endif /* !S4SERVER */
 
 
 
@@ -889,7 +881,6 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
 #endif /* S4SERVER */
 
 
-#ifndef S4SERVER
    // AS Feb 12/03 - Added new switch odbc for internal use.
    void S4FUNCTION c4setOdbc( CODE4 *c4, Bool5 val )
    {
@@ -902,7 +893,6 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
       #endif
       c4->odbc = val ;
    }
-#endif
 
 
 
@@ -1018,7 +1008,6 @@ Bool5 S4FUNCTION c4getFileAccessed( CODE4 *c4 )
 
 
 // AS Apr 11/03 - New feature allows unlock appending as well as locking of clones
-#ifndef S4SERVER
    void S4FUNCTION c4setShareCloneLocks( CODE4 *c4, short val )
    {
       #ifdef E4PARM_HIGH
@@ -1030,7 +1019,6 @@ Bool5 S4FUNCTION c4getFileAccessed( CODE4 *c4 )
       #endif
       c4->shareCloneLocks = val ;
    }
-#endif
 
 
 

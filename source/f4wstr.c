@@ -61,7 +61,6 @@ void S4FUNCTION f4assignUnicode( FIELD4 *field, const WSTR5 *wideString )
       if ( error4code( field->data->codeBase ) < 0 )
          return ;
 
-      #ifndef S4SERVER
          #ifndef S4OFF_ENFORCE_LOCK
             if ( field->data->codeBase->lockEnforce && field->data->recNum > 0L )
                if ( d4lockTest( field->data, field->data->recNum, lock4write ) != 1 )
@@ -70,7 +69,6 @@ void S4FUNCTION f4assignUnicode( FIELD4 *field, const WSTR5 *wideString )
                   return ;
                }
          #endif
-      #endif
 
       if ( field->type == r5wstr )
       {

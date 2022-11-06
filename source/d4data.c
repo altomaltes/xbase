@@ -111,7 +111,6 @@ void S4FUNCTION d4blank( DATA4 *data )
       }
    #endif
 
-   #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( data->codeBase->lockEnforce && data->recNum > 0L )
             if ( d4lockTest( data, data->recNum ) != 1 )
@@ -120,7 +119,6 @@ void S4FUNCTION d4blank( DATA4 *data )
                return ;
             }
       #endif
-   #endif
 
    d4blankLow( data, data->record ) ;
 
@@ -172,7 +170,6 @@ void S4FUNCTION d4delete( DATA4 *data )
 
    if ( data->record[0] != '*' )
    {
-      #ifndef S4SERVER
          #ifndef S4OFF_ENFORCE_LOCK
             if ( data->codeBase->lockEnforce && data->recNum > 0L )
                if ( d4lockTest( data, data->recNum ) != 1 )
@@ -181,7 +178,6 @@ void S4FUNCTION d4delete( DATA4 *data )
                   return ;
                }
          #endif
-      #endif
         data->record[0] = '*' ;
       data->recordChanged = 1 ;
    }
@@ -349,7 +345,6 @@ int d4readOld( DATA4 *data, const long recNum )
    return 0 ;
 }
 
-#ifndef S4SERVER
 #ifndef S4OFF_WRITE
 void S4FUNCTION d4recall( DATA4 *data )
 {
@@ -375,7 +370,6 @@ void S4FUNCTION d4recall( DATA4 *data )
 
    if ( *data->record != ' ' )
    {
-      #ifndef S4SERVER
          #ifndef S4OFF_ENFORCE_LOCK
             if ( data->codeBase->lockEnforce && data->recNum > 0L )
                if ( d4lockTest( data, data->recNum ) != 1 )
@@ -384,14 +378,12 @@ void S4FUNCTION d4recall( DATA4 *data )
                   return ;
                }
          #endif
-      #endif
       *data->record = ' ' ;
       data->recordChanged = 1 ;
    }
 
    return ;
 }
-#endif
 #endif
 
 /* returns true if the input count is <= record count */

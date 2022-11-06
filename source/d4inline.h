@@ -160,12 +160,10 @@ PUBLIC int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) ;
 #ifdef S4CB51
    #define c4trim_n( a, b )          ( c4trimN( a, b ) )
 
-   #ifndef S4SERVER
 /*   #ifndef S4CBPP*/
       #define code4date_format( a )  ( code4dateFormat( a ) )
       #define code4date_format_set( a, b ) ( code4dateFormatSet( a, b ) )
 /*   #endif*/
-   #endif
    #define d4alias_set( a, b )       ( d4aliasSet( a, b ) )
    #define d4append_blank( a )       ( d4appendBlank( a ) )
    #define d4append_start( a, b )    ( d4appendStart( a, b ) )

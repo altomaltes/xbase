@@ -16,7 +16,6 @@ void S4FUNCTION f4assignField( FIELD4 *fieldTo, const FIELD4 *fieldFrom )
    if ( error4code( fieldTo->data->codeBase ) < 0 )
       return ;
 
-   #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( fieldTo->data->codeBase->lockEnforce && fieldTo->data->recNum > 0L )
             if ( d4lockTest( fieldTo->data, fieldTo->data->recNum ) != 1 )
@@ -25,7 +24,6 @@ void S4FUNCTION f4assignField( FIELD4 *fieldTo, const FIELD4 *fieldFrom )
                return ;
             }
       #endif
-   #endif
 
    #ifdef CLIENT_OR_FOX
       /* first check if null, if so then assign null */

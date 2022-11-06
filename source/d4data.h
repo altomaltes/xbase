@@ -661,11 +661,7 @@ typedef struct S4CLASS CODE4TRANSSt
       int space2 ;
       struct TRAN4FILESt *space1 ;
    #endif
-   #ifndef S4SERVER
       TRAN4 trans ;
-   #else
-      TRAN4 space3 ;
-   #endif
 } CODE4TRANS ;
 
 // AS 6/10.98 cannot be enumerator because Borland Builder mismatches the DLL
@@ -1125,9 +1121,7 @@ typedef struct CODE4St
          int lockAttemptsSingle ;                               /* How many times to attempt each lock in a group lock */
          unsigned int lockDelay ;
          int fileFlush ;  /* force hard file flush during write */
-         #ifndef S4SERVER
             S4CONV( char readLock, char read_lock ) ;               /* Do lock when reading database ? */
-         #endif
          S4CONV( int lockAttempts, int lock_attempts ) ;        /* How many times to attempt locks. */
          MEM4 S4PTR *lockMemory ;
          MEM4 S4PTR *lockLinkMemory ;
@@ -1171,9 +1165,7 @@ typedef struct CODE4St
       int lockAttemptsSingle ;                               /* How many times to attempt each lock in a group lock */
       unsigned int lockDelay ;
       int fileFlush ;  /* force hard file flush during write */
-      #ifndef S4SERVER
          S4CONV( char readLock, char read_lock ) ;               /* Do lock when reading database ? */
-      #endif
       S4CONV( int lockAttempts, int lock_attempts ) ;        /* How many times to attempt locks. */
       MEM4 S4PTR *lockMemory ;
       MEM4 S4PTR *lockLinkMemory ;
@@ -2306,12 +2298,10 @@ typedef void * FIXED4MEM ;
 #endif
 
 #ifdef S4TESTING
-#ifndef S4SERVER
 typedef struct
 {
    unsigned char T4SUITE[255] ;
    unsigned char T4RECNO[100] ;
 } ATS4RECINFO ;
-#endif
 #endif
 

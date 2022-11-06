@@ -44,7 +44,6 @@ short int S4FUNCTION t4unique( const TAG4 *tag )
       return tfile4unique( tag->tagFile, tag->errUnique ) ;
 }
 
-#ifndef S4SERVER
 int S4FUNCTION t4uniqueSetLow( TAG4 *, const short, const char ) ;
 
 int S4FUNCTION t4uniqueSet( TAG4 *t4, const short uniqueCode )
@@ -83,7 +82,6 @@ int S4FUNCTION t4uniqueSet( TAG4 *t4, const short uniqueCode )
 
    return t4uniqueSetLow( t4, uniqueCode, 1 ) ;
 }
-#endif
 #endif  /* S4OFF_INDEX */
 
 #ifndef S4OFF_INDEX

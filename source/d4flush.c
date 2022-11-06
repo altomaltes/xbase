@@ -2,7 +2,6 @@
 
 #include "d4all.h"
 
-#ifndef S4SERVER
 #ifndef S4OFF_WRITE
 int S4FUNCTION d4changed( DATA4 *data, int flag )
 {
@@ -76,7 +75,6 @@ int d4flushData( DATA4 *data )
          return saveRc ;
    #endif
 }
-#endif /* S4SERVER */
 
 int dfile4flush( DATA4FILE *data )
 {
@@ -172,7 +170,6 @@ int dfile4flushData( DATA4FILE *data )
    #endif
 }
 
-#ifndef S4SERVER
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -210,7 +207,6 @@ int S4FUNCTION code4flush( CODE4 *c4 )
       return rcReturn ;
    #endif
 }
-#endif
 
 #ifndef S4OFF_WRITE
 

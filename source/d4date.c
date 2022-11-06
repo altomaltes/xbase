@@ -201,7 +201,6 @@ static MONTH monthOfYear[] =
 #endif
 #endif
 
-#ifndef S4SERVER
 const char *S4FUNCTION code4dateFormat( CODE4 *c4 )
 {
    #ifdef E4PARM_HIGH
@@ -237,7 +236,6 @@ int S4FUNCTION code4dateFormatSet( CODE4 *c4, const char *str )
 
    return 0 ;
 }
-#endif
 
 int S4FUNCTION date4isLeap( const char *date )
 {

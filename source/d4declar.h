@@ -163,9 +163,7 @@ PUBLIC INDEX4 S4PTR * S4FUNCTION d4index( DATA4 S4PTR *, const char S4PTR * ) ;
    PUBLIC int S4FUNCTION d4lockTest( DATA4 S4PTR *, const long ) ; /* SQL */
    PUBLIC int S4FUNCTION d4lockTestAppendLow( DATA4 S4PTR * ) ;  /* testing only */
 #endif
-#ifndef S4SERVER
    PUBLIC int S4FUNCTION d4log( DATA4 S4PTR *, const int ) ;
-#endif
 #ifndef S4COMP_OFF_MEMO
    PUBLIC int S4FUNCTION d4memoCompress( DATA4 S4PTR * ) ;
 #endif
@@ -210,9 +208,7 @@ PUBLIC int S4FUNCTION d4zap( DATA4 S4PTR *, const long, const long ) ;
    #ifndef S4SINGLE
       PUBLIC int S4FUNCTION d4unlockLow( DATA4 *, long, char ) ;
    #endif
-   #ifndef S4SERVER
       PUBLIC int S4FUNCTION d4unlock( DATA4 S4PTR * ) ;
-   #endif
    PUBLIC int S4FUNCTION d4unlockRecord( DATA4 *, long ) ;  /* exported for SQL */
 #endif
 #ifndef S4CB51
@@ -295,17 +291,13 @@ PUBLIC const char S4PTR * S4FUNCTION error4text( CODE4 S4PTR *, const long ) ;
    PUBLIC void S4FUNCTION e4hook( CODE4 S4PTR *, int, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
    PUBLIC int S4FUNCTION e4log( CODE4 S4PTR *, const char S4PTR * ) ;
    #define e4exitTest( c4 ) ( error4exitTest( c4 ) )
-   #ifndef S4SERVER
       PUBLIC void S4FUNCTION e4severe( const int, const char S4PTR * ) ;
       PUBLIC void S4FUNCTION error4exitTest( CODE4 S4PTR * ) ;
       #ifdef S4VBASIC
          PUBLIC void S4FUNCTION e4severe_vbasic( int, const char S4PTR * ) ;
       #endif
-   #endif /* S4SERVER */
 #endif /* S4CB51 */
-#ifndef S4SERVER
    PUBLIC void S4FUNCTION error4exitTest( CODE4 S4PTR * ) ;
-#endif /* S4SERVER */
 #ifdef E4STACK
    PUBLIC int S4FUNCTION error4stackDefault( CODE4 S4PTR *, const int, const long ) ;
 #endif
@@ -508,13 +500,11 @@ PUBLIC void S4FUNCTION mem4release( MEM4 S4PTR * ) ;
    #ifdef S4CLIPPER
       PUBLIC TAG4 S4PTR *S4FUNCTION t4create( DATA4 S4PTR *, const TAG4INFO S4PTR *, INDEX4 S4PTR *, int ) ;
    #endif
-   #ifndef S4SERVER
       PUBLIC int S4FUNCTION t4uniqueSet( TAG4 S4PTR *, const short ) ;
       PUBLIC S4CONST char S4PTR *S4FUNCTION t4exprLow( TAG4 S4PTR * ) ;
       PUBLIC S4CONST char S4PTR *S4FUNCTION t4filterLow( TAG4 S4PTR * ) ;
          /* 'source' members are constant, so can use defines */
          #define t4expr( t4 )   ( (t4)->tagFile->expr->source )
-   #endif
       #define t4filter( t4 ) ( ( (t4)->tagFile->filter == 0 ? 0 : (t4)->tagFile->filter->source ) )
       PUBLIC unsigned short int S4FUNCTION tfile4isDescending( TAG4FILE * ) ;  /* for SQL */
 #endif /* S4COMP_OFF_INDEX */
@@ -1121,9 +1111,7 @@ int mem4reset( void ) ;
          #ifndef S4MNDX
             int memo4fileChainFlush( MEMO4FILE *, MEMO4CHAIN_ENTRY * ) ;
             int memo4fileChainSkip( MEMO4FILE *, MEMO4CHAIN_ENTRY * ) ;
-            #ifndef S4SERVER
                PUBLIC int S4FUNCTION f4memoCheck( MEMO4FILE S4PTR *, DATA4 S4PTR * ) ;
-            #endif
          #endif /* S4MNDX  */
       #endif /* S4MFOX  */
 
@@ -1207,11 +1195,9 @@ int mem4reset( void ) ;
    #ifdef S4WINDOWS
       PUBLIC void S4FUNCTION u4terminate( void );
    #endif
-   #ifndef S4SERVER
       void u4setField( const char *, const char *, const long, const char *, const char * ) ;
       int ats4readInfo( char *, void *, const unsigned int ) ;
       PUBLIC void S4FUNCTION ats4setSuiteStatus( const char * ) ;
-   #endif
    PUBLIC void S4FUNCTION u4writeErr( const char S4PTR *, int ) ;
    void u4writeOut( char *, int, long  ) ;
 #else
@@ -1303,9 +1289,7 @@ double S4FUNCTION x4reverseDouble( const void S4PTR * ) ;
 
 /* VISUAL BASIC */
 #ifdef S4VBASIC
-   #ifndef S4SERVER
       PUBLIC int c4parm_check( const void S4PTR *, int, const long ) ;
-   #endif
 #endif
 
 #ifndef S4OFF_THREAD

@@ -342,7 +342,6 @@ PUBLIC void S4FUNCTION u4terminate( void )
 }
 #endif  /* S4WINDOWS */
 
-#ifndef S4SERVER
 void u4setField( const char *serverId, const char *database, const long recno, const char *fieldName, const char *newValue )
 {
    #ifndef S4OFF_WRITE
@@ -483,7 +482,6 @@ PUBLIC void S4FUNCTION ats4setSuiteStatus( const char *newValue )
       }
    }
 }
-#endif /* S4SERVER */
 #endif /* S4TESTING */
 
 #ifdef S4MEM_PRINT
@@ -494,10 +492,6 @@ PUBLIC void S4FUNCTION ats4setSuiteStatus( const char *newValue )
 #endif
 
 #ifdef S4TESTING
-#ifdef S4SERVER
-static int isInit = 0 ;
-static CRITICAL_SECTION crit4 ;
-#endif
 
 void u4writeOut( char *out, int newLine, long lenIn )
 {
@@ -507,18 +501,9 @@ void u4writeOut( char *out, int newLine, long lenIn )
    FILE4LONG pos ;
    char buf[10] ;
    #ifdef S4TESTING
-      #ifndef S4SERVER
          int undoLocal = 0 ;
-      #endif
    #endif
 
-   #ifdef S4SERVER
-      if ( isInit == 0 )
-      {
-         InitializeCriticalSection( &crit4 ) ;
-         isInit = 1 ;
-      }
-   #endif
 
    #ifdef S4MEM_PRINT
       if ( in4temp == 1 )
@@ -528,9 +513,6 @@ void u4writeOut( char *out, int newLine, long lenIn )
    if( s4test.hand == INVALID4HANDLE )  /* even for non-testing just ensure else return */
       return ;
 
-   #ifdef S4SERVER
-      EnterCriticalSection( &crit4 ) ;
-   #endif
 
    if ( s4test.codeBase != 0 )
    {
@@ -643,9 +625,6 @@ void u4writeOut( char *out, int newLine, long lenIn )
 
    error4set( s4test.codeBase, errCode ) ;
 
-   #ifdef S4SERVER
-      LeaveCriticalSection( &crit4 ) ;
-   #endif
 }
 #endif
 
@@ -665,29 +644,18 @@ void u4writeOut( char *out, int newLine, long lenIn )
    int errCode, flushCode ;
    FILE4LONG len, len2 ;
    #ifdef S4TESTING
-      #ifndef S4SERVER
          CODE4 cb ;
          int undoLocal = 0 ;
-      #endif
    #endif
 
-   #ifdef S4SERVER
-      if ( isInit == 0 )
-      {
-         InitializeCriticalSection( &crit4 ) ;
-         isInit = 1 ;
-      }
-   #endif
 
    #ifdef S4TESTING
-      #ifndef S4SERVER
          if ( ats4errorFlag == 0 )
          {
             ats4errorFlag = 1 ;
             ats4setSuiteStatus( "E" ) ;
             ats4errorFlag = 0 ;
          }
-      #endif
    #endif
 
    #ifdef S4MEM_PRINT
@@ -695,16 +663,10 @@ void u4writeOut( char *out, int newLine, long lenIn )
          return ;
    #endif
 
-   #ifdef S4TESTING
-      #ifdef S4SERVER
-         EnterCriticalSection( &crit4 ) ;
-      #endif
-   #endif
 
    if ( s4test.hand == INVALID4HANDLE )
    {
       #ifdef S4TESTING
-         #ifndef S4SERVER
             /* reopen the log if it has been previously closed:   */
             code4init(&cb) ;
             /* the code4init() call should have opened or created s4test  */
@@ -713,21 +675,14 @@ void u4writeOut( char *out, int newLine, long lenIn )
             {
                code4close(&cb) ;
                code4initUndo(&cb) ;
-               #ifdef S4SERVER
-                  LeaveCriticalSection( &crit4 ) ;
-               #endif
                return ;
             }
             undoLocal = 1 ;
-         #endif
       #endif
    }
 
    if( s4test.hand == INVALID4HANDLE )  /* even for non-testing just ensure else return */
    {
-      #ifdef S4SERVER
-         LeaveCriticalSection( &crit4 ) ;
-      #endif
       return ;
    }
 
@@ -796,17 +751,12 @@ void u4writeOut( char *out, int newLine, long lenIn )
    error4set( s4test.codeBase, errCode ) ;
 
    #ifdef S4TESTING
-      #ifndef S4SERVER
          if ( undoLocal )
          {
             code4close(&cb) ;
             code4initUndo(&cb) ;
          }
-      #endif
 
-      #ifdef S4SERVER
-         LeaveCriticalSection( &crit4 ) ;
-      #endif
    #endif
 }
 #undef INC_U4WRITEERR

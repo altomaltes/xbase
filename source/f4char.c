@@ -41,7 +41,6 @@ void S4FUNCTION f4assignChar( FIELD4 *field, const int chr )
    if ( error4code( field->data->codeBase ) < 0 )
       return ;
 
-   #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( field->data->codeBase->lockEnforce && field->data->recNum > 0L )
             if ( d4lockTest( field->data, field->data->recNum ) != 1 )
@@ -50,7 +49,6 @@ void S4FUNCTION f4assignChar( FIELD4 *field, const int chr )
                return ;
             }
       #endif
-   #endif
 
    f4blank( field ) ;
    *f4assignPtr( field ) = (char)chr ;

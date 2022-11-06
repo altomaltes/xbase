@@ -41,7 +41,6 @@ void S4FUNCTION f4assignDouble( FIELD4 *field, const double dValue )
    if ( error4code( field->data->codeBase ) < 0 )
       return ;
 
-   #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( field->data->codeBase->lockEnforce && field->data->recNum > 0L )
             if ( d4lockTest( field->data, field->data->recNum ) != 1 )
@@ -50,7 +49,6 @@ void S4FUNCTION f4assignDouble( FIELD4 *field, const double dValue )
                return ;
             }
       #endif
-   #endif
 
    switch( field->type )
    {

@@ -1892,7 +1892,6 @@ DATA4 *d4data_v( CODE4 *c4, char *alias )
 #endif
 
 /*#ifdef S4CB51*/
-#ifndef S4SERVER
 #ifdef S4DLL_BUILD
 #ifndef S4WINCE
 #ifndef S4PASCAL_DOS
@@ -2124,7 +2123,6 @@ void S4FUNCTION ctrl4setServerName( HINSTANCE hInst,char *serverName ) /*5 oh so
 #endif /* S4PASCAL_DOS */
 #endif /* S4WINCE */
 #endif /* S4DLL_BUILD */
-#endif /* S4SERVER */
 
 #ifdef S4SERVER
 /* when shutdown, doDelay is 0, continue with shutdown even

@@ -965,13 +965,11 @@ int expr4parseFunction( E4PARSE *p4, const char *startPtr, const int fLen )
       else
       {
          fNum = E4CALC_FUNCTION ;
-         #ifndef S4SERVER
             if( calc->total != 0 )
             {
                fNum = E4TOTAL ;
                newOrTotalPtr = calc->total ;
             }
-         #endif
       }
    }
 

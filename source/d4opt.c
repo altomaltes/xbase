@@ -437,7 +437,6 @@ int S4FUNCTION code4optSuspend( CODE4 *c4 )
    return 0 ;
 }
 
-#ifndef S4SERVER
 int S4FUNCTION d4optimize( DATA4 *d4, const int optFlag )
 {
       #ifdef S4VBASIC
@@ -451,7 +450,6 @@ int S4FUNCTION d4optimize( DATA4 *d4, const int optFlag )
       #endif
       return dfile4optimize( d4->dataFile, optFlag ) ;
 }
-#endif /* S4SERVER */
 
 #ifdef P4ARGS_USED
    #pragma argsused

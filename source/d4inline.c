@@ -43,7 +43,6 @@ void trans4unlockAutoSet( TRAN4 *t4, int val )
 #endif
 */
 
-#ifndef S4SERVER
 #ifndef S4SINGLE
 int code4unlockAutoSave( CODE4 *c4 )
 {
@@ -75,7 +74,6 @@ PUBLIC int S4FUNCTION code4tranStatusSet( CODE4 *c4, const int val )
 #endif
 #endif
 
-#endif  /*  S4SERVER */
 
 #ifdef S4SERVER
 #ifndef S4SINGLE

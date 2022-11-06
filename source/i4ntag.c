@@ -1004,13 +1004,11 @@ static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
 /*      return 0 ; */
 
       /*
-      #ifndef S4SERVER
          if ( c4->singleOpen != OPEN4SPECIAL )   only one instance allowed...
          {
             error4( c4, e4instance, E94906 ) ;
             return 0 ;
          }
-      #endif
 
       tfile->userCount++ ;
       return tfile ;

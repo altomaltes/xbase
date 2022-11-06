@@ -284,11 +284,7 @@ public:
    Tag4( TAG4 S4PTR *tg )         { tag = tg ; }
    Tag4( Data4 d, const char * const name = NULL ) { init(d,name); }
    operator TAG4*() const         { return tag ; }
-   #ifndef S4SERVER
       const char S4PTR* alias()   { return t4alias( tag ) ; }
-   #else
-      const char S4PTR* alias()   { DEBUG4PTR( tag == 0, 60901 ) return tag->tagFile->alias ; }
-   #endif
    #ifdef S4CLIPPER
        int close()                { return t4close( tag ) ; }
    #endif

@@ -705,9 +705,7 @@ RELATE4 *S4FUNCTION relate4createSlave( RELATE4 *master, DATA4 *slaveData, const
                   if ( !( tfile4type( slaveTag->tagFile ) == r4numDoub && expr4type( slave->masterExpr ) == r4num ) )
             #endif
                {
-                  #ifndef S4SERVER
                      error4( c4, e4relate, E84404 ) ;
-                  #endif
                   mem4free( c4->relateMemory, slave ) ;
                   return 0 ;
                }
@@ -786,10 +784,8 @@ int S4FUNCTION relate4doAll( RELATE4 *relate )
 
    if ( rc == relate4filterRecord )  /* no match is an error */
    {
-      #ifndef S4SERVER
          if ( c4->errRelate )
             return error4describe( c4, e4lookupErr, E94404, relate->data->alias, 0, 0 ) ;
-      #endif
       return r4terminate ;
    }
 
@@ -844,10 +840,8 @@ int S4FUNCTION relate4doOne( RELATE4 *relate )
    relate->isRead = relate->master->isRead ;  /* we are read if master is read */
    if ( rc == relate4filterRecord )  /* no match is an error */
    {
-      #ifndef S4SERVER
          if ( c4->errRelate )
             return error4describe( c4, e4info, E94405, relate->data->alias, 0, 0 ) ;
-      #endif
       return r4terminate ;
    }
    return rc ;
@@ -1326,9 +1320,7 @@ static int relate4lookup( RELATE4 *relate, const char direction )
    long recno ;
    CODE4 *c4 ;
    RELATION4 *relation ;
-   #ifndef S4SERVER
       int oldGoError ;
-   #endif
    #ifndef S4OFF_INDEX
       char *ptr ;
       int len ;
@@ -1370,16 +1362,12 @@ static int relate4lookup( RELATE4 *relate, const char direction )
          if ( f4flagIsSetFlip( &relate->set, (unsigned long)recno ) == 0 )
             return relate4filterRecord ;
 
-      #ifndef S4SERVER
          oldGoError = c4->errGo ;
          c4->errGo = 0 ;
-      #endif
       rc = d4go( relate->data, recno ) ;
-      #ifndef S4SERVER
          c4->errGo = oldGoError ;
          if ( rc < 0 )
             return error4stack( c4, rc, E94412 ) ;
-      #endif
       if ( rc != r4entry )  /* if not error, then return */
          return 0 ;
       if ( relate->relationType == relate4approx )
@@ -1501,10 +1489,8 @@ static int relate4lookup( RELATE4 *relate, const char direction )
          }
          return relate4filterRecord ;
       case relate4terminate:
-         #ifndef S4SERVER
             if ( c4->errRelate )
                return error4describe( c4, e4lookupErr, E94412, relate->data->alias, 0, 0 ) ;
-         #endif
          return r4terminate ;
       default:  /* should never get this far */
          return error4( c4, e4info, E84411 ) ;
@@ -1649,9 +1635,7 @@ static int relate4nextRecordInScan( RELATE4 *relate )
    long nextRec ;
    int rc ;
    DATA4 *d4 ;
-   #ifndef S4SERVER
       int  saveCode ;
-   #endif
    #ifndef S4OFF_INDEX
       B4KEY_DATA *key ;
       char *ptr ;
@@ -1771,14 +1755,10 @@ static int relate4nextRecordInScan( RELATE4 *relate )
       }
    #endif
 
-   #ifndef S4SERVER
       saveCode = relate->codeBase->errGo ;
       relate->codeBase->errGo = 0 ;
-   #endif
    rc = d4go( d4, nextRec ) ;
-   #ifndef S4SERVER
       relate->codeBase->errGo = saveCode ;
-   #endif
    if ( rc < 0 )
       return -1 ;
    if ( rc == r4entry )
@@ -2060,9 +2040,7 @@ static int relate4prevRecordInScan( RELATE4 *relate )
    long nextRec ;
    int  rc ;
    DATA4 *d4 ;
-   #ifndef S4SERVER
       int  saveCode ;
-   #endif
    #ifndef S4OFF_INDEX
       TAG4FILE *tagFile ;
       B4KEY_DATA *key ;
@@ -2198,14 +2176,10 @@ static int relate4prevRecordInScan( RELATE4 *relate )
    }
    #endif
 
-   #ifndef S4SERVER
       saveCode = relate->codeBase->errGo ;
       relate->codeBase->errGo = 0 ;
-   #endif
    rc = d4go( d4, nextRec ) ;
-   #ifndef S4SERVER
       relate->codeBase->errGo = saveCode ;
-   #endif
    if ( rc < 0 )
       return -1 ;
    if ( rc == r4entry )

@@ -11,9 +11,7 @@ int S4FUNCTION d4top( DATA4 *data )
       TAG4 *tag ;
       TAG4FILE *tagFile ;
    #endif
-   #ifndef S4SERVER
       int saveFlag ;
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( data, 2, E92301 ) )
@@ -37,14 +35,10 @@ int S4FUNCTION d4top( DATA4 *data )
    #endif
       if ( d4recCount( data ) > 0L )
       {
-         #ifndef S4SERVER
             saveFlag = c4->errGo ;
             c4->errGo = 0 ;
-         #endif
          rc = d4go( data, 1L ) ;
-         #ifndef S4SERVER
             c4->errGo = saveFlag ;
-         #endif
          return rc ;
       }
    #ifndef S4OFF_INDEX

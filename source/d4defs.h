@@ -49,11 +49,9 @@
    #define S4OLEDB_OR_NOT_SERVER
 #endif
 
-#ifndef S4SERVER
    #ifndef S4OLEDB_OR_NOT_SERVER
       #define S4OLEDB_OR_NOT_SERVER
    #endif
-#endif
 
 #ifndef S4DLL_BUILD
    #ifndef S4LIB_BUILD
@@ -1058,12 +1056,10 @@
 /* #define S4DEAD_CHECK */
 #endif
 
-#ifndef S4SERVER
    #ifdef S4TESTING
       #define ATS_FILENAME_REC "RECINFO.ATS"
       #define ATS_FILENAME_CS "CSINFO.ATS"
    #endif
-#endif
 
 #ifdef S4SERVER
    #define MEMORY4START_CONNECT_LOW 20

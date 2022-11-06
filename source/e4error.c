@@ -158,7 +158,6 @@ void error4logAppend( CODE4 *c4, int errCode1, long errCode2, const char *desc1,
    c4->errorLog = errorLog ;
 }
 
-#ifndef S4SERVER
 #ifdef S4CONSOLE
 #ifdef E4PAUSE
 static void error4pause( void )
@@ -169,7 +168,6 @@ static void error4pause( void )
       getch() ;
    #endif
 }
-#endif
 #endif
 #endif
 
@@ -1248,13 +1246,11 @@ int S4FUNCTION error4describeDefault( CODE4 *c4, const int errCode1, const long 
 int S4FUNCTION error4describeExecute( CODE4 *c4, const int errCode1, const long errCode2, const char *s1, const char *s2, const char *s3 )
 {
    #ifdef E4HOOK
-      #ifndef S4SERVER
          if ( c4 != 0 )
          {
             error4set( c4, errCode1 ) ;
             error4set2( c4, errCode2 ) ;
          }
-      #endif
 
       error4hook( c4, errCode1, errCode2, s1, s2, s3 ) ;
       return errCode1 ;
@@ -1305,7 +1301,6 @@ int S4FUNCTION error4describeExecute( CODE4 *c4, const int errCode1, const long 
    #endif
 }
 
-#ifndef S4SERVER
 void S4FUNCTION error4exitTest( CODE4 *c4 )
 {
    if ( c4 == 0 )
@@ -1313,10 +1308,8 @@ void S4FUNCTION error4exitTest( CODE4 *c4 )
    if ( error4code( c4 ) < 0 )
       code4exit( c4 ) ;
 }
-#endif /* S4SERVER */
 
 #ifdef S4CB51
-#ifndef S4SERVER
 void S4FUNCTION e4severe( const int errCode, const char *desc )
 {
    #ifdef E4HOOK
@@ -1331,7 +1324,6 @@ void S4FUNCTION e4severe( const int errCode, const char *desc )
    #endif
    code4exit( 0 ) ;
 }
-#endif
 
 int S4FUNCTION e4describe( CODE4 *c4, int errCode, const char *s1, const char *s2, const char *s3 )
 {

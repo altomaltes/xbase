@@ -51,7 +51,6 @@ void S4FUNCTION f4blank( FIELD4 *field )
    if ( error4code( field->data->codeBase ) < 0 )
       return ;
 
-   #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( field->data->codeBase->lockEnforce && field->data->recNum > 0L )
             if ( d4lockTest( field->data, field->data->recNum ) != 1 )
@@ -60,7 +59,6 @@ void S4FUNCTION f4blank( FIELD4 *field )
                return ;
             }
       #endif
-   #endif
 
    #ifdef CLIENT_OR_FOX
       if ( field->binary )
@@ -997,7 +995,6 @@ void S4FUNCTION f4assignCurrency( FIELD4 *field, char *str )
    if ( error4code( field->data->codeBase ) < 0 )
       return ;
 
-   #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( field->data->codeBase->lockEnforce && field->data->recNum > 0L )
             if ( d4lockTest( field->data, field->data->recNum ) != 1 )
@@ -1006,7 +1003,6 @@ void S4FUNCTION f4assignCurrency( FIELD4 *field, char *str )
                return ;
             }
       #endif
-   #endif
 
    c4atoCurrency( (CURRENCY4 *)f4assignPtr( field ), str, strlen( str ) ) ;
 }
@@ -1131,7 +1127,6 @@ void S4FUNCTION f4assignNull( FIELD4 *field )
       return ;
    }
 
-   #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( field->data->codeBase->lockEnforce && field->data->recNum > 0L )
             if ( d4lockTest( field->data, field->data->recNum ) != 1 )
@@ -1140,7 +1135,6 @@ void S4FUNCTION f4assignNull( FIELD4 *field )
                return ;
             }
       #endif
-   #endif
 
    if ( field->null == 1 )
    {

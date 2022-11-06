@@ -17,9 +17,7 @@
 #ifndef UTIL5INCLUDED
    #define UTIL5INCLUDED
 
-   #ifndef S4SERVER
       extern LPMALLOC pIMalloc5 ;  // Refer to the gloabal 'alloc5' function.
-   #endif
 
    extern "C" {
       //const char *S4FUNCTION error4text( CODE4 *c4, const long errCode2 ) ;

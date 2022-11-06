@@ -75,13 +75,11 @@ int S4FUNCTION f4memoAssignN( FIELD4 *field, const char *ptr, const unsigned int
       if ( error4code( c4 ) < 0 )
          return e4codeBase ;
 
-      #ifndef S4SERVER
          #ifndef S4OFF_ENFORCE_LOCK
             if ( c4->lockEnforce && field->data->recNum > 0L )
                if ( d4lockTest( field->data, field->data->recNum ) != 1 )
                   return error4( c4, e4lock, E90519 ) ;
          #endif
-      #endif
 
       if ( ptrLen > UINT_MAX - 128 )
          return error4( c4, e4memory, E85202 ) ;
@@ -373,13 +371,11 @@ int S4FUNCTION f4memoSetLen( FIELD4 *field, const unsigned len )
    if ( error4code( c4 ) < 0 )
       return e4codeBase ;
 
-   #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( c4->lockEnforce  && field->data->recNum > 0L )
             if ( d4lockTest( field->data, field->data->recNum ) != 1 )
                return error4( c4, e4lock, E90528 ) ;
       #endif
-   #endif
 
    mfield = field->memo ;
    if ( mfield == 0 )

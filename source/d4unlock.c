@@ -127,7 +127,6 @@ int S4FUNCTION d4unlockLow( DATA4 *data, long clientId, char doReqdUpdate )
 }
 #endif
 
-#ifndef S4SERVER
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -144,7 +143,6 @@ int S4FUNCTION d4unlock( DATA4 *data )
       return 0 ;
    #endif
 }
-#endif
 
 /*#ifdef S4STAND_ALONE*/
 

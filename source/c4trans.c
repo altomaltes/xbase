@@ -58,9 +58,7 @@ static DATA4 *tran4dataFull( TRAN4 *, const long, const long ) ;
 static int code4transVerify( CODE4TRANS *, int ) ;
 #endif  /* E4ANALYZE */
 
-#ifndef S4SERVER
 static void code4invalidate( CODE4 * ) ;
-#endif
 
 #ifdef E4ANALYZE
 static int tran4fileVerify( TRAN4FILE *t4, int subs )
@@ -1598,7 +1596,6 @@ int S4FUNCTION code4tranCommitSingle( CODE4 *c4 )
    return code4tranCommitPhaseTwo( c4, 0 ) ;
 }
 
-#ifndef S4SERVER
 /* places all DATA4's into an invalid state */
 /* S4STAND_ALONE */
 static void code4invalidate( CODE4 *c4 )
@@ -1626,7 +1623,6 @@ static void code4invalidate( CODE4 *c4 )
       d4changed( dataOn, 0 ) ;
    }
 }
-#endif  /* not S4SERVER */
 
 #ifdef S4STAND_ALONE
 /* S4STAND_ALONE */
@@ -1955,7 +1951,6 @@ static void tran4unlock( SINGLE4DISTANT *toAdd, SINGLE4DISTANT *toUnlock )
 
 #endif /* SOFF_MULTI */
 
-#ifndef S4SERVER
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -2044,7 +2039,6 @@ int S4FUNCTION code4lock( CODE4 *c4 )
          }
    #endif  /* S4OFF_MULTI */
 }
-#endif  /* not S4SERVER */
 
 #ifdef S4SERVER
 int tran4closeAll( TRAN4 *trans )
@@ -2208,9 +2202,7 @@ int S4FUNCTION code4transInitUndo( CODE4TRANS *c4trans )
 #ifdef S4SERVER
 int code4transInit( CODE4TRANS *c4trans, CODE4 *c4 )
 {
-   #ifndef S4SERVER
       int rc ;
-   #endif
 
    #ifdef E4PARM_LOW
       if ( c4trans == 0 || c4 == 0 )
@@ -2232,11 +2224,9 @@ int code4transInit( CODE4TRANS *c4trans, CODE4 *c4 )
    #endif
    c4trans->c4 = c4 ;
 
-   #ifndef S4SERVER
       rc = code4tranInitLow( &c4trans->trans, c4trans ) ;
       if ( rc < 0 )
          return rc ;
-   #endif
 
    #ifdef E4ANALYZE
       return code4transVerify( c4trans, 0 ) ;

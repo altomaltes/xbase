@@ -38,7 +38,6 @@ void S4FUNCTION f4assign( FIELD4 *field, const char *str )
    if ( error4code( field->data->codeBase ) < 0 )
       return ;
 
-   #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( field->data->codeBase->lockEnforce && field->data->recNum > 0L )
             if ( d4lockTest( field->data, field->data->recNum ) != 1 )
@@ -47,7 +46,6 @@ void S4FUNCTION f4assign( FIELD4 *field, const char *str )
                return ;
             }
       #endif
-   #endif
 
    f4assignN( field, str, (unsigned)strlen(str) ) ;
 }
@@ -73,7 +71,6 @@ void S4FUNCTION f4assignN( FIELD4 *field, const char *ptr, const unsigned ptrLen
    if ( error4code( field->data->codeBase ) < 0 )
       return ;
 
-   #ifndef S4SERVER
       #ifndef S4OFF_ENFORCE_LOCK
          if ( field->data->codeBase->lockEnforce && field->data->recNum > 0L )
             if ( d4lockTest( field->data, field->data->recNum ) != 1 )
@@ -82,7 +79,6 @@ void S4FUNCTION f4assignN( FIELD4 *field, const char *ptr, const unsigned ptrLen
                return ;
             }
       #endif
-   #endif
 
    fPtr = f4assignPtr( field ) ;
 

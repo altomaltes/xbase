@@ -51,10 +51,8 @@ int S4FUNCTION d4go( DATA4 *data, const long recNo )
    {
       data->recNum = -1 ;  /* at an invalid position */
       d4blankLow( data, data->record ) ;
-      #ifndef S4SERVER
          if ( c4->errGo )
             return error4describe( c4, e4read, E91102, d4alias( data ), 0, 0 ) ;
-      #endif
       return r4entry ;
    }
 
@@ -201,10 +199,8 @@ int dfile4goData( DATA4FILE *data, long rec, void *record, int fromDisk )
    if ( len != data->recWidth )
    {
       memset( record, ' ', data->recWidth ) ;  /* clear the partially read record to avoid corruption */
-      #ifndef S4SERVER
          if ( cb->errGo )
             return error4describe( cb, e4read, E91102, data->file.name, 0, 0 ) ;
-      #endif
       return r4entry ;
    }
    return 0 ;

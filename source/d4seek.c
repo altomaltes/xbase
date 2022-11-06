@@ -199,11 +199,9 @@ int S4FUNCTION d4seekNextN( DATA4 *data, const char *str, const short l )
 {
    CODE4 *c4 ;
    int rc ;
-   #ifndef S4SERVER
       #ifndef S4OFF_MULTI
          int oldErrGo ;
       #endif
-   #endif
       int len, rc2, saveGo ;
       TAG4 *tag ;
       TAG4FILE *tfile ;
@@ -317,10 +315,8 @@ int S4FUNCTION d4seekNextN( DATA4 *data, const char *str, const short l )
          #ifndef S4OFF_MULTI
             if ( d4lockTest( data, data->recNum ) == 0 )  /* ensure latest from disk */
             {
-               #ifndef S4SERVER
                   oldErrGo = data->codeBase->errGo ;
                   data->codeBase->errGo = 0 ;
-               #endif
                #ifndef S4OFF_OPTIMIZE
                   data->dataFile->hiPrio = 1 ;
                #endif
@@ -328,9 +324,7 @@ int S4FUNCTION d4seekNextN( DATA4 *data, const char *str, const short l )
                #ifndef S4OFF_OPTIMIZE
                   data->dataFile->hiPrio = 0 ;
                #endif
-               #ifndef S4SERVER
                   data->codeBase->errGo = oldErrGo ;
-               #endif
                if ( saveGo < 0 )
                   return saveGo ;
             }
@@ -673,11 +667,9 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
 {
    CODE4 *c4 ;
    int rc ;
-   #ifndef S4SERVER
       #ifndef S4OFF_MULTI
          int oldErrGo ;
       #endif
-   #endif
       int rc2, saveGo ;
       TAG4 *tag ;
       TAG4FILE *tfile ;
@@ -794,10 +786,8 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
          #ifndef S4OFF_MULTI
             if ( d4lockTest( data, data->recNum ) == 0 )  /* ensure latest from disk */
             {
-               #ifndef S4SERVER
                   oldErrGo = data->codeBase->errGo ;
                   data->codeBase->errGo = 0 ;
-               #endif
                #ifndef S4OFF_OPTIMIZE
                   data->dataFile->hiPrio = 1 ;
                #endif
@@ -805,9 +795,7 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
                #ifndef S4OFF_OPTIMIZE
                   data->dataFile->hiPrio = 0 ;
                #endif
-               #ifndef S4SERVER
                   data->codeBase->errGo = oldErrGo ;
-               #endif
                if ( saveGo < 0 )
                   return saveGo ;
             }
