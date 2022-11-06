@@ -71,10 +71,6 @@ typedef struct RELATE4St
       int scanValueLen ;
       int isRead ;
       F4FLAG  set ;  /* Specify records for bitmap optimizable sub-expression. */
-      #ifndef S4STAND_ALONE
-         DATA4 S4PTR *dataOld ; /* the DATA4 that originally derived the relation */
-         int freeData ;         /* did the relate create the data structure */
-      #endif
 
       S4CONV( char S4PTR *oldRecord, char S4PTR *old_record ) ;
 

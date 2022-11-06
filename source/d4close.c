@@ -151,9 +151,6 @@ int code4dataFileCloseAll( CODE4 *c4 )
 
 int dfile4close( DATA4FILE *data )
 {
-   #ifndef S4STAND_ALONE
-      CODE4 *c4 ;
-   #endif
 
    #ifdef E4PARM_LOW
       if ( data == 0 )
@@ -163,10 +160,6 @@ int dfile4close( DATA4FILE *data )
    #ifdef E4ANALYZE
       if ( data->userCount <= 0 )
          return error4( 0, e4struct, E91102 ) ;
-   #endif
-
-   #ifndef S4STAND_ALONE
-      c4 = data->c4 ;
    #endif
 
 

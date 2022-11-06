@@ -92,10 +92,6 @@ PUBLIC int S4FUNCTION code4unlock( CODE4 S4PTR * ) ;
       int S4FUNCTION code4unlockAuto( CODE4 * ) ;
    #endif
 
-#ifndef S4STAND_ALONE
-   PUBLIC DATA4 S4PTR *S4FUNCTION code4connectionStatus( CODE4 S4PTR * ) ;
-#endif
-
 PUBLIC int S4FUNCTION currency4compare( const CURRENCY4 *, const CURRENCY4 * ) ;
 PUBLIC int S4FUNCTION date4timeCompare( const long *, const long * ) ;
 /* for testing */
@@ -600,9 +596,6 @@ PUBLIC long S4FUNCTION u4switch( void ) ;  /* used for example start-up verifica
 
 /* INTERNAL FUNCTIONS : */
 
-#ifndef S4STAND_ALONE
-int client4indexSetup( CODE4 *, DATA4 *, DATA4FILE *, unsigned int, const char *, unsigned int, const char *, INDEX4 * ) ;
-#endif
 
 long time4long( const char *, int ) ;
 

@@ -260,13 +260,6 @@
 #endif
 
 #ifdef __WIN32
-   #ifndef S4STAND_ALONE
-      #ifndef S4OFF_THREAD
-         #ifndef S4COMM_THREAD
-            #define S4COMM_THREAD
-         #endif
-      #endif
-   #endif
    #ifndef S4CONSOLE
       #ifndef S4WINDOWS
          #define S4WINDOWS
@@ -373,22 +366,6 @@
          #define S4OFF_COMMUNICATIONS
       #endif
    /* #endif */
-#endif
-
-#ifdef S4NWSDK
-   #ifndef S4SPX
-      #define S4SPX
-   #endif
-#endif
-
-#ifdef S4SPX
-   #ifndef S4NWSDK
-      #ifdef S4WINDOWS
-         #define S4NWSDK
-      #else
-         #define S4REGISTERS
-      #endif
-   #endif
 #endif
 
 #ifndef S4MACINTOSH
@@ -1004,10 +981,6 @@
 #endif
 
 #define WAIT4EVER -1
-#ifndef S4STAND_ALONE
-/* #define S4DEAD_CHECK */
-#endif
-
    #ifdef S4TESTING
       #define ATS_FILENAME_REC "RECINFO.ATS"
       #define ATS_FILENAME_CS "CSINFO.ATS"
@@ -1255,32 +1228,6 @@
    #define LOCK4FILE     20
    #define LOCK4RECORD   30
    #define LOCK4INDEX    40
-#endif
-
-#ifndef S4STAND_ALONE
-   #ifdef S4SPX
-      #error IPX/SPX communication protocol not supported
-   #endif
-
-
-   #ifdef S4SPX
-         #define DEF4PROTOCOL "C4SPX.DLL"
-   #endif
-   #define CON4LOW_ACCEPT_TIME  15
-   #define MEMORY4EXPAND_SIGNAL_ROUTINE 20
-   #define MEMORY4START_SIGNAL_ROUTINE 10
-   #define MEMORY4START_WRITE_MEMORY 10
-   #define MEMORY4EXPAND_WRITE_MEMORY 20
-   #define READ4MESSAGE_BUFFER_LEN 4096
-   #define READ4MESSAGE_NUM_BUFFER 2
-   #define WRITE4MESSAGE_NUM_BUFFER 10
-   #define WRITE4MESSAGE_BUFFER_LEN 4096
-   #define CONNECT4SPECIAL 1
-   #define CONNECT4IDLE 2
-   #define CONNECT4NORMAL 3
-   #define CONNECT4WORKING 4
-   #define CONNECT4SHUTDOWN 5
-   #define S4MAX_WRITES 2
 #endif
 
 #define LEN4ACCOUNT_ID   20
@@ -1665,11 +1612,6 @@
 
 #define E4DEBUG_INT 0x5281
 
-#ifdef S4SPX
-   #define S4SERVER_NAME_SIZE 47
-   #define S4MAX_PACKET_SIZE 534
-#endif
-
 #ifdef S4COMNB
    #define S4SERVER_NAME_SIZE 16
 #endif
@@ -1680,29 +1622,12 @@
 
 #define S4MAX_SERVER_NAME_SIZE 80
 
-#ifdef S4WINDOWS
-   #ifdef S4SPX
-      #ifndef S4NWSDK
-         #define S4USE_LOW_MEMORY
-      #endif
-   #endif
-#endif
-
-#ifdef S4SPX
-   #define S4REVERSE_FUNC
-#endif
 
 #ifndef S4CB51
    #define S4CONST const
 #else
    #ifndef S4CONST
       #define S4CONST
-   #endif
-#endif
-
-#ifdef S4NWSDK
-   #ifdef S4DOS
-      #error S4NWSDK unsupported in DOS configuration
    #endif
 #endif
 

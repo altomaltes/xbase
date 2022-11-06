@@ -388,8 +388,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
 
    char S4FUNCTION c4getOledbSchemaCreate( const CODE4 *c4 )
-   {
-      return c4->optimize ;
+   {  return c4->optimize ;
    }
 
 
@@ -403,14 +402,14 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
    int S4FUNCTION c4getOptimizeWrite( const CODE4 *c4 )
    {
-      return c4->optimizeWrite ;
+      retur( c4->optimizeWrite );
    }
 
 
 
    int S4FUNCTION c4getReadLockDo( const CODE4 *c4 )
    {
-      return c4->readLock ;
+      return( c4->readLock );
    }
 
 
@@ -952,11 +951,7 @@ long S4FUNCTION c4getTimeout( CODE4 *c4 )
          return error4( 0, e4parm_null, E96702 ) ;
    #endif
 
-   #ifdef S4STAND_ALONE
       return e4notSupported ;
-   #else
-      return c4->timeout ;
-   #endif
 }
 
 

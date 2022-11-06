@@ -19,26 +19,6 @@
 
 #include "d4all.h"
 
-#ifdef __BORLANDC__
-   #if __BORLANDC__ < 0x500
-      #ifndef S4STAND_ALONE
-         #ifndef S4EXE_BUILD
-            #error Client/Server library build not supported with Borland C++ prior to version 5
-         #endif
-      #endif
-   #endif
-#endif
-
-#ifdef _MSC_VER
-   #if _MSC_VER < 1000
-      #ifndef S4STAND_ALONE
-         #ifndef S4EXE_BUILD
-            #error Client/Server library build not supported with Visual C++ prior to version 4
-         #endif
-      #endif
-   #endif
-#endif
-
 short S4FUNCTION x4reverseShort( const void *val )
 {
    unsigned char out[2] ;

@@ -154,11 +154,6 @@
 
 #include "o4opt.h"
 
-// #include "c4com.h" JACS
-// #ifndef S4STAND_ALONE
-//    #include "c4comlow.h"
-// #endif
-
 #include "c4trans.h"
 
 #ifdef OLEDB5BUILD

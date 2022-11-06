@@ -153,9 +153,6 @@ static int d4doAppend( DATA4 *data )
    #endif /* S4OFF_MEMO */
    #ifndef S4OFF_MULTI
          long serverId ;
-      #ifndef S4STAND_ALONE
-         long clientId ;
-      #endif
    #endif
 
    #ifdef S4DEMO
@@ -186,9 +183,6 @@ static int d4doAppend( DATA4 *data )
 
    #ifndef S4OFF_MULTI
       serverId = data4serverId( data ) ;
-      #ifndef S4STAND_ALONE
-         clientId = data4clientId( data ) ;
-      #endif
    #endif
 
    #ifdef E4ANALYZE

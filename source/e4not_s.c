@@ -153,14 +153,6 @@
    #endif
 #endif
 
-#ifndef S4STAND_ALONE
-   #ifndef S4OFF_STAND_OPT
-      #define S4OFF_STAND_OPT
-   #endif
-   #ifndef S4OFF_STAND_WRITE_TRAN
-      #define S4OFF_STAND_WRITE_TRAN
-   #endif
-#endif
 
 #ifdef S4CB51
    #ifndef S4OFF_INDEX_ON_CB51

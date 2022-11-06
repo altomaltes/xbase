@@ -124,9 +124,6 @@ int S4FUNCTION d4writeLow( DATA4 *d4, const long recIn, const int unlock )
          if ( code4tranStatus( c4 ) == r4active )
          {
             trans = code4trans( c4 ) ;
-            #ifndef S4STAND_ALONE
-               connectionId = c4->currentClient->id ;
-            #endif
             recNo = d4recNo( d4 ) ;
             rc = tran4set( trans, trans->currentTranStatus, -1L, connectionId, TRAN4WRITE,
                  sizeof( recNo ) + 2 * dfile4recWidth( d4->dataFile ), data4clientId( d4 ), data4serverId( d4 ) ) ;

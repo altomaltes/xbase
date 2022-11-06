@@ -250,11 +250,6 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
          int oldOffErr ;
       #endif
    #endif
-   #ifndef S4STAND_ALONE
-      #ifdef S4WINTEL
-         WSADATA WSAData ;
-      #endif
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( c4 == 0 )
@@ -278,9 +273,7 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
          memset( &s4test, 0, sizeof( s4test ) ) ;
          s4test.hand = INVALID4HANDLE ;
       }
-      #ifdef S4STAND_ALONE
          c4->doTransLocking = 1 ;   /* for testing, to allow one program to have multiple transactions in progress */
-      #endif
    #else
       #ifdef S4TRACK_FILES
          if ( numCode4 == 0 )
@@ -439,9 +432,7 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
    #ifndef S4OFF_TRAN
       #ifndef S4OFF_WRITE
             c4->log = LOG4ON ;
-         #ifdef S4STAND_ALONE
             c4->logOpen = 1 ;
-         #endif
       #endif
    #endif
 
@@ -630,53 +621,6 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
       #endif
    #endif
 
-   #ifndef S4STAND_ALONE
-      #ifdef S4WINTEL
-         rc = WSAStartup( MAKEWORD( 1,1 ), &WSAData ) ;
-      #endif
-      c4->ver4 = code4osVersion() ;
-      if ( c4->ver4 <= 0 )
-      {
-         numCode4--;
-         return error4( 0, e4result, E91001 ) ;
-      }
-      c4->readMessageBufferLen = READ4MESSAGE_BUFFER_LEN ;
-
-
-      #ifndef S4OFF_THREAD
-         list4mutexInit(&c4->writeBuffersAvail) ;
-         list4mutexInit(&c4->connectBufferListMutex) ;
-      #endif
-
-      if (c4->ver4 == ver4NT )
-         c4->readMessageNumBuffers = READ4MESSAGE_NUM_BUFFER ;
-      else
-         c4->readMessageNumBuffers = 1 ;
-      c4->writeMessageBufferLen = WRITE4MESSAGE_BUFFER_LEN ;
-      c4->writeMessageNumOutstanding = WRITE4MESSAGE_NUM_BUFFER ;
-
-      #ifdef S4COMM_THREAD
-         /* and now start the communications thread */
-         c4->inter = (INTER4 *)u4alloc( sizeof( INTER4 ) ) ;
-         if ( c4->inter == 0 )
-         {
-            numCode4--;
-            return error4( 0, e4memory, E91001 ) ;
-         }
-         if ( inter4init( c4->inter, c4 ) < 0 )
-         {
-            numCode4--;
-            return error4( 0, e4result, E91001 ) ;
-         }
-         c4->interThreadHandle = _beginthread( inter4, 5000, c4->inter ) ;
-         if ( c4->interThreadHandle == -1 )
-         {
-            inter4initUndo( c4->inter ) ;
-            numCode4--;
-            return error4( 0, e4result, E91001 ) ;
-         }
-      #endif
-   #endif
 
    #ifdef S4FOX
       c4->compatibility = 26 ;
@@ -994,23 +938,6 @@ static int code4initUndo2( CODE4 *c4, int doClose )
       #endif
    #endif
 
-   #ifndef S4STAND_ALONE
-      #ifndef S4OFF_THREAD
-         list4mutexInitUndo(&c4->writeBuffersAvail) ;
-         list4mutexInitUndo(&c4->connectBufferListMutex) ;
-      #endif
-      #ifdef S4COMM_THREAD
-         if ( c4->inter != 0 )
-         {
-            inter4shutdownRequest( c4->inter ) ;
-            u4free( c4->inter ) ;
-            c4->inter = 0 ;
-         }
-      #endif
-      #ifdef S4WINTEL
-         WSACleanup() ;
-      #endif
-   #endif
 
       /* the server has no current SERVER4CLIENT to get error code of */
       errCode = error4code( c4 ) ;
@@ -1358,7 +1285,6 @@ int S4FUNCTION code4indexFormat( CODE4 *c4 )
 
 void S4FUNCTION code4largeOn( CODE4 *c4 )
 {
-#ifdef S4STAND_ALONE
 #ifndef S4OFF_WRITE
 #ifndef S4OFF_TRAN
    #ifdef S4FILE_EXTENDED
@@ -1384,10 +1310,8 @@ void S4FUNCTION code4largeOn( CODE4 *c4 )
    #endif
 #endif
 #endif
-#endif
 }
 
-#ifdef S4STAND_ALONE
 #ifndef S4OFF_WRITE
 #ifndef S4OFF_TRAN
 int S4FUNCTION code4logCreate( CODE4 *c4, const char *fileName, const char *userId )
@@ -1502,7 +1426,6 @@ void S4FUNCTION code4logOpenOff( CODE4 *c4 )
 }
 #endif /* S4OFF_TRAN */
 #endif /* S4OFF_WRITE */
-#endif /* S4STAND_ALONE */
 
 const char *S4FUNCTION code4indexExtension( CODE4 *c4 )
 {
@@ -1584,11 +1507,7 @@ const char *S4FUNCTION code4indexExtension( CODE4 *c4 )
    #define S4OPERATING 0x40
 #endif
 
-#ifdef S4STAND_ALONE
    #define S4STAND_ALONE_VAL 0x80
-#else
-   #define S4STAND_ALONE_VAL 0x0
-#endif
 
 #ifdef S4OS2
    #ifdef S4OPERATING
@@ -1999,23 +1918,21 @@ void S4FUNCTION ctrl4initVBX( CODE4 *code, HINSTANCE hInstance, int initialize )
 }
 
 
-#ifdef S4STAND_ALONE
-#ifdef P4ARGS_USED
-   #pragma argsused
-#endif
-void  S4FUNCTION ctrl4getServerName( HINSTANCE hInst,char *serverName,int strLen ) /*5 oh something*/
-{
-   return ;
-}
+  #ifdef P4ARGS_USED
+     #pragma argsused
+  #endif
+  void  S4FUNCTION ctrl4getServerName( HINSTANCE hInst,char *serverName,int strLen ) /*5 oh something*/
+  {
+     return ;
+  }
 
-#ifdef P4ARGS_USED
-   #pragma argsused
-#endif
+  #ifdef P4ARGS_USED
+     #pragma argsused
+  #endif
 void S4FUNCTION ctrl4setServerName( HINSTANCE hInst,char *serverName ) /*5 oh something*/
 {
    return ;
 }
-#endif /* S4STAND_ALONE */
 
 #endif /* S4PASCAL_DOS */
 #endif /* S4WINCE */
@@ -2236,33 +2153,6 @@ void S4FUNCTION c4setErrDefaultUnique( CODE4 *c4, short val )
    c4->errDefaultUnique = val ;
 }
 
-#ifndef S4STAND_ALONE
-int S4FUNCTION code4osVersion(void)
-{
-   #ifdef S4WINTEL
-      int rc ;
-      OSVERSIONINFO verInfo ;
-
-      verInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO) ;
-      rc = GetVersionEx(&verInfo) ;
-      if (!rc)
-         return -1 ;
-      switch ( verInfo.dwPlatformId )
-      {
-         case VER_PLATFORM_WIN32s:
-            return ver431 ;
-         case VER_PLATFORM_WIN32_WINDOWS:
-            return ver495 ;
-         case VER_PLATFORM_WIN32_NT:
-            return ver4NT ;
-         default:
-            return -1 ;
-      }
-   #else
-      return ver4Unix ;
-   #endif
-}
-#endif
 
 
 #ifndef S4OFF_TRAN
@@ -2290,7 +2180,6 @@ int code4tranInitUndoLow( TRAN4 *t4, const long clientId )
    return 0 ;
 }
 
-#ifdef S4STAND_ALONE
 void code4tranInitUndo( CODE4 *c4 )
 {
    #ifdef E4PARM_LOW
@@ -2325,12 +2214,10 @@ int S4FUNCTION code4tranInit2( CODE4 *c4, const char *fileName, const char *char
 
    return 0 ;
 }
-#endif /* S4STAND_ALONE */
 
 #endif /* S4OFF_WRITE */
 #endif /* S4OFF_TRAN */
 
-#ifdef S4STAND_ALONE
 int S4FUNCTION code4tranInit( CODE4 *c4 )
 {
    #ifdef E4PARM_LOW
@@ -2343,4 +2230,3 @@ int S4FUNCTION code4tranInit( CODE4 *c4 )
    tran4dataListSet( &c4->c4trans.trans, &c4->c4trans.trans.localDataList ) ;
    return 0 ;
 }
-#endif /* S4STAND_ALONE */

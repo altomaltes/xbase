@@ -250,12 +250,10 @@ static int tran4fileStatusFile( TRAN4FILE *t4 )
    int rc ;
    LOG4HEADER header ;
    TRAN4ENTRY_LEN entryLen;
-   #ifdef S4STAND_ALONE
       #ifndef S4OFF_MULTI
          long loop ;
          int oldNumAttempts ;
       #endif
-   #endif
 
    #ifdef E4ANALYZE
       if ( ( rc = tran4fileVerify( t4, 1 ) ) < 0 )
@@ -266,7 +264,6 @@ static int tran4fileStatusFile( TRAN4FILE *t4 )
 
    c4 = t4->c4trans->c4 ;
 
-   #ifdef S4STAND_ALONE
       /* first see if the only user, in which case can verify */
       #ifndef S4OFF_MULTI
          oldNumAttempts = c4->lockAttempts ;
@@ -291,7 +288,6 @@ static int tran4fileStatusFile( TRAN4FILE *t4 )
             return rc ;
          }
       #endif
-   #endif
 
    for( ;; )
    {
@@ -346,9 +342,7 @@ static int tran4fileStatusFile( TRAN4FILE *t4 )
       break ;
    }
 
-   #ifdef S4STAND_ALONE
       file4unlockInternal( &t4->file, TRAN4LOCK_USERS + TRAN4MAX_USERS + 1, 0, 1, 0 ) ;
-   #endif
 
    if ( rc < 0 )
       return rc ;
@@ -442,7 +436,6 @@ static long tran4fileGetNextTransId( TRAN4FILE *t4, TRAN4 *trans )
          return rc ;
    #endif
 
-   #ifdef S4STAND_ALONE
       if ( t4->transId > 0 )
       {
          if ( t4->transId == LONG_MAX )
@@ -474,7 +467,6 @@ static long tran4fileGetNextTransId( TRAN4FILE *t4, TRAN4 *trans )
          else
             t4->transId = trans->header.transId + TRAN4MAX_USERS ;
       }
-   #endif
    return t4->transId ;
 }
 
@@ -799,12 +791,8 @@ int S4FUNCTION tran4set( TRAN4 *t4, const int status, const long id1, const long
    if ( t4->header.transId < 0 )
       return error4( t4->c4trans->c4, e4trans, E93801 ) ;
 
-   #ifdef S4STAND_ALONE
       /* AS 5/14/98 always just use the userIdNo for s/a */
       t4->header.clientId = t4->c4trans->trans.userIdNo ;
-   #else
-      t4->header.clientId = id2 ;
-   #endif
    t4->header.type = typ ;
    t4->header.dataLen = dLen ;
    t4->header.clientDataId = clientId ;
@@ -1058,13 +1046,9 @@ int S4FUNCTION tran4lowStart( TRAN4 *trans, long clientId, int doUnlock )
 
    if ( trans->c4trans->enabled == 0 )
    {
-      #ifdef S4STAND_ALONE
          if ( c4->logOpen == 0 )
             return error4( c4, e4trans, E83814 ) ;
          rc = code4logOpen( c4, 0, 0 ) ;
-      #else
-         rc = code4transFileEnable( trans->c4trans, 0, 0 ) ;
-      #endif
       if ( rc < 0 )
          return rc ;
    }
@@ -1072,10 +1056,8 @@ int S4FUNCTION tran4lowStart( TRAN4 *trans, long clientId, int doUnlock )
    if ( trans->c4trans->enabled != 1 )
       return error4( c4, e4trans, E83807 ) ;
 
-   #ifdef S4STAND_ALONE
       if ( trans->currentTranStatus == r4active )   /* already in a transactional state */
          return error4( c4, e4trans, E93801 ) ;
-   #endif
 
    if ( trans->c4trans->transFile->status != tran4notRollbackOrCommit )
       return error4( c4, e4trans, E83801 ) ;
@@ -1511,7 +1493,6 @@ static void code4invalidate( CODE4 *c4 )
    }
 }
 
-#ifdef S4STAND_ALONE
 /* S4STAND_ALONE */
 int S4FUNCTION code4tranCommitPhaseOne( CODE4 *c4 )
 {
@@ -1618,13 +1599,8 @@ int S4FUNCTION code4tranRollback( CODE4 *c4 )
       return code4unlock( c4 ) ;
    #endif
 }
-#endif  /* S4STAND_ALONE */
 
-#ifdef S4STAND_ALONE
 int S4FUNCTION code4transFileEnable( CODE4TRANS *c4trans, const char *logName, const int doCreate )
-#else
-int code4transFileEnable( CODE4TRANS *c4trans, const char *logName, const int doCreate )
-#endif
 {
    #ifdef E4ANALYZE
       int rc ;
@@ -1637,11 +1613,9 @@ int code4transFileEnable( CODE4TRANS *c4trans, const char *logName, const int do
    if ( c4trans->enabled == 1 )
       return 0 ;
 
-   #ifdef S4STAND_ALONE
       rc = code4tranInitLow( &c4trans->trans, c4trans ) ;
       if ( rc < 0 )
          return rc ;
-   #endif
 
    #ifdef E4ANALYZE
       if ( ( rc = code4transVerify( c4trans, 1 ) ) < 0 )
@@ -1704,18 +1678,15 @@ int tran4addUser( TRAN4 *trans, const long clientId, const char *charId, const u
    char *netId ;
    CODE4 *c4 ;
    static char defaultUser[] = "PUBLIC" ;
-   #ifdef S4STAND_ALONE
       #ifndef S4OFF_MULTI
          int i, oldNumAttempts ;
       #endif
-   #endif
 
    len = lenIn ;
    c4 = trans->c4trans->c4 ;
 
    if ( trans->c4trans->enabled == 1 && code4tranStatus( c4 ) != r4off )
    {
-      #ifdef S4STAND_ALONE
          #ifdef S4OFF_MULTI
             trans->userIdNo = 1 ;   /* only one user */
          #else
@@ -1737,7 +1708,6 @@ int tran4addUser( TRAN4 *trans, const long clientId, const char *charId, const u
                }
             }
          #endif
-      #endif
       if ( len > sizeof( trans->userId ) )
          len = sizeof( trans->userId ) - 1 ;
       memcpy( trans->userId, charId, len ) ;
@@ -2004,9 +1974,7 @@ int S4FUNCTION code4transInitUndo( CODE4TRANS *c4trans )
                #ifndef S4UTILS
                   short int i ;
                #endif
-               #ifdef S4STAND_ALONE
                   int oldNumAttempts ;
-               #endif
             #endif
          #endif
    #endif
@@ -2035,12 +2003,10 @@ int S4FUNCTION code4tranLockTransactions( CODE4TRANS *c4trans, long lockByte )
          return 0 ;
    #endif
 
-   #ifdef S4STAND_ALONE
       #ifdef S4TESTING
          if ( c4trans->c4->doTransLocking == 0 )
             return 0 ;
       #endif
-   #endif
 
    if ( lockByte < TRAN4LOCK_BASE )
       return e4parm ;
@@ -2065,12 +2031,10 @@ int S4FUNCTION code4tranUnlockTransactions( CODE4TRANS *c4trans, long lockByte )
          return 0 ;
    #endif
 
-   #ifdef S4STAND_ALONE
       #ifdef S4TESTING
          if ( c4trans->c4->doTransLocking == 0 )
             return 0 ;
       #endif
-   #endif
 
    if ( lockByte < TRAN4LOCK_BASE )
       return e4parm ;
@@ -2170,69 +2134,24 @@ static DATA4 *tran4dataFull( TRAN4 *trans, const long serverId, const long clien
 /* are there any active transactions which conflict with the data4? */
 int tran4active( CODE4 *c4, DATA4 *data )
 {
-   #ifndef S4OFF_TRAN
-      #ifndef S4STAND_ALONE
-         SERVER4CLIENT *client ;
-         DATA4 *dataLoop ;
-      #endif
-   #endif
 
    #ifndef S4OFF_TRAN
       if ( code4transEnabled( c4 ) )
          if ( code4trans( c4 )->currentTranStatus == r4active )
             return e4transViolation ;
 
-      #ifdef S4STAND_ALONE
          if ( data->logVal == LOG4TRANS )   /* not logging this datafile, and not a transaction in progress... */
             return 0 ;
-      #endif
 
       #ifdef S4OFF_MULTI
          return 0 ;
       #else
-         #ifdef S4STAND_ALONE
             if ( d4lockTestFile( data ) == 1 )
                return 0 ;
             if ( data->dataFile->file.lowAccessMode != OPEN4DENY_NONE )
                return 0 ;
             /* in stand-alone, can't check active transactions, so just deny */
             return error4( c4, e4transViolation, E81504 ) ;
-         #else
-            if ( dfile4lockTestFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) == 1 )
-               return 0 ;
-            /* if file not ultimately opened exclusively, may be problems */
-            if ( data->dataFile->file.lowAccessMode == OPEN4DENY_NONE )
-               return error4( c4, e4transViolation, E81504 ) ;
-
-            /* reserve the client list during this process */
-            list4mutexWait( &c4->server->clients ) ;
-
-            for ( client = 0 ;; )
-            {
-               client = (SERVER4CLIENT *)l4next( &c4->server->clients.list, client ) ;
-               if ( client == 0 )
-                  break ;
-               if ( client->trans.c4trans->enabled )
-                  if ( client->trans.currentTranStatus == r4active )
-                  {
-                     /* check if that user has a data4 using the same datafile */
-                     for( dataLoop = 0 ;; )
-                     {
-                        dataLoop = (DATA4 *)l4next( client->trans.dataList, dataLoop ) ;
-                        if ( dataLoop == 0 )
-                           break ;
-                        if ( dataLoop->readOnly == 0 )
-                           if ( dataLoop->dataFile == data->dataFile )
-                           {
-                              list4mutexRelease( &c4->server->clients ) ;
-                              return error4( c4, e4transViolation, E81504 ) ;
-                           }
-                     }
-                  }
-            }
-            list4mutexRelease( &c4->server->clients ) ;
-            return 0 ;
-         #endif
       #endif
    #else
       return 0 ;

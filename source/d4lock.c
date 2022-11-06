@@ -461,26 +461,3 @@ int S4FUNCTION d4lockTest( DATA4 *data, const long rec )
    #endif
 }
 
-#ifndef S4STAND_ALONE
-int S4FUNCTION d4lockTestAppendLow( DATA4 *data )
-{
-   #ifndef S4SINGLE
-      int rc ;
-
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parm, E92704 ) ;
-      #endif
-
-         if ( data->accessMode == OPEN4DENY_RW )
-            return 1 ;
-
-      rc = dfile4lockTestAppend( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
-
-      return rc ;
-   #else
-      return 1 ;
-   #endif
-}
-#endif
-

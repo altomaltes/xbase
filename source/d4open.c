@@ -57,21 +57,6 @@ static DATA4 *d4openInit( CODE4 *c4 )
    #endif
    #endif
 
-      #ifdef E4ANALYZE
-         #ifndef S4STAND_ALONE
-            if ( c4->currentClient == 0 || c4->accessMutexCount == 0 )
-            {
-               error4( c4, e4struct, E94301 ) ;
-               return 0 ;
-            }
-            if ( c4->currentClient->trans.c4trans == 0 )
-            {
-               error4( c4, e4struct, E94301 ) ;
-               return 0 ;
-            }
-         #endif
-      #endif
-
    if ( c4->dataMemory == 0 )
    {
       c4->dataMemory = mem4create( c4, c4->memStartData, sizeof(DATA4), c4->memExpandData, 0 ) ;
