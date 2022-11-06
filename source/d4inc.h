@@ -52,10 +52,6 @@
       // CS 2009/11/20 Needed by C++Builder.
       #include <math.h>
 
-      #if !defined(S4STAND_ALONE) && defined(S4WINSOCK)
-         #include <winsock.h>
-      #endif
-
       //CJ July 17/01-include some of the powerplant header files for Macintosh client software.
       #if !defined(S4STAND_ALONE) && defined(S4MAC_TCP)
         #include <LInternetAddress.h>

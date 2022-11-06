@@ -164,15 +164,6 @@ S4EXPORT int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) 
 #endif
 #endif   /* S4INLINE */
 
-#ifndef S4STAND_ALONE
-#ifdef S4WINSOCK
-   #define ioctl(a,b,c)         (ioctlsocket((a),(b),(c)))
-#endif
-#ifdef S4BERKSOCK
-   #define closesocket(alpha)         (close(alpha))
-#endif
-#endif
-
 
 #ifndef S4NO_FILELENGTH
    #define u4filelength( a )          ( filelength( a ) )

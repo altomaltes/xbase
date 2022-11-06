@@ -105,11 +105,6 @@ int S4FUNCTION u4allocAgainDefault( CODE4 *c4, char **ptrPtr, unsigned *wasOldLe
 void *S4FUNCTION u4allocFreeDefault( CODE4 *c4, long n )
 {
    void *ptr ;
-   #ifndef S4OFF_COMMUNICATIONS
-   #ifdef S4SERVER
-      SERVER4CLIENT *client ;
-   #endif
-   #endif
 
    #ifdef S4SEMAPHORE
       #ifdef E4MISC
@@ -120,33 +115,6 @@ void *S4FUNCTION u4allocFreeDefault( CODE4 *c4, long n )
    #endif
 
    ptr = (void *)u4allocDefault( n ) ;
-
-   #ifndef S4OFF_COMMUNICATIONS
-   /*    go through all of the SERVER4CLIENTs, and if they are not in an*/
-   /*         active state (i.e. no worker thread working on them), then*/
-   /*         free up their SERVER4CLIENT.CONNECT.buffer and set len to 0*/
-   /*         then retry allocation (left in)*/
-      if ( ptr == NULL )
-      {
-         #ifdef S4SERVER
-            list4mutexWait(&c4->server->clients) ;
-            client = (SERVER4CLIENT *)l4first(&c4->server->clients.list) ;
-            while(client)
-            {
-               if (client->connect.workState == CONNECT4IDLE)
-               {
-                  connection4clear(&client->connection) ;
-                  client->connection.bufferLen = 0 ;
-                  ((char *)(client->connection.buffer)) -= 4 ;
-                  u4free(client->connection.buffer) ;
-               }
-               client = (SERVER4CLIENT *)l4next(&c4->server->clients.list, client ) ;
-            }
-            list4mutexRelease(&c4->server->clients) ;
-            ptr = (void *)u4allocDefault( n ) ;
-         #endif
-      }
-   #endif
 
    #ifndef S4OPTIMIZE_OFF
       if ( ptr == 0 && c4 )

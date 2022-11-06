@@ -849,20 +849,6 @@ typedef struct INTER4St
 } INTER4 ;
 #endif /*!S4OFF_THREAD */
 
-#ifdef S4WINSOCK
-typedef struct
-{
-   SOCKET sockw ;
-   SOCKET sockr ;
-} CONNECT4LOW ;
-#endif
-#ifdef S4BERKSOCK
-typedef struct
-{
-   int sockw ;
-   int sockr ;
-} CONNECT4LOW ;
-#endif
 
 typedef struct
 {

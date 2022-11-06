@@ -1109,10 +1109,7 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
    #ifdef E4MISC
       unsigned fieldDataLen ;
    #endif
-      CONNECTION4 *connection ;
       int len2, len3 ;
-      CONNECTION4OPEN_INFO_IN *dataIn ;
-      CONNECTION4OPEN_INFO_OUT *dataInfo ;
       #ifndef S4OFF_INDEX
          char indexName[258] ;
       #endif
@@ -1176,100 +1173,6 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
          return d4 ;
    }
 
-   #ifdef S4CLIENT
-      #ifdef E4MISC
-         if ( strlen( name ) > LEN4PATH )
-         {
-            error4describe( c4, e4name, E84301, name, 0, 0 ) ;
-            return 0 ;
-         }
-      #endif
-      if ( !c4->defaultServer.connected )
-      {
-         rc = code4connect( c4, 0, DEF4PROCESS_ID, 0, 0, 0 ) ;
-         if ( rc == 0 )
-         {
-            if ( !c4->defaultServer.connected )
-            {
-               error4describe( c4, e4connection, E84302, DEF4SERVER_ID, DEF4PROCESS_ID, 0 ) ;
-               return 0 ;
-            }
-         }
-         if ( rc != 0 )
-         {
-            if ( c4->defaultServer.connected )
-            {
-               connection4initUndo( &c4->defaultServer ) ;
-               /* connection4free( c4->defaultServer ) ; */
-               c4->defaultServer.connected = 0 ;
-            }
-            error4describe( c4, e4connection, E81001, DEF4SERVER_ID, DEF4PROCESS_ID, 0 ) ;
-            return 0 ;
-         }
-      }
-      connection = &c4->defaultServer ;
-      if ( connection == 0 )
-      {
-         error4( c4, e4connection, E84303 ) ;
-         return 0 ;
-      }
-      connection4assign( connection, CON4OPEN, data->trans->dataIdCount,0 ) ;
-      data->trans->dataIdCount++ ;
-
-      len3 = strlen( name ) + 1 ;
-      if ( len3 > LEN4PATH )
-         len3 = LEN4PATH ;
-
-      /* get the dataIn ptr, which is part of the to-send buffer */
-      connection4addData( connection, NULL, sizeof( CONNECTION4OPEN_INFO_IN ), (void **)&dataIn ) ;
-      /* memset( dataIn, 0, sizeof( CONNECTION4OPEN_INFO_IN ) ) ; */
-      memcpy( dataIn->name, name, len3 ) ;
-      dataIn->name[LEN4PATH] = 0 ;
-
-      #ifdef S4OFF_MULTI
-         dataIn->exclusiveClient = 1 ;
-      #else
-         dataIn->accessMode = htons(c4->accessMode) ;
-      #endif
-
-      dataIn->readOnly = c4getReadOnly( c4 ) ;
-/*      dataIn->safety = c4->safety ; */  /* for catalog */
-      dataIn->errDefaultUnique = htons(c4->errDefaultUnique) ;
-      dataIn->openForCreate = htons(c4->openForCreate) ;
-      dataIn->singleOpen = htons(c4->singleOpen) ;
-      dataIn->log = htons(c4->log) ;
-
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-      {
-         error4( c4, rc, E91102 ) ;
-         return 0 ;
-      }
-      if ( connection4type( connection ) != CON4OPEN )
-      {
-         error4( c4, e4connection, E84304 ) ;
-         return 0 ;
-      }
-
-      rc = connection4status( connection ) ;
-      if ( rc < 0 )
-      {
-         if ( c4->errOpen == 0 )
-            error4set( c4, r4noOpen ) ;
-         else
-            connection4errorDescribe( connection, c4, rc, E91102, name, 0, 0 ) ;
-         return 0 ;
-      }
-
-      if ( connection4len( connection ) < sizeof( CONNECTION4OPEN_INFO_OUT ) )
-      {
-         error4( c4, e4connection, E84305 ) ;
-         return 0 ;
-      }
-
-      dataInfo = (CONNECTION4OPEN_INFO_OUT *)connection4data( connection ) ;
-   #endif  /* S4CLIENT */
 
    if ( c4->data4fileMemory == 0 )
    {

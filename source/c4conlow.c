@@ -31,11 +31,9 @@ None of these functions are relevant for the STAND-ALONE version of CodeBase.
 
 #ifndef S4STAND_ALONE
 
-#ifndef S4WINSOCK
    #ifndef S4BERKSOCK
       #define DoNotCompileC4CONLOW
    #endif
-#endif
 
 #ifdef S4OFF_THREAD
    #include <errno.h>

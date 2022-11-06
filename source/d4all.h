@@ -42,10 +42,6 @@
 /* #define S4MACINTOSH  */   /* requires CodeBase Mac version */
 /* #define S4PASCAL_WIN */   /* requires CodePascal version */
 
-/* Selected default communications option */
-/* #define S4BERKSOCK */
-   #define S4WINSOCK
-
 /* Alterable CodeBase Global Defines */
 #define DEF4SERVER_ID "localhost"
 #define DEF4PROCESS_ID "23165"
@@ -147,12 +143,6 @@
    #endif
 #endif
 
-#ifndef S4STAND_ALONE
-   #ifdef S4WINSOCK
-      #include <winsock.h>
-   #endif
-#endif
-
 #include "d4defs.h"
 #include "d4data.h"
 #include "d4declar.h"
@@ -168,10 +158,10 @@
 
 #include "o4opt.h"
 
-#include "c4com.h"
-#ifndef S4STAND_ALONE
-   #include "c4comlow.h"
-#endif
+// #include "c4com.h" JACS
+// #ifndef S4STAND_ALONE
+//    #include "c4comlow.h"
+// #endif
 
 #include "c4trans.h"
 

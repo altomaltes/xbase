@@ -383,14 +383,9 @@ const char *S4FUNCTION t4fileName( TAG4 *t4 )
 
 const char *S4FUNCTION i4fileName( INDEX4 *i4 )
 {
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      int rc ;
-   #else
       #ifdef S4CLIPPER
          TAG4FILE *tag ;
       #endif
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( i4 == 0 )
@@ -400,32 +395,6 @@ const char *S4FUNCTION i4fileName( INDEX4 *i4 )
       }
    #endif
 
-   #ifdef S4CLIENT
-      if ( error4code( i4->codeBase ) < 0 )
-         return 0 ;
-
-      connection = i4->data->dataFile->connection ;
-      connection4assign( connection, CON4INDEX_FNAME, data4clientId( i4->data ), data4serverId( i4->data ) ) ;
-      connection4addData( connection, i4->indexFile->accessName, strlen( i4->indexFile->accessName ) + 1, NULL ) ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-      {
-         #ifdef E4STACK
-            error4stack( i4->codeBase, rc, E95501 ) ;
-         #endif
-         return 0 ;
-      }
-
-      rc = connection4status( connection ) ;
-      if ( rc < 0 )
-      {
-         connection4error( connection, i4->codeBase, rc, E95501 ) ;
-         return 0 ;
-      }
-
-      return connection4data( connection ) ;
-   #else
       #ifdef S4CLIPPER
          if ( i4->path != 0 )
             return i4->path ;
@@ -439,7 +408,6 @@ const char *S4FUNCTION i4fileName( INDEX4 *i4 )
       #else
          return i4->indexFile->file.name ;
       #endif /* S4CLIPPER */
-   #endif /* S4CLIENT */
 }
 
 #ifndef S4CLIPPER
@@ -970,158 +938,6 @@ INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
    #endif
 }
 
-#ifdef S4CLIENT
-/* for the client, if index is not null, then the function only verifies the
-   existance of the index file and does not actually open it */
-INDEX4FILE *index4open( DATA4 *d4, const char *fileName, INDEX4 *index )
-{
-   CODE4 *c4 ;
-   int rc ;
-   INDEX4FILE *i4 ;
-   CONNECTION4OPEN_INDEX_INFO_OUT *info ;
-   CONNECTION4OPEN_INDEX_INFO_IN *dataIn ;
-   CONNECTION4 *connection ;
-   short len ;
-   INDEX4 *indexLoop ;
-
-   #ifdef E4PARM_LOW
-      if ( d4 == 0 )
-      {
-         error4( 0, e4parm_null, E91707 ) ;
-         return 0 ;
-      }
-         if ( index == 0 )
-         {
-            error4( 0, e4parm_null, E91707 ) ;
-            return 0 ;
-         }
-   #endif
-
-   c4 = d4->codeBase ;
-
-   i4 = dfile4index( d4->dataFile, fileName ) ;
-   if ( i4 != 0 )
-   {
-      /* allowed if current data4 does not have a pointer to index */
-      for ( indexLoop = 0 ;; )
-      {
-         indexLoop = (INDEX4 *)l4next( &d4->indexes, indexLoop ) ;
-         if ( indexLoop == 0 )
-            break ;
-         if ( indexLoop->indexFile == i4 )
-         {
-            error4( c4, e4instance, E91707 ) ;
-            return 0 ;
-         }
-      }
-      i4->userCount++ ;
-      i4->isValid = 1 ;
-      return i4 ;
-   }
-
-   #ifdef S4VBASIC
-      if ( c4parm_check( d4, 2, E91707 ) )
-         return 0 ;
-   #endif
-
-   if ( index != 0 )   /* just wanted to verify existance of... */
-      return 0 ;
-   c4 = d4->dataFile->c4 ;
-   if ( error4code( c4 ) < 0 )
-      return 0 ;
-
-   if ( c4->index4fileMemory == 0 )
-      c4->index4fileMemory = mem4create( c4, c4->memStartIndexFile, sizeof(INDEX4FILE), c4->memExpandIndexFile, 0 ) ;
-   if ( c4->index4fileMemory == 0 )
-       return 0 ;
-
-   if ( c4->tagMemory == 0 )
-   {
-      c4->tagMemory = mem4create( c4, c4->memStartTag, sizeof(TAG4), c4->memExpandTag, 0 ) ;
-      if ( c4->tagMemory == 0 )
-         return 0 ;
-   }
-
-   if ( c4->tagFileMemory == 0 )
-   {
-      c4->tagFileMemory = mem4create( c4, c4->memStartTagFile, sizeof(TAG4FILE), c4->memExpandTagFile, 0 ) ;
-      if ( c4->tagFileMemory == 0 )
-         return 0 ;
-   }
-
-   connection = d4->dataFile->connection ;
-   connection4assign( connection, CON4INDEX_OPEN, data4clientId( d4 ), data4serverId( d4 ) ) ;
-   connection4addData( connection, NULL, sizeof( CONNECTION4OPEN_INDEX_INFO_IN ), (void **)&dataIn ) ;
-   connection = d4->dataFile->connection ;
-   if ( connection == 0 )
-   {
-      error4( c4, e4connection, E81704 ) ;
-      return 0 ;
-   }
-
-   len = (short)(strlen( (char*)fileName ) + 1) ;
-   dataIn->nameLen = htons((short)len) ;
-   dataIn->openForCreate = htons(c4->openForCreate) ;
-
-   #ifdef S4SINGLE
-      dataIn->exclusiveClient = 1 ;
-   #else
-      if ( c4->singleOpen == OPEN4DENY_RW )
-         dataIn->accessMode = htons(OPEN4DENY_RW) ;
-      else
-         dataIn->accessMode = htons(c4->accessMode) ;
-   #endif
-
-   dataIn->readOnly = c4->readOnly ;
-   dataIn->safety = c4->safety ;  /* for catalog */
-   dataIn->errDefaultUnique = htons(c4->errDefaultUnique) ;
-
-   connection4addData( connection, fileName, len, NULL ) ;
-   connection4sendMessage( connection ) ;
-   rc = connection4receiveMessage( connection ) ;
-   if ( rc < 0 )
-   {
-      error4( c4, rc, E81701 ) ;
-      return 0 ;
-   }
-   rc = connection4status( connection ) ;
-   if ( rc != 0 )
-   {
-      if ( rc < 0 )
-      {
-         if ( c4->errOpen == 0 )
-         {
-            if ( error4code( c4 ) >= 0 )
-               error4set( c4, r4noOpen ) ;
-         }
-         else
-            connection4error( connection, c4, rc, E91707 ) ;
-      }
-      return 0 ;
-   }
-
-   #ifdef E4MISC
-      if ( connection4len( connection ) < sizeof( info ) )
-      {
-         error4( c4, e4packetLen, E91707 ) ;
-         return 0 ;
-      }
-   #endif
-
-   info = (CONNECTION4OPEN_INDEX_INFO_OUT *)connection4data( connection ) ;
-   if ( client4indexSetup( c4, d4, d4->dataFile, ntohs(info->numTags), connection4data( connection ) + sizeof(CONNECTION4OPEN_INDEX_INFO_OUT),
-        (unsigned int)connection4len( connection ) - sizeof(CONNECTION4OPEN_INDEX_INFO_OUT), (char*)fileName, 0 ) < 0 )
-   {
-      error4( c4, e4connection, E91707 ) ;
-      return 0 ;
-   }
-
-   /* in the client case, a null is a valid return code as the index is
-      later extracted */
-   i4setup( c4, d4, (char*)fileName, 0, 0 ) ;
-   return 0 ;
-}
-#else
 INDEX4FILE *index4open( DATA4 *d4, const char *fileName, INDEX4 *index )
 {
    CODE4  *c4 ;
@@ -1535,7 +1351,6 @@ INDEX4FILE *index4open( DATA4 *d4, const char *fileName, INDEX4 *index )
    i4->isValid = 1 ;
    return i4 ;
 }
-#endif /* S4CLIENT */
 
 TAG4 *S4FUNCTION i4tag( INDEX4 *i4, const char *tagName )
 {

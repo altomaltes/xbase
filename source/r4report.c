@@ -1280,9 +1280,6 @@ int S4FUNCTION report4dataDo( PREPORT4 report )
    long bsize = 8198;
    int  rc, i, trl;
    PGROUP4 group;
-   #ifdef S4CLIENT
-      int oldExclusive ;
-   #endif
 
    if( !report->output_group || !report->dfile_name || report->output_objs.nLink <= 0 )
    {
@@ -1313,10 +1310,6 @@ int S4FUNCTION report4dataDo( PREPORT4 report )
 
    trl = report->codeBase->readOnly;
    report->codeBase->readOnly = 0;
-   #ifdef S4CLIENT
-      oldExclusive = report->codeBase->accessMode ;
-      report->codeBase->accessMode = 1 ;
-   #endif
 
    /* create the new data file*/
    dfile = d4create( report->codeBase, report->dfile_name, (FIELD4INFO *)f4info, NULL );
@@ -1325,15 +1318,9 @@ int S4FUNCTION report4dataDo( PREPORT4 report )
       error4describe( report->codeBase, e4repData, 0L, E4_REP_NODCREATE, report->dfile_name, (char *)0 );
       u4free( f4info );
       report->codeBase->readOnly = trl;
-      #ifdef S4CLIENT
-         report->codeBase->accessMode = oldExclusive ;
-      #endif
       return -1;
    }
    report->codeBase->readOnly = trl;
-   #ifdef S4CLIENT
-      report->codeBase->accessMode = oldExclusive ;
-   #endif
 
    /* associate the fields in the new data file with the output objects in the*/
    /* report*/

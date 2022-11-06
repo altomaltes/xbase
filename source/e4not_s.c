@@ -1627,23 +1627,6 @@ int S4FUNCTION d4log( DATA4 *data, const int logging )
 }
 #endif
 
-#ifdef S4OFF_COMMUNICATIONS
-#ifdef P4ARGS_USED
-   #pragma argsused
-#endif
-int S4FUNCTION code4connect( CODE4 *c4, const char *serverId, const char *processId, const char *userName, const char *password, const char *protocol )
-{
-   return 0 ;
-}
-
-#ifdef P4ARGS_USED
-   #pragma argsused
-#endif
-CODE4 * S4FUNCTION socket4codeBase( void *socket )
-{
-   return 0 ;
-}
-#endif
 
 #ifdef S4OFF_STAND_OPT
 #ifdef P4ARGS_USED

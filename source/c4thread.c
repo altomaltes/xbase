@@ -484,7 +484,7 @@ void connect4threadWriteRequest( CONNECT4THREAD *connectThread, NET4MESSAGE *mes
 {
 /* PARAMATERS:
 
-   connect is the CONNECTION4THREAD for which to perform the write.
+   connect is the CONNE CTION4THREAD for which to perform the write.
    message is the message to send.  It can be added directly to the list
      of messages to send.  After this function call, the caller should no
      longer use the message pointer.

@@ -683,11 +683,7 @@ RELATE4 * S4FUNCTION   relate4retrieve_relate_foo( FILE4SEQ_READ *seq, int open_
                      the report.  IF the user is using a different extension
                      he should undefine this switch */
                   #ifdef S4DEFAULT_INDEX
-                  #ifdef S4CLIENT
-                     indexType = code4indexFormat( c4 ) ;
-                  #else
                      indexType = report4index_type() ;
-                  #endif
                   switch( indexType )
                   {
                      case r4cdx :

@@ -44,10 +44,8 @@
 /* #define S4WIN64      */   /* for IA-64 Windows */
 
 /* Selected default communications option */
-/* #define S4BERKSOCK */
 /* #define S4MAC_TCP  */
 /* #define S4MACOT_TCP */
-   #define S4WINSOCK
 
 /* Alterable CodeBase Global Defines */
 #define DEF4SERVER_ID "localhost"

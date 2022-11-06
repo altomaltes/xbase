@@ -266,13 +266,8 @@ int r4dataListBuild( LIST4 *, RELATE4 *, EXPR4 *, int ) ;
 void relate4freeBitmaps( RELATE4 * ) ;
 RELATE4 *relate4lookupRelate( RELATE4 *, const DATA4 * ) ;
 int relate4readIn( RELATE4 * ) ;   /* Read a record for this specific data file. */
-#ifndef S4STAND_ALONE
-   int relate4unpack( RELATION4 *, CONNECTION4 * ) ;
-#endif
 
-#ifdef S4CLIENT
-   int relate4clientInit( RELATE4 * ) ;
-#endif
+
 
 #ifdef __cplusplus
    }

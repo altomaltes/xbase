@@ -1539,87 +1539,6 @@ int S4FUNCTION relate4lock( RELATE4 *relate )
 }
 #endif
 
-#ifdef S4CLIENT
-#ifdef S4CB51
-#ifdef S4OLD_RELATE_LOCK
-int S4FUNCTION relate4lock( RELATE4 *relate )
-{
-   CONNECTION4 *connection ;
-   CONNECTION4RELATE_LOCK_INFO_IN *info ;
-   CONNECTION4RELATE_LOCK_INFO_OUT *out ;
-   CONNECTION4RELATE_LOCK_SUB_DATA *subData ;
-   int rc, count ;
-   CODE4 *c4 ;
-   DATA4 *data ;
-   short countN ;
-
-   #ifdef E4PARM_HIGH
-      if ( relate == 0 )
-         return error4( 0, e4parm_null, E94411 ) ;
-   #endif
-
-   c4 = relate->codeBase ;
-
-   /* must ensure that client relation is registered before requesting a lock */
-   if ( relate->relation->isInitialized == 0 || relate->dataTag != relate->data->tagSelected )
-   {
-      relate->dataTag = relate->data->tagSelected ;
-      rc = relate4clientInit( relate ) ;
-      if ( rc != 0 )
-         return rc ;
-   }
-
-   connection = relate->data->dataFile->connection ;
-   #ifdef E4ANALYZE
-      if ( connection == 0 )
-      {
-         error4( c4, e4struct, E94411 ) ;
-         return 0 ;
-      }
-   #endif
-
-   connection4assign( connection, CON4RELATE_LOCK, 0, 0 ) ;
-   connection4addData( connection, NULL, sizeof( CONNECTION4RELATE_LOCK_INFO_IN ), &info ) ;
-   info->relationId = htonl(relate->relation->relationId) ;
-   rc = connection4repeat( connection, -2, -1, -1, 0 ) ;
-   if ( rc == r4locked )
-      return r4locked ;
-   if ( rc < 0 )
-      return connection4error( connection, c4, rc, E94411 ) ;
-
-   if ( rc == 0 )  /* add locks */
-   {
-      if ( connection4len( connection ) < sizeof(CONNECTION4RELATE_LOCK_INFO_OUT) )
-         return error4( c4, e4packetLen, E94411 ) ;
-      out = (CONNECTION4RELATE_LOCK_INFO_OUT *)connection4data( connection ) ;
-      countN = ntohs(out->count) ;
-      if ( connection4len( connection ) != (long)sizeof(CONNECTION4RELATE_LOCK_INFO_OUT) + countN * sizeof( CONNECTION4RELATE_LOCK_SUB_DATA ) )
-         return error4( c4, e4packetLen, E94411 ) ;
-      subData = (CONNECTION4RELATE_LOCK_SUB_DATA *)( (char *)connection4data( connection ) + sizeof( CONNECTION4RELATE_LOCK_INFO_OUT ) ) ;
-      for( count = countN ; count > 0 ; count-- )
-      {
-         data = tran4data( code4trans( c4 ), ntohl(subData->serverId), ntohl(subData->clientId) ) ;
-         if ( data == 0 )
-            return error4( c4, e4info, E94411 ) ;
-         if ( data->dataFile->fileLock != 0 )
-         {
-            #ifdef E4MISC
-               if ( data->dataFile->fileLock != data )
-                  return error4( c4, e4info, E94411 ) ;
-            #endif
-         }
-         else
-            data->dataFile->fileLock = data ;
-         subData++ ;
-      }
-   }
-
-   return rc ;
-}
-#endif  /* S4OLD_RELATE_LOCK */
-#endif  /* S4CB51 */
-#else
-
 #ifdef S4OLD_RELATE_LOCK
 int S4FUNCTION relate4lock( RELATE4 *relate )
 {
@@ -1915,7 +1834,6 @@ static int relate4lookup( RELATE4 *relate, const char direction )
          return error4( c4, e4info, E84411 ) ;
    }
 }
-#endif
 
 RELATE4 *relate4lookupRelate( RELATE4 *relate, const DATA4 *d4 )
 {

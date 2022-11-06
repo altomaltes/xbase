@@ -218,182 +218,6 @@ HINSTANCE S4FUNCTION c4dllInst( void )
 
 #endif   /* __DLL__ */
 
-#ifndef S4OFF_COMMUNICATIONS
-#ifndef S4SERVER
-static int code4userConnect( CODE4 *c4, const char *userName, const char *password )
-{
-   int rc ;
-   long version ;
-   CONNECTION4 *connection ;
-   static char defaultUser[] = "PUBLIC" ;
-
-   if ( c4->defaultServer.connected == 0 )
-      return 0 ;
-   connection = &c4->defaultServer ;
-   if ( connection == 0 )
-      return 0 ;
-
-   if ( userName == 0 )
-      userName = defaultUser ;
-   else
-      if ( userName[0] == 0 )
-         userName = defaultUser ;
-   if ( password == 0 )
-      password = "" ;
-
-   connection4assign( connection, CON4CONNECT, 0L, 0L ) ;
-   version = htonl(S4VERSION) ;
-   connection4addData( connection, &version, sizeof( version ), NULL ) ;
-   connection4addData( connection, userName, strlen( userName ) + 1, NULL  ) ;
-   connection4addData( connection, password, strlen( password ) + 1, NULL  ) ;
-   if (c4->copyright!=NULL)
-      connection4addData( connection, c4->copyright, strlen( c4->copyright ) + 1, NULL  ) ;
-   else
-       connection4addData( connection, " ", 2, NULL  ) ;
-   connection4sendMessage( connection ) ;
-   rc = connection4receiveMessage( connection ) ;
-   if ( rc < 0 )
-      return rc ;
-   if ( connection4type( connection ) != CON4CONNECT )
-      connection4error( connection, c4, e4net, E91005 ) ;
-   rc = connection4status( connection ) ;
-   if ( rc < 0 )
-   {
-      if (rc == e4invalidLicence )
-      {
-         char *company;
-
-         company = connection4data( connection );
-         connection4errorDescribeExecute(connection, c4, rc,0,"This CodeBase software is licenced for use only with applications developed by ",company,0);
-      }
-      else
-         connection4error( connection, c4, rc, E91005 ) ;
-   }
-   if ( connection4len(connection) != sizeof(S4LONG) )
-      return e4packetLen ;
-   c4->clientConnect.clientId = *((long *)connection4data(connection)) ;
-
-   return rc ;
-}
-
-int S4FUNCTION code4connect( CODE4 *c4, const char *serverId, const char *processId, const char *userName, const char *password, const char *protocol )
-{
-   int rc ;
-   CONNECT4 *connect ;
-/*
-   #ifndef S4DOS
-      int len ;
-   #endif
-*/
-
-   #ifdef S4VBASIC
-      if ( c4parm_check( c4, 1, E91004 ) )
-         return 0 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E91004 ) ;
-   #endif
-
-   if ( c4->defaultServer.connected )
-   {
-      if ( c4->defaultServer.connectionFailure < 0 )   /* means connection was deleted, must call code4initUndo() to recover */
-         return error4( c4, e4connection, E81007 ) ;
-      return r4connected ;
-   }
-
-/*
-   #ifdef S4WINTEL
-   #ifndef S4DOS
-      if ( c4->protocol[0] == 0 )
-      {
-         if ( protocol == 0 )
-            return error4( 0, e4parm_null, E81005 ) ;
-         if ( protocol[0] == 0 )
-            return error4( 0, e4parm_null, E81005 ) ;
-      }
-
-      if ( protocol != 0 )
-         if ( protocol[0] != 0 )
-         {
-            len = strlen( protocol ) ;
-            #ifdef E4PARM_HIGH
-               if ( len > LEN4PROTOCOL )
-                  return error4( 0, e4parm, E81005 ) ;
-            #endif
-            memcpy( c4->protocol, protocol, len ) ;
-            c4->protocol[len] = 0 ;
-         }
-   #endif
-   #endif
-*/
-
-   if ( serverId == 0 )
-      serverId = DEF4SERVER_ID ;
-   else
-      if ( serverId[0] == 0 )
-         serverId = DEF4SERVER_ID ;
-   if ( processId == 0 )
-      processId = DEF4PROCESS_ID ;
-   else
-      if ( processId[0] == 0 )
-         processId = DEF4PROCESS_ID ;
-   if (c4->connectLowMemory == NULL )
-      c4->connectLowMemory = mem4create(c4, MEMORY4START_CONNECT_LOW, sizeof(CONNECT4LOW), MEMORY4EXPAND_CONNECT_LOW, 0 ) ;
-
-   connect = &c4->clientConnect ;
-   rc = connect4connect(connect, c4, (unsigned short)c4atol(processId, strlen(processId)), serverId ) ;
-   if ( rc < 0 )
-      return rc ; /* An error4() has already been called */
-
-   connection4init(&c4->defaultServer, connect ) ;
-   c4->defaultServer.connected = 1 ;
-   #ifndef S4UTILS
-      rc = code4userConnect( c4, userName, password ) ;
-   #endif
-
-   if ( rc == 0 )
-      rc = code4dateFormatSet( c4, code4dateFormat( c4 ) ) ;
-   if ( rc < 0 )
-      connection4initUndo( &c4->defaultServer ) ;
-
-   return rc ;
-}
-
-#ifdef S4UTIL
-int S4FUNCTION code4passwordSet( CODE4 *c4, const char *userId, const char *oldPass, const char *newPass ) ;
-{
-   CONNECTION4 *connection ;
-   unsigned short int len[3] ;
-
-   #ifdef E4PARM_HIGH
-      if ( userId == 0 || oldPass == 0 || newPass == 0 )
-         return error4( c4, e4parmNull, E91017 ) ;
-   #endif
-
-   connection = c4->defaultServer->connect ;
-   if ( connection == 0 )  /* not connected */
-      return error4( c4, e4connection, E91017 ) ;
-
-   connection4assign( connection, CON4PASSWORD_SET, 0L, 0L ) ;
-   len[0] = strlen( userId ) ;
-   len[1] = strlen( oldPass ) ;
-   len[2] = strlen( newPass ) ;
-   connection4addData( connection, len, sizeof( len ), NULL  ) ;
-   connection4addData( connection, userId, len[0], NULL  ) ;
-   connection4addData( connection, oldPass, len[1], NULL  ) ;
-   connection4addData( connection, newPass, len[2], NULL  ) ;
-   connection4sendMessage( connection ) ;
-   rc = connection4receive( connection ) ;
-   if ( rc < 0 )
-      return rc ;
-   return connection4status( connection ) ;
-}
-#endif /* S4UTIL */
-#endif /* S4SERVER */
-#endif /* S4OFF_COMMUNICATIONS */
-
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -957,10 +781,6 @@ void S4FUNCTION expr4calcDelete( EXPR4CALC *calc )
 void S4FUNCTION code4calcReset( CODE4 *c4 )
 {
    LIST4 *list ;
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      int rc ;
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( c4 == 0 )
@@ -981,22 +801,6 @@ void S4FUNCTION code4calcReset( CODE4 *c4 )
       while( list->nLink > 0 )
          expr4calcDelete( (EXPR4CALC *)list->lastNode ) ;
 
-      #ifdef S4CLIENT
-         if ( c4->defaultServer.connected )
-         {
-            connection = &c4->defaultServer ;
-            rc = connection4assign( connection, CON4CALC_RESET, 0, 0 ) ;
-            if ( rc < 0 )
-               return ;
-            connection4sendMessage( connection ) ;
-            rc = connection4receiveMessage( connection ) ;
-            if ( rc < 0 )
-               return ;
-            rc = connection4status( connection ) ;
-            if ( rc < 0 )
-               connection4error( connection, c4, rc, E90921 ) ;
-         }
-      #endif
    }
 }
 
@@ -1007,11 +811,6 @@ void S4FUNCTION code4calcReset( CODE4 *c4 )
 
 static int code4initUndo2( CODE4 *c4, int doClose )
 {
-   #ifdef S4MULTI_SERVER
-      #ifdef S4CLIENT
-         SOCKET4 *socket, *socketNext ;
-      #endif
-   #endif
    #ifndef S4SERVER
       int errCode ;
    #endif
@@ -1061,25 +860,11 @@ static int code4initUndo2( CODE4 *c4, int doClose )
 
       code4calcReset( c4 ) ;
       #ifndef S4OFF_COMMUNICATIONS
-         #ifdef S4MULTI_SERVER
-            socketNext = (SOCKET4 *)l4first( &c4->servers ) ;
-            for ( ;; )
-            {
-               socket = socketNext ;
-               if ( socket == 0 )
-                  break ;
-               socketNext = (SOCKET4 *)l4next( &c4->servers, socket ) ;
-               socket4initUndo( socket ) ;
-               l4remove( &c4->servers, socket ) ;
-               socket4free( socket ) ;
-            }
-         #else
             /* if ( c4->defaultServer != 0 ) */
             /* { */
                connection4initUndo( &c4->defaultServer ) ;
             /*    connection4free( c4->defaultServer ) ;*/
             /* } */
-         #endif
          c4->defaultServer.connected = 0 ;
       #endif
 
@@ -1699,7 +1484,7 @@ int S4FUNCTION code4indexFormat( CODE4 *c4 )
    #ifdef S4OFF_INDEX
       return 0 ;
    #else
-      CONNECTION4 *connection ;
+// JACS      CONNECTION4 *connection ;
       int rc ;
 
       #ifdef E4PARM_HIGH

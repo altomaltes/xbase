@@ -1393,21 +1393,6 @@
       #error IPX/SPX communication protocol not supported
    #endif
 
-   #ifdef __unix__
-      #ifdef S4WINSOCK
-         #error Windows Sockets not supported under UNIX
-      #endif
-   #else
-      #ifdef S4BERKSOCK
-         #error Berkeley Sockets only supported under UNIX
-      #endif
-   #endif
-
-   #ifndef S4WINSOCK
-      #ifndef S4BERKSOCK
-         #error Must compile with one of the communication options (S4WINSOCK OR S4BERKSOCK)
-      #endif
-   #endif
 
    #ifdef S4SPX
       #ifdef S4SERVER
@@ -1415,16 +1400,6 @@
       #else
          #define DEF4PROTOCOL "C4SPX.DLL"
       #endif
-   #endif
-   #ifdef S4WINSOCK
-      #ifdef S4SERVER
-         #define DEF4PROTOCOL "S4SOCK.DLL"
-      #else
-         #define DEF4PROTOCOL "C4SOCK.DLL"
-      #endif
-   #endif
-   #ifdef S4BERKSOCK
-      #define DEF4PROTOCOL NULL
    #endif
    #define CON4LOW_ACCEPT_TIME  15
    #define MEMORY4EXPAND_SIGNAL_ROUTINE 20
@@ -1933,9 +1908,6 @@
    #ifdef S4PASCAL_WIN
       #error - CodeBase Server incorrectly built with S4PASCAL_WIN
    #endif
-   #ifdef S4OFF_COMMUNICATIONS
-      #error - CodeBase Server incorrectly built with S4OFF_COMMUNICATIONS
-   #endif
    #ifdef S4NT_DOS
       #error - CodeBase Server incorrectly built with S4NT_DOS
    #endif
@@ -2066,13 +2038,6 @@
    /* Need enough room for both a large starting offset and room to grow, use middle value */
    /* this value is the hi-byte offset used for locking when using large files */
    #define S4LARGE_FILE_OFFSET 0x3FFFFFFF
-#endif
-
-#ifndef S4OFF_COMMUNICATIONS
-   #define WS4MAX_PENDING_CONNECTS 4
-   #ifndef __unix__
-      #define S4NO_INET_ATON      /* A unix address conversion function */
-   #endif
 #endif
 
 #ifdef S4SPEED_TEST

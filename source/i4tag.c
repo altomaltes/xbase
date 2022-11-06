@@ -90,70 +90,6 @@ int S4FUNCTION t4uniqueSet( TAG4 *t4, const short uniqueCode )
 #endif
 #endif  /* S4OFF_INDEX */
 
-#ifdef S4CLIENT
-#ifndef S4OFF_INDEX
-int S4FUNCTION t4uniqueSetLow( TAG4 *t4, const short uniqueCode, const char doZeroCheck )
-{
-   CONNECTION4 *connection ;
-   CONNECTION4UNIQUE_INFO_IN *infoIn ;
-   CONNECTION4UNIQUE_TAG_INFO *tagInfo ;
-   int rc ;
-   CODE4 *c4 ;
-   #ifndef S4OFF_TRAN
-      TRAN4 *trans ;
-   #endif
-
-   c4 = t4->index->data->codeBase ;
-   if ( error4code( c4 ) < 0 )
-      return e4codeBase ;
-
-   #ifndef S4OFF_TRAN
-      if ( code4transEnabled( c4 ) && doZeroCheck )  /* user cannot request from within transaction */
-      {
-         trans = code4trans( c4 ) ;
-         if ( trans->currentTranStatus == r4active )
-            return error4( c4, e4transViolation, E81608 ) ;
-      }
-   #endif
-
-   if ( uniqueCode == t4unique( t4 ) )
-      return 0 ;
-
-   /* verify that the tag is unique before setting */
-   if ( doZeroCheck )
-      if ( t4unique( t4 ) == 0 )
-         return error4( c4, e4parm, E81609 ) ;
-
-   connection = t4->index->data->dataFile->connection ;
-   #ifdef E4ANALYZE
-      if ( connection == 0 )
-         return error4( c4, e4struct, E91601 ) ;
-   #endif
-
-   rc = connection4assign( connection, CON4UNIQUE_SET, data4clientId( t4->index->data ), data4serverId( t4->index->data ) ) ;
-   if ( rc < 0 )
-      return error4stack( c4, rc, E91601 ) ;
-   connection4addData( connection, NULL, sizeof(CONNECTION4UNIQUE_INFO_IN), (void **)&infoIn ) ;
-   connection4addData( connection, NULL, sizeof(CONNECTION4UNIQUE_TAG_INFO), (void **)&tagInfo ) ;
-   infoIn->numTags = htons(1) ;
-   tagInfo->unique = htons(uniqueCode) ;
-   memcpy( tagInfo->alias, t4->tagFile->alias, LEN4TAG_ALIAS ) ;
-   tagInfo->alias[LEN4TAG_ALIAS] = 0 ;
-   connection4sendMessage( connection ) ;
-   rc = connection4receiveMessage( connection ) ;
-   if ( rc < 0 )
-      return error4stack( c4, rc, E91601 ) ;
-
-   rc = connection4status( connection ) ;
-   if ( rc < 0 )
-      return connection4error( connection, c4, rc, E91601 ) ;
-
-   t4->errUnique = uniqueCode ;
-
-   return rc ;
-}
-#endif  /* S4OFF_INDEX */
-#else
 #ifndef S4OFF_INDEX
 #ifdef S4STAND_ALONE
 int S4FUNCTION t4uniqueSetLow( TAG4 *t4, const short uniqueCode, const char doZeroCheck )
@@ -2117,4 +2053,3 @@ int tfile4seekV( TAG4FILE *t4, char *seekVal, int keyLen )
 }
 
 #endif
-#endif  /* S4CLIENT */
