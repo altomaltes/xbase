@@ -22,11 +22,9 @@ static DATA4FILE *data4reopen( DATA4FILE *, char ** ) ;
 static DATA4 *d4openInit( CODE4 *c4 )
 {
    DATA4 *d4 ;
-   #ifdef S4STAND_ALONE
       #ifndef S4OFF_TRAN
          int rc;
       #endif
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( c4, 1, E94301 ) )
@@ -44,7 +42,6 @@ static DATA4 *d4openInit( CODE4 *c4 )
       }
    #endif
 
-   #ifdef S4STAND_ALONE
    #ifndef S4OFF_TRAN
       if ( c4->logOpen )
       {
@@ -54,7 +51,6 @@ static DATA4 *d4openInit( CODE4 *c4 )
          else
             error4set( c4, 0 ) ;   /* remove r4open if it already existed */
       }
-   #endif
    #endif
 
    if ( c4->dataMemory == 0 )
@@ -362,11 +358,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
             if ( code4transEnabled( c4 ) )
             {
                trans = code4trans( c4 ) ;
-               #ifdef S4STAND_ALONE
                   connectionId = 0L ;
-               #else
-                  connectionId = c4->currentClient->id ;
-               #endif
                rc = u4nameCurrent( nameBuf, sizeof( nameBuf ), dfile4name( d4->dataFile ) ) ;
                if ( rc < 0 )
                   return error4stack( c4, rc, E94301 ) ;

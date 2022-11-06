@@ -167,7 +167,6 @@ static INDEX4 *i4createLow( DATA4 *d4, const char *fileName, const TAG4INFO *tag
    l4add( &data->indexes, indexFile ) ;
    l4add( &d4->indexes, i4 ) ;
 
-   #ifdef S4STAND_ALONE
       if ( fileName == 0 )
          u4namePiece( i4->accessName, sizeof( i4->accessName ), d4->alias, 0, 0 ) ;
       else
@@ -185,7 +184,6 @@ static INDEX4 *i4createLow( DATA4 *d4, const char *fileName, const TAG4INFO *tag
          u4ncpy( i4->accessName, fileName, sizeof( i4->accessName ) - 1 ) ;
       }
       c4upper( i4->accessName ) ;
-   #endif
 
    #ifdef S4FOX
       indexFile->blockMemory = mem4create( c4, c4->memStartBlock,

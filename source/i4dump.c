@@ -2,7 +2,6 @@
 
 #include "d4all.h"
 
-#ifdef S4STAND_ALONE
 
 #ifndef S4INDEX_OFF
 
@@ -119,4 +118,4 @@ int tfile4dump( TAG4FILE *t4, int outHandle, const int displayAll )
 
 #endif /* S4MDX */
 #endif /* S4INDEX_OFF */
-#endif /* S4STAND_ALONE */
+

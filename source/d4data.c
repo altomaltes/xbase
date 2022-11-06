@@ -19,7 +19,6 @@
 #include "d4all.h"
 
 #ifndef S4INLINE
-#ifdef S4STAND_ALONE
 unsigned long S4FUNCTION data4serverId( DATA4 *d4 )
 {
    return d4->clientId ;
@@ -29,7 +28,6 @@ unsigned long data4clientId( DATA4 *d4 )
 {
    return d4->clientId ;
 }
-#endif
 
 
 #endif  /* S4INLINE */
@@ -229,7 +227,6 @@ const char *S4FUNCTION d4fileName( DATA4 *data )
 }
 
 #ifndef S4OFF_TRAN
-#ifdef S4STAND_ALONE
 #ifndef S4OFF_WRITE
 /* can change LOG4ON-->LOG4TRANS or LOG4TRANS-->LOG4ON */
 int S4FUNCTION d4log( DATA4 *data, const int logging )
@@ -267,7 +264,6 @@ int S4FUNCTION d4log( DATA4 *data, const int logging )
    return oldVal ;
 }
 #endif /* S4OFF_WRITE */
-#endif /* S4STAND_ALONE */
 #endif /* S4OFF_TRAN */
 
 short int S4FUNCTION d4numFields( DATA4 *data )

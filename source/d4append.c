@@ -406,11 +406,7 @@ int S4FUNCTION d4append( DATA4 *data )
             if ( code4tranStatus( c4 ) == r4active )
             {
                trans = code4trans( c4 ) ;
-               #ifdef S4STAND_ALONE
                   connectionId = 0L ;
-               #else
-                  connectionId = c4->currentClient->id ;
-               #endif
                rc = tran4set( trans, trans->currentTranStatus, -1L, connectionId, TRAN4APPEND,
                              sizeof( data->recNum ) + (unsigned int)dfile4recWidth( data->dataFile ), data4clientId( data ), data4serverId( data ) ) ;
                if ( rc < 0 )

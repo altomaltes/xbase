@@ -267,11 +267,7 @@ int S4FUNCTION d4close( DATA4 *data )
                if ( code4transEnabled( c4 ) )
                {
                   trans = code4trans( c4 ) ;
-                  #ifdef S4STAND_ALONE
                      connectionId = 0L ;
-                  #else
-                     connectionId = c4->currentClient->id ;
-                  #endif
 
                   if ( trans->currentTranStatus != r4active )
                   {

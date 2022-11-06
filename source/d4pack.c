@@ -81,11 +81,7 @@ int d4packData( DATA4 *d4 )
          if ( code4transEnabled( d4->codeBase ) )
          {
             trans = code4trans( d4->codeBase ) ;
-            #ifdef S4STAND_ALONE
                connectionId = 0L ;
-            #else
-               connectionId = d4->codeBase->currentClient->id ;
-            #endif
             if (  tran4set( trans, trans->currentTranStatus, -1L, connectionId, TRAN4PACK,
                  0, data4clientId( d4 ), data4serverId( d4 ) ) == 0 )
                tran4lowAppend( trans, "\0", 1 ) ;

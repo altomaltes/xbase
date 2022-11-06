@@ -1606,7 +1606,6 @@ int S4FUNCTION code4optAll( CODE4 *codeBase )
 }
 #endif
 
-#ifdef S4STAND_ALONE
 int S4FUNCTION d4lockTestAppendLow( DATA4 *data )
 {
    return error4( data->codeBase, e4notSupported, E92704 ) ;
@@ -1643,7 +1642,6 @@ const char *S4FUNCTION code4serverName( CODE4 *c4 )
 {
    return 0 ;
 }
-#endif
 
 #ifdef S4DLL_DEF
    #ifndef S4LOCK_HOOK

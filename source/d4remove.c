@@ -13,13 +13,11 @@ int S4FUNCTION d4remove( DATA4 *data )
    #endif
 
    /* for c/s, server takes care of determining this info... */
-   #ifdef S4STAND_ALONE
       #ifndef S4OFF_TRAN
          if ( code4transEnabled( data->codeBase ) )
             if ( tran4active( data->codeBase, data ) != 0 )
                return error4( data->codeBase, e4transViolation, E81521 ) ;
       #endif
-   #endif
 
    c4 = data->codeBase;
    c4setDoRemove( c4, 1 ) ;

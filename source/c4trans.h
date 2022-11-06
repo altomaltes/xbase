@@ -33,10 +33,8 @@
    #endif
    #ifndef S4INLINE
    #endif
-   #ifdef S4STAND_ALONE
       PUBLIC int S4FUNCTION code4tranInit2( CODE4 S4PTR *, const char S4PTR *, const char S4PTR * ) ;
       void code4tranInitUndo( CODE4 * ) ;
-   #endif
    #ifdef __cplusplus
       }
    #endif
@@ -82,10 +80,8 @@ PUBLIC int S4FUNCTION code4tranCommitSingle( CODE4 S4PTR * ) ;
          #define TRAN4LOCK_FIX       TRAN4LOCK_BASE+4
          #define TRAN4VERSION_NUM 2      /*CJ- changed so older version of CodeUtil would report the correct error*/
 
-         #ifdef S4STAND_ALONE
             #define TRAN4LOCK_USERS     TRAN4LOCK_BASE+1000
             #define TRAN4MAX_USERS      1000
-         #endif
       #endif  /* S4OFF_TRAN */
 
    #ifdef __cplusplus

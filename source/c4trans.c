@@ -1466,7 +1466,7 @@ int S4FUNCTION code4tranCommitSingle( CODE4 *c4 )
 }
 
 /* places all DATA4's into an invalid state */
-/* S4STAND_ALONE */
+
 static void code4invalidate( CODE4 *c4 )
 {
    DATA4 *dataOn ;
@@ -1493,7 +1493,7 @@ static void code4invalidate( CODE4 *c4 )
    }
 }
 
-/* S4STAND_ALONE */
+
 int S4FUNCTION code4tranCommitPhaseOne( CODE4 *c4 )
 {
    int saveErr, rc ;

@@ -59,7 +59,6 @@ static int code4freeBlocks( CODE4 *c4 )
          return error4( 0, e4parm_null, E92510 ) ;
    #endif
 
-   #ifdef S4STAND_ALONE
       for ( data = 0 ;; )
       {
          data = (DATA4 *)l4next( tran4dataList( &c4->c4trans.trans ), data ) ;
@@ -67,12 +66,10 @@ static int code4freeBlocks( CODE4 *c4 )
             break ;
          d4freeBlocks( data ) ;
       }
-   #endif
 
    return 0 ;
 }
 
-#ifdef S4STAND_ALONE
 #ifndef S4OFF_OPTIMIZE
 int S4FUNCTION code4optAll( CODE4 *c4 )
 {
@@ -141,7 +138,6 @@ int S4FUNCTION code4optAll( CODE4 *c4 )
    return 0 ;
 }
 #endif /* S4OFF_OPTIMIZE */
-#endif /* S4STAND_ALONE */
 
 #ifdef P4ARGS_USED
    #pragma argsused

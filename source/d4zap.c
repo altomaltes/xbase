@@ -88,11 +88,7 @@ int d4zapData( DATA4 *data, const long startRec, const long endRec )
          if ( code4transEnabled( data->codeBase ) )
          {
             trans = code4trans( data->codeBase ) ;
-            #ifdef S4STAND_ALONE
                connectionId = 0L ;
-            #else
-               connectionId = data->codeBase->currentClient->id ;
-            #endif
             rc = tran4set( trans, trans->currentTranStatus, -1L, connectionId, TRAN4ZAP,
                  2 * sizeof(S4LONG), data4clientId( data ), data4serverId( data ) ) ;
             if ( rc < 0 )

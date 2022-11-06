@@ -85,7 +85,6 @@ int S4FUNCTION t4uniqueSet( TAG4 *t4, const short uniqueCode )
 #endif  /* S4OFF_INDEX */
 
 #ifndef S4OFF_INDEX
-#ifdef S4STAND_ALONE
 int S4FUNCTION t4uniqueSetLow( TAG4 *t4, const short uniqueCode, const char doZeroCheck )
 {
    #ifdef E4PARM_HIGH
@@ -118,7 +117,6 @@ int S4FUNCTION t4uniqueSetLow( TAG4 *t4, const short uniqueCode, const char doZe
 
    return 0 ;
 }
-#endif  /* S4STAND_ALONE */
 
 long S4FUNCTION tfile4dskip( TAG4FILE *t4, long numSkip )
 {

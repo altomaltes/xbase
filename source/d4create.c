@@ -112,7 +112,6 @@ DATA4 *S4FUNCTION d4createLow( CODE4 *c4, const char *name, const FIELD4INFO *fi
    if ( error4code( c4 ) < 0 )
       return 0 ;
 
-   #ifdef S4STAND_ALONE
    #ifndef S4OFF_TRAN
       if ( c4->logOpen )   /* open now so that can turn off during create */
       {
@@ -122,7 +121,6 @@ DATA4 *S4FUNCTION d4createLow( CODE4 *c4, const char *name, const FIELD4INFO *fi
          else
             error4set( c4, 0 ) ;   /* remove r4open if it already existed */
       }
-   #endif
    #endif
 
    /* AS 06/04/97 ole-db allows creation of permanent files without fixed file names */

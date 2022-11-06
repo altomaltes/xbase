@@ -67,13 +67,11 @@ int dfile4refresh( DATA4FILE *data )
 }
 
 
-#ifdef S4STAND_ALONE
    #ifndef S4SINGLE
       #ifndef S4OFF_OPTIMIZE
          #define S4DO_REFRESH
       #endif
    #endif
-#endif
 
 #ifdef P4ARGS_USED
    #pragma argsused
