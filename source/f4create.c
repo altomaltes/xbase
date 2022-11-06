@@ -528,7 +528,6 @@ int S4FUNCTION file4create( FILE4 *file, CODE4 *c4, S4CONST char *name, const in
    else
       rc = file4createLow( file, c4, name ) ;
 
-   #ifdef S4SERVER
       if ( rc == r4noCreate )   /* free up any open unused file handles */
       {
          error4set( c4, 0 ) ;
@@ -540,7 +539,6 @@ int S4FUNCTION file4create( FILE4 *file, CODE4 *c4, S4CONST char *name, const in
          else
             rc = file4createLow( file, c4, name ) ;
       }
-   #endif
 
    if ( rc < 0 )
       return rc ;

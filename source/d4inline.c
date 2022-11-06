@@ -51,43 +51,6 @@ PUBLIC int S4FUNCTION code4tranStatusSet( CODE4 *c4, const int val )
 #endif
 
 
-#ifdef S4SERVER
-#ifndef S4SINGLE
-int code4unlockAutoSave( CODE4 *c4 )
-{
-   return c4->currentClient->trans.savedUnlockAuto ;
-}
-
-void S4FUNCTION code4unlockAutoSet( CODE4 *c4, int val )
-{
-   c4->currentClient->trans.unlockAuto = val ;
-}
-#endif  /* S4SINGLE */
-
-#ifndef S4OFF_WRITE
-#ifndef S4OFF_TRAN
-int S4FUNCTION code4tranStatus( CODE4 *c4 )
-{
-   return c4->currentClient->trans.currentTranStatus ;
-}
-
-int S4FUNCTION code4tranStatusSet( CODE4 *c4, const int val )
-{
-   return c4->currentClient->trans.currentTranStatus = val ;
-}
-
-int code4transEnabled( CODE4 *c4 )
-{
-      return ( c4->currentClient->trans.c4trans->enabled && code4tranStatus( c4 ) != r4rollback && code4tranStatus( c4 ) != r4off ) ;
-}
-#endif  /* S4OFF_TRAN */
-#endif  /* S4OFF_WRITE */
-
-TRAN4 *code4trans( CODE4 *c4 )
-{
-   return &c4->currentClient->trans ;
-}
-#else
 #ifndef S4OFF_TRAN
 int code4transEnabled( CODE4 *c4 )
 {
@@ -99,7 +62,6 @@ TRAN4 *code4trans( CODE4 *c4 )
 {
    return &c4->c4trans.trans ;
 }
-#endif
 
 #ifndef S4OFF_TRAN
 unsigned short int tran4entryLen( LOG4HEADER *header )

@@ -33,11 +33,7 @@ EXPR4CALC *S4FUNCTION code4calcCreate( CODE4 *c4, EXPR4 *exp4, const char *name 
    if ( calcPtr == 0 )
       return 0 ;
 
-   #ifdef S4SERVER
-      l4add( &c4->currentClient->calcList, calcPtr ) ;
-   #else
       l4add( &c4->calcList, calcPtr ) ;
-   #endif
    calcPtr->expr = exp4 ;
    u4ncpy( calcPtr->name, name, sizeof(calcPtr->name) ) ;
    c4upper( calcPtr->name ) ;
@@ -62,11 +58,7 @@ EXPR4CALC *S4FUNCTION expr4calcLookup( CODE4 *c4, const char *name, const unsign
    c4upper( buf ) ;
    for( calcOn = 0 ;; )
    {
-      #ifdef S4SERVER
-         calcOn = (EXPR4CALC *)l4next( &c4->currentClient->calcList, calcOn ) ;
-      #else
          calcOn = (EXPR4CALC *)l4next( &c4->calcList, calcOn ) ;
-      #endif
       if ( calcOn == 0 )
          return 0 ;
       if ( strcmp( calcOn->name, buf) == 0 )

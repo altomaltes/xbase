@@ -37,11 +37,7 @@ int S4FUNCTION f4memoCheck( MEMO4FILE *f4memo, DATA4 *data )
 
    d4 = f4memo->data ;
    #ifndef S4OFF_MULTI
-      #ifdef S4SERVER
-         rc = dfile4lockFile( d4, d4->currentClientId, d4->serverId ) ;
-      #else
          rc = d4lockFile( data ) ;
-      #endif
       if ( rc != 0 )
          return rc ;
    #endif

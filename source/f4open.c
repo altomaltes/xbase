@@ -71,12 +71,6 @@
 **     This routine shouldn't generate a CodeBase error
 */
 
-#ifdef S4SERVER
-unsigned short u4openFiles( void )
-{
-   return numFiles5 ;
-}
-#endif /* S4SERVER */
 
 
 #ifdef S4MACINTOSH
@@ -571,27 +565,6 @@ int S4FUNCTION file4open( FILE4 *file, CODE4 *c4, S4CONST char *name, const int 
    file->hand = INVALID4HANDLE ;
 
    rc = file4openLow( file, c4, name ) ;
-
-   #ifdef S4SERVER
-      if ( rc != 0 )
-      {
-         if ( rc != 0 && rc != e4fileFind && rc != e4permiss && rc != e4access )
-         {
-            error4set( c4, 0 ) ;
-            rc = code4dataFileCloseAll( c4 ) ;
-            if ( rc < 0 )
-               return rc ;
-            rc = file4openLow( file, c4, name ) ;
-         }
-         if ( c4getReadOnly( c4 ) == 0 && c4->readOnlyRequest == 1 )   /* try opening in read-only mode */
-         {
-            error4set( c4, 0 ) ;
-            c4setReadOnly( c4, 1 ) ;
-            rc = file4openLow( file, c4, name ) ;
-            c4setReadOnly( c4, 0 ) ;
-         }
-      }
-   #endif
 
    if ( rc != 0 )
    {

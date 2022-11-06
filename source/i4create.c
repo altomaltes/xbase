@@ -83,13 +83,6 @@ static INDEX4 *i4createLow( DATA4 *d4, const char *fileName, const TAG4INFO *tag
 
    #ifndef S4OFF_MULTI
       if ( fileName == 0 )  /* must have file open exclusively, since the lock handling changes, potentially causing multi-user failures */
-      #ifdef S4SERVER
-         if ( d4->accessMode != OPEN4DENY_RW )
-         {
-            error4( c4, e4create, E81306 ) ;
-            return 0 ;
-         }
-      #else
          #ifdef S4FOX
          if ( d4version( d4 ) != 0x30 )    /* new locking scheme does not conflict */
          #endif
@@ -98,7 +91,6 @@ static INDEX4 *i4createLow( DATA4 *d4, const char *fileName, const TAG4INFO *tag
                error4( c4, e4exclusive, E81306 ) ;
                return 0 ;
             }
-      #endif
    #endif  /* S4OFF_MULTI */
 
    #ifdef E4ANALYZE

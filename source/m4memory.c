@@ -33,13 +33,9 @@
 #ifdef S4MAX
    #define S4MAX_OR_SERVER
 #else
-   #ifdef S4SERVER
-      #define S4MAX_OR_SERVER
-   #else
       #ifdef S4TRACK_MEMORY
          #define S4MAX_OR_SERVER
       #endif
-   #endif
 #endif
 
 #ifdef S4OS2

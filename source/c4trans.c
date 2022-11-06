@@ -2145,7 +2145,7 @@ int tran4lock( TRAN4 *trans )
       }
    }
 }
-#endif  /* S4SERVER */
+#endif  /* */
 
 static DATA4 *tran4dataFull( TRAN4 *trans, const long serverId, const long clientId )
 {

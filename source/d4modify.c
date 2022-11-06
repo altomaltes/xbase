@@ -491,9 +491,6 @@ DATA4 *S4FUNCTION d4fieldsRemove( DATA4 **d4, int nFields, char *names[] )
    DATA4 *newData ;
    char buf[258] ;
    DATA4FILE *d4file ;
-   #ifdef S4SERVER
-      int oldSingleClient ;
-   #endif
    #ifndef S4OFF_INDEX
       int nTags, numIndexes, needRecreate, idxOn ;
       TAG4INFO *tags = 0 ;
@@ -721,14 +718,7 @@ DATA4 *S4FUNCTION d4fieldsRemove( DATA4 **d4, int nFields, char *names[] )
       c4->autoOpen = 0 ;
       oldAccessMode = c4->accessMode ;
       c4->accessMode = OPEN4DENY_RW ;
-      #ifdef S4SERVER
-         oldSingleClient = c4->singleClient ;
-         c4->singleClient = OPEN4DENY_RW ;
-      #endif
       newData = d4open( c4, buf ) ;
-      #ifdef S4SERVER
-         c4->singleClient = oldSingleClient ;
-      #endif
       c4->accessMode = oldAccessMode ;
       c4->autoOpen = oldAutoOpen ;
 

@@ -124,7 +124,7 @@ void S4FUNCTION f4assignUnicode( FIELD4 *field, const WSTR5 *wideString )
             return error4( field->data->codeBase, e4parm_null, E90518 ) ;
       #endif
 
-      #if !defined(S4SERVER) && !defined(S4OFF_ENFORCE_LOCK)
+      #if  !defined(S4OFF_ENFORCE_LOCK)
          if ( field->data->codeBase->lockEnforce && field->data->recNum > 0L )
             if ( d4lockTest( field->data, field->data->recNum, lock4write ) != 1 )
                return error4( field->data->codeBase, e4lock, E90519 ) ;

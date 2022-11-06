@@ -45,14 +45,6 @@
    #define data4clientId( d4 ) ( (d4)->clientId )
 #endif
 
-#ifdef S4SERVER
-   #define data4serverId( d4 ) ( (d4)->serverId )
-   #define data4clientId( d4 ) ( (d4)->clientId )
-   #ifndef S4OFF_WRITE
-      #define code4transEnabled( c4 ) ( (c4)->currentClient == 0 ? 0 : ( (c4)->currentClient->trans.c4trans->enabled && ( code4tranStatus( (c4) ) != r4rollback ) && ( code4tranStatus( (c4) ) != r4off ) ) )
-   #endif
-   #define code4trans( c4 ) ( (c4)->currentClient == 0 ? 0 : (&(c4)->currentClient->trans ) )
-#else
    #ifndef S4SINGLE
    #endif
    #define code4trans( c4 ) ( &(c4)->c4trans.trans )
@@ -63,12 +55,7 @@
             #define code4transEnabled( c4 ) ( (c4)->c4trans.enabled && ( code4tranStatus( (c4) ) != r4rollback ) && ( code4tranStatus( (c4) ) != r4off ) )
       #endif
    #endif
-#endif  /* S4SERVER */
 
-
-#ifdef S4SERVER
-   #define code4dateFormat( c4 ) ( (c4)->currentClient == 0 ? 0 : ( (c4)->currentClient->trans.dateFormat ) )
-#endif
 
 /* C4TRANS.C */
 #ifdef S4STAND_ALONE /* temp patch */
@@ -93,13 +80,8 @@
 #define tran4dataList( t4 ) ( (t4)->dataList )
 #define tran4dataListSet( t4, l4 ) ( (t4)->dataList = l4 )
 
-#ifdef S4SERVER
-   #define error4code( a ) ( ((a)->currentClient == 0 || (a)->accessMutexCount == 0) ? (a)->errorCodeDefault : (a)->currentClient->errorCode )
-   #define error4code2( a ) ( ((a)->currentClient == 0 || (a)->accessMutexCount == 0) ? (a)->errorCode2Default : (a)->currentClient->errorCode2 )
-#else
    #define error4code( a ) ( (a)->errorCode )
    #define error4code2( a ) ( (a)->errorCode2 )
-#endif
 #define expr4parse( a, b ) ( expr4parseLow( (a), (b), 0 ) )
 
 #else   /* NOT S4INLINE STARTS NOW... */
@@ -123,9 +105,6 @@ long data4clientId( DATA4 * ) ;
 long S4FUNCTION data4serverId( DATA4 * ) ;
 #ifdef __cplusplus
    }
-#endif
-#ifdef S4SERVER
-   #define code4dateFormat( c4 ) ( (c4)->c4trans.trans.dateFormat )
 #endif
 #ifdef __cplusplus
    extern "C" {

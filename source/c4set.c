@@ -23,7 +23,6 @@
 #include "d4all.h"
 
 
-// JACS #if !defined( S4SERVER )
    short S4FUNCTION code4getErrorCode( const CODE4 *cb )
    {
       #ifdef E4PARM_HIGH
@@ -41,7 +40,6 @@
       #endif
       return cb->errorCode2 ;
    }
-//#endif /* #if !defined( S4SERVER ) */
 
 
    void S4FUNCTION code4autoIncrementStart( CODE4 *c4, double val )
@@ -812,51 +810,6 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
          return collate4none ;
       #endif
    }
-
-
-
-#if defined( S4SERVER ) && defined( S4FOX )
-   // CS 1999/08/26 return short for VB
-   short S4FUNCTION code4indexBlockSizeSet( CODE4 S4PTR *c4, short val )
-   {
-      /* does not set error code, but returns e4parm if invalid value given */
-      assert5( c4 != 0 ) ;
-      SERVER4CLIENT *clientToUse = c4->currentClient ;
-      if ( clientToUse == 0 )
-         clientToUse = c4->catalogClient ;
-      if ( val == -1 )  // means set it to foxpro compatible defaults
-      {
-         clientToUse->foxCreateIndexBlockSize = 512 ;
-         clientToUse->foxCreateIndexMultiplier = 1 ;
-      }
-      else
-      {
-         // must be greater than or equal to 512
-         if ( val >= 512 )
-         {
-            // must be a multiple of 2...
-            for ( short valToCheck = val ;; )
-            {
-               if ( valToCheck == 512 )   // is a multiple of 2...
-                  break ;
-               if ( valToCheck % 2 != 0 ) // not a multiple of 2...
-                  return e4parm ;
-               valToCheck /= 2 ;
-            }
-
-            clientToUse->foxCreateIndexBlockSize = val ;
-            // if not-compatible, we set multiplier to 1024 (or 512 if val is 512, since must be a multiple of this)
-            if ( val == 512 )
-               clientToUse->foxCreateIndexMultiplier = 512 ;
-            else
-               clientToUse->foxCreateIndexMultiplier = 1024 ;
-         }
-         else
-            return e4parm ;
-      }
-      return 0 ;
-   }
-#endif /* S4SERVER && S4FOX */
 
 
 

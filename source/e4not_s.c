@@ -169,21 +169,6 @@
 #endif
 
 
-#ifdef S4SERVER
-/* for index-independence of OLE-DB dll, need to export some functions... */
-
-#ifndef S4FOX
-#ifdef P4ARGS_USED
-   #pragma argsused
-#endif
-void S4FUNCTION f4assignNull( FIELD4 *field )
-{
-   return ;
-}
-#endif /* S4FOX */
-
-#else
-
 #ifndef E4MISC
    int S4FUNCTION mem4checkMemory()
    {
@@ -2518,8 +2503,6 @@ int S4FUNCTION file4seqWriteDelay( FILE4SEQ_WRITE *seqWrite )
 }
 
 #endif
-
-#endif /* S4SERVER */
 
 #ifdef S4DLL_DEF
    #undef S4DLL_DEF

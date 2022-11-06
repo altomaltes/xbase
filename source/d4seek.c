@@ -103,11 +103,7 @@ static int d4seekCheck( DATA4 *data, TAG4FILE *tag, const int rc, const char *bu
       }
 
    #ifndef S4SINGLE
-      #ifdef S4SERVER
-         if ( dfile4lockTestFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) )
-      #else
          if ( d4lockTestFile( data ) )
-      #endif
       {
    #endif
       #ifndef S4OFF_OPTIMIZE

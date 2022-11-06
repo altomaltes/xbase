@@ -218,7 +218,7 @@ long S4FUNCTION time4long( const char *time, int strLen, Bool5 isMilli )
 
 
 
-#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
+#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD )  ) )
    void t4dblToCur( char *result, const double d )
    {
       /* result must be big enough to hold a CURRENCY4 structure - 8 bytes */
@@ -613,7 +613,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
 
 
-#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
+#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD )  ) )
    void t4strToDateTime( COLLATE4 *collate, char *result, const char *input, const int len, int *lenOut )
    {
       // AS 06/26/00 - not requite that collate be 0
@@ -682,7 +682,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
 
 
-#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
+#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD )  ) )
    #ifdef P4ARGS_USED
       #pragma argsused
    #endif
@@ -1046,7 +1046,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
 
 
-#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
+#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD )  ) )
    void t4unsignedIntToFox( char *result, const unsigned long *val )
    {
       *((long *)result) = x4reverseLong( val ) ;
@@ -1062,7 +1062,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 
 
 
-#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
+#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD )  ) )
    void t4foxToUnsignedInt( char *result, const unsigned long *val )
    {
       *((long *)result) = x4reverseLong( val ) ;
@@ -1365,7 +1365,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
 
 
 
-#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD ) && !defined( S4SERVER ) ) )
+#if  ( defined( S4FOX ) || ( defined( OLEDB5BUILD )  ) )
    void t4curToFox( char *result, const CURRENCY4 *source )
    {
       char i ;
