@@ -37,11 +37,11 @@
       #define S5EXPORT
    #endif
 
-      S4EXPORT char *S4FUNCTION getCharPtrFromUnicode5( const WSTR5 *in, char S4PTR *out = 0 ) ;
-      S4EXPORT WSTR5 * S4FUNCTION getUnicodeFromCharPtr5( const char S4PTR *in, WSTR5 *outx = 0 ) ;
+      PUBLIC char *S4FUNCTION getCharPtrFromUnicode5( const WSTR5 *in, char S4PTR *out = 0 ) ;
+      PUBLIC WSTR5 * S4FUNCTION getUnicodeFromCharPtr5( const char S4PTR *in, WSTR5 *outx = 0 ) ;
 
-      S4EXPORT char *S4FUNCTION convert5unicodeToChar( const WSTR5 *in, long codePage, int numChars, char S4PTR *out = 0 ) ;
-      S4EXPORT WSTR5 * S4FUNCTION convert5charToUnicode( const char S4PTR *in, long codePage, int numChars, WSTR5 *outx = 0 ) ;
+      PUBLIC char *S4FUNCTION convert5unicodeToChar( const WSTR5 *in, long codePage, int numChars, char S4PTR *out = 0 ) ;
+      PUBLIC WSTR5 * S4FUNCTION convert5charToUnicode( const char S4PTR *in, long codePage, int numChars, WSTR5 *outx = 0 ) ;
 
       S5EXPORT void *S4FUNCTION alloc5( ULONG amount ) ; // Throws a 'err5memory()' exception if it could not be allocated.
       S5EXPORT HRESULT S4FUNCTION alloc5init() ; // Throws a 'err5memory()' exception if it could not be allocated.

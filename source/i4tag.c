@@ -41,11 +41,7 @@ short int S4FUNCTION t4unique( const TAG4 *tag )
          return error4( 0, e4parm, E91639 ) ;
    #endif
 
-   #ifdef S4CLIENT
-      return tag->errUnique ;
-   #else
       return tfile4unique( tag->tagFile, tag->errUnique ) ;
-   #endif
 }
 
 #ifndef S4SERVER
@@ -67,7 +63,7 @@ int S4FUNCTION t4uniqueSet( TAG4 *t4, const short uniqueCode )
 
    /* if not zero matches, then neither should be zero */
    #ifdef E4PARM_HIGH
-      #ifdef S4CLIENT_OR_FOX
+      #ifdef CLIENT_OR_FOX
          if ( t4unique( t4 ) == r4candidate )
          {
             if ( uniqueCode != e4candidate )
@@ -97,7 +93,7 @@ int S4FUNCTION t4uniqueSetLow( TAG4 *t4, const short uniqueCode, const char doZe
    #ifdef E4PARM_HIGH
       if ( t4 == 0 )
          return error4( 0, e4parm_null, E91601 ) ;
-      #ifdef S4CLIENT_OR_FOX
+      #ifdef CLIENT_OR_FOX
          if ( t4unique( t4 ) == r4candidate )  /* can't change a candidate setting */
          {
             if ( uniqueCode != e4candidate )
@@ -1285,7 +1281,7 @@ B4KEY_DATA *tfile4keyData( TAG4FILE *t4 )
 }
 
 /* returns 0 if tag is empty */
-S4EXPORT long S4FUNCTION tfile4recNo( TAG4FILE *t4 )
+PUBLIC long S4FUNCTION tfile4recNo( TAG4FILE *t4 )
 {
    B4BLOCK *blockOn ;
 

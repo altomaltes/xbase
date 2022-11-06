@@ -99,23 +99,10 @@ static void d4createClose( CODE4 *c4, DATA4 *d4, int doDelete )
 
 DATA4 *S4FUNCTION d4createLow( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, const TAG4INFO *tagInfo )
 {
-    #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      CONNECTION4CREATE_INFO_IN *dataIn ;
-      unsigned short numTags, numFields, numUniqueTags ;
-      CONNECTION4FIELD_INFO *finfo ;
-      CONNECTION4TAG_INFO *tinfo ;
-      CONNECTION4UNIQUE_INFO_IN *uniqueInfoIn ;
-      CONNECTION4UNIQUE_TAG_INFO *uniqueTagInfo ;
-      unsigned int len2, len3, j ;
-      short len, offset ;
-      int oldAccessMode ;
-   #else
       int oldReadOnly ;
       #ifndef S4OFF_TRAN
          int saveStatus ;
       #endif
-   #endif
    char nameBuf[258] ;
    int rc, i, oldAutoOpen ;
    DATA4FILE *d4 = NULL ;
@@ -150,16 +137,12 @@ DATA4 *S4FUNCTION d4createLow( CODE4 *c4, const char *name, const FIELD4INFO *fi
    }
    else
    {
-      #ifdef S4CLIENT
-         d4 = dfile4data( c4, name ) ;
-      #else
          u4nameCurrent( nameBuf, sizeof( nameBuf ), name ) ;
          u4nameExt( nameBuf, sizeof( nameBuf ), "dbf", 0 ) ;
          #ifndef S4CASE_SEN
             c4upper(nameBuf);
          #endif
          d4 = dfile4data( c4, nameBuf ) ;
-      #endif
       if ( d4 != 0 )
       {
          if ( c4getErrCreate( c4 ) == 0 )
@@ -170,248 +153,6 @@ DATA4 *S4FUNCTION d4createLow( CODE4 *c4, const char *name, const FIELD4INFO *fi
       }
    }
 
-   #ifdef S4CLIENT
-      if ( !c4->defaultServer.connected )
-      {
-         rc = code4connect( c4, 0, DEF4PROCESS_ID, 0, 0, 0 ) ;
-         if ( rc == 0 )
-         {
-            if ( !c4->defaultServer.connected )
-            {
-               error4( c4, e4connection, E84302 ) ;
-               return 0 ;
-            }
-         }
-         if ( rc != 0 )
-         {
-            if ( c4->defaultServer.connected )
-            {
-               connection4initUndo( &c4->defaultServer ) ;
-               /* connection4free( &c4->defaultServer ) ;*/
-               c4->defaultServer.connected = 0 ;
-            }
-            return 0 ;
-         }
-      }
-      connection = &c4->defaultServer ;
-
-      if ( connection == 0 )
-      {
-         error4( c4, e4connection, E81303 ) ;
-         return 0 ;
-      }
-      connection4assign( connection, CON4CREATE, 0, 0 ) ;
-      connection4addData( connection, NULL, sizeof(CONNECTION4CREATE_INFO_IN), (void **)&dataIn ) ;
-      if ( c4->createTemp == 1 )
-      {
-         dataIn->createTemp = 1 ;
-         dataIn->log = htons(LOG4TRANS) ;
-      }
-      else
-         dataIn->log = htons(c4->log) ;
-      dataIn->oledbSchemaCreate = c4->oledbSchemaCreate ;
-      dataIn->safety = c4->safety ;
-      dataIn->readOnly = c4getReadOnly( c4 ) ;  /* catalog purposes */
-      dataIn->compatibility = htons(c4->compatibility) ;
-      if ( name != 0 )
-      {
-         #ifdef E4MISC
-            if ( strlen( name ) > LEN4PATH )
-               error4describe( c4, e4create, E84301, name, (char *)0, (char *)0 ) ;
-         #endif
-         strncpy( dataIn->name, name, LEN4PATH ) ;
-      }
-      if ( tagInfo == 0 )
-         numTags = 0 ;
-      else
-         for( numTags = 0 ; tagInfo[numTags].name != 0; numTags++ )
-            ;
-      dataIn->numTags = htons(numTags) ;
-      for( i = 0 ; fieldData[i].name != 0; i++ )
-         ;
-      dataIn->numFields = htons(numFields = i) ;
-      len = 0 ;
-      for ( j = 0 ; j != numFields ; j++ )
-      {
-         len += sizeof( CONNECTION4FIELD_INFO ) ;
-         len += strlen( fieldData[j].name ) + 1 ;
-      }
-      dataIn->fieldInfoLen = htons(len) ;
-      offset = sizeof( CONNECTION4CREATE_INFO_IN ) ;
-      for ( j = 0 ; j != numFields ; j++ )
-      {
-         len = strlen( fieldData[j].name ) + 1 ;
-         connection4addData( connection, NULL, sizeof(CONNECTION4FIELD_INFO), (void **)&finfo ) ;
-         finfo->name.offset = htons((short)(offset + (short)sizeof(CONNECTION4FIELD_INFO))) ;
-         finfo->type = htons(fieldData[j].type) ;
-         finfo->len = htons(fieldData[j].len) ;
-         finfo->dec = htons(fieldData[j].dec) ;
-         finfo->nulls = htons(fieldData[j].nulls) ;
-         connection4addData( connection, fieldData[j].name, len, NULL ) ;
-         offset += ( len + sizeof( CONNECTION4FIELD_INFO ) ) ;
-      }
-      for ( j = 0 ; j != numTags ; j++ )
-      {
-         len = strlen( tagInfo[j].name ) + 1 ;
-         offset += sizeof( CONNECTION4TAG_INFO ) ;
-         connection4addData( connection, NULL, sizeof(CONNECTION4TAG_INFO), (void **)&tinfo ) ;
-         tinfo->name.offset = htons(offset) ;
-         len2 = strlen( tagInfo[j].expression ) + 1 ;
-         offset += len ;
-         tinfo->expression.offset = htons(offset) ;
-         offset += len2 ;
-         if ( tagInfo[j].filter == 0 )
-         {
-            len3 = 0 ;
-            tinfo->filter.offset = 0 ;
-         }
-         else
-         {
-            len3 = strlen( tagInfo[j].filter ) + 1 ;
-            tinfo->filter.offset = htons(offset) ;
-         }
-         offset += len3 ;
-         tinfo->unique = htons(tagInfo[j].unique) ;
-         tinfo->descending = htons(tagInfo[j].descending) ;
-         connection4addData( connection, tagInfo[j].name, len, NULL ) ;
-         connection4addData( connection, tagInfo[j].expression, len2, NULL ) ;
-         if ( len3 != 0 )
-            connection4addData( connection, tagInfo[j].filter, len3, NULL ) ;
-      }
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-      {
-         #ifdef E4STACK
-            error4stack( c4, rc, E91401 ) ;
-         #endif
-         return 0 ;
-      }
-      if ( connection4type( connection ) != CON4CREATE )
-      {
-         #ifdef E4STACK
-            error4stack( c4, e4connection, E91401 ) ;
-         #endif
-         return 0 ;
-      }
-
-      rc = connection4status( connection ) ;
-      if ( rc != 0 )
-      {
-         if ( c4getErrCreate( c4 ) == 0 )
-            error4set( c4, r4noCreate ) ;
-         else
-            connection4errorDescribe( connection, c4, rc, E91401, name, 0, 0 ) ;
-         return 0 ;
-      }
-
-      oldAutoOpen = c4->autoOpen ;
-      if ( tagInfo == 0 )
-         c4->autoOpen = 0 ;
-      else
-      {
-         if ( tagInfo[0].name == 0 )
-            c4->autoOpen = 0 ;
-         else
-            c4->autoOpen = 1 ;
-      }
-
-      if ( c4->createTemp == 0 )
-      {
-         if ( connection4len( connection ) != 0 )
-         {
-            c4->autoOpen = oldAutoOpen ;
-            #ifdef E4STACK
-               error4stack( c4, e4packetLen, E91401 ) ;
-            #endif
-            return 0 ;
-         }
-         if ( numTags == 0 )
-            c4->openForCreate = 2 ;
-         else
-            c4->openForCreate = 1 ;
-         data = d4open( c4, name ) ;
-         c4->openForCreate = 0 ;
-      }
-      else
-      {
-         oldAccessMode = c4->accessMode ;
-         c4->accessMode = OPEN4DENY_RW ;
-         if ( name == 0 )
-         {
-            if ( connection4len( connection ) > sizeof( nameBuf ) + 1 )
-            {
-               c4->accessMode = oldAccessMode ;
-               c4->autoOpen = oldAutoOpen ;
-               error4( c4, e4packetLen, E91401 ) ;
-               return 0 ;
-            }
-            memcpy( nameBuf, connection4data( connection ), (unsigned int)connection4len( connection ) ) ;
-            nameBuf[connection4len( connection )] = 0 ;
-            if ( numTags == 0 )
-               c4->openForCreate = 2 ;
-            else
-               c4->openForCreate = 1 ;
-            data = d4open( c4, nameBuf ) ;
-            c4->openForCreate = 0 ;
-         }
-         else
-         {
-            if ( numTags == 0 )
-               c4->openForCreate = 2 ;
-            else
-               c4->openForCreate = 1 ;
-            data = d4open( c4, name ) ;
-            c4->openForCreate = 0 ;
-         }
-         c4->accessMode = oldAccessMode ;
-      }
-      c4->autoOpen = oldAutoOpen ;
-      if ( data == 0 )
-         return 0 ;
-
-      /* set the unique settings... */
-      code4indexFormat( c4 ) ;  /* need to call this to avoid corruption in d4tag() call below which asks
-                                   this question calling the server destroying com struct */
-      connection4assign( connection, CON4UNIQUE_SET, data4clientId( data ), data4serverId( data ) ) ;
-      connection4addData( connection, NULL, sizeof(CONNECTION4UNIQUE_INFO_IN), (void **)&uniqueInfoIn ) ;
-      /* uniqueInfoIn->numTags = htons(numTags) ; */
-      numUniqueTags = numTags ;
-      for ( j = 0 ; j != numTags ; j++ )
-      {
-         if ( tagInfo[j].unique == c4->errDefaultUnique )
-            numUniqueTags-- ;
-         else
-         {
-            tag = d4tag( data, tagInfo[j].name ) ;
-            if ( tag == 0 )
-            {
-               rc = error4describe( data->codeBase, e4name, E81406, d4alias( data ), tagInfo[j].name, 0 ) ;
-               break ;
-            }
-            connection4addData( connection, NULL, sizeof(CONNECTION4UNIQUE_TAG_INFO), (void **)&uniqueTagInfo ) ;
-            uniqueTagInfo->unique = htons(tagInfo[j].unique) ;
-            tag->errUnique = tagInfo[j].unique ;
-            memcpy( uniqueTagInfo->alias, tag->tagFile->alias, LEN4TAG_ALIAS ) ;
-         }
-      }
-      uniqueInfoIn->numTags = htons(numUniqueTags) ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc >= 0 )
-      {
-         rc = connection4status( connection ) ;
-         if ( rc < 0 )
-            connection4error( connection, c4, rc, E91401 ) ;
-      }
-      if ( rc < 0 )
-      {
-         d4close( data ) ;
-         return 0 ;
-      }
-
-      return data ;
-   #else
       if ( c4->createTemp == 1 )
       {
          data = 0 ;
@@ -483,7 +224,6 @@ DATA4 *S4FUNCTION d4createLow( CODE4 *c4, const char *name, const FIELD4INFO *fi
          }
 
       return data ;
-   #endif
 }
 
 DATA4 *S4FUNCTION d4create( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, const TAG4INFO *tagInfo )
@@ -1324,7 +1064,7 @@ int dfile4create( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, cons
 
    return error4code( c4 ) ;
 }
-#endif  /* not S4CLIENT */
+#endif  /*  */
 #endif  /* S4OFF_WRITE */
 
 #ifdef S4VB_DOS

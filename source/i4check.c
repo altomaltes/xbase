@@ -2,53 +2,6 @@
 
 #include "d4all.h"
 
-#ifdef S4CLIENT
-int S4FUNCTION d4check( DATA4 *d4 )
-{
-   #ifdef S4OFF_INDEX
-      return 0 ;
-   #else
-      CONNECTION4 *connection ;
-      int rc ;
-      CONNECTION4CHECK_INFO_OUT *out ;
-
-      #ifdef E4PARM_HIGH
-         if ( d4 == 0 )
-            return error4( 0, e4parm_null, E95702 ) ;
-      #endif
-
-      #ifndef S4OFF_MULTI
-         #ifdef S4SERVER
-            rc = dfile4lockFile( d4->dataFile, d4->currentClientId, d4->serverId ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-         #else
-            rc = d4lockFile( d4 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-         #endif
-         if ( rc )
-            return rc ;
-      #endif
-
-      connection = d4->dataFile->connection ;
-      if ( connection == 0 )
-         return e4connection ;
-      connection4assign( connection, CON4CHECK, data4clientId( d4 ), data4serverId( d4 ) ) ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-         return rc ;
-      rc = connection4status( connection ) ;
-      if ( rc != 0 )
-         return connection4error( connection, d4->codeBase, rc, E95702 ) ;
-
-      if ( connection4len( connection ) != sizeof( CONNECTION4CHECK_INFO_OUT ) )
-         return error4( d4->codeBase, e4packetLen, E95702 ) ;
-      out = (CONNECTION4CHECK_INFO_OUT *)connection4data( connection ) ;
-      if ( out->lockedDatafile == 1 )
-         d4->dataFile->fileLock = d4 ;
-      return 0 ;
-   #endif  /* S4OFF_INDEX */
-}
-#else
-
 #ifndef S4OFF_INDEX
 
 typedef struct
@@ -911,5 +864,4 @@ int S4FUNCTION d4check( DATA4 *d4 )
    #endif  /* S4OFF_INDEX */
 }
 
-#endif /* S4CLIENT */
 

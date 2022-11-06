@@ -19,12 +19,6 @@ void S4FUNCTION expr4calcMassage( EXPR4CALC *calc )
 
 EXPR4CALC *S4FUNCTION code4calcCreate( CODE4 *c4, EXPR4 *exp4, const char *name )
 {
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      CONNECTION4CALC_CREATE_INFO_IN *infoIn ;
-      DATA4 *data ;
-      int rc ;
-   #endif
    EXPR4CALC *calcPtr ;
 
    #ifdef E4PARM_HIGH
@@ -50,30 +44,6 @@ EXPR4CALC *S4FUNCTION code4calcCreate( CODE4 *c4, EXPR4 *exp4, const char *name 
 
    expr4calcMassage( calcPtr ) ;
 
-   #ifdef S4CLIENT
-      if ( calcPtr != 0 )   /* need to register calc on server */
-      {
-         data = exp4->data ;
-         connection = data->dataFile->connection ;
-         rc = connection4assign( connection, CON4CALC_CREATE, data4clientId( data ), data4serverId( data ) ) ;
-         if ( rc < 0 )
-            return 0 ;
-         connection4addData( connection, NULL, sizeof( CONNECTION4CALC_CREATE_INFO_IN ), (void **)&infoIn ) ;
-         u4ncpy( infoIn->calcName, name, sizeof( calcPtr->name ) ) ;
-         connection4addData( connection, exp4->source, strlen( exp4->source ) + 1, NULL ) ;
-         connection4sendMessage( connection ) ;
-         rc = connection4receiveMessage( connection ) ;
-         if ( rc < 0 )
-            return 0 ;
-
-         rc = connection4status( connection ) ;
-         if ( rc < 0 )
-         {
-            connection4error( connection, c4, rc, E90920 ) ;
-            return 0 ;
-         }
-      }
-   #endif
 
    return calcPtr ;
 }

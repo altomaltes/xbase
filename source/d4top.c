@@ -2,98 +2,6 @@
 
 #include "d4all.h"
 
-#ifdef S4CLIENT
-int S4FUNCTION d4top( DATA4 *data )
-{
-   #ifndef S4OFF_INDEX
-      TAG4 *tag ;
-   #endif
-   int rc ;
-   CONNECTION4 *connection ;
-   CONNECTION4TOP_INFO_IN *info ;
-   CONNECTION4TOP_INFO_OUT *out ;
-   CODE4 *c4 ;
-
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E92301 ) )
-         return -1 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E92301 ) ;
-   #endif
-
-   c4 = data->codeBase ;
-   if ( error4code( c4 ) < 0 )
-      return e4codeBase ;
-
-   #ifndef S4OFF_WRITE
-      rc = d4updateRecord( data, 0 ) ;
-      if ( rc )
-         return rc ;
-   #endif
-
-   connection = data->dataFile->connection ;
-   if ( connection == 0 )
-      return e4connection ;
-
-   data->recNum = -1 ;
-   connection4assign( connection, CON4TOP, data4clientId( data ), data4serverId( data ) ) ;
-   connection4addData( connection, NULL, sizeof( CONNECTION4TOP_INFO_IN ), (void **)&info ) ;
-   #ifdef S4OFF_INDEX
-      info->usesTag = 0 ;
-   #else
-      tag = data->tagSelected ;
-      if ( tag == 0 )
-         info->usesTag = 0 ;
-      else
-      {
-         info->usesTag = 1 ;
-         memcpy( info->tagName, tag->tagFile->alias, LEN4TAG_ALIAS  ) ;
-         info->tagName[LEN4TAG_ALIAS] = 0 ;
-      }
-   #endif
-
-   rc = connection4repeat( connection ) ;
-   switch( rc )
-   {
-      case r4eof:
-         data->bofFlag = 1 ;
-         return d4goEof( data ) ;
-      case r4success:
-         break ;
-      default:
-         if ( rc < 0 )
-            connection4error( connection, c4, rc, E92301 ) ;
-         return rc ;
-   }
-
-   if ( connection4len( connection ) != (long)sizeof( CONNECTION4TOP_INFO_OUT ) + (long)dfile4recWidth( data->dataFile ) )
-      return error4( c4, e4packetLen, E92301 ) ;
-
-   out = (CONNECTION4TOP_INFO_OUT *)connection4data( connection ) ;
-
-   /* now copy the data into the record */
-   memcpy( data->record, ((char *)out) + sizeof( CONNECTION4TOP_INFO_OUT ), dfile4recWidth( data->dataFile ) ) ;
-
-   data->bofFlag = out->bofFlag ;
-   data->eofFlag = out->eofFlag ;
-
-   data->recNum = ntohl(out->recNo) ;
-   if ( out->recordLocked )
-   {
-      d4localLockSet( data, data->recNum ) ;
-      memcpy( data->recordOld, data->record, dfile4recWidth( data->dataFile ) ) ;
-      data->recNumOld = data->recNum ;
-      data->memoValidated = 1 ;
-   }
-
-   return 0 ;
-}
-
-#else
-
 int S4FUNCTION d4top( DATA4 *data )
 {
    int rc ;
@@ -182,7 +90,6 @@ int S4FUNCTION d4top( DATA4 *data )
    return d4goEof( data ) ;
 }
 
-#endif /* S4CLIENT */
 
 int S4FUNCTION d4goBof( DATA4 *data )
 {

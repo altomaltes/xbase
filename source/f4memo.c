@@ -245,12 +245,6 @@ int f4memoRead( FIELD4 *field )
    int rc ;
    F4MEMO *mfield ;
    CODE4 *c4 ;
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      CONNECTION4MEMO_INFO_IN *info ;
-      CONNECTION4MEMO_INFO_OUT *out ;
-      DATA4 *data ;
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( field == 0 )
@@ -270,77 +264,6 @@ int f4memoRead( FIELD4 *field )
       return mfield->len ;
    }
 
-   #ifdef S4CLIENT
-      data = field->data ;
-      connection = data->dataFile->connection ;
-      if ( connection == 0 )
-         return e4connection ;
-
-      connection4assign( connection, CON4MEMO, data4clientId( data ), data4serverId( data ) ) ;
-      connection4addData( connection, NULL, sizeof( CONNECTION4MEMO_INFO_IN ), (void **)&info ) ;
-      info->recNo = htonl(d4recNo( data )) ;
-      info->fieldNo = htons((short)d4fieldNumber( data, field->name )) ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-         return error4stack( c4, rc, E90525 ) ;
-      rc = connection4status( connection ) ;
-      if ( rc < 0 )
-         return connection4error( connection, c4, rc, E90525 ) ;
-
-      if ( rc == r4entry )  /* no record, therefore no memo entry */
-      {
-         if ( mfield->lenMax == 0 )
-            mfield->contents = &f4memoNullChar ;
-         else
-            mfield->contents[0] = 0 ;
-         field->memo->status = 0 ;
-         mfield->len = 0 ;
-         return 0 ;
-      }
-
-      if ( connection4len( connection ) < sizeof( CONNECTION4MEMO_INFO_OUT ) )
-         return e4packetLen ;
-
-      out = (CONNECTION4MEMO_INFO_OUT *)connection4data( connection ) ;
-      out->memoLen = ntohl( out->memoLen ) ;
-
-      if ( connection4len( connection ) != (long)sizeof( CONNECTION4MEMO_INFO_OUT ) + (long)out->memoLen )
-         return e4packetLen ;
-
-      if ( out->memoLen == 0 )
-      {
-         if ( mfield->lenMax == 0 )
-            mfield->contents = &f4memoNullChar ;
-         else
-            mfield->contents[0] = 0 ;
-         field->memo->status = 0 ;
-         mfield->len = 0 ;
-         return 0 ;
-      }
-      else
-      {
-         if ( (long)mfield->lenMax < out->memoLen )
-         {
-            if ( mfield->lenMax != 0 )
-               u4free( mfield->contents ) ;
-            mfield->lenMax = mfield->len = 0 ;
-            mfield->contents = (char *)u4allocFree( c4, out->memoLen + 1 ) ;
-            if ( mfield->contents == 0 )
-            {
-               mfield->contents = &f4memoNullChar ;
-               return error4stack( c4, e4memory, E90525 ) ;
-            }
-            mfield->lenMax = (unsigned int)out->memoLen ;
-         }
-      }
-      mfield->len = (unsigned int)out->memoLen ;
-
-      memcpy( mfield->contents, ((char *)out) + sizeof( CONNECTION4MEMO_INFO_OUT ), out->memoLen ) ;
-      mfield->contents[mfield->len] = 0 ;
-      field->memo->status = 0 ;
-      return 0 ;
-   #else
       #ifndef S4OFF_MULTI
          if ( c4getReadLock( c4 ) )
          {
@@ -355,7 +278,6 @@ int f4memoRead( FIELD4 *field )
          return error4stack( c4, rc, E90525 ) ;
 
       return 0 ;
-   #endif
 }
 
 int f4memoReadLow( FIELD4 *field )

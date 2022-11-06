@@ -29,66 +29,6 @@ int S4FUNCTION d4remove( DATA4 *data )
    return rc ;
 }
 
-#ifdef S4CLIENT
-int dfile4remove( DATA4FILE *data )
-{
-   CODE4 *c4 ;
-   int finalRc ;
-   INDEX4FILE *i4 ;
-
-   #ifdef E4PARM_LOW
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E96401 ) ;
-   #endif
-
-   #ifdef E4ANALYZE
-      if ( data->userCount <= 0 )
-         return error4( 0, e4struct, E96401 ) ;
-   #endif
-
-   c4 = data->c4 ;
-   finalRc = error4set( c4, 0 ) ;
-
-   data->userCount-- ;
-   if ( data->userCount == 0 )
-   {
-      if ( data->info != 0 )
-      {
-         u4free( data->info ) ;
-         data->info = 0 ;
-      }
-
-      if ( data->connection == 0 )
-         finalRc = e4connection ;
-      else
-      {
-         connection4assign( data->connection, CON4REMOVE, 0, data->serverId ) ;
-         connection4sendMessage( data->connection ) ;
-         finalRc = connection4receiveMessage( data->connection ) ;
-         if ( finalRc >= 0 )
-            finalRc = connection4status( data->connection ) ;
-      }
-
-      #ifndef S4OFF_INDEX
-         for ( ;; )
-         {
-            i4 = (INDEX4FILE *)l4first( &data->indexes ) ;
-            if ( i4 == 0 )
-               break ;
-            index4close( i4 ) ;
-         }
-      #endif
-
-      l4remove( &c4->dataFileList, data ) ;
-      mem4free( c4->data4fileMemory, data ) ;
-      error4set( c4, finalRc ) ;
-      return finalRc ;
-   }
-   else
-      return error4( 0, e4remove, E86402 ) ;
-}
-#else
-
 #ifdef S4SERVER
 int d4clearTables( DATA4FILE *data )
 {
@@ -207,4 +147,3 @@ int S4FUNCTION dfile4remove( DATA4FILE *data )
 
    return rc ;
 }
-#endif  /* S4CLIENT */

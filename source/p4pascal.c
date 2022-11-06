@@ -93,8 +93,8 @@ short S4FUNCTION report4doP(REPORT4 *r4);
 CODE4 S4PTR * S4FUNCTION code4initP( void ) ;
 int S4FUNCTION code4initUndoP ( CODE4 S4PTR * ) ;
 
-S4EXPORT int S4FUNCTION d4logStatusP( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4tagSelectP( DATA4 S4PTR *, TAG4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4logStatusP( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4tagSelectP( DATA4 S4PTR *, TAG4 S4PTR * ) ;
 int S4FUNCTION d4writeP( DATA4 S4PTR *, long ) ;
 
 int S4FUNCTION expr4lenP                  ( EXPR4 S4PTR * ) ;
@@ -105,11 +105,11 @@ int S4FUNCTION expr4typeP                 ( EXPR4 S4PTR * ) ;
 DATA4 S4PTR * S4FUNCTION relate4dataP       ( RELATE4 S4PTR * ) ;
 TAG4 S4PTR * S4FUNCTION relate4dataTagP     ( RELATE4 S4PTR * ) ;
 RELATE4 S4PTR * S4FUNCTION relate4masterP   ( RELATE4 S4PTR * ) ;
-S4EXPORT S4CONST char S4PTR * S4FUNCTION relate4masterExprP ( RELATE4 S4PTR * ) ;
+PUBLIC S4CONST char S4PTR * S4FUNCTION relate4masterExprP ( RELATE4 S4PTR * ) ;
 
-S4EXPORT S4CONST char S4PTR * S4FUNCTION t4exprP    ( TAG4 S4PTR * ) ;
-S4EXPORT S4CONST char S4PTR * S4FUNCTION t4filterP  ( TAG4 S4PTR * ) ;
-S4EXPORT S4CONST TAG4 *S4FUNCTION t4openP (DATA4 S4PTR *d4, INDEX4 S4PTR *i4ndx, S4CONST char *fileName);
+PUBLIC S4CONST char S4PTR * S4FUNCTION t4exprP    ( TAG4 S4PTR * ) ;
+PUBLIC S4CONST char S4PTR * S4FUNCTION t4filterP  ( TAG4 S4PTR * ) ;
+PUBLIC S4CONST TAG4 *S4FUNCTION t4openP (DATA4 S4PTR *d4, INDEX4 S4PTR *i4ndx, S4CONST char *fileName);
 
 /*********************************************************************
   End Prototypes
@@ -962,7 +962,7 @@ int S4FUNCTION d4tagSelectP( DATA4 S4PTR * d4, TAG4 S4PTR * tag )
    The 'P' is added to avoid conflicts.
 ******************************************************************************/
 
-S4EXPORT int S4FUNCTION d4logStatusP( DATA4 S4PTR *d4 )
+PUBLIC int S4FUNCTION d4logStatusP( DATA4 S4PTR *d4 )
 {
    if ( d4 == 0 )
    {
@@ -1058,7 +1058,7 @@ RELATE4 S4PTR * S4FUNCTION relate4masterP   ( RELATE4 *r4 )
         return r4->master ;
 }
 
-S4EXPORT S4CONST char S4PTR * S4FUNCTION relate4masterExprP ( RELATE4 *r4 )
+PUBLIC S4CONST char S4PTR * S4FUNCTION relate4masterExprP ( RELATE4 *r4 )
 {
         if ( r4 == 0 )
         {
@@ -1069,7 +1069,7 @@ S4EXPORT S4CONST char S4PTR * S4FUNCTION relate4masterExprP ( RELATE4 *r4 )
         return relate4masterExpr( r4 ) ; /* (r4)->masterExpr->source ; */
 }
 
-S4EXPORT S4CONST char S4PTR * S4FUNCTION t4exprP( TAG4 S4PTR *t4 )
+PUBLIC S4CONST char S4PTR * S4FUNCTION t4exprP( TAG4 S4PTR *t4 )
 {
         if ( t4 == 0 )
         {
@@ -1077,27 +1077,19 @@ S4EXPORT S4CONST char S4PTR * S4FUNCTION t4exprP( TAG4 S4PTR *t4 )
            FatalAppExit( 0, E4_MESSAG_EXI ) ;
         }
 
-        #ifdef S4CLIENT
-        return t4exprLow( t4 ); /* (t4)->tagFile->expr->source ; */
-        #else
         if ( (t4)->tagFile->expr )
            return (t4)->tagFile->expr->source ;
         return NULL ;
-        #endif /* S4CLIENT */
 }
 
-S4EXPORT S4CONST char S4PTR * S4FUNCTION t4filterP  ( TAG4 S4PTR *t4 )
+PUBLIC S4CONST char S4PTR * S4FUNCTION t4filterP  ( TAG4 S4PTR *t4 )
 {
-        #ifdef S4CLIENT
-                return t4filterLow( t4 ) ;
-        #else
         if ( (t4)->tagFile->filter )
            return (t4)->tagFile->filter->source ;
         return NULL ;
-        #endif ;
 }
 
-S4EXPORT S4CONST TAG4 *S4FUNCTION t4openP (DATA4 S4PTR *d4, INDEX4 S4PTR *i4ndx, S4CONST char *fileName)
+PUBLIC S4CONST TAG4 *S4FUNCTION t4openP (DATA4 S4PTR *d4, INDEX4 S4PTR *i4ndx, S4CONST char *fileName)
 {
    return t4openLow(d4,i4ndx,fileName,0);
 }

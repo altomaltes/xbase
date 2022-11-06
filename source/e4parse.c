@@ -463,9 +463,6 @@ static int e4massage( E4PARSE *p4 )
 
       /* make sure there is enough key space allocated for the type,
          in case a partial evaluation occurs */
-      #ifdef S4CLIENT
-         storedKeyLen = (unsigned)(length[numParms]) ;
-      #else
          switch( types[numParms] )
          {
             #ifdef S4FOX
@@ -508,7 +505,6 @@ static int e4massage( E4PARSE *p4 )
          #ifdef S4FOX
             storedKeyLen++ ;    /* null entry will increase length by one */
          #endif
-      #endif
 
       u4allocAgain( codeBase, &codeBase->storedKey, &codeBase->storedKeyLen, (unsigned)storedKeyLen + 1 ) ;
 

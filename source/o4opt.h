@@ -43,7 +43,7 @@ typedef struct
    extern "C" {
 #endif
 
-S4EXPORT int S4FUNCTION c4calcType( unsigned long ) ;
+PUBLIC int S4FUNCTION c4calcType( unsigned long ) ;
 
 int d4updatePrio( CODE4 * ) ;
 void file4setWriteOpt( FILE4 *, int ) ;

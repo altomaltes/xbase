@@ -243,9 +243,7 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
          #endif
       #endif
    #endif
-   #ifndef S4SERVER
       int rc ;
-   #endif
    #ifndef S4OFF_OPTIMIZE
       #ifdef S4OPTIMIZE_STATS
          DATA4 *stat ;
@@ -366,9 +364,7 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
 
    /* Flags initialization */
 
-   #ifndef S4SERVER
       c4setErrCreate( c4, 1 ) ;
-   #endif
    c4->errDefaultUnique = r4uniqueContinue ;
    c4->errExpr = 1 ;
    c4->errFieldName = 1 ;
@@ -477,13 +473,10 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
 
    #ifndef S4OPTIMIZE_OFF
       c4->doOpt = 1 ;   /* by default do optimization */
-      #ifndef S4SERVER
          c4->optimize = OPT4EXCLUSIVE ;   /* by default optimize non-shared files */
          c4->optimizeWrite = OPT4EXCLUSIVE ;
-      #endif  /* S4SERVER */
    #endif  /* not S4OPTIMIZE_OFF */
 
-   #ifndef S4SERVER
       rc = code4tranInit( c4 ) ;
       if ( rc < 0 )
       {
@@ -514,7 +507,6 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
             code4dateFormatSet( c4, "DD-MM-YYYY" ) ;
          #endif
       #endif
-   #endif
 
    #ifdef S4FILE_EXTENDED
       #ifdef S4FOX
@@ -555,7 +547,6 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
       #endif
    }
 
-   #ifndef S4SERVER
       #ifndef S4SINGLE
          #ifdef S4CB51
             code4unlockAutoSet( c4, LOCK4DATA ) ;
@@ -563,7 +554,6 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
             code4unlockAutoSet( c4, LOCK4ALL ) ;
          #endif
       #endif
-   #endif
 
    #ifndef S4OFF_OPTIMIZE
       #ifdef S4OPTIMIZE_STATS
@@ -761,14 +751,12 @@ void S4FUNCTION expr4calcDelete( EXPR4CALC *calc )
 
    c4 = calc->expr->codeBase ;
 
-   #ifndef S4SERVER
       if( calc->total != 0 )
       {
          expr4free( calc->total->resetExpression );
          l4remove( &c4->totalList, calc->total ) ;
          mem4free( c4->totalMemory, calc->total ) ;
       }
-   #endif
    #ifdef S4SERVER
       l4remove( &c4->currentClient->calcList, calc ) ;
    #else
@@ -811,9 +799,7 @@ void S4FUNCTION code4calcReset( CODE4 *c4 )
 
 static int code4initUndo2( CODE4 *c4, int doClose )
 {
-   #ifndef S4SERVER
       int errCode ;
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( c4 == 0 )
@@ -1088,10 +1074,8 @@ static int code4initUndo2( CODE4 *c4, int doClose )
       #endif
    #endif
 
-   #ifndef S4SERVER
       /* the server has no current SERVER4CLIENT to get error code of */
       errCode = error4code( c4 ) ;
-   #endif
    c4->initialized = 0 ;
    if ( c4->didAlloc == 1 )
       u4free( c4 ) ;
@@ -1116,7 +1100,6 @@ static int code4initUndo2( CODE4 *c4, int doClose )
    #endif
 }
 
-#ifndef S4SERVER
 void S4FUNCTION code4exit( CODE4 *c4 )
 {
    int rc ;
@@ -1143,7 +1126,6 @@ void S4FUNCTION code4exit( CODE4 *c4 )
       #endif
    #endif
 }
-#endif /* S4SERVER */
 
 int S4FUNCTION code4initUndo( CODE4 *c4 )
 {
@@ -1154,7 +1136,6 @@ int S4FUNCTION code4initUndo( CODE4 *c4 )
    #endif
 }
 
-#ifndef S4SERVER
 int S4FUNCTION code4close( CODE4 *c4 )
 {
    DATA4 *dataOn, *dataNext ;
@@ -1192,7 +1173,6 @@ int S4FUNCTION code4close( CODE4 *c4 )
       return error4code( c4 ) ;
    return 0 ;
 }
-#endif
 
 /* input must be in capital letters */
 DATA4FILE *dfile4data( CODE4 *c4, const char *aliasName )
@@ -1369,9 +1349,7 @@ DATA4 *tran4data( TRAN4 *trans, const long serverId, const long clientId )
       if ( dataOn == 0 )
          break ;
       if ( data4serverId( dataOn ) == serverId )
-         #ifndef S4SERVER
             if ( data4clientId( dataOn ) == clientId )
-         #endif
          {
             #ifdef S4SERVER
                dataOn->clientId = clientId ;
@@ -1898,7 +1876,7 @@ long S4FUNCTION u4switch()
           + E4OFF_STRING_VAL + E4PARM_HIGH_VAL + E4PAUSE_VAL + E4STOP_VAL +
           E4STOP_CRITICAL_VAL + S4OFF_INDEX_VAL + S4OFF_MEMO_VAL +
           S4OFF_MULTI_VAL + S4OFF_OPTIMIZE_VAL +
-/*          S4OFF_REPORT_VAL + S4OFF_TRAN_VAL + S4OFF_WRITE_VAL +  S4CLIENT_VAL +  no room */
+/*          S4OFF_REPORT_VAL + S4OFF_TRAN_VAL + S4OFF_WRITE_VAL +  S4CLIEN T_VAL +  no room */
 
 
            S4STAND_ALONE_VAL ) ;
@@ -2425,7 +2403,7 @@ int S4FUNCTION code4osVersion(void)
       return ver4Unix ;
    #endif
 }
-#endif /* S4CLIENT */
+#endif
 
 
 #ifndef S4OFF_TRAN

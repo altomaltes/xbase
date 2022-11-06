@@ -64,25 +64,6 @@
 #endif
 
 #ifndef S4SINGLE
-#ifdef S4CLIENT
-static char this4application[] = "THIS APPLICATION" ;
-int dfile4registerLocked( DATA4FILE *locker, const long lockId )
-{
-   CODE4 *c4 ;
-
-   if ( locker == 0 )
-      return 0 ;
-
-   c4 = locker->c4 ;
-
-   c4->lockedLockItem = lockId ;
-   c4->lockedFileName = locker->accessName ;
-   c4->lockedUserName = this4application ;
-   c4->lockedNetName = this4application ;
-
-   return 0 ;
-}
-#else
 int dfile4registerLocked( DATA4FILE *d4, const long lockId, int doExtra )
 {
    DATA4 *lockedData ;
@@ -166,7 +147,6 @@ int dfile4registerLocked( DATA4FILE *d4, const long lockId, int doExtra )
 
    return 0 ;
 }
-#endif /* S4CLIENT */
 #endif /* S4SINGLE */
 
 #ifdef S4SERVER

@@ -81,12 +81,6 @@ void inter4( void *input )
    SIGNAL4ROUTINE *routineToExecute ;
    long waitTime;
    int rc ;
-   #ifdef S4CLIENT
-      #ifdef S4DEAD_CHECK
-         long checkTime, currentTime ;
-         int i = 0 ;
-      #endif
-   #endif
 
    #ifdef E4PARM_LOW
       if ( inter == NULL )
@@ -96,16 +90,7 @@ void inter4( void *input )
       }
    #endif
 
-   #ifdef S4CLIENT
-      #ifdef S4DEAD_CHECK
-         waitTime = INTER4WAITTIME*1000 ;
-         checkTime = time( NULL ) + DEAD4CHECK_TIMEOUT ;
-      #else
-         waitTime = INFINITE ;
-      #endif
-   #else
       waitTime = INFINITE ;
-   #endif
 
 
    while ( 1 )
@@ -116,21 +101,6 @@ void inter4( void *input )
          ;  /* Figure out later what should happen on error */
       if ( routineToExecute != NULL )
          routineToExecute->routine( inter, routineToExecute ) ;
-      #ifdef S4CLIENT
-      #ifdef S4DEAD_CHECK
-         if ( i==DEAD4CHECK_LOOP )
-         {
-            currentTime = time( NULL ) ;
-            i = 0 ;
-            if ( currentTime > checkTime )
-            {
-               inter4connectionCheck( inter ) ;
-               checkTime = currentTime + DEAD4CHECK_TIMEOUT ;
-            }
-         }
-         i++ ;
-      #endif
-      #endif
    }
 }
 
@@ -277,22 +247,6 @@ void inter4completeRequired( INTER4 *inter, SIGNAL4ROUTINE *signal )
    }
    semaphore4release( &conThread->completedSemaphore ) ;
 }
-
-#ifdef S4DEAD_CHECK
-#ifdef S4CLIENT
-
-void inter4connectionCheck( INTER4 *inter )
-{
-   CONNECT4LOW conlow ;
-   CONNECT4 *connect ;
-
-   connect = &inter->cb->clientConnect ;
-   connect4lowConnectConnect( &conlow, &connect->address, connect->addrLen ) ;
-   connect4lowWrite( &conlow, ( char * )&connect->clientId, 4 ) ;
-   connect4lowClose( &conlow ) ;
-}
-#endif /* S4CLIENT */
-#endif /* S4DEAD_CHECK */
 
 void inter4error( INTER4 *inter, CONNECT4THREAD *connectThread )
 {

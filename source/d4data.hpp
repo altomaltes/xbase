@@ -111,11 +111,6 @@ public:
    int calcCreate( Expr4 ex, const char *name ) { return ( code4calcCreate( this, ex.expr, name ) ) ? r4success : -1 ; }
    void calcReset()            { code4calcReset( this ) ; }
    int  closeAll()             { return code4close( this ) ; }
-#ifdef S4CLIENT
-   int connect( S4CONST char *serverId=DEF4SERVER_ID, S4CONST char *processId=DEF4PROCESS_ID,
-                S4CONST char *userName = "PUBLIC", S4CONST char *password = 0, S4CONST char *protocol = ( char * )PROT4DEFAULT )
-       { return code4connect( this, serverId, processId, userName, password, protocol ) ; }
-#endif
    Data4 data( const char * ) ;
    const char S4PTR* dateFormat()  { return code4dateFormat( this ) ; }
    int dateFormat( const char *format ) { return code4dateFormatSet( this, format ) ; }
@@ -135,10 +130,6 @@ public:
    void lockClear()           { code4lockClear( this ) ; }
    const char *lockFileName() {return code4lockFileName( this ); }
    long lockItem()            { return code4lockItem( this ) ; }
-   #ifdef S4CLIENT
-      const char S4PTR* lockUserId()    { return code4lockUserId( this ) ; }
-      const char S4PTR* lockNetworkId() { return code4lockNetworkId( this ) ; }
-   #endif
    #ifdef S4SERVER
       const char S4PTR* lockUserId()    { return code4lockUserId( this ) ; }
       const char S4PTR* lockNetworkId() { return code4lockNetworkId( this ) ; }

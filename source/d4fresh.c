@@ -9,13 +9,9 @@ int S4FUNCTION d4refresh( DATA4 *data )
          return error4( 0, e4parm_null, E94201 ) ;
    #endif
 
-   #ifdef S4CLIENT
-      return 0 ;
-   #else
       if ( dfile4refresh( data->dataFile ) < 0 )
          return -1 ;
       return d4freeBlocks( data ) ;
-   #endif
 }
 
 #ifdef P4ARGS_USED

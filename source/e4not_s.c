@@ -44,7 +44,7 @@
    #endif
 #endif
 
-#ifndef S4CLIENT_OR_FOX
+#ifndef CLIENT_OR_FOX
    #ifndef S4OFF_CLIENT_OR_FOX_OR_WRITE
       #define S4OFF_CLIENT_OR_FOX_OR_WRITE
    #endif
@@ -132,15 +132,6 @@
    #endif
    #ifndef S4OFF_N4OTHER_INDEX_WRITE
       #define S4OFF_N4OTHER_INDEX_WRITE
-   #endif
-#endif
-
-#ifdef S4CLIENT
-   #ifndef ON_CLIENT_OFF_TRAN
-      #define ON_CLIENT_OFF_TRAN
-   #endif
-   #ifndef S4OFF_INDEX_WRITE_OR_CLIENT
-      #define S4OFF_INDEX_WRITE_OR_CLIENT
    #endif
 #endif
 
@@ -282,7 +273,7 @@ void S4FUNCTION f4assignNull( FIELD4 *field )
 }
 #endif /* S4OFF_CLIENT_OR_FOX_OR_WRITE */
 
-#ifndef S4CLIENT_OR_FOX
+#ifndef CLIENT_OR_FOX
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -290,7 +281,7 @@ int S4FUNCTION f4null( const FIELD4 *field )
 {
    return error4( field->data->codeBase, e4notSupported, E90540 ) ;
 }
-#endif /* S4CLIENT_OR_FOX */
+#endif /* CLIENT_OR_FOX */
 
 #ifdef S4WINDOWS
 #ifdef S4OFF_REPORT

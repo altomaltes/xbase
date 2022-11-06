@@ -8,15 +8,9 @@ int dfile4lock( DATA4FILE *data, const long clientId, const long serverId, const
 {
    int rc ;
    CODE4 *c4 ;
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      CONNECTION4LOCK_INFO_IN *info ;
-      long recNum ;
-   #else
       FILE4LONG position ;
       LOCK4 *lock, *lockOn ;
       SINGLE4DISTANT singleDistant ;
-   #endif
    #ifdef S4FOX
       FILE4LONG pos2 ;
    #endif
@@ -35,32 +29,6 @@ int dfile4lock( DATA4FILE *data, const long clientId, const long serverId, const
    if ( error4code( c4 ) < 0 )
       return e4codeBase ;
 
-   #ifdef S4CLIENT
-      if ( data->lockTest != 0 && code4unlockAuto( c4 ) != LOCK4ALL )
-      {
-         if ( c4->lockAttempts == WAIT4EVER )
-            return error4( c4, e4lock, E81523 ) ;
-         else
-            return r4locked ;
-      }
-
-      connection = data->connection ;
-      if ( connection == 0 )
-         rc = e4connection ;
-      else
-      {
-         connection4assign( connection, CON4LOCK, clientId, data->serverId ) ;
-         connection4addData( connection, NULL, sizeof( CONNECTION4LOCK_INFO_IN ), (void **)&info ) ;
-         info->type = htons(LOCK4RECORD) ;
-         recNum = htonl(rec) ;
-         connection4addData( connection, &recNum, sizeof( recNum ), NULL ) ;
-         rc = connection4repeat( connection ) ;
-
-         if ( rc < 0 )
-            connection4error( connection, c4, rc, E91102 ) ;
-      }
-      return rc ;
-   #else
       if ( dfile4lockTest( data, clientId, serverId, rec ) > 0 )  /* if record or file already locked */
          return 0 ;
 
@@ -154,7 +122,6 @@ int dfile4lock( DATA4FILE *data, const long clientId, const long serverId, const
          single4distantNext( &singleDistant ) ;
       }
       return 0 ;
-   #endif
 }
 
 #ifndef S4CLIPPER
@@ -170,10 +137,6 @@ int dfile4lockAppend( DATA4FILE *data, const long clientId, const long serverId 
 {
    int rc ;
    CODE4 *c4 ;
-   #ifdef S4CLIENT
-      CONNECTION4LOCK_INFO_IN *info ;
-      CONNECTION4 *connection ;
-   #endif
 
    #ifdef E4PARM_LOW
       if ( data == 0 || clientId == 0
@@ -188,25 +151,6 @@ int dfile4lockAppend( DATA4FILE *data, const long clientId, const long serverId 
    if ( error4code( c4 ) < 0 )
       return -1 ;
 
-   #ifdef S4CLIENT
-      if ( data->lockTest != 0 && code4unlockAuto( c4 ) != LOCK4ALL )
-      {
-         if ( c4->lockAttempts == WAIT4EVER )
-            return error4( c4, e4lock, E81523 ) ;
-         else
-            return r4locked ;
-      }
-
-      connection = data->connection ;
-      if ( connection == 0 )
-         return e4connection ;
-      connection4assign( connection, CON4LOCK, clientId, data->serverId ) ;
-      connection4addData( connection, NULL, sizeof( CONNECTION4LOCK_INFO_IN ), (void **)&info ) ;
-      info->type = htons(LOCK4APPEND) ;
-      rc = connection4repeat( connection ) ;
-      if ( rc < 0 )
-         return connection4error( connection, c4, rc, E91102 ) ;
-   #else
       if ( dfile4lockTestAppend( data, clientId, serverId ) )
          return 0 ;
 
@@ -240,7 +184,6 @@ int dfile4lockAppend( DATA4FILE *data, const long clientId, const long serverId 
       }
       if ( rc == r4locked )
          dfile4registerLocked( data, 0L, 0 ) ;
-   #endif
 
    return rc ;
 }
@@ -249,20 +192,10 @@ int dfile4lockAppend( DATA4FILE *data, const long clientId, const long serverId 
    #error additive locks no longer supported
 #endif
 
-#ifdef S4CLIENT
-int dfile4lockFile( DATA4FILE *data, const long clientId, const long serverId, DATA4 *d4 )
-#else
 int dfile4lockFile( DATA4FILE *data, const long clientId, const long serverId )
-#endif
 {
    int rc = 0 ;
    CODE4 *c4 ;
-   #ifdef S4CLIENT
-      CONNECTION4LOCK_INFO_IN *info ;
-      CONNECTION4 *connection ;
-
-      memset( &info, 0, sizeof( CONNECTION4LOCK_INFO_IN ) ) ;
-   #endif
 
    #ifdef E4PARM_LOW
       if ( data == 0 || clientId == 0
@@ -277,27 +210,6 @@ int dfile4lockFile( DATA4FILE *data, const long clientId, const long serverId )
    if ( error4code( c4 ) < 0 )
       return e4codeBase ;
 
-   #ifdef S4CLIENT
-      if ( data->lockTest != 0 && code4unlockAuto( c4 ) != LOCK4ALL )
-      {
-         if ( c4->lockAttempts == WAIT4EVER )
-            return error4( c4, e4lock, E81523 ) ;
-         else
-            return r4locked ;
-      }
-      connection = data->connection ;
-      if ( connection == 0 )
-         return e4connection ;
-      connection4assign( connection, CON4LOCK, clientId, data->serverId ) ;
-      connection4addData( connection, NULL, sizeof( CONNECTION4LOCK_INFO_IN ), (void **)&info ) ;
-      info->type = htons(LOCK4FILE) ;
-      rc = connection4repeat( connection ) ;
-      if ( rc < 0 )
-         connection4error( connection, c4, rc, E91102 ) ;
-      if ( rc == 0 )
-         data->fileLock = d4 ;
-      return rc ;
-   #else
       if ( dfile4lockTestFile( data, clientId, serverId ) )
          return 0 ;
 
@@ -364,39 +276,9 @@ int dfile4lockFile( DATA4FILE *data, const long clientId, const long serverId )
          file4refresh( &data->file ) ;   /* make sure all up to date */
       #endif
       return 0 ;
-   #endif /* S4CLIENT */
 }
 
-#ifdef S4CLIENT
-int dfile4lockAll( DATA4FILE *data, const long clientId, const long serverId )
-{
-   CONNECTION4LOCK_INFO_IN *info ;
-   CONNECTION4 *connection ;
-   int rc ;
-   CODE4 *c4 ;
 
-   #ifdef E4PARM_LOW
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
-   #endif
-
-   c4 = data->c4 ;
-   if ( error4code( c4 ) < 0 )
-      return e4codeBase ;
-
-   connection = data->connection ;
-   if ( connection == 0 )
-      return e4connection ;
-   connection4assign( connection, CON4LOCK, clientId, data->serverId ) ;
-   connection4addData( connection, NULL, sizeof( CONNECTION4LOCK_INFO_IN ), (void **)&info ) ;
-   info->type = htons(LOCK4ALL) ;
-   rc = connection4repeat( connection ) ;
-   if ( rc < 0 )
-      connection4error( connection, c4, rc, E91102 ) ;
-   return rc ;
-}
-#else
-/* not S4CLIENT */
 int S4FUNCTION dfile4lockIndex( DATA4FILE *data, const long serverId )
 {
    #ifndef S4INDEX_OFF
@@ -504,7 +386,6 @@ int S4FUNCTION dfile4lockIndex( DATA4FILE *data, const long serverId )
    #endif
 }
 
-/* not S4CLIENT */
 int dfile4lockAll( DATA4FILE *data, const long clientId, const long serverId )
 {
    int rc, saveUnlockAuto ;
@@ -551,7 +432,6 @@ int dfile4lockAll( DATA4FILE *data, const long clientId, const long serverId )
 
    return rc ;
 }
-#endif /* S4CLIENT */
 
 /* if rec == -1, then any lock is checked */
 /* for client, if clientId == 0, then any d4 with a lock will return success */
@@ -560,14 +440,10 @@ int dfile4lockAll( DATA4FILE *data, const long clientId, const long serverId )
 int dfile4lockTest( DATA4FILE *data, const long clientId, const long serverId, const long rec )
 {
    int rc ;
-   #ifdef S4CLIENT
-      LOCK4LINK *lock ;
-   #else
       LOCK4 *lock ;
       #ifdef E4MISC
          long recSave ;
       #endif
-   #endif
 
    #ifdef E4PARM_LOW
       if ( data == 0 )
@@ -578,33 +454,6 @@ int dfile4lockTest( DATA4FILE *data, const long clientId, const long serverId, c
    if ( rc )
       return rc ;
 
-   #ifdef S4CLIENT
-      if ( data->fileLock != 0 )
-      {
-         data->lockTest = data->fileLock ;
-         return 0 ;
-      }
-
-      for( lock = (LOCK4LINK *)single4initIterate( &data->lockedRecords ) ;; )
-      {
-         if ( lock == 0 )
-            break ;
-         if ( lock->recNo == rec || rec == -1L )
-         {
-            if ( clientId == 0 )   /* if clintId == 0 then any lock is considered success */
-               return 1 ;
-            if ( lock->data->clientId == clientId )
-               return 1 ;
-            else
-            {
-               data->lockTest = lock->data ;
-               return 0 ;
-            }
-         }
-         lock = (LOCK4LINK *)single4next( &lock->link ) ;
-      }
-      return 0 ;
-   #else
       #ifdef E4MISC
          /* verify the order of the list */
          lock = (LOCK4 *)single4initIterate( &data->lockedRecords ) ;
@@ -671,10 +520,9 @@ int dfile4lockTest( DATA4FILE *data, const long clientId, const long serverId, c
          }
       }
       return 0 ;
-   #endif /* S4CLIENT */
 }
 
-/* not S4CLIENT */
+
 int dfile4lockTestIndex( DATA4FILE *data, const long serverId )
 {
    #ifndef S4INDEX_OFF
@@ -736,21 +584,6 @@ int S4FUNCTION dfile4lockTestAppend( DATA4FILE *data, const long clientId, const
    #ifdef S4SINGLE
       return 1 ;
    #else
-      #ifdef S4CLIENT
-         data->lockTest = 0 ;
-         if ( data->appendLock != 0 )
-         {
-            if ( data->appendLock->clientId == clientId )
-               return 1 ;
-            data->lockTest = data->appendLock ;
-            return 0 ;
-         }
-
-         if ( data->fileLock != 0 )
-            return ( data->fileLock->clientId == clientId ) ;
-
-         return 0 ;
-      #else
          int rc ;
 
          if ( data == 0 )
@@ -767,7 +600,6 @@ int S4FUNCTION dfile4lockTestAppend( DATA4FILE *data, const long clientId, const
             return ( data->appendServerLock == serverId ) ;
          else
             return ( data->appendServerLock == serverId && data->appendClientLock == clientId ) ;
-      #endif /* S4CLIENT */
    #endif /* S4SINGLE */
 }
 
@@ -779,19 +611,6 @@ int S4FUNCTION dfile4lockTestFile( DATA4FILE *data, const long clientId, const l
    #ifdef S4SINGLE
       return 1 ;
    #else
-      #ifdef S4CLIENT
-         data->lockTest = 0 ;
-         if ( data->accessMode != OPEN4DENY_NONE )
-            return 1 ;
-         if ( data->fileLock != 0 )
-         {
-            if ( data->fileLock->clientId == clientId )
-               return 1 ;
-            data->lockTest = data->fileLock ;
-            return 0 ;
-         }
-         return 0 ;
-      #else
          if ( data == 0 )
             return error4( 0, e4parm_null, E91102 ) ;
 
@@ -843,6 +662,5 @@ int S4FUNCTION dfile4lockTestFile( DATA4FILE *data, const long clientId, const l
          }
          else
             return ( data->fileServerLock == serverId && data->fileClientLock == clientId ) ;
-      #endif /* S4CLIENT */
    #endif /* S4SINGLE */
 }

@@ -120,7 +120,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
    char *savePtr ;
    char fieldBuf[2] ;
    FIELD4IMAGE *image ;
-   #ifdef S4CLIENT_OR_FOX
+   #ifdef CLIENT_OR_FOX
       int nullCount ;
    #endif
 
@@ -214,7 +214,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
 
    recOffset = 1 ;
 
-   #ifdef S4CLIENT_OR_FOX
+   #ifdef CLIENT_OR_FOX
       nullCount = 0 ;
    #endif
 
@@ -228,7 +228,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
          c4upper( fieldBuf ) ;
          d4->fields[iFields].type = *fieldBuf ;
          fieldType = d4->fields[iFields].type ;
-         #ifdef S4CLIENT_OR_FOX
+         #ifdef CLIENT_OR_FOX
             if ( d4version( d4 ) == 0x30 )  /* FOX 3.0 */
             {
                d4->fields[iFields].null = ( image->nullBinary & 0x02 ) ? 1 : 0 ;
@@ -251,7 +251,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
 
          switch( fieldType )
          {
-            #ifdef S4CLIENT_OR_FOX
+            #ifdef CLIENT_OR_FOX
                case r4int:
             #endif
             case r4log:
@@ -269,7 +269,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
                break ;
             case r4num:
             case r4float:
-            #ifdef S4CLIENT_OR_FOX
+            #ifdef CLIENT_OR_FOX
                case r4currency:
                case r4dateTime:
             #endif
@@ -345,16 +345,6 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
    d4->recordOld[recWidth] = 0 ;
 
    #ifndef S4OFF_INDEX
-      #ifdef S4CLIENT
-         /* client will get all the index tags if autoOpen set to 1, else
-            will get none -- this is an undocumented side-effect */
-         if ( d4->dataFile->indexes.nLink > 0 && c4->autoOpen == 1 )
-         {
-            u4namePiece( nameBuf, sizeof( nameBuf ), name, 0, 0 ) ;
-            if ( i4setup( c4, d4, nameBuf, 1, 0 ) < 0 )
-               return -1 ;
-         }
-      #else
          #ifdef S4CLIPPER
             if ( c4->autoOpen )
             {
@@ -405,7 +395,6 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
                d4->dataFile->openMdx = 1 ;
             }
          #endif
-      #endif  /* S4CLIENT */
    #endif  /* S4OFF_INDEX */
 
    #ifndef S4SERVER
@@ -556,15 +545,11 @@ DATA4 *S4FUNCTION d4openClone( DATA4 *dataOld )
    char *info ;
    #ifndef S4OFF_INDEX
       TAG4 *tagNew, *tagOld ;
-      #ifdef S4CLIENT
-         INDEX4 *i4, *i42 ;
-      #else
          #ifdef S4CLIPPER
             TAG4 *t4, *t42 ;
          #else
             INDEX4 *i4 ;
          #endif
-      #endif
    #endif
    #ifndef S4SERVER
       int oldSingleOpen ;
@@ -609,29 +594,6 @@ DATA4 *S4FUNCTION d4openClone( DATA4 *dataOld )
       module in client/server */
 
    #ifndef S4OFF_INDEX
-      #ifdef S4CLIENT
-         for ( i4 = 0 ;; )
-         {
-            i4 = (INDEX4 *)l4next( &dataOld->indexes, i4 ) ;
-            if ( i4 == NULL )
-               break ;
-            for( i42 = 0 ;; )   /* see if exists first (i.e. production) */
-            {
-               i42 = (INDEX4 *)l4next( &d4->indexes, i42 ) ;
-               if ( i42 == 0 )
-               {
-                  #ifdef S4CLIENT
-                     i4open( d4, i4->alias ) ;
-                  #else
-                     i4open( d4, i4->accessName ) ;
-                  #endif
-                  break ;
-               }
-               if ( i42->indexFile == i4->indexFile )  /* don't open */
-                  break ;
-            }
-         }
-      #else
          #ifdef S4CLIPPER
             for ( t4 = 0 ;; )
             {
@@ -660,7 +622,6 @@ DATA4 *S4FUNCTION d4openClone( DATA4 *dataOld )
                      i4open( d4, i4->accessName ) ;
             }
          #endif /* S4CLIPPER */
-      #endif /* S4CLIENT */
       /* now go through all the tags, and set the unique settings to the same as the old data */
       for ( tagOld = 0 ;; )
       {
@@ -687,105 +648,6 @@ DATA4 *S4FUNCTION d4openClone( DATA4 *dataOld )
 }
 
 #ifndef S4OFF_INDEX
-#ifdef S4CLIENT
-int client4indexSetup( CODE4 *c4, DATA4 *d4, DATA4FILE *data, unsigned int numTags, const char *info, unsigned int iLen, const char *indexAlias, INDEX4 *i4ndx )
-{
-   unsigned int i ;
-   TAG4FILE *tag, *first ;
-   INDEX4FILE *i4file ;
-   long infoLen ;
-   DATA4FILE *oldDataFile ;
-   int doTags ;
-
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 || d4 == 0 || data == 0 || info == 0 )
-         return error4( c4, e4parm_null, E94302 ) ;
-   #endif
-
-   infoLen = iLen ;
-
-   if ( numTags == 0 )
-      return 0 ;
-
-   if ( c4->index4fileMemory == 0 )
-   {
-      c4->index4fileMemory = mem4create( c4, c4->memStartIndexFile, sizeof(INDEX4FILE), c4->memExpandIndexFile, 0 ) ;
-      if ( c4->index4fileMemory == 0 )
-         return e4memory ;
-   }
-
-   if ( c4->tagFileMemory == 0 )
-   {
-      c4->tagFileMemory = mem4create( c4, c4->memStartTagFile, sizeof(TAG4FILE), c4->memExpandTagFile, 0 ) ;
-      if ( c4->tagFileMemory == 0 )
-         return e4memory ;
-   }
-
-   oldDataFile = d4->dataFile ; ;
-   d4->dataFile = data ;
-   /* passing non-null into index4open will ensure that an actual open
-      does not occur, but simply a check will occur ... */
-   if ( i4ndx != 0 )
-      i4file = i4ndx->indexFile ;
-   else
-      i4file = index4open( d4, indexAlias, (INDEX4 *)1 ) ;
-   if ( i4file == 0 )
-   {
-      i4file = (INDEX4FILE *)mem4alloc( c4->index4fileMemory ) ;
-      if ( i4file == 0 )
-      {
-         d4->dataFile = oldDataFile ;
-         return error4stack( c4, e4memory, E94302 ) ;
-      }
-
-      i4file->codeBase = c4 ;
-      i4file->autoOpened = 1 ;
-      i4file->dataFile = data ;
-      i4file->clientId = data4clientId( d4 ) ;
-      i4file->serverId = data4serverId( d4 ) ;
-      d4->dataFile = oldDataFile ;
-
-      #ifdef E4MISC
-         if ( strlen( indexAlias ) > sizeof( i4file->accessName ) )
-            return error4describe( c4, e4name, E91102, indexAlias, 0, 0 ) ;
-      #endif
-      strcpy( i4file->accessName, indexAlias ) ;
-      c4upper( i4file->accessName ) ;
-
-      l4add( &data->indexes, i4file ) ;
-      doTags = 1 ;
-   }
-   else
-      doTags = 0 ;
-
-   /* only execute next if i4file was not blank and i4ndx was blank */
-   if ( i4ndx != 0 || doTags == 1 )   /* new index file, or add to existing */
-   {
-      for ( i = 0 ; i < numTags ; i++ )
-      {
-         tag = (TAG4FILE *)mem4alloc( c4->tagFileMemory ) ;
-         if ( tag == 0 )
-            return e4memory ;
-         infoLen -= LEN4TAG_ALIAS ;
-         if ( infoLen < 0 )
-            return e4connection ;
-         memcpy( tag->alias, info, LEN4TAG_ALIAS ) ;
-         tag->indexFile = i4file ;
-         info += LEN4TAG_ALIAS ;
-         tag->errUniqueHold = ntohs(*(short *)info) ;
-         info += sizeof( short int ) ;
-         first = (TAG4FILE *)l4first( &i4file->tags ) ;
-         if ( first == 0 )
-            l4add( &i4file->tags, tag ) ;
-         else
-            l4addBefore( &i4file->tags, first, tag ) ;
-      }
-   }
-   else
-      d4->dataFile = oldDataFile ;
-   return 0 ;
-}
-#endif  /* S4CLIENT */
 #endif  /* not S4OFF_INDEX */
 
 #ifdef S4SERVER
@@ -1222,52 +1084,6 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
 
    l4add( &c4->dataFileList, &d4->link ) ;
 
-   #ifdef S4CLIENT
-      #ifdef E4MISC
-         if ( strlen( name ) > sizeof( d4->accessName ) )
-         {
-            error4describe( c4, e4name, E91102, name, 0, 0 ) ;
-            dfile4close( d4 ) ;
-            return 0 ;
-         }
-      #endif
-      strcpy( d4->accessName, name ) ;
-      c4upper( d4->accessName ) ;
-      d4->connection = connection ;
-      d4->recWidth = ntohs(dataInfo->recWidth) ;
-      d4->headerLen = ntohs(dataInfo->headerLen) ;
-      d4->version = dataInfo->version ;
-      d4->serverId = ntohl(dataInfo->serverId) ;
-      data->readOnly = dataInfo->readOnly ;
-
-      d4->infoLen = ntohs(dataInfo->infoLen) ;
-      d4->info = (char *)u4allocFree( c4, d4->infoLen ) ;
-      if ( d4->info == 0 )
-      {
-         dfile4close( d4 ) ;
-         return 0 ;
-      }
-      len2 = sizeof( CONNECTION4OPEN_INFO_OUT ) ;
-      memcpy( d4->info, connection4data( connection ) + len2, d4->infoLen ) ;
-      len2 += d4->infoLen ;
-
-      #ifndef S4OFF_INDEX
-         /* index file information... */
-         if ( c4->autoOpen == 1 && ntohs(dataInfo->numTags) > 0 )
-         {
-            u4namePiece( indexName, sizeof(indexName), name, 1, 0 ) ;
-            rc = client4indexSetup( c4, data, d4, ntohs(dataInfo->numTags), connection4data( connection ) + len2, (unsigned int)connection4len( connection ) - len2, indexName, 0 ) ;
-            if ( rc < 0 )
-            {
-               dfile4close( d4 ) ;
-               return 0 ;
-            }
-         }
-      #endif
-      #ifdef E4MISC
-         fieldDataLen = d4->infoLen ;
-      #endif
-   #else
       file4longAssign( pos, 0, 0 ) ;
       if ( file4readAllInternal( &d4->file, pos, &fullHeader, sizeof( fullHeader ) ) < 0 )
       {
@@ -1397,7 +1213,6 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
             }
          }
       #endif
-   #endif
 
    d4->numRecs = -1L ;
    *info = d4->info ;
@@ -1471,7 +1286,7 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
                #endif
             }
             break ;
-         #ifdef S4CLIENT_OR_FOX
+         #ifdef CLIENT_OR_FOX
             case r4currency:
             case r4int:
             case r4dateTime:
@@ -1548,11 +1363,7 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
          }
    #endif
 
-   #ifdef S4CLIENT
-      d4->accessMode = c4->accessMode ;
-   #else
       d4->valid = 1 ;   /* valid, so low closes will leave open. */
-   #endif
 
    #ifndef S4OFF_OPTIMIZE
       file4optimizeLow( &d4->file, c4->optimize, OPT4DBF, d4->recWidth, d4 ) ;

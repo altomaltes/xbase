@@ -43,17 +43,6 @@ unsigned long data4clientId( DATA4 *d4 )
 }
 #endif
 
-#ifdef S4CLIENT
-unsigned long S4FUNCTION data4serverId( DATA4 *d4 )
-{
-   return d4->dataFile->serverId ;
-}
-
-unsigned long data4clientId( DATA4 *d4 )
-{
-   return d4->clientId ;
-}
-#endif
 #endif  /* S4INLINE */
 
 S4CONST char *S4FUNCTION d4alias( DATA4 *data )
@@ -93,9 +82,6 @@ void S4FUNCTION d4aliasSet( DATA4 *data, const char * newAlias )
       c4upper( data->alias ) ;
    #endif
 
-   #ifdef S4CLIENT
-      data->aliasSet = 1 ;
-   #endif
 
    return ;
 }
@@ -245,10 +231,6 @@ int S4FUNCTION d4eof( DATA4 *data )
 
 const char *S4FUNCTION d4fileName( DATA4 *data )
 {
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      int rc ;
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
@@ -258,33 +240,7 @@ const char *S4FUNCTION d4fileName( DATA4 *data )
       }
    #endif
 
-   #ifdef S4CLIENT
-      if ( error4code( data->codeBase ) < 0 )
-         return 0 ;
-
-      connection = data->dataFile->connection ;
-      connection4assign( connection, CON4DATA_FNAME, data4clientId( data ), data4serverId( data ) ) ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-      {
-         #ifdef E4STACK
-            error4stack( data->codeBase, rc, E95501 ) ;
-         #endif
-         return 0 ;
-      }
-
-      rc = connection4status( connection ) ;
-      if ( rc < 0 )
-      {
-         connection4error( connection, data->codeBase, rc, E95501 ) ;
-         return 0 ;
-      }
-
-      return connection4data( connection ) ;
-   #else
       return data->dataFile->file.name ;
-   #endif
 }
 
 #ifndef S4OFF_TRAN
@@ -341,7 +297,7 @@ short int S4FUNCTION d4numFields( DATA4 *data )
          return error4( 0, e4parm_null, E93308 ) ;
    #endif
 
-   #ifdef S4CLIENT_OR_FOX
+   #ifdef CLIENT_OR_FOX
       if ( data->fields[data->dataFile->nFields-1].type == '0' )   /* null flags field */
          return data->dataFile->nFields - 1 ;
    #endif

@@ -59,7 +59,7 @@ void list4mutexInitUndo(LIST4MUTEX *listMutex )  /* uninit a mutex object */
    memset(listMutex, 0, sizeof(LIST4MUTEX) ) ;
 }
 
-S4EXPORT void list4mutexRelease( LIST4MUTEX *listMutex)
+PUBLIC void list4mutexRelease( LIST4MUTEX *listMutex)
 {
 /*
    ERRORS
@@ -134,7 +134,7 @@ void list4mutexRemoveLink( LIST4MUTEX *listMutex, LINK4 *link )
    list4mutexRelease( listMutex ) ;
 }
 
-S4EXPORT void list4mutexWait(LIST4MUTEX *listMutex )
+PUBLIC void list4mutexWait(LIST4MUTEX *listMutex )
 {
 
 /* ERRORS

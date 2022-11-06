@@ -1600,7 +1600,7 @@ int S4FUNCTION code4tranCommitSingle( CODE4 *c4 )
 
 #ifndef S4SERVER
 /* places all DATA4's into an invalid state */
-/* S4STAND_ALONE, S4CLIENT */
+/* S4STAND_ALONE */
 static void code4invalidate( CODE4 *c4 )
 {
    DATA4 *dataOn ;

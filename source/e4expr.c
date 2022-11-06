@@ -563,7 +563,7 @@ int expr4keyConvert( EXPR4 *e4expr, char **ptrPtr, const int rLen, const int exp
    the expression and the result type is otherwise r4numDoub */
 int S4FUNCTION expr4currency( const EXPR4 *e4expr )
 {
-   #ifndef S4CLIENT_OR_FOX
+   #ifndef CLIENT_OR_FOX
       FIELD4 *field ;
       int parms ;
 
@@ -582,7 +582,7 @@ int S4FUNCTION expr4currency( const EXPR4 *e4expr )
    return 0 ;
 }
 
-#ifdef S4CLIENT_OR_FOX
+#ifdef CLIENT_OR_FOX
 /* if forAdd is 0, then returns whether or not the expression has the
    possibility of a null return.  If one, it evaluates the current
    expression to see if the current result is null */
@@ -594,10 +594,6 @@ int S4FUNCTION expr4nullLow( const EXPR4 *e4expr, const int forAdd )
          TAG4FILE *tag ;
       #endif
 
-   #ifdef S4CLIENT
-      if ( code4indexFormat( e4expr->codeBase ) != r4cdx )
-         return 0 ;
-   #endif
 
       #ifndef S4OFF_INDEX
          #ifdef S4FOX
@@ -652,65 +648,6 @@ int S4FUNCTION expr4keyLen( EXPR4 *e4expr )
 
    len = expr4nullLow( e4expr, 0 ) ;   /* extra byte for nulls if required */
 
-   #ifdef S4CLIENT
-      switch( e4expr->type )
-      {
-         case r4num:
-            switch( code4indexFormat( e4expr->codeBase ) )
-            {
-               case r4cdx:
-               case r4ndx:
-                  return len + (int)sizeof( double ) ;
-               case r4ntx:
-                  return len + f4len( e4expr->info[0].fieldPtr ) ;
-               case r4mdx:
-                  return len + (int)sizeof( C4BCD ) ;
-            }
-            break ;
-         case r4date:
-            switch( code4indexFormat( e4expr->codeBase ) )
-            {
-               case r4cdx:
-               case r4ndx:
-               case r4mdx:
-                  return len + (int)sizeof( double ) ;
-            }
-            break ;
-         case r4dateDoub:
-            switch( code4indexFormat( e4expr->codeBase ) )
-            {
-               case r4mdx:
-                  return len + (int)sizeof( double ) ;
-            }
-            break ;
-         case r4numDoub:
-            switch( code4indexFormat( e4expr->codeBase ) )
-            {
-               case r4cdx:
-                  return len + (int)sizeof( double ) ;
-               case r4ntx:
-                  return len + e4expr->codeBase->numericStrLen ;
-               case r4mdx:
-                  return len + (int)sizeof( C4BCD ) ;
-            }
-            break ;
-         case r4log:
-            switch( code4indexFormat( e4expr->codeBase ) )
-            {
-               case r4cdx:
-                  return len + (int)sizeof( char ) ;
-            }
-            break ;
-         case r4int:
-            if ( code4indexFormat( e4expr->codeBase ) == r4cdx )
-               return len + (int)sizeof( long ) ;
-         case r4dateTime:
-         case r4currency:
-            if ( code4indexFormat( e4expr->codeBase ) == r4cdx )
-               return len + (int)sizeof( double ) ;
-      }
-      return expr4len( e4expr ) ;
-   #else
       switch( e4expr->type )
       {
          #ifdef S4FOX
@@ -757,7 +694,6 @@ int S4FUNCTION expr4keyLen( EXPR4 *e4expr )
             #endif
                   return len + expr4len( e4expr ) ;
        }
-   #endif
 }
 
 static char e4nullChar = '\0' ;

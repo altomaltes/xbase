@@ -21,7 +21,7 @@ void S4FUNCTION f4assignLong( FIELD4 *field, const long lValue )
       switch( field->type )
       {
          case r4log:
-         #ifdef S4CLIENT_OR_FOX
+         #ifdef CLIENT_OR_FOX
             case r4system:
             case r4dateTime:
          #endif
@@ -56,7 +56,7 @@ void S4FUNCTION f4assignLong( FIELD4 *field, const long lValue )
       case r4int:
          f4assignInt( field, (int)lValue ) ;
          break ;
-      #ifdef S4CLIENT_OR_FOX
+      #ifdef CLIENT_OR_FOX
          case r4double:
             f4assignDouble( field, (double)lValue ) ;
             break ;
@@ -85,7 +85,7 @@ void S4FUNCTION f4assignLong( FIELD4 *field, const long lValue )
 
 long S4FUNCTION f4long( const FIELD4 *field )
 {
-   #ifdef S4CLIENT_OR_FOX
+   #ifdef CLIENT_OR_FOX
       const char *ptr ;
    #endif
    #ifdef S4VBASIC
@@ -102,7 +102,7 @@ long S4FUNCTION f4long( const FIELD4 *field )
       switch( field->type )
       {
          case r4log:
-         #ifdef S4CLIENT_OR_FOX
+         #ifdef CLIENT_OR_FOX
             case r4system:
             case r4dateTime:
          #endif
@@ -123,7 +123,7 @@ long S4FUNCTION f4long( const FIELD4 *field )
          #else
             return *((S4LONG *)f4ptr( field )) ;
          #endif
-      #ifdef S4CLIENT_OR_FOX
+      #ifdef CLIENT_OR_FOX
          case r4memo:
          case r4memoBin:
          case r4gen:

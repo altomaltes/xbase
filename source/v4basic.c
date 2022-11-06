@@ -1461,7 +1461,7 @@ typedef struct
    short int dummy ;
 } FIELD4INFOVB32 ;
 
-S4EXPORT DATA4 * S4FUNCTION d4createVB( CODE4 *cb, char *name, FIELD4INFOVB32* fldInfo, TAG4INFO *tagInfo)
+PUBLIC DATA4 * S4FUNCTION d4createVB( CODE4 *cb, char *name, FIELD4INFOVB32* fldInfo, TAG4INFO *tagInfo)
 {
    int i = 0, numFlds = 0, numTags = 0 ;
    FIELD4INFO *fldInfoC ;
@@ -1494,7 +1494,7 @@ S4EXPORT DATA4 * S4FUNCTION d4createVB( CODE4 *cb, char *name, FIELD4INFOVB32* f
 
 #else
 
-S4EXPORT DATA4 * S4FUNCTION d4createVB( CODE4 *cb, char *name, FIELD4INFO* fldInfo, TAG4INFO *tagInfo)
+PUBLIC DATA4 * S4FUNCTION d4createVB( CODE4 *cb, char *name, FIELD4INFO* fldInfo, TAG4INFO *tagInfo)
 {
    return d4create( cb, name, fldInfo, tagInfo ) ;
 }

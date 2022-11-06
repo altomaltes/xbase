@@ -45,16 +45,12 @@ int S4FUNCTION d4flush( DATA4 *data )
             return error4( 0, e4parm_null, E94102 ) ;
       #endif
 
-      #ifdef S4CLIENT
-         return d4update( data );
-      #else
          saveRc = d4flushData( data ) ;
          rc = dfile4flushIndex( data->dataFile ) ;
          if ( rc < 0 )
             saveRc = rc ;
 
          return saveRc ;
-      #endif
    #endif /* S4OFF_WRITE */
 }
 
@@ -73,15 +69,11 @@ int d4flushData( DATA4 *data )
             return error4( 0, e4parm, E94105 ) ;
       #endif
 
-      #ifdef S4CLIENT
-         return d4flush( data ) ;
-      #else
          saveRc = d4update( data ) ;   /* returns -1 if error4code( codeBase ) < 0 */
          rc = dfile4flushData( data->dataFile ) ;
          if ( rc < 0 )
             saveRc = rc ;
          return saveRc ;
-      #endif
    #endif
 }
 #endif /* S4SERVER */

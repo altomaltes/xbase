@@ -7,11 +7,6 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
 {
    int rc ;
    CODE4 *c4 ;
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      CONNECTION4ZAP_INFO_IN *info ;
-      CONNECTION4ZAP_INFO_OUT *out ;
-   #endif
 
    if ( r2 < r1 )   /* simple no records to remove -- get before parm check */
       return 0 ;
@@ -35,44 +30,6 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
    if ( d4->readOnly == 1 )
       return error4describe( c4, e4write, E80606, d4alias( d4 ), 0, 0 ) ;
 
-   #ifdef S4CLIENT
-      connection = d4->dataFile->connection ;
-      if ( connection == 0 )
-         return e4connection ;
-
-      d4->count = -1 ;
-      d4->dataFile->numRecs = -1 ;
-
-      connection4assign( connection, CON4ZAP, data4clientId( d4 ), data4serverId( d4 ) ) ;
-      connection4addData( connection, NULL, sizeof( CONNECTION4ZAP_INFO_IN ), (void **)&info ) ;
-      info->recStart = htonl(r1) ;
-      info->recStop = htonl(r2) ;
-      rc = connection4repeat( connection ) ;
-      if ( rc == r4locked )
-         return r4locked ;
-      if ( rc < 0 )
-         return connection4error( connection, c4, rc, E94604 ) ;
-
-      if ( connection4len( connection ) != sizeof( CONNECTION4ZAP_INFO_OUT ) )
-         return error4( c4, e4packetLen, E95702 ) ;
-      out = (CONNECTION4ZAP_INFO_OUT *)connection4data( connection ) ;
-      if ( out->lockedDatafile  )
-         d4->dataFile->fileLock = d4 ;
-
-      if ( rc == 0 )
-      {
-         if ( d4recCount( d4 ) == 0L )
-            d4->bofFlag = d4->eofFlag = 1 ;
-         else
-            d4->bofFlag = d4->eofFlag = 0 ;
-      }
-
-      d4->recNum = -1 ;
-      d4->recNumOld = -1 ;
-      memset( d4->record, ' ', dfile4recWidth( d4->dataFile ) ) ;
-
-      return rc ;
-   #else
       #ifndef S4SINGLE
          rc = d4lockAll( d4 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
          if ( rc )
@@ -100,7 +57,6 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
       }
 
       return rc ;
-   #endif
 }
 
 int d4zapData( DATA4 *data, const long startRec, const long endRec )

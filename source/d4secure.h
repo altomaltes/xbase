@@ -109,24 +109,24 @@ typedef struct
 } ACCOUNT4USER ;
 
 /* returns success or failures (id not found, password mismatch */
-S4EXPORT int S4FUNCTION account4userInit( ACCOUNT4USER S4PTR *, ACCOUNT4 S4PTR *, PRIVILEGE4 S4PTR *, TCP4ADDRESS, const char S4PTR *, const char S4PTR * ) ;
+PUBLIC int S4FUNCTION account4userInit( ACCOUNT4USER S4PTR *, ACCOUNT4 S4PTR *, PRIVILEGE4 S4PTR *, TCP4ADDRESS, const char S4PTR *, const char S4PTR * ) ;
 
 /* following functions check the privilegeTable if generic rights are not set */
-S4EXPORT Bool5 S4FUNCTION account4userAllowCreate( ACCOUNT4USER S4PTR *userAccount, int isTemp, int doReplace ) ;
-S4EXPORT Bool5 S4FUNCTION account4userAllowRead( ACCOUNT4USER S4PTR *userAccount, DATA4 S4PTR *data ) ;
-S4EXPORT Bool5 S4FUNCTION account4userAllowAppend( ACCOUNT4USER S4PTR *userAccount, DATA4 S4PTR *data ) ;
-S4EXPORT Bool5 S4FUNCTION account4userAllowDelete( ACCOUNT4USER S4PTR *userAccount, DATA4 S4PTR *data ) ;
-S4EXPORT Bool5 S4FUNCTION account4userAllowUpdate( ACCOUNT4USER S4PTR *userAccount, DATA4 S4PTR *data ) ;
-S4EXPORT Bool5 S4FUNCTION account4userAllowIndex( ACCOUNT4USER S4PTR *userAccount, DATA4 S4PTR *data ) ;
-S4EXPORT Bool5 S4FUNCTION account4userAllowCompress( ACCOUNT4USER S4PTR *userAccount, DATA4 S4PTR *data ) ;
+PUBLIC Bool5 S4FUNCTION account4userAllowCreate( ACCOUNT4USER S4PTR *userAccount, int isTemp, int doReplace ) ;
+PUBLIC Bool5 S4FUNCTION account4userAllowRead( ACCOUNT4USER S4PTR *userAccount, DATA4 S4PTR *data ) ;
+PUBLIC Bool5 S4FUNCTION account4userAllowAppend( ACCOUNT4USER S4PTR *userAccount, DATA4 S4PTR *data ) ;
+PUBLIC Bool5 S4FUNCTION account4userAllowDelete( ACCOUNT4USER S4PTR *userAccount, DATA4 S4PTR *data ) ;
+PUBLIC Bool5 S4FUNCTION account4userAllowUpdate( ACCOUNT4USER S4PTR *userAccount, DATA4 S4PTR *data ) ;
+PUBLIC Bool5 S4FUNCTION account4userAllowIndex( ACCOUNT4USER S4PTR *userAccount, DATA4 S4PTR *data ) ;
+PUBLIC Bool5 S4FUNCTION account4userAllowCompress( ACCOUNT4USER S4PTR *userAccount, DATA4 S4PTR *data ) ;
 #define account4userAllowDisconnect( userAccount ) ( (userAccount)->allowDisconnect )
 
-S4EXPORT int S4FUNCTION account4init( CODE4 S4PTR *c4, ACCOUNT4 S4PTR *account, const char S4PTR *accountFileName ) ;
-S4EXPORT void S4FUNCTION account4initUndo( ACCOUNT4 S4PTR *account ) ;
+PUBLIC int S4FUNCTION account4init( CODE4 S4PTR *c4, ACCOUNT4 S4PTR *account, const char S4PTR *accountFileName ) ;
+PUBLIC void S4FUNCTION account4initUndo( ACCOUNT4 S4PTR *account ) ;
 
-S4EXPORT int S4FUNCTION privilege4init( CODE4 S4PTR *c4, PRIVILEGE4 S4PTR *privilege, const char S4PTR *privilegeFileName ) ;
-S4EXPORT void S4FUNCTION privilege4initUndo( PRIVILEGE4 S4PTR *privilege ) ;
-S4EXPORT Bool5 S4FUNCTION privilege4allowDo( PRIVILEGE4 S4PTR *privilege, const char S4PTR *accountId, const char S4PTR *fullPathName, FIELD4 S4PTR *field ) ;
+PUBLIC int S4FUNCTION privilege4init( CODE4 S4PTR *c4, PRIVILEGE4 S4PTR *privilege, const char S4PTR *privilegeFileName ) ;
+PUBLIC void S4FUNCTION privilege4initUndo( PRIVILEGE4 S4PTR *privilege ) ;
+PUBLIC Bool5 S4FUNCTION privilege4allowDo( PRIVILEGE4 S4PTR *privilege, const char S4PTR *accountId, const char S4PTR *fullPathName, FIELD4 S4PTR *field ) ;
 #define privilege4allowRead( p, a, f ) (privilege4allowDo( (p), (a), (f), (p)->readField ))
 #define privilege4allowAppend( p, a, f ) (privilege4allowDo( (p), (a), (f), (p)->appendField ))
 #define privilege4allowDelete( p, a, f ) (privilege4allowDo( (p), (a), (f), (p)->deleteField ))

@@ -1086,7 +1086,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 #endif /*  defined( S4FOX ) */
 
 
-#if ( ( defined( S4FOX ) || defined( OLEDB5BUILD ) ) || defined( S4CLIENT ) ) && !defined( S4NO_LONGLONG )
+#if ( ( defined( S4FOX ) || defined( OLEDB5BUILD ) )  ) && !defined( S4NO_LONGLONG )
    void t4foxToI8( char *result, const char *fromPtr )
    {
       Bool5 isPositive =  ( fromPtr[0] & ( unsigned )0x80 ) != 0 ;
@@ -1097,11 +1097,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       else /* negative */
          result[7] += (unsigned)0x80 ;
    }
-#endif /* ( defined( S4FOX ) || defined( OLEDB5BUILD ) ) || defined( S4CLIENT ) ) && defined( __WIN32 ) */
+#endif /* ( defined( S4FOX ) || defined( OLEDB5BUILD ) )  ) && defined( __WIN32 ) */
 
 
 
-#if !defined( S4NO_LONGLONG) && ( defined( S4FOX ) || defined( OLEDB5BUILD ) || defined( S4CLIENT ) )  // CS 2000/06/01, BCR 2000/08/18
+#if !defined( S4NO_LONGLONG) && ( defined( S4FOX ) || defined( OLEDB5BUILD )  )  // CS 2000/06/01, BCR 2000/08/18
    void t4i8ToFox( char *result, const LONGLONG *val )
    {
       int isPositive ;
@@ -1122,7 +1122,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       else /* negative */
          result[0] -= (unsigned)0x80 ;
    }
-#endif //S4NO_LONGLONG && __WIN32 && ( S4FOX || OLEDB5BUILD || S4CLIENT )
+#endif //S4NO_LONGLONG && __WIN32 && ( S4FOX || OLEDB5BUILD )
 
 
 

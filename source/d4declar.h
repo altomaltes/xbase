@@ -26,80 +26,67 @@
 /* EXTERNAL FUNCTIONS : */
 
 /* CONVERSIONS */
-S4EXPORT double S4FUNCTION c4atod( const char S4PTR *, const int ) ;
-S4EXPORT void S4FUNCTION c4atod2( char S4PTR *, int, double S4PTR *);
-S4EXPORT int S4FUNCTION c4atoi( const char S4PTR *, const int ) ;
-S4EXPORT long S4FUNCTION c4atol( const char S4PTR *, const int ) ;
+PUBLIC double S4FUNCTION c4atod( const char S4PTR *, const int ) ;
+PUBLIC void S4FUNCTION c4atod2( char S4PTR *, int, double S4PTR *);
+PUBLIC int S4FUNCTION c4atoi( const char S4PTR *, const int ) ;
+PUBLIC long S4FUNCTION c4atol( const char S4PTR *, const int ) ;
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION c4atou(const char *, unsigned short *,  int ) ;
-   S4EXPORT void S4FUNCTION c4utoa( unsigned short *from) ;
+   PUBLIC void S4FUNCTION c4atou(const char *, unsigned short *,  int ) ;
+   PUBLIC void S4FUNCTION c4utoa( unsigned short *from) ;
 #endif
-S4EXPORT void S4FUNCTION c4encode( char S4PTR *, const char S4PTR *, char S4PTR *, const char S4PTR * ) ;
-S4EXPORT void S4FUNCTION c4trimN( char S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4encode( char S4PTR *, const char S4PTR *, char S4PTR *, const char S4PTR * ) ;
+PUBLIC void S4FUNCTION c4trimN( char S4PTR *, int ) ;
 
 /* CODE4 */
-S4EXPORT CODE4 S4PTR *S4FUNCTION code4allocLow( int, const char S4PTR *, long ) ;
-S4EXPORT DATA4 S4PTR *S4FUNCTION code4data( CODE4 S4PTR *, const char S4PTR * ) ;
-S4EXPORT const char S4PTR * S4FUNCTION code4indexExtension( CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION code4initLow( CODE4 S4PTR *, const char S4PTR *, long, long ) ;
-S4EXPORT int S4FUNCTION code4initUndo( CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION code4lock( CODE4 S4PTR * ) ;
-S4EXPORT void S4FUNCTION code4largeOn( CODE4 S4PTR * ) ;
-S4EXPORT void S4FUNCTION tran4freeLocks( CODE4 S4PTR *, SINGLE4DISTANT S4PTR *t ) ;
-S4EXPORT void S4FUNCTION code4lockClear( CODE4 S4PTR * ) ;
-S4EXPORT const char S4PTR *S4FUNCTION code4lockFileName( CODE4 S4PTR * ) ;
-S4EXPORT long S4FUNCTION code4lockItem( CODE4 S4PTR * ) ;
-S4EXPORT const char S4PTR *S4FUNCTION code4lockNetworkId( CODE4 S4PTR * ) ;
-S4EXPORT const char S4PTR *S4FUNCTION code4lockUserId( CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION code4optStart( CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION code4optSuspend( CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION code4unlock( CODE4 S4PTR * ) ;
+PUBLIC CODE4 S4PTR *S4FUNCTION code4allocLow( int, const char S4PTR *, long ) ;
+PUBLIC DATA4 S4PTR *S4FUNCTION code4data( CODE4 S4PTR *, const char S4PTR * ) ;
+PUBLIC const char S4PTR * S4FUNCTION code4indexExtension( CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION code4initLow( CODE4 S4PTR *, const char S4PTR *, long, long ) ;
+PUBLIC int S4FUNCTION code4initUndo( CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION code4lock( CODE4 S4PTR * ) ;
+PUBLIC void S4FUNCTION code4largeOn( CODE4 S4PTR * ) ;
+PUBLIC void S4FUNCTION tran4freeLocks( CODE4 S4PTR *, SINGLE4DISTANT S4PTR *t ) ;
+PUBLIC void S4FUNCTION code4lockClear( CODE4 S4PTR * ) ;
+PUBLIC const char S4PTR *S4FUNCTION code4lockFileName( CODE4 S4PTR * ) ;
+PUBLIC long S4FUNCTION code4lockItem( CODE4 S4PTR * ) ;
+PUBLIC const char S4PTR *S4FUNCTION code4lockNetworkId( CODE4 S4PTR * ) ;
+PUBLIC const char S4PTR *S4FUNCTION code4lockUserId( CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION code4optStart( CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION code4optSuspend( CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION code4unlock( CODE4 S4PTR * ) ;
 #ifdef S4CB51
-   S4EXPORT int S4FUNCTION code4freeBlocks( CODE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION code4freeBlocks( CODE4 S4PTR * ) ;
 #endif
-#ifdef S4CLIENT
-   #define code4alloc( c4 ) ( code4allocLow( (c4), DEF4PROTOCOL, S4VERSION ) )
-   #define code4init( c4 ) ( code4initLow( (c4), DEF4PROTOCOL, S4VERSION, sizeof( CODE4 ) ) )
-   S4EXPORT int S4FUNCTION code4serverRestart( CODE4 S4PTR * ) ;  /* for testing only */
-   S4EXPORT int S4FUNCTION code4serverCrash( CODE4 S4PTR * ) ;  /* for testing only */
-   S4EXPORT char S4PTR *S4FUNCTION code4tables( CODE4 S4PTR *, const char S4PTR * ) ;
-   S4EXPORT char S4PTR *S4FUNCTION code4serverCurrentDirectory( CODE4 S4PTR * ) ;
-   S4EXPORT DATA4 S4PTR *S4FUNCTION code4directory( CODE4 S4PTR *, char S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4serverShutdown( CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4connectAcceptNew( CODE4 S4PTR *, short ) ;
-   S4EXPORT int S4FUNCTION code4connectCutAll( CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4connectCut( CODE4 S4PTR *, long ) ;
-   S4EXPORT int S4FUNCTION code4serverCloseFiles( CODE4 S4PTR * ) ;
-#else
+
    #define code4alloc( c4 ) ( code4allocLow( (c4), 0, S4VERSION ) )
    #define code4init( c4 ) ( code4initLow( (c4), 0, S4VERSION, sizeof( CODE4 ) ) )
-#endif
+
 #ifdef S4UTIL
-   S4EXPORT int S4FUNCTION code4passwordSet( CODE4 S4PTR *, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;  /* for utility only */
+   PUBLIC int S4FUNCTION code4passwordSet( CODE4 S4PTR *, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;  /* for utility only */
 #endif
 #ifdef S4SERVER
-   S4EXPORT int S4FUNCTION code4unlockAuto( CODE4 * ) ;
+   PUBLIC int S4FUNCTION code4unlockAuto( CODE4 * ) ;
    #ifdef S4INLINE
       #define code4unlockAutoSet( c4, val ) ( (c4)->currentClient->trans.unlockAuto = (val) )
    #else
-      S4EXPORT void S4FUNCTION code4unlockAutoSet( CODE4 *, int ) ;
+      PUBLIC void S4FUNCTION code4unlockAutoSet( CODE4 *, int ) ;
    #endif
 #else
-   S4EXPORT int S4FUNCTION code4close( CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4connect( CODE4 S4PTR *, const char S4PTR *, const char S4PTR *, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
-   S4EXPORT const char S4PTR *S4FUNCTION code4dateFormat( CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4dateFormatSet( CODE4 S4PTR *, const char S4PTR * ) ;
-   S4EXPORT void S4FUNCTION code4exit( CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4flush( CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4info( CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4infoRetrieve( CODE4 S4PTR *, S4LONG S4PTR *, unsigned short S4PTR *, S4LONG S4PTR *, int S4PTR * ) ;
-   S4EXPORT char *S4FUNCTION code4serverConfigName( CODE4 S4PTR * ) ;
-   S4EXPORT const char S4PTR * S4FUNCTION code4serverName( CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4optAll( CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4logCreate( CODE4 S4PTR *, const char S4PTR *, const char S4PTR * ) ;
-   S4EXPORT const char S4PTR *S4FUNCTION code4logFileName( CODE4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION code4logOpen( CODE4 S4PTR *, const char S4PTR *, const char S4PTR * ) ;
-   S4EXPORT void S4FUNCTION code4logOpenOff( CODE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION code4close( CODE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION code4connect( CODE4 S4PTR *, const char S4PTR *, const char S4PTR *, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
+   PUBLIC const char S4PTR *S4FUNCTION code4dateFormat( CODE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION code4dateFormatSet( CODE4 S4PTR *, const char S4PTR * ) ;
+   PUBLIC void S4FUNCTION code4exit( CODE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION code4flush( CODE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION code4info( CODE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION code4infoRetrieve( CODE4 S4PTR *, S4LONG S4PTR *, unsigned short S4PTR *, S4LONG S4PTR *, int S4PTR * ) ;
+   PUBLIC char *S4FUNCTION code4serverConfigName( CODE4 S4PTR * ) ;
+   PUBLIC const char S4PTR * S4FUNCTION code4serverName( CODE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION code4optAll( CODE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION code4logCreate( CODE4 S4PTR *, const char S4PTR *, const char S4PTR * ) ;
+   PUBLIC const char S4PTR *S4FUNCTION code4logFileName( CODE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION code4logOpen( CODE4 S4PTR *, const char S4PTR *, const char S4PTR * ) ;
+   PUBLIC void S4FUNCTION code4logOpenOff( CODE4 S4PTR * ) ;
    #ifdef S4INLINE
       #ifdef S4OFF_MULTI
          #define code4unlockAuto( c4 ) ( 0 )
@@ -109,147 +96,140 @@ S4EXPORT int S4FUNCTION code4unlock( CODE4 S4PTR * ) ;
          #define code4unlockAutoSet( c4, val ) ( (c4)->c4trans.trans.unlockAuto = (val) )
       #endif
    #else
-      S4EXPORT void S4FUNCTION code4unlockAutoSet( CODE4 *, int ) ;
+      PUBLIC void S4FUNCTION code4unlockAutoSet( CODE4 *, int ) ;
       int S4FUNCTION code4unlockAuto( CODE4 * ) ;
    #endif
 #endif
 #ifndef S4STAND_ALONE
-   S4EXPORT DATA4 S4PTR *S4FUNCTION code4connectionStatus( CODE4 S4PTR * ) ;
+   PUBLIC DATA4 S4PTR *S4FUNCTION code4connectionStatus( CODE4 S4PTR * ) ;
 #endif
 
-S4EXPORT int S4FUNCTION currency4compare( const CURRENCY4 *, const CURRENCY4 * ) ;
-S4EXPORT int S4FUNCTION date4timeCompare( const long *, const long * ) ;
+PUBLIC int S4FUNCTION currency4compare( const CURRENCY4 *, const CURRENCY4 * ) ;
+PUBLIC int S4FUNCTION date4timeCompare( const long *, const long * ) ;
 /* for testing */
-S4EXPORT int S4FUNCTION currency4add( CURRENCY4 S4PTR *, const CURRENCY4 S4PTR *, const CURRENCY4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION currency4subtract( CURRENCY4 S4PTR *, const CURRENCY4 S4PTR *, const CURRENCY4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION currency4multiplyShort( CURRENCY4 S4PTR *, const CURRENCY4 S4PTR *, const short  ) ;
-S4EXPORT int S4FUNCTION currency4divideShort( CURRENCY4 S4PTR *, const CURRENCY4 S4PTR *, const short ) ;
-S4EXPORT int S4FUNCTION c4currencyToA( char S4PTR *, int, const CURRENCY4 S4PTR *, int ) ;
-S4EXPORT int S4FUNCTION c4atoCurrency( CURRENCY4 S4PTR *, const char S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION f4assignCurrency( FIELD4 S4PTR *, char S4PTR * ) ;
-S4EXPORT char S4PTR *S4FUNCTION f4currency( const FIELD4 S4PTR *, int ) ;
-S4EXPORT char S4PTR *S4FUNCTION f4dateTime( const FIELD4 S4PTR * ) ;
-S4EXPORT void S4FUNCTION f4assignDateTime( FIELD4 S4PTR *, char S4PTR * ) ;
+PUBLIC int S4FUNCTION currency4add( CURRENCY4 S4PTR *, const CURRENCY4 S4PTR *, const CURRENCY4 S4PTR * ) ;
+PUBLIC int S4FUNCTION currency4subtract( CURRENCY4 S4PTR *, const CURRENCY4 S4PTR *, const CURRENCY4 S4PTR * ) ;
+PUBLIC int S4FUNCTION currency4multiplyShort( CURRENCY4 S4PTR *, const CURRENCY4 S4PTR *, const short  ) ;
+PUBLIC int S4FUNCTION currency4divideShort( CURRENCY4 S4PTR *, const CURRENCY4 S4PTR *, const short ) ;
+PUBLIC int S4FUNCTION c4currencyToA( char S4PTR *, int, const CURRENCY4 S4PTR *, int ) ;
+PUBLIC int S4FUNCTION c4atoCurrency( CURRENCY4 S4PTR *, const char S4PTR *, int ) ;
+PUBLIC void S4FUNCTION f4assignCurrency( FIELD4 S4PTR *, char S4PTR * ) ;
+PUBLIC char S4PTR *S4FUNCTION f4currency( const FIELD4 S4PTR *, int ) ;
+PUBLIC char S4PTR *S4FUNCTION f4dateTime( const FIELD4 S4PTR * ) ;
+PUBLIC void S4FUNCTION f4assignDateTime( FIELD4 S4PTR *, char S4PTR * ) ;
 
 /* DATA4 */
-S4EXPORT S4CONST char S4PTR * S4FUNCTION d4alias( DATA4 S4PTR * ) ;
-S4EXPORT void S4FUNCTION d4aliasSet( DATA4 S4PTR *, const char S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4append( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4appendBlank( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4appendStart( DATA4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION d4blank( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4bof( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4bottom( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4check( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4close( DATA4 S4PTR * ) ;
-S4EXPORT DATA4 S4PTR * S4FUNCTION d4create( CODE4 S4PTR *, const char S4PTR *, const FIELD4INFO S4PTR *, const TAG4INFO S4PTR * ) ;
-S4EXPORT DATA4 S4PTR * S4FUNCTION d4createLow( CODE4 S4PTR *, const char S4PTR *, const FIELD4INFO S4PTR *, const TAG4INFO S4PTR * ) ;
-S4EXPORT DATA4 S4PTR * S4FUNCTION d4createTemp( CODE4 S4PTR *, const FIELD4INFO S4PTR *, const TAG4INFO S4PTR * ) ;
-S4EXPORT void S4FUNCTION d4delete( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4eof( DATA4 S4PTR * ) ;
-S4EXPORT FIELD4 S4PTR * S4FUNCTION d4field( DATA4 S4PTR *, const char S4PTR * ) ;
-S4EXPORT FIELD4 S4PTR * S4FUNCTION d4fieldJ( DATA4 S4PTR *, const int ) ;
-S4EXPORT int S4FUNCTION d4fieldNumber( DATA4 S4PTR *, const char S4PTR * ) ;
-S4EXPORT DATA4 S4PTR * S4FUNCTION d4fieldsAdd( DATA4 S4PTR *, int, FIELD4INFO S4PTR * ) ;
-S4EXPORT DATA4 S4PTR * S4FUNCTION d4fieldsRemove( DATA4 S4PTR * S4PTR *, int, char S4PTR * S4PTR * ) ;
-S4EXPORT const char S4PTR *S4FUNCTION d4fileName( DATA4 S4PTR * ) ;
+PUBLIC S4CONST char S4PTR * S4FUNCTION d4alias( DATA4 S4PTR * ) ;
+PUBLIC void S4FUNCTION d4aliasSet( DATA4 S4PTR *, const char S4PTR * ) ;
+PUBLIC int S4FUNCTION d4append( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4appendBlank( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4appendStart( DATA4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION d4blank( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4bof( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4bottom( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4check( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4close( DATA4 S4PTR * ) ;
+PUBLIC DATA4 S4PTR * S4FUNCTION d4create( CODE4 S4PTR *, const char S4PTR *, const FIELD4INFO S4PTR *, const TAG4INFO S4PTR * ) ;
+PUBLIC DATA4 S4PTR * S4FUNCTION d4createLow( CODE4 S4PTR *, const char S4PTR *, const FIELD4INFO S4PTR *, const TAG4INFO S4PTR * ) ;
+PUBLIC DATA4 S4PTR * S4FUNCTION d4createTemp( CODE4 S4PTR *, const FIELD4INFO S4PTR *, const TAG4INFO S4PTR * ) ;
+PUBLIC void S4FUNCTION d4delete( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4eof( DATA4 S4PTR * ) ;
+PUBLIC FIELD4 S4PTR * S4FUNCTION d4field( DATA4 S4PTR *, const char S4PTR * ) ;
+PUBLIC FIELD4 S4PTR * S4FUNCTION d4fieldJ( DATA4 S4PTR *, const int ) ;
+PUBLIC int S4FUNCTION d4fieldNumber( DATA4 S4PTR *, const char S4PTR * ) ;
+PUBLIC DATA4 S4PTR * S4FUNCTION d4fieldsAdd( DATA4 S4PTR *, int, FIELD4INFO S4PTR * ) ;
+PUBLIC DATA4 S4PTR * S4FUNCTION d4fieldsRemove( DATA4 S4PTR * S4PTR *, int, char S4PTR * S4PTR * ) ;
+PUBLIC const char S4PTR *S4FUNCTION d4fileName( DATA4 S4PTR * ) ;
 #ifdef S4SERVER
    #define d4flush( d4 ) ( dfile4flush( (d4)->dataFile ) )
 #else
-S4EXPORT int S4FUNCTION d4flush( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4flush( DATA4 S4PTR * ) ;
 #endif
-S4EXPORT int S4FUNCTION d4freeBlocks( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4go( DATA4 S4PTR *, const long ) ;
-S4EXPORT int S4FUNCTION d4goBof( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4goEof( DATA4 S4PTR * ) ;
-S4EXPORT INDEX4 S4PTR * S4FUNCTION d4index( DATA4 S4PTR *, const char S4PTR * ) ;
+PUBLIC int S4FUNCTION d4freeBlocks( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4go( DATA4 S4PTR *, const long ) ;
+PUBLIC int S4FUNCTION d4goBof( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4goEof( DATA4 S4PTR * ) ;
+PUBLIC INDEX4 S4PTR * S4FUNCTION d4index( DATA4 S4PTR *, const char S4PTR * ) ;
 #ifndef S4COMP_OFF_MULTI
-   S4EXPORT int S4FUNCTION d4lock( DATA4 S4PTR *, const long ) ;
-   S4EXPORT int S4FUNCTION d4lockAdd( DATA4 S4PTR *, long ) ;
-   S4EXPORT int S4FUNCTION d4lockAddAll( DATA4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION d4lockAddAppend( DATA4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION d4lockAddFile( DATA4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION d4lockAll( DATA4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION d4lockAppendRecord( DATA4 *data ) ;
-   S4EXPORT int S4FUNCTION d4lockAppend( DATA4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION d4lockFile( DATA4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION d4lockTest( DATA4 S4PTR *, const long ) ; /* SQL */
-   S4EXPORT int S4FUNCTION d4lockTestAppendLow( DATA4 S4PTR * ) ;  /* testing only */
+   PUBLIC int S4FUNCTION d4lock( DATA4 S4PTR *, const long ) ;
+   PUBLIC int S4FUNCTION d4lockAdd( DATA4 S4PTR *, long ) ;
+   PUBLIC int S4FUNCTION d4lockAddAll( DATA4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4lockAddAppend( DATA4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4lockAddFile( DATA4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4lockAll( DATA4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4lockAppendRecord( DATA4 *data ) ;
+   PUBLIC int S4FUNCTION d4lockAppend( DATA4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4lockFile( DATA4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4lockTest( DATA4 S4PTR *, const long ) ; /* SQL */
+   PUBLIC int S4FUNCTION d4lockTestAppendLow( DATA4 S4PTR * ) ;  /* testing only */
 #endif
 #ifndef S4SERVER
-   S4EXPORT int S4FUNCTION d4log( DATA4 S4PTR *, const int ) ;
+   PUBLIC int S4FUNCTION d4log( DATA4 S4PTR *, const int ) ;
 #endif
 #ifndef S4COMP_OFF_MEMO
-   S4EXPORT int S4FUNCTION d4memoCompress( DATA4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4memoCompress( DATA4 S4PTR * ) ;
 #endif
-S4EXPORT short int S4FUNCTION d4numFields( DATA4 S4PTR * ) ;
-S4EXPORT DATA4 S4PTR *S4FUNCTION d4open( CODE4 S4PTR *, const char S4PTR * ) ;
-S4EXPORT DATA4 S4PTR *S4FUNCTION d4openClone( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4optimizeWrite( DATA4 S4PTR *, const int ) ;
-S4EXPORT int S4FUNCTION d4pack( DATA4 S4PTR * ) ;
-S4EXPORT double S4FUNCTION d4position( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4position2( DATA4 S4PTR *, double S4PTR * ) ;
-S4EXPORT long S4FUNCTION d4recCountDo( DATA4 S4PTR * ) ;
-S4EXPORT long S4FUNCTION d4recNo( DATA4 S4PTR * ) ;
-S4EXPORT char S4PTR *S4FUNCTION d4record( DATA4 S4PTR * ) ;
-S4EXPORT char S4PTR *S4FUNCTION d4recordOld( DATA4 S4PTR * ) ;
-S4EXPORT unsigned int S4FUNCTION d4recWidth( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4refresh( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4skip( DATA4 S4PTR *, const long ) ;
-S4EXPORT int S4FUNCTION d4top( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4unappend( DATA4 * ) ;  /* internal only */
-S4EXPORT int S4FUNCTION d4writeLow( DATA4 S4PTR *, const long, const int ) ;
-S4EXPORT int S4FUNCTION d4zap( DATA4 S4PTR *, const long, const long ) ;
+PUBLIC short int S4FUNCTION d4numFields( DATA4 S4PTR * ) ;
+PUBLIC DATA4 S4PTR *S4FUNCTION d4open( CODE4 S4PTR *, const char S4PTR * ) ;
+PUBLIC DATA4 S4PTR *S4FUNCTION d4openClone( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4optimizeWrite( DATA4 S4PTR *, const int ) ;
+PUBLIC int S4FUNCTION d4pack( DATA4 S4PTR * ) ;
+PUBLIC double S4FUNCTION d4position( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4position2( DATA4 S4PTR *, double S4PTR * ) ;
+PUBLIC long S4FUNCTION d4recCountDo( DATA4 S4PTR * ) ;
+PUBLIC long S4FUNCTION d4recNo( DATA4 S4PTR * ) ;
+PUBLIC char S4PTR *S4FUNCTION d4record( DATA4 S4PTR * ) ;
+PUBLIC char S4PTR *S4FUNCTION d4recordOld( DATA4 S4PTR * ) ;
+PUBLIC unsigned int S4FUNCTION d4recWidth( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4refresh( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4skip( DATA4 S4PTR *, const long ) ;
+PUBLIC int S4FUNCTION d4top( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4unappend( DATA4 * ) ;  /* internal only */
+PUBLIC int S4FUNCTION d4writeLow( DATA4 S4PTR *, const long, const int ) ;
+PUBLIC int S4FUNCTION d4zap( DATA4 S4PTR *, const long, const long ) ;
 #ifdef S4OFF_MULTI
    #define d4recCount( d4 ) ( dfile4recCount( ( d4->dataFile ), 0 ) )
 #else
    #define d4recCount( d4 ) ( d4recCountDo( d4 ) )
 #endif
 #ifndef S4COMP_OFF_INDEX
-   S4EXPORT int S4FUNCTION d4reindex( DATA4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION d4seek( DATA4 S4PTR *, const char S4PTR * ) ;
-   S4EXPORT int S4FUNCTION d4seekDouble( DATA4 S4PTR *, const double ) ;
-   S4EXPORT int S4FUNCTION d4seekN( DATA4 S4PTR *, const char S4PTR *, const short ) ;
-   S4EXPORT TAG4 S4PTR *S4FUNCTION d4tag( DATA4 S4PTR *, const char S4PTR * const ) ;
-   S4EXPORT TAG4 S4PTR *S4FUNCTION d4tagDefault( DATA4 S4PTR * ) ;
-   S4EXPORT TAG4 S4PTR *S4FUNCTION d4tagNext( DATA4 S4PTR *, TAG4 S4PTR * ) ;
-   S4EXPORT TAG4 S4PTR *S4FUNCTION d4tagPrev( DATA4 S4PTR *, TAG4 S4PTR * ) ;
-   S4EXPORT void S4FUNCTION d4tagSelect( DATA4 S4PTR *, TAG4 S4PTR * ) ;
-   S4EXPORT TAG4 S4PTR *S4FUNCTION d4tagSelected( DATA4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION d4tagSync( DATA4 S4PTR *, TAG4 S4PTR * const ) ;
-   S4EXPORT int S4FUNCTION d4numTags(DATA4 S4PTR *);
+   PUBLIC int S4FUNCTION d4reindex( DATA4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4seek( DATA4 S4PTR *, const char S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4seekDouble( DATA4 S4PTR *, const double ) ;
+   PUBLIC int S4FUNCTION d4seekN( DATA4 S4PTR *, const char S4PTR *, const short ) ;
+   PUBLIC TAG4 S4PTR *S4FUNCTION d4tag( DATA4 S4PTR *, const char S4PTR * const ) ;
+   PUBLIC TAG4 S4PTR *S4FUNCTION d4tagDefault( DATA4 S4PTR * ) ;
+   PUBLIC TAG4 S4PTR *S4FUNCTION d4tagNext( DATA4 S4PTR *, TAG4 S4PTR * ) ;
+   PUBLIC TAG4 S4PTR *S4FUNCTION d4tagPrev( DATA4 S4PTR *, TAG4 S4PTR * ) ;
+   PUBLIC void S4FUNCTION d4tagSelect( DATA4 S4PTR *, TAG4 S4PTR * ) ;
+   PUBLIC TAG4 S4PTR *S4FUNCTION d4tagSelected( DATA4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4tagSync( DATA4 S4PTR *, TAG4 S4PTR * const ) ;
+   PUBLIC int S4FUNCTION d4numTags(DATA4 S4PTR *);
 #endif /* S4COMP_OFF_INDEX */
 #ifndef S4COMP_OFF_MULTI
    #ifndef S4SINGLE
-      S4EXPORT int S4FUNCTION d4unlockLow( DATA4 *, long, char ) ;
+      PUBLIC int S4FUNCTION d4unlockLow( DATA4 *, long, char ) ;
    #endif
    #ifndef S4SERVER
-      S4EXPORT int S4FUNCTION d4unlock( DATA4 S4PTR * ) ;
+      PUBLIC int S4FUNCTION d4unlock( DATA4 S4PTR * ) ;
    #endif
-   S4EXPORT int S4FUNCTION d4unlockRecord( DATA4 *, long ) ;  /* exported for SQL */
+   PUBLIC int S4FUNCTION d4unlockRecord( DATA4 *, long ) ;  /* exported for SQL */
 #endif
 #ifndef S4CB51
-   S4EXPORT int S4FUNCTION d4seekNext( DATA4 S4PTR *, const char S4PTR * ) ;
-   S4EXPORT int S4FUNCTION d4seekNextDouble( DATA4 S4PTR *, const double ) ;
-   S4EXPORT int S4FUNCTION d4seekNextN( DATA4 S4PTR *, const char S4PTR *, const short ) ;
+   PUBLIC int S4FUNCTION d4seekNext( DATA4 S4PTR *, const char S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4seekNextDouble( DATA4 S4PTR *, const double ) ;
+   PUBLIC int S4FUNCTION d4seekNextN( DATA4 S4PTR *, const char S4PTR *, const short ) ;
 #endif  /* S4CB51 */
 #ifndef S4COMP_OFF_MULTI
-   S4EXPORT int S4FUNCTION dfile4lockTestFile( DATA4FILE S4PTR *, const long, const long ) ;
+   PUBLIC int S4FUNCTION dfile4lockTestFile( DATA4FILE S4PTR *, const long, const long ) ;
 #endif
-#ifdef S4CLIENT
-   #ifndef S4COMP_OFF_MULTI
-      #define d4lockTestFile( d4 ) ( d4lockTestFileLow( d4 ) )
-      S4EXPORT int S4FUNCTION d4lockTestFileLow( DATA4 S4PTR * ) ;  /* testing only */
-   #endif
-#else
    #ifndef S4COMP_OFF_MULTI
       #define d4lockTestFile( d4 ) ( dfile4lockTestFile( (d4)->dataFile, data4clientId( d4 ), data4serverId( d4 ) ) )
       #ifndef S4OFF_MULTI
          #define d4lockIndex( d4 ) ( dfile4lockIndex( (d4)->dataFile, data4serverId( d4 ) ) )
       #endif
    #endif
-   S4EXPORT int S4FUNCTION dfile4remove( DATA4FILE S4PTR * ) ;
-#endif /* S4CLIENT */
+   PUBLIC int S4FUNCTION dfile4remove( DATA4FILE S4PTR * ) ;
 #ifndef S4COMP_OFF_MULTI
    #ifdef S4STAND_ALONE
       #define d4lockTestAppend( d4 ) ( dfile4lockTestAppend( (d4)->dataFile, data4clientId( d4 ), data4serverId( d4 ) ) )
@@ -257,141 +237,137 @@ S4EXPORT int S4FUNCTION d4zap( DATA4 S4PTR *, const long, const long ) ;
       #define d4lockTestAppend( d4 ) ( d4lockTestAppendLow( d4 ) )
    #endif
 #endif
-S4EXPORT int S4FUNCTION d4deleted( DATA4 S4PTR * ) ;
-S4EXPORT FIELD4INFO S4PTR * S4FUNCTION d4fieldInfo( DATA4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION d4remove( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4deleted( DATA4 S4PTR * ) ;
+PUBLIC FIELD4INFO S4PTR * S4FUNCTION d4fieldInfo( DATA4 S4PTR * ) ;
+PUBLIC int S4FUNCTION d4remove( DATA4 S4PTR * ) ;
 #define d4write( a, b ) ( d4writeLow( a, b, 0 ) )
 #ifdef S4SERVER
-   S4EXPORT long S4FUNCTION d4positionSet( DATA4 S4PTR *, const double ) ;
+   PUBLIC long S4FUNCTION d4positionSet( DATA4 S4PTR *, const double ) ;
 #else
-   S4EXPORT int S4FUNCTION d4changed( DATA4 S4PTR *, int ) ;
-   S4EXPORT int S4FUNCTION d4optimize( DATA4 S4PTR *, const int ) ;
-   S4EXPORT int S4FUNCTION d4positionSet( DATA4 S4PTR *, const double ) ;
-   S4EXPORT void S4FUNCTION d4recall( DATA4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION d4refreshRecord( DATA4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4changed( DATA4 S4PTR *, int ) ;
+   PUBLIC int S4FUNCTION d4optimize( DATA4 S4PTR *, const int ) ;
+   PUBLIC int S4FUNCTION d4positionSet( DATA4 S4PTR *, const double ) ;
+   PUBLIC void S4FUNCTION d4recall( DATA4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4refreshRecord( DATA4 S4PTR * ) ;
    #ifdef S4CB51
-      S4EXPORT int S4FUNCTION d4lock_group( DATA4 S4PTR *, const long S4PTR *, const int ) ;
+      PUBLIC int S4FUNCTION d4lock_group( DATA4 S4PTR *, const long S4PTR *, const int ) ;
    #endif
 #endif /* S4SERVER */
 #ifndef S4OFF_MULTI
-   S4EXPORT int S4FUNCTION dfile4lockTestAppend( DATA4FILE S4PTR *, const long, const long ) ;
-   S4EXPORT int S4FUNCTION dfile4unlockRecord( DATA4FILE *, const long, const long, const long ) ;
+   PUBLIC int S4FUNCTION dfile4lockTestAppend( DATA4FILE S4PTR *, const long, const long ) ;
+   PUBLIC int S4FUNCTION dfile4unlockRecord( DATA4FILE *, const long, const long, const long ) ;
 #endif /* S4OFF_MULTI */
 #ifdef S4OFF_TRAN
    #define d4logStatus( d4 ) ( 0 )
 #else
-   #ifdef S4CLIENT
-      #define d4logStatus( d4 ) ( 0 )
-   #else
       #define d4logStatus( d4 ) ( (d4)->logVal == 0 ? 0 : 1 )
-   #endif
 #endif
 
 /* DATE4 */
-S4EXPORT int S4FUNCTION date4assign( char S4PTR *, const long ) ;
-S4EXPORT S4CONST char *S4FUNCTION date4cdow( const char S4PTR * ) ;
-S4EXPORT S4CONST char *S4FUNCTION date4cmonth( const char S4PTR * ) ;
-S4EXPORT int S4FUNCTION date4dow( const char S4PTR * ) ;
-S4EXPORT void S4FUNCTION date4format( const char S4PTR *, char S4PTR *, char S4PTR * ) ;/* 'dt' may be 'result'*/
-S4EXPORT double S4FUNCTION date4formatMdx( const char S4PTR * ) ;
-S4EXPORT int S4FUNCTION date4formatMdx2( const char S4PTR * , double S4PTR * ) ;
-S4EXPORT void S4FUNCTION date4init( char S4PTR *, const char S4PTR *, char S4PTR * ) ;
-S4EXPORT int S4FUNCTION date4isLeap( const char S4PTR * ) ;
-S4EXPORT long S4FUNCTION date4long( const char S4PTR * ) ;
-S4EXPORT void S4FUNCTION date4timeNow( char S4PTR * ) ;
-S4EXPORT void S4FUNCTION date4today( char S4PTR * ) ;
+PUBLIC          int  S4FUNCTION date4assign( char S4PTR *, const long ) ;
+PUBLIC S4CONST char *S4FUNCTION date4cdow( const char S4PTR * ) ;
+PUBLIC S4CONST char *S4FUNCTION date4cmonth( const char S4PTR * ) ;
+PUBLIC          int  S4FUNCTION date4dow( const char S4PTR * ) ;
+PUBLIC         void  S4FUNCTION date4format( const char S4PTR *, char S4PTR *, char S4PTR * ) ;/* 'dt' may be 'result'*/
+PUBLIC       double  S4FUNCTION date4formatMdx( const char S4PTR * ) ;
+PUBLIC          int  S4FUNCTION date4formatMdx2( const char S4PTR * , double S4PTR * ) ;
+PUBLIC         void  S4FUNCTION date4init(       char S4PTR *, const char S4PTR *, char S4PTR * ) ;
+PUBLIC          int  S4FUNCTION date4isLeap( const char S4PTR * ) ;
+PUBLIC         long  S4FUNCTION date4long(   const char S4PTR * ) ;
+PUBLIC         void  S4FUNCTION date4timeNow( char S4PTR * ) ;
+PUBLIC         void  S4FUNCTION date4today(    char S4PTR * ) ;
 #define date4day( datePtr )    ( (int)c4atol( (datePtr) + 6, 2 ) )
 #define date4month( datePtr )  ( (int)c4atol( (datePtr) + 4, 2 ) )
 #define date4year( yearPtr )   ( (int)c4atol( (yearPtr), 4 ) )
 
 /* ERROR4 */
-S4EXPORT int S4FUNCTION error4default( CODE4 S4PTR *, const int, const long ) ;
-S4EXPORT int S4FUNCTION error4describeDefault( CODE4 S4PTR *, const int, const long, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
-S4EXPORT int S4FUNCTION error4describeExecute( CODE4 S4PTR *, const int, const long, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
-S4EXPORT int S4FUNCTION error4file( CODE4 S4PTR *, S4CONST char S4PTR *, const int ) ;
-S4EXPORT void S4FUNCTION error4hook( CODE4 S4PTR *, int, long, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
-S4EXPORT int S4FUNCTION error4set( CODE4 S4PTR *, const int ) ;
-S4EXPORT int S4FUNCTION error4set2( CODE4 S4PTR *, const long ) ;
-S4EXPORT const char S4PTR * S4FUNCTION error4text( CODE4 S4PTR *, const long ) ;
+PUBLIC int S4FUNCTION error4default( CODE4 S4PTR *, const int, const long ) ;
+PUBLIC int S4FUNCTION error4describeDefault( CODE4 S4PTR *, const int, const long, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
+PUBLIC int S4FUNCTION error4describeExecute( CODE4 S4PTR *, const int, const long, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
+PUBLIC int S4FUNCTION error4file( CODE4 S4PTR *, S4CONST char S4PTR *, const int ) ;
+PUBLIC void S4FUNCTION error4hook( CODE4 S4PTR *, int, long, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
+PUBLIC int S4FUNCTION error4set( CODE4 S4PTR *, const int ) ;
+PUBLIC int S4FUNCTION error4set2( CODE4 S4PTR *, const long ) ;
+PUBLIC const char S4PTR * S4FUNCTION error4text( CODE4 S4PTR *, const long ) ;
 #ifdef S4CB51
-   S4EXPORT S4CONST char S4PTR *S4FUNCTION e4text( const int ) ;
-   S4EXPORT int S4FUNCTION e4describe( CODE4 S4PTR *, int, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
-   S4EXPORT void S4FUNCTION e4hook( CODE4 S4PTR *, int, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
-   S4EXPORT int S4FUNCTION e4log( CODE4 S4PTR *, const char S4PTR * ) ;
+   PUBLIC S4CONST char S4PTR *S4FUNCTION e4text( const int ) ;
+   PUBLIC int S4FUNCTION e4describe( CODE4 S4PTR *, int, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
+   PUBLIC void S4FUNCTION e4hook( CODE4 S4PTR *, int, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
+   PUBLIC int S4FUNCTION e4log( CODE4 S4PTR *, const char S4PTR * ) ;
    #define e4exitTest( c4 ) ( error4exitTest( c4 ) )
    #ifndef S4SERVER
-      S4EXPORT void S4FUNCTION e4severe( const int, const char S4PTR * ) ;
-      S4EXPORT void S4FUNCTION error4exitTest( CODE4 S4PTR * ) ;
+      PUBLIC void S4FUNCTION e4severe( const int, const char S4PTR * ) ;
+      PUBLIC void S4FUNCTION error4exitTest( CODE4 S4PTR * ) ;
       #ifdef S4VBASIC
-         S4EXPORT void S4FUNCTION e4severe_vbasic( int, const char S4PTR * ) ;
+         PUBLIC void S4FUNCTION e4severe_vbasic( int, const char S4PTR * ) ;
       #endif
    #endif /* S4SERVER */
 #endif /* S4CB51 */
 #ifndef S4SERVER
-   S4EXPORT void S4FUNCTION error4exitTest( CODE4 S4PTR * ) ;
+   PUBLIC void S4FUNCTION error4exitTest( CODE4 S4PTR * ) ;
 #endif /* S4SERVER */
 #ifdef E4STACK
-   S4EXPORT int S4FUNCTION error4stackDefault( CODE4 S4PTR *, const int, const long ) ;
+   PUBLIC int S4FUNCTION error4stackDefault( CODE4 S4PTR *, const int, const long ) ;
 #endif
 #ifdef S4COM_PRINT
    const char *s4connectionPrint(const int type ) ;
 #endif
 
 /* FIELD4 */
-S4EXPORT void S4FUNCTION f4assign( FIELD4 S4PTR *, const char S4PTR * ) ;
-S4EXPORT void S4FUNCTION f4assignChar( FIELD4 S4PTR *, const int ) ;
-S4EXPORT void S4FUNCTION f4assignDouble( FIELD4 S4PTR *, const double ) ;
-S4EXPORT void S4FUNCTION f4assignField( FIELD4 S4PTR *, const FIELD4 S4PTR * ) ;
-S4EXPORT void S4FUNCTION f4assignInt( FIELD4 S4PTR *, const int ) ;
-S4EXPORT void S4FUNCTION f4assignLong( FIELD4 S4PTR *, const long ) ;
-S4EXPORT void S4FUNCTION f4assignN( FIELD4 S4PTR *, const char S4PTR *, const unsigned int ) ;
-S4EXPORT void S4FUNCTION f4assignNull( FIELD4 S4PTR * ) ;
-S4EXPORT char S4PTR * S4FUNCTION f4assignPtr( FIELD4 S4PTR * ) ;
-S4EXPORT void S4FUNCTION f4blank( FIELD4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION f4char( const FIELD4 S4PTR * ) ;
-S4EXPORT DATA4 S4PTR *S4FUNCTION f4data( const FIELD4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION f4decimals( const FIELD4 S4PTR * ) ;
-S4EXPORT double S4FUNCTION f4double( const FIELD4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION f4double2( const FIELD4 S4PTR *, double S4PTR * ) ;
-S4EXPORT int S4FUNCTION f4int( const FIELD4 S4PTR * ) ;
-S4EXPORT unsigned int S4FUNCTION f4len( const FIELD4 S4PTR * ) ;
-S4EXPORT long S4FUNCTION f4long( const FIELD4 S4PTR * ) ;
+PUBLIC void S4FUNCTION f4assign( FIELD4 S4PTR *, const char S4PTR * ) ;
+PUBLIC void S4FUNCTION f4assignChar( FIELD4 S4PTR *, const int ) ;
+PUBLIC void S4FUNCTION f4assignDouble( FIELD4 S4PTR *, const double ) ;
+PUBLIC void S4FUNCTION f4assignField( FIELD4 S4PTR *, const FIELD4 S4PTR * ) ;
+PUBLIC void S4FUNCTION f4assignInt( FIELD4 S4PTR *, const int ) ;
+PUBLIC void S4FUNCTION f4assignLong( FIELD4 S4PTR *, const long ) ;
+PUBLIC void S4FUNCTION f4assignN( FIELD4 S4PTR *, const char S4PTR *, const unsigned int ) ;
+PUBLIC void S4FUNCTION f4assignNull( FIELD4 S4PTR * ) ;
+PUBLIC char S4PTR * S4FUNCTION f4assignPtr( FIELD4 S4PTR * ) ;
+PUBLIC void S4FUNCTION f4blank( FIELD4 S4PTR * ) ;
+PUBLIC int S4FUNCTION f4char( const FIELD4 S4PTR * ) ;
+PUBLIC DATA4 S4PTR *S4FUNCTION f4data( const FIELD4 S4PTR * ) ;
+PUBLIC int S4FUNCTION f4decimals( const FIELD4 S4PTR * ) ;
+PUBLIC double S4FUNCTION f4double( const FIELD4 S4PTR * ) ;
+PUBLIC int S4FUNCTION f4double2( const FIELD4 S4PTR *, double S4PTR * ) ;
+PUBLIC int S4FUNCTION f4int( const FIELD4 S4PTR * ) ;
+PUBLIC unsigned int S4FUNCTION f4len( const FIELD4 S4PTR * ) ;
+PUBLIC long S4FUNCTION f4long( const FIELD4 S4PTR * ) ;
 #ifndef S4COMP_OFF_MEMO
-   S4EXPORT int S4FUNCTION f4memoAssign( FIELD4 S4PTR *, const char S4PTR * ) ;
-   S4EXPORT int S4FUNCTION f4memoAssignN( FIELD4 S4PTR *, const char S4PTR *, const unsigned int ) ;
-   S4EXPORT int S4FUNCTION f4memoFree( FIELD4 S4PTR * ) ;
-   S4EXPORT unsigned int S4FUNCTION f4memoLen( FIELD4 S4PTR * ) ;
-   S4EXPORT unsigned int S4FUNCTION f4memoNcpy( FIELD4 S4PTR *, char S4PTR *, const unsigned int ) ;
-   S4EXPORT char S4PTR * S4FUNCTION f4memoPtr( FIELD4 S4PTR * ) ;
-   S4EXPORT S4CONST char S4PTR * S4FUNCTION f4memoStr( FIELD4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION f4memoAssign( FIELD4 S4PTR *, const char S4PTR * ) ;
+   PUBLIC int S4FUNCTION f4memoAssignN( FIELD4 S4PTR *, const char S4PTR *, const unsigned int ) ;
+   PUBLIC int S4FUNCTION f4memoFree( FIELD4 S4PTR * ) ;
+   PUBLIC unsigned int S4FUNCTION f4memoLen( FIELD4 S4PTR * ) ;
+   PUBLIC unsigned int S4FUNCTION f4memoNcpy( FIELD4 S4PTR *, char S4PTR *, const unsigned int ) ;
+   PUBLIC char S4PTR * S4FUNCTION f4memoPtr( FIELD4 S4PTR * ) ;
+   PUBLIC S4CONST char S4PTR * S4FUNCTION f4memoStr( FIELD4 S4PTR * ) ;
    void f4memoAssignField( FIELD4 *, FIELD4 * ) ;
 #endif
-S4EXPORT S4CONST char S4PTR * S4FUNCTION f4name( S4CONST FIELD4 S4PTR * ) ;
-S4EXPORT unsigned int S4FUNCTION f4ncpy( FIELD4 S4PTR *, char S4PTR *, const unsigned int ) ;
-S4EXPORT int S4FUNCTION f4null( const FIELD4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION f4number( const FIELD4 S4PTR * ) ;
-S4EXPORT char S4PTR * S4FUNCTION f4ptr( const FIELD4 S4PTR * ) ;
-S4EXPORT char S4PTR * S4FUNCTION f4str( FIELD4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION f4true( const FIELD4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION f4type( const FIELD4 S4PTR * ) ;
-#ifdef S4CLIENT_OR_FOX  /*Internal function */
+PUBLIC S4CONST char S4PTR * S4FUNCTION f4name( S4CONST FIELD4 S4PTR * ) ;
+PUBLIC unsigned int S4FUNCTION f4ncpy( FIELD4 S4PTR *, char S4PTR *, const unsigned int ) ;
+PUBLIC int S4FUNCTION f4null( const FIELD4 S4PTR * ) ;
+PUBLIC int S4FUNCTION f4number( const FIELD4 S4PTR * ) ;
+PUBLIC char S4PTR * S4FUNCTION f4ptr( const FIELD4 S4PTR * ) ;
+PUBLIC char S4PTR * S4FUNCTION f4str( FIELD4 S4PTR * ) ;
+PUBLIC int S4FUNCTION f4true( const FIELD4 S4PTR * ) ;
+PUBLIC int S4FUNCTION f4type( const FIELD4 S4PTR * ) ;
+#ifdef CLIENT_OR_FOX  /*Internal function */
    void S4FUNCTION f4assignNotNull( FIELD4 *field );
 #endif
 
 /* FILE4 */
-S4EXPORT int    S4FUNCTION file4close( FILE4 S4PTR * ) ;
-S4EXPORT int    S4FUNCTION file4create( FILE4 S4PTR *, CODE4 S4PTR *, S4CONST char S4PTR *, const int ) ;
-S4EXPORT int    S4FUNCTION file4flush( FILE4 S4PTR * ) ;
-S4EXPORT FILE4LONG S4FUNCTION file4lenLow( FILE4 S4PTR * ) ;
+PUBLIC int    S4FUNCTION file4close( FILE4 S4PTR * ) ;
+PUBLIC int    S4FUNCTION file4create( FILE4 S4PTR *, CODE4 S4PTR *, S4CONST char S4PTR *, const int ) ;
+PUBLIC int    S4FUNCTION file4flush( FILE4 S4PTR * ) ;
+PUBLIC FILE4LONG S4FUNCTION file4lenLow( FILE4 S4PTR * ) ;
 
 #ifdef S4FILE_EXTENDED
    int file4lenSetLow( FILE4 S4PTR *, FILE4LONG ) ;
 #else
-   S4EXPORT int S4FUNCTION file4lenSetLow( FILE4 S4PTR *, FILE4LONG ) ;
+   PUBLIC int S4FUNCTION file4lenSetLow( FILE4 S4PTR *, FILE4LONG ) ;
 #endif
 #ifndef S4INTERNAL_COMPILE_CHECK
    #ifdef S4FILE_EXTENDED
-      S4EXPORT int    S4FUNCTION file4lenSet( FILE4 *, long ) ;
+      PUBLIC int    S4FUNCTION file4lenSet( FILE4 *, long ) ;
    #else
       #define file4lenSet( f4, len ) file4lenSetLow( f4, len )
    #endif
@@ -399,94 +375,94 @@ S4EXPORT FILE4LONG S4FUNCTION file4lenLow( FILE4 S4PTR * ) ;
 #ifndef S4INTERNAL_COMPILE_CHECK
    #define file4lock( f4, a, b ) file4lockInternal( (f4), (unsigned long)a, 0, (unsigned long)b, 0 )
 #endif
-S4EXPORT int    S4FUNCTION file4lockInternal( FILE4 S4PTR *, unsigned long, long, unsigned long, long ) ;
+PUBLIC int    S4FUNCTION file4lockInternal( FILE4 S4PTR *, unsigned long, long, unsigned long, long ) ;
 #define file4name( f4 ) ( (f4)->name )
-S4EXPORT int    S4FUNCTION file4open( FILE4 S4PTR *, CODE4 S4PTR *, S4CONST char S4PTR *, const int ) ;
-S4EXPORT int    S4FUNCTION file4openTest( FILE4 S4PTR * ) ;
-S4EXPORT int    S4FUNCTION file4optimizeLow( FILE4 S4PTR *, const int, const int, const long, const void S4PTR * ) ;
+PUBLIC int    S4FUNCTION file4open( FILE4 S4PTR *, CODE4 S4PTR *, S4CONST char S4PTR *, const int ) ;
+PUBLIC int    S4FUNCTION file4openTest( FILE4 S4PTR * ) ;
+PUBLIC int    S4FUNCTION file4optimizeLow( FILE4 S4PTR *, const int, const int, const long, const void S4PTR * ) ;
 #define file4optimize( f4, i1, i2 ) ( file4optimizeLow( (f4), (i1), (i2), 0, 0 ) )
-S4EXPORT int    S4FUNCTION file4optimizeWrite( FILE4 S4PTR *, const int ) ;
+PUBLIC int    S4FUNCTION file4optimizeWrite( FILE4 S4PTR *, const int ) ;
 int file4readAllInternal( FILE4 *, FILE4LONG, void *, unsigned ) ;
 unsigned file4readInternal( FILE4 *, FILE4LONG, void *, unsigned ) ;
 #ifndef S4INTERNAL_COMPILE_CHECK
-   S4EXPORT unsigned int S4FUNCTION file4read( FILE4 S4PTR *, const long, void S4PTR *, const unsigned int ) ;
-   S4EXPORT int    S4FUNCTION file4readAll( FILE4 S4PTR *, const long, void S4PTR *, const unsigned int ) ;
+   PUBLIC unsigned int S4FUNCTION file4read( FILE4 S4PTR *, const long, void S4PTR *, const unsigned int ) ;
+   PUBLIC int    S4FUNCTION file4readAll( FILE4 S4PTR *, const long, void S4PTR *, const unsigned int ) ;
 #endif
-S4EXPORT int    S4FUNCTION file4readError( FILE4 S4PTR *, FILE4LONG, unsigned, const char S4PTR * ) ;
-S4EXPORT int    S4FUNCTION file4refresh( FILE4 S4PTR * ) ;
-S4EXPORT int    S4FUNCTION file4replace( FILE4 S4PTR *, FILE4 S4PTR * ) ;
+PUBLIC int    S4FUNCTION file4readError( FILE4 S4PTR *, FILE4LONG, unsigned, const char S4PTR * ) ;
+PUBLIC int    S4FUNCTION file4refresh( FILE4 S4PTR * ) ;
+PUBLIC int    S4FUNCTION file4replace( FILE4 S4PTR *, FILE4 S4PTR * ) ;
 #ifndef S4INTERNAL_COMPILE_CHECK
    #define file4unlock( f4, a, b ) file4unlockInternal( (f4), (unsigned long)(a), 0, (unsigned long)(b), 0 )
 #endif
-S4EXPORT int    S4FUNCTION file4unlockInternal( FILE4 S4PTR *, unsigned long, long, unsigned long, long ) ;
+PUBLIC int    S4FUNCTION file4unlockInternal( FILE4 S4PTR *, unsigned long, long, unsigned long, long ) ;
 int file4writeInternal( FILE4 *, FILE4LONG, const void *, unsigned ) ;
 #ifndef S4INTERNAL_COMPILE_CHECK
-   S4EXPORT int    S4FUNCTION file4write( FILE4 S4PTR *, const long, const void S4PTR *, const unsigned int ) ;
+   PUBLIC int    S4FUNCTION file4write( FILE4 S4PTR *, const long, const void S4PTR *, const unsigned int ) ;
 #endif
 #ifdef S4CB51
    int S4FUNCTION file4temp( FILE4 *file, CODE4 *c4, char *buf, const int auto_remove ) ;
 #else
-   S4EXPORT int    S4FUNCTION file4temp( FILE4 S4PTR *, CODE4 S4PTR *, char *, const int ) ;
+   PUBLIC int    S4FUNCTION file4temp( FILE4 S4PTR *, CODE4 S4PTR *, char *, const int ) ;
    #ifdef E4LOCK_HOOK
-      S4EXPORT int S4FUNCTION file4lockHook( CODE4 S4PTR *, const char S4PTR *, long, long, int ) ;
+      PUBLIC int S4FUNCTION file4lockHook( CODE4 S4PTR *, const char S4PTR *, long, long, int ) ;
    #endif
 #endif
 
 /* FILE4SEQ_READ */
-S4EXPORT int S4FUNCTION file4seqReadInitDo( FILE4SEQ_READ *, FILE4 *, FILE4LONG, void *, const unsigned, const int ) ;
+PUBLIC int S4FUNCTION file4seqReadInitDo( FILE4SEQ_READ *, FILE4 *, FILE4LONG, void *, const unsigned, const int ) ;
 #ifndef S4INTERNAL_COMPILE_CHECK
-   S4EXPORT int S4FUNCTION file4seqReadInit( FILE4SEQ_READ S4PTR *, FILE4 S4PTR *, long, void S4PTR *, const unsigned ) ;
+   PUBLIC int S4FUNCTION file4seqReadInit( FILE4SEQ_READ S4PTR *, FILE4 S4PTR *, long, void S4PTR *, const unsigned ) ;
 #endif
 #ifdef S4ADVANCE_READ
    void file4seqReadInitUndo( const FILE4SEQ_READ * ) ;
 #endif
-S4EXPORT unsigned int S4FUNCTION file4seqRead( FILE4SEQ_READ S4PTR *, void S4PTR *, unsigned ) ;
-S4EXPORT int    S4FUNCTION file4seqReadAll( FILE4SEQ_READ S4PTR *, void S4PTR *, const unsigned int ) ;
+PUBLIC unsigned int S4FUNCTION file4seqRead( FILE4SEQ_READ S4PTR *, void S4PTR *, unsigned ) ;
+PUBLIC int    S4FUNCTION file4seqReadAll( FILE4SEQ_READ S4PTR *, void S4PTR *, const unsigned int ) ;
 
 /* FILE4SEQ_WRITE */
 int file4seqWriteInitLow( FILE4SEQ_WRITE *seqWrite, FILE4 *file, FILE4LONG startOffset, void *ptr, const unsigned ptrLen ) ;
 #ifndef S4INTERNAL_COMPILE_CHECK
-   S4EXPORT int    S4FUNCTION file4seqWriteInit( FILE4SEQ_WRITE S4PTR *, FILE4 S4PTR *, const long, void S4PTR *, const unsigned int ) ;
+   PUBLIC int    S4FUNCTION file4seqWriteInit( FILE4SEQ_WRITE S4PTR *, FILE4 S4PTR *, const long, void S4PTR *, const unsigned int ) ;
 #endif
-S4EXPORT int    S4FUNCTION file4seqWrite( FILE4SEQ_WRITE S4PTR *, const void S4PTR *, const unsigned int ) ;
-S4EXPORT int    S4FUNCTION file4seqWriteFlush( FILE4SEQ_WRITE S4PTR * ) ;
-S4EXPORT int    S4FUNCTION file4seqWriteRepeat( FILE4SEQ_WRITE S4PTR *, const long, const char ) ;
+PUBLIC int    S4FUNCTION file4seqWrite( FILE4SEQ_WRITE S4PTR *, const void S4PTR *, const unsigned int ) ;
+PUBLIC int    S4FUNCTION file4seqWriteFlush( FILE4SEQ_WRITE S4PTR * ) ;
+PUBLIC int    S4FUNCTION file4seqWriteRepeat( FILE4SEQ_WRITE S4PTR *, const long, const char ) ;
 
 /* INDEX4 */
 #ifndef S4COMP_OFF_INDEX
-   S4EXPORT int S4FUNCTION i4close( INDEX4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION i4closeLow( INDEX4 S4PTR * ) ;
-   S4EXPORT INDEX4 S4PTR *S4FUNCTION i4create( DATA4 S4PTR *, const char S4PTR *, const TAG4INFO S4PTR * ) ; /* 0 name -> productn */
-   S4EXPORT const char S4PTR *S4FUNCTION i4fileName( INDEX4 S4PTR * ) ;
-   S4EXPORT const char S4PTR *S4FUNCTION t4fileName( TAG4 S4PTR * ) ;
-   S4EXPORT INDEX4 S4PTR *S4FUNCTION i4open( DATA4 S4PTR *, const char S4PTR * ) ;
-   S4EXPORT int S4FUNCTION i4reindex( INDEX4 S4PTR * ) ;
-   S4EXPORT TAG4 S4PTR *S4FUNCTION i4tag( INDEX4 S4PTR *, const char S4PTR * ) ;
-   S4EXPORT int S4FUNCTION i4tagAdd( INDEX4 S4PTR *, const TAG4INFO S4PTR * ) ;
-   S4EXPORT TAG4INFO *S4FUNCTION i4tagInfo( INDEX4 * ) ;
-   S4EXPORT int S4FUNCTION i4tagRemove( TAG4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION d4indexesRemove( DATA4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION i4close( INDEX4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION i4closeLow( INDEX4 S4PTR * ) ;
+   PUBLIC INDEX4 S4PTR *S4FUNCTION i4create( DATA4 S4PTR *, const char S4PTR *, const TAG4INFO S4PTR * ) ; /* 0 name -> productn */
+   PUBLIC const char S4PTR *S4FUNCTION i4fileName( INDEX4 S4PTR * ) ;
+   PUBLIC const char S4PTR *S4FUNCTION t4fileName( TAG4 S4PTR * ) ;
+   PUBLIC INDEX4 S4PTR *S4FUNCTION i4open( DATA4 S4PTR *, const char S4PTR * ) ;
+   PUBLIC int S4FUNCTION i4reindex( INDEX4 S4PTR * ) ;
+   PUBLIC TAG4 S4PTR *S4FUNCTION i4tag( INDEX4 S4PTR *, const char S4PTR * ) ;
+   PUBLIC int S4FUNCTION i4tagAdd( INDEX4 S4PTR *, const TAG4INFO S4PTR * ) ;
+   PUBLIC TAG4INFO *S4FUNCTION i4tagInfo( INDEX4 * ) ;
+   PUBLIC int S4FUNCTION i4tagRemove( TAG4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4indexesRemove( DATA4 S4PTR * ) ;
    int i4indexRemove( INDEX4 * ) ;
 #endif /* S4COMP_OFF_INDEX */
 
-S4EXPORT int S4FUNCTION expr4getReturnType( EXPR4 S4PTR *, int ) ;
+PUBLIC int S4FUNCTION expr4getReturnType( EXPR4 S4PTR *, int ) ;
 
 #ifdef S4JAVA
-   S4EXPORT int S4FUNCTION java4processMessage( CODE4 *, struct SERVER4CLIENTSt *, short ) ;
+   PUBLIC int S4FUNCTION java4processMessage( CODE4 *, struct SERVER4CLIENTSt *, short ) ;
 #endif /* S4JAVA */
 
 /* LIST4 */
-S4EXPORT void S4FUNCTION l4addAfter(   LIST4 S4PTR *, void S4PTR *, void S4PTR * ) ;
-S4EXPORT void S4FUNCTION l4addBefore( LIST4 S4PTR *, void S4PTR *, void S4PTR * ) ;
+PUBLIC void S4FUNCTION l4addAfter(   LIST4 S4PTR *, void S4PTR *, void S4PTR * ) ;
+PUBLIC void S4FUNCTION l4addBefore( LIST4 S4PTR *, void S4PTR *, void S4PTR * ) ;
 #define l4init( l4 ) ( (void)( (l4)->selected = 0, (l4)->nLink = 0, (l4)->lastNode = 0 ) )
 #define l4numNodes( l4 ) ( (l4)->nLink )
-S4EXPORT void S4PTR *S4FUNCTION l4prev( const LIST4 S4PTR *, const void S4PTR * ) ;
-S4EXPORT void S4PTR *S4FUNCTION l4pop( LIST4 S4PTR * ) ;
-S4EXPORT void S4FUNCTION l4remove( LIST4 S4PTR *, void S4PTR * ) ;
-S4EXPORT void S4PTR* S4FUNCTION l4firstLow( const LIST4 S4PTR * ) ;  /* Returns 0 if none */
-S4EXPORT void S4PTR* S4FUNCTION l4lastLow( const LIST4 S4PTR * ) ;   /* Returns 0 if none */
-S4EXPORT void S4PTR* S4FUNCTION l4nextLow( const LIST4 S4PTR *, const void S4PTR * ) ;  /* Returns 0 if none */
-S4EXPORT void S4FUNCTION l4addLow( LIST4 S4PTR *, void S4PTR * ) ;
+PUBLIC void S4PTR *S4FUNCTION l4prev( const LIST4 S4PTR *, const void S4PTR * ) ;
+PUBLIC void S4PTR *S4FUNCTION l4pop( LIST4 S4PTR * ) ;
+PUBLIC void S4FUNCTION l4remove( LIST4 S4PTR *, void S4PTR * ) ;
+PUBLIC void S4PTR* S4FUNCTION l4firstLow( const LIST4 S4PTR * ) ;  /* Returns 0 if none */
+PUBLIC void S4PTR* S4FUNCTION l4lastLow( const LIST4 S4PTR * ) ;   /* Returns 0 if none */
+PUBLIC void S4PTR* S4FUNCTION l4nextLow( const LIST4 S4PTR *, const void S4PTR * ) ;  /* Returns 0 if none */
+PUBLIC void S4FUNCTION l4addLow( LIST4 S4PTR *, void S4PTR * ) ;
 #ifdef E4LINK
    #define l4first( l4 )         ( l4firstLow( l4 ) )
    #define l4last( l4 )          ( l4lastLow( l4 ) )
@@ -512,67 +488,62 @@ S4EXPORT void S4FUNCTION l4addLow( LIST4 S4PTR *, void S4PTR * ) ;
 #define single4distantPopWithCheck( s4 ) ( (s4)->nextLink ? ( (s4)->nextLink->nextLink ? ( single4distantRemove( s4 ) ) : 0 ) : 0 )
 
 /* MEM4 */
-S4EXPORT void S4PTR *S4FUNCTION mem4allocDefault( MEM4 S4PTR * ) ;  /* 0 Parm causes 0 return */
-S4EXPORT void S4PTR *S4FUNCTION mem4alloc2Default( MEM4 S4PTR *, CODE4 S4PTR * ) ;  /* 0 Parm causes 0 return */
-S4EXPORT int S4FUNCTION mem4checkMemory( void ) ;
-S4EXPORT void S4PTR *S4FUNCTION mem4createAllocDefault( CODE4 S4PTR *, MEM4 S4PTR * S4PTR *, int, const unsigned int, int, const int ) ;
-S4EXPORT MEM4 S4PTR *S4FUNCTION mem4createDefault( CODE4 S4PTR *, int, const unsigned int, int, const int ) ;
-S4EXPORT int S4FUNCTION mem4freeCheck( const int ) ;
-S4EXPORT int S4FUNCTION mem4freeDefault( MEM4 S4PTR *, void S4PTR * ) ;
-S4EXPORT void S4FUNCTION mem4release( MEM4 S4PTR * ) ;
+PUBLIC void S4PTR *S4FUNCTION mem4allocDefault( MEM4 S4PTR * ) ;  /* 0 Parm causes 0 return */
+PUBLIC void S4PTR *S4FUNCTION mem4alloc2Default( MEM4 S4PTR *, CODE4 S4PTR * ) ;  /* 0 Parm causes 0 return */
+PUBLIC int S4FUNCTION mem4checkMemory( void ) ;
+PUBLIC void S4PTR *S4FUNCTION mem4createAllocDefault( CODE4 S4PTR *, MEM4 S4PTR * S4PTR *, int, const unsigned int, int, const int ) ;
+PUBLIC MEM4 S4PTR *S4FUNCTION mem4createDefault( CODE4 S4PTR *, int, const unsigned int, int, const int ) ;
+PUBLIC int S4FUNCTION mem4freeCheck( const int ) ;
+PUBLIC int S4FUNCTION mem4freeDefault( MEM4 S4PTR *, void S4PTR * ) ;
+PUBLIC void S4FUNCTION mem4release( MEM4 S4PTR * ) ;
 
 /* TAG4 */
 #ifndef S4COMP_OFF_INDEX
-   S4EXPORT char S4PTR *S4FUNCTION t4alias( TAG4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION t4close( TAG4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION t4uniqueModify( TAG4 S4PTR *, int ) ;
+   PUBLIC char S4PTR *S4FUNCTION t4alias( TAG4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION t4close( TAG4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION t4uniqueModify( TAG4 S4PTR *, int ) ;
    #define t4open( a, b, c ) t4openLow( (a), (b), (c), 0 )
-   S4EXPORT TAG4 S4PTR *S4FUNCTION t4openLow( DATA4 S4PTR *, INDEX4 S4PTR *, const char S4PTR *, const char S4PTR * ) ;
-   S4EXPORT short int S4FUNCTION t4unique( const TAG4 S4PTR * ) ;
+   PUBLIC TAG4 S4PTR *S4FUNCTION t4openLow( DATA4 S4PTR *, INDEX4 S4PTR *, const char S4PTR *, const char S4PTR * ) ;
+   PUBLIC short int S4FUNCTION t4unique( const TAG4 S4PTR * ) ;
    #ifdef S4CLIPPER
-      S4EXPORT TAG4 S4PTR *S4FUNCTION t4create( DATA4 S4PTR *, const TAG4INFO S4PTR *, INDEX4 S4PTR *, int ) ;
+      PUBLIC TAG4 S4PTR *S4FUNCTION t4create( DATA4 S4PTR *, const TAG4INFO S4PTR *, INDEX4 S4PTR *, int ) ;
    #endif
    #ifndef S4SERVER
-      S4EXPORT int S4FUNCTION t4uniqueSet( TAG4 S4PTR *, const short ) ;
-      S4EXPORT S4CONST char S4PTR *S4FUNCTION t4exprLow( TAG4 S4PTR * ) ;
-      S4EXPORT S4CONST char S4PTR *S4FUNCTION t4filterLow( TAG4 S4PTR * ) ;
-      #ifdef S4CLIENT
-         #define t4expr( t4 ) ( t4exprLow( t4 ) )
-         #define t4filter( t4 ) ( t4filterLow( t4 ) )
-      #else
+      PUBLIC int S4FUNCTION t4uniqueSet( TAG4 S4PTR *, const short ) ;
+      PUBLIC S4CONST char S4PTR *S4FUNCTION t4exprLow( TAG4 S4PTR * ) ;
+      PUBLIC S4CONST char S4PTR *S4FUNCTION t4filterLow( TAG4 S4PTR * ) ;
          /* 'source' members are constant, so can use defines */
          #define t4expr( t4 )   ( (t4)->tagFile->expr->source )
-      #endif
    #endif
       #define t4filter( t4 ) ( ( (t4)->tagFile->filter == 0 ? 0 : (t4)->tagFile->filter->source ) )
-      S4EXPORT unsigned short int S4FUNCTION tfile4isDescending( TAG4FILE * ) ;  /* for SQL */
+      PUBLIC unsigned short int S4FUNCTION tfile4isDescending( TAG4FILE * ) ;  /* for SQL */
 #endif /* S4COMP_OFF_INDEX */
 
 /* UTIL4 */
-S4EXPORT int S4FUNCTION u4allocAgainDefault( CODE4 S4PTR *, char S4PTR * S4PTR *, unsigned int S4PTR *, const unsigned int ) ;
-S4EXPORT void S4PTR *S4FUNCTION u4allocDefault( long ) ;
-S4EXPORT void S4PTR *S4FUNCTION u4allocErDefault( CODE4 S4PTR *, long ) ;
-S4EXPORT void S4PTR *S4FUNCTION u4allocFreeDefault( CODE4 S4PTR *, long ) ;
-S4EXPORT int S4FUNCTION u4freeDefault( void S4PTR * ) ;
-S4EXPORT void S4FUNCTION u4freeFixedDefault( FIXED4MEM ) ;
-S4EXPORT int S4FUNCTION u4nameChar( unsigned char ) ;
+PUBLIC int S4FUNCTION u4allocAgainDefault( CODE4 S4PTR *, char S4PTR * S4PTR *, unsigned int S4PTR *, const unsigned int ) ;
+PUBLIC void S4PTR *S4FUNCTION u4allocDefault( long ) ;
+PUBLIC void S4PTR *S4FUNCTION u4allocErDefault( CODE4 S4PTR *, long ) ;
+PUBLIC void S4PTR *S4FUNCTION u4allocFreeDefault( CODE4 S4PTR *, long ) ;
+PUBLIC int S4FUNCTION u4freeDefault( void S4PTR * ) ;
+PUBLIC void S4FUNCTION u4freeFixedDefault( FIXED4MEM ) ;
+PUBLIC int S4FUNCTION u4nameChar( unsigned char ) ;
 /* u4nameCurrent for utils */
-S4EXPORT int S4FUNCTION u4nameCurrent( char S4PTR *, const int, const char S4PTR * ) ;
-S4EXPORT int S4FUNCTION u4nameCurrentExtended( char S4PTR *, const int, const char S4PTR *, const char S4PTR * ) ;
-S4EXPORT int S4FUNCTION u4nameExt( char S4PTR *, int, const char S4PTR *, const int ) ;
-S4EXPORT int S4FUNCTION u4namePiece( char S4PTR *, const unsigned int, const char S4PTR *, const int, const int ) ;
+PUBLIC int S4FUNCTION u4nameCurrent( char S4PTR *, const int, const char S4PTR * ) ;
+PUBLIC int S4FUNCTION u4nameCurrentExtended( char S4PTR *, const int, const char S4PTR *, const char S4PTR * ) ;
+PUBLIC int S4FUNCTION u4nameExt( char S4PTR *, int, const char S4PTR *, const int ) ;
+PUBLIC int S4FUNCTION u4namePiece( char S4PTR *, const unsigned int, const char S4PTR *, const int, const int ) ;
 #ifdef S4MACINTOSH
    char *u4getMacPath(CODE4 *c4, char *buf, int buflen ) ;
 #endif
-S4EXPORT unsigned int S4FUNCTION u4ncpy( char S4PTR *, const char S4PTR *, const unsigned int ) ;
-S4EXPORT int S4FUNCTION u4remove( const char S4PTR * ) ;  /* used for testing */
-S4EXPORT long S4FUNCTION u4switch( void ) ;  /* used for example start-up verification */
+PUBLIC unsigned int S4FUNCTION u4ncpy( char S4PTR *, const char S4PTR *, const unsigned int ) ;
+PUBLIC int S4FUNCTION u4remove( const char S4PTR * ) ;  /* used for testing */
+PUBLIC long S4FUNCTION u4switch( void ) ;  /* used for example start-up verification */
 #ifdef S4COMPILE_TEST
    #ifndef S4OFF_WRITE
-      S4EXPORT void S4FUNCTION u4yymmdd( char S4PTR * ) ;
+      PUBLIC void S4FUNCTION u4yymmdd( char S4PTR * ) ;
    #endif
 #else
-   S4EXPORT void S4FUNCTION u4yymmdd( char S4PTR * ) ;
+   PUBLIC void S4FUNCTION u4yymmdd( char S4PTR * ) ;
 #endif
 
 #ifdef S4SERVER
@@ -610,50 +581,50 @@ S4EXPORT long S4FUNCTION u4switch( void ) ;  /* used for example start-up verifi
    where the structures are unknown (eg. index independent program) */
 /* cannot be defines */
 
-S4EXPORT int S4FUNCTION c4getAccessMode( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getAutoOpen( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getErrorCode( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getErrExpr( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getErrFieldName( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getErrGo( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getErrOpen( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getErrRelate( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getErrSkip( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getErrTagName( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getLockAttempts( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getLockEnforce( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getOptimize( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getOptimizeWrite( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getReadLockDo( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getReadOnlyDo( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getSafety( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getSingleOpen( const CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION c4getErrDefaultUnique( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getAccessMode( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getAutoOpen( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getErrorCode( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getErrExpr( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getErrFieldName( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getErrGo( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getErrOpen( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getErrRelate( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getErrSkip( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getErrTagName( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getLockAttempts( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getLockEnforce( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getOptimize( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getOptimizeWrite( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getReadLockDo( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getReadOnlyDo( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getSafety( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getSingleOpen( const CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION c4getErrDefaultUnique( const CODE4 S4PTR * ) ;
 #ifndef S4CLIPPER
-S4EXPORT INDEX4FILE S4PTR *S4FUNCTION i4getIndexFileDo( const INDEX4 S4PTR * ) ;
+PUBLIC INDEX4FILE S4PTR *S4FUNCTION i4getIndexFileDo( const INDEX4 S4PTR * ) ;
 #endif
 
-S4EXPORT const char *S4FUNCTION t4getExprSource( TAG4 S4PTR * ) ;
+PUBLIC const char *S4FUNCTION t4getExprSource( TAG4 S4PTR * ) ;
 
-S4EXPORT void S4FUNCTION c4setAccessMode( CODE4 S4PTR *, char ) ;
-S4EXPORT void S4FUNCTION c4setAutoOpen( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setErrorCode( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setErrExpr( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setErrFieldName( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setErrGo( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setErrOpen( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setErrRelate( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setErrSkip( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setErrTagName( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setLockAttempts( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setLockEnforce( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setOptimize( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setOptimizeWrite( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setReadLockDo( CODE4 S4PTR *, char ) ;
-S4EXPORT void S4FUNCTION c4setReadOnlyDo( CODE4 S4PTR *, int ) ;
-S4EXPORT void S4FUNCTION c4setSafety( CODE4 S4PTR *, char ) ;
-S4EXPORT void S4FUNCTION c4setSingleOpen( CODE4 S4PTR *, short ) ;
-S4EXPORT void S4FUNCTION c4setErrDefaultUnique( CODE4 S4PTR *, short ) ;
+PUBLIC void S4FUNCTION c4setAccessMode( CODE4 S4PTR *, char ) ;
+PUBLIC void S4FUNCTION c4setAutoOpen( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setErrorCode( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setErrExpr( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setErrFieldName( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setErrGo( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setErrOpen( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setErrRelate( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setErrSkip( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setErrTagName( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setLockAttempts( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setLockEnforce( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setOptimize( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setOptimizeWrite( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setReadLockDo( CODE4 S4PTR *, char ) ;
+PUBLIC void S4FUNCTION c4setReadOnlyDo( CODE4 S4PTR *, int ) ;
+PUBLIC void S4FUNCTION c4setSafety( CODE4 S4PTR *, char ) ;
+PUBLIC void S4FUNCTION c4setSingleOpen( CODE4 S4PTR *, short ) ;
+PUBLIC void S4FUNCTION c4setErrDefaultUnique( CODE4 S4PTR *, short ) ;
 #endif /* S4SERVER */
 
 #ifdef S4SERVER
@@ -663,7 +634,7 @@ S4EXPORT void S4FUNCTION c4setErrDefaultUnique( CODE4 S4PTR *, short ) ;
    int d4server( void * ) ;
 #endif
 #ifdef __WIN32
-   S4EXPORT long FAR PASCAL MainWndProc( HWND, UINT, UINT, LONG ) ;
+   PUBLIC long FAR PASCAL MainWndProc( HWND, UINT, UINT, LONG ) ;
 #else
    long FAR PASCAL _export MainWndProc( HWND, UINT, UINT, LONG ) ;
 #endif
@@ -793,8 +764,8 @@ long time4long( const char *, int ) ;
          int tfile4init( TAG4FILE *, INDEX4 *, T4DESC * ) ;
       #endif /* S4MDX */
 
-         S4EXPORT int S4FUNCTION tfile4lock( TAG4FILE S4PTR *, const long ) ; /*Move outside the S4CLIPPER to facilitate index independant OLE-DB DLL*/
-         S4EXPORT int S4FUNCTION tfile4unlock( TAG4FILE S4PTR *, const long ) ;
+         PUBLIC int S4FUNCTION tfile4lock( TAG4FILE S4PTR *, const long ) ; /*Move outside the S4CLIPPER to facilitate index independant OLE-DB DLL*/
+         PUBLIC int S4FUNCTION tfile4unlock( TAG4FILE S4PTR *, const long ) ;
       #ifdef S4CLIPPER
          int b4append( B4BLOCK *, const long ) ;
          int b4insert( B4BLOCK *, const void *, const long, const long ) ;
@@ -810,16 +781,16 @@ long time4long( const char *, int ) ;
       #endif /* S4CLIPPER */
    #endif /* S4OFF_INDEX */
 
-S4EXPORT int S4FUNCTION c4clip( char *, int ) ;
-S4EXPORT char *S4FUNCTION c4descend( char *, const char *, int ) ; /* exported for OLEDB */
+PUBLIC int S4FUNCTION c4clip( char *, int ) ;
+PUBLIC char *S4FUNCTION c4descend( char *, const char *, int ) ; /* exported for OLEDB */
 #ifdef S4CLIPPER
    char *c4descendBinary( char *, const char *, int ) ;
 #endif
 void c4dtoaClipper( double, char *, int, int ) ;
-S4EXPORT int  S4FUNCTION c4dtoa45( double, char *, int, int ) ; /* need to export for ++ API */
-S4EXPORT void S4FUNCTION c4lower( char * ) ;
-S4EXPORT void S4FUNCTION c4ltoa45( long, char *, int ) ;
-S4EXPORT void S4FUNCTION c4upper( char * ) ;
+PUBLIC int  S4FUNCTION c4dtoa45( double, char *, int, int ) ; /* need to export for ++ API */
+PUBLIC void S4FUNCTION c4lower( char * ) ;
+PUBLIC void S4FUNCTION c4ltoa45( long, char *, int ) ;
+PUBLIC void S4FUNCTION c4upper( char * ) ;
 
 #ifndef S4STAND_ALONE
    #ifdef S4SERVER
@@ -833,7 +804,7 @@ int code4numCodeBase( void ) ;
 int code4optRestart( CODE4 * ) ;
 int code4unlockDo( LIST4 * ) ;
 int code4verify( CODE4 *, int ) ;
-S4EXPORT long S4FUNCTION code4version( CODE4 S4PTR * ) ;
+PUBLIC long S4FUNCTION code4version( CODE4 S4PTR * ) ;
 
 #ifdef S4SERVER
    int code4dataFileCloseAll( CODE4 * ) ;
@@ -851,12 +822,12 @@ S4EXPORT long S4FUNCTION code4version( CODE4 S4PTR * ) ;
 #endif
 
 /* used for internal testing only */
-S4EXPORT int S4FUNCTION file4seqWriteDelay( FILE4SEQ_WRITE * ) ;
-S4EXPORT int S4FUNCTION code4catalogSet( CODE4 S4PTR *, int, int ) ;
-S4EXPORT int S4FUNCTION code4indexFormat( CODE4 * ) ;
+PUBLIC int S4FUNCTION file4seqWriteDelay( FILE4SEQ_WRITE * ) ;
+PUBLIC int S4FUNCTION code4catalogSet( CODE4 S4PTR *, int, int ) ;
+PUBLIC int S4FUNCTION code4indexFormat( CODE4 * ) ;
 #ifndef S4OFF_TRAN
    #ifdef S4STAND_ALONE
-      S4EXPORT int S4FUNCTION code4transFileEnable( CODE4TRANS S4PTR *, const char S4PTR *logName, const int ) ;
+      PUBLIC int S4FUNCTION code4transFileEnable( CODE4TRANS S4PTR *, const char S4PTR *logName, const int ) ;
    #else
       int code4transFileEnable( CODE4TRANS *, const char * logName, const int ) ;
    #endif
@@ -879,7 +850,7 @@ DATA4FILE *dfile4open( CODE4 *, DATA4 *, const char *, char * * ) ;
 S4CONST char *dfile4name( S4CONST DATA4FILE * ) ;
 int dfile4read( DATA4FILE *, long, char *, int ) ;
 int dfile4readOld( DATA4FILE *, long ) ;
-S4EXPORT long S4FUNCTION dfile4recCount( DATA4FILE S4PTR *, const long ) ;  /* exported for single-user version (d4recCount replacement) */
+PUBLIC long S4FUNCTION dfile4recCount( DATA4FILE S4PTR *, const long ) ;  /* exported for single-user version (d4recCount replacement) */
 /* #define dfile4recordPosition( d4, rec ) ( (unsigned long)(d4)->headerLen + (unsigned long)(d4)->recWidth * ( (rec) - 1 ) ) */
 FILE4LONG dfile4recordPosition( DATA4FILE *, long ) ;
 #define dfile4recWidth( d4 ) ((unsigned int)(d4)->recWidth)
@@ -907,7 +878,7 @@ int dfile4writeData( DATA4FILE *, const long, const char * ) ;
    int dfile4lockAll( DATA4FILE *, const long, const long ) ;
    int dfile4lockAppend( DATA4FILE *, const long, const long ) ;
    int dfile4lockAppendRecord( DATA4FILE *, const long, const long ) ;
-   S4EXPORT int S4FUNCTION dfile4lockIndex( DATA4FILE *, const long ) ;
+   PUBLIC int S4FUNCTION dfile4lockIndex( DATA4FILE *, const long ) ;
    int dfile4lockTest( DATA4FILE *, const long, const long, const long ) ;
    int dfile4lockTestIndex( DATA4FILE *, const long ) ;
    int dfile4lockTestRecs( DATA4FILE *, const long, const long ) ;
@@ -916,15 +887,8 @@ int dfile4writeData( DATA4FILE *, const long, const char * ) ;
    int dfile4unlockRecords( DATA4FILE *, const long, const long ) ;
    int dfile4unlockAppend( DATA4FILE *, const long, const long ) ;
    int dfile4unlockRange( DATA4FILE *, const long, long ) ;
-   #ifdef S4CLIENT
-      int dfile4lockFile( DATA4FILE *, const long, const long, DATA4 * ) ;
-   #else
       int dfile4lockFile( DATA4FILE *, const long, const long ) ;
-   #endif
 #endif /* S4OFF_MULTI */
-#ifdef S4CLIENT
-   int dfile4remove( DATA4FILE * ) ;
-#else
    int dfile4optimize( DATA4FILE *, const int ) ;
    int dfile4optimizeWrite( DATA4FILE *, const int ) ;
    int dfile4packData( DATA4FILE * ) ;
@@ -932,10 +896,9 @@ int dfile4writeData( DATA4FILE *, const long, const char * ) ;
    int dfile4zapData( DATA4FILE *, long, long ) ;
    #ifndef S4INDEX_OFF
       #ifndef S4OFF_MULTI
-         S4EXPORT int S4FUNCTION dfile4unlockIndex( DATA4FILE *, const long ) ;
+         PUBLIC int S4FUNCTION dfile4unlockIndex( DATA4FILE *, const long ) ;
       #endif
    #endif
-#endif
 
 #ifndef S4OFF_SECURITY
    int d4authorize( DATA4 *, struct SERVER4CLIENTSt * ) ;
@@ -961,10 +924,6 @@ int d4tagSyncDo( DATA4 S4PTR *, TAG4 S4PTR * const, int ) ;
 #endif
 int d4verify( DATA4 *, const int ) ;
 #define d4version( d4 ) ( (d4)->dataFile->version )
-#ifdef S4CLIENT
-   int d4localLockSet( DATA4 *, const long ) ;
-   int dfile4registerLocked( DATA4FILE *, const long ) ;
-#else
    int d4packData( DATA4 * ) ;
    int d4writeData( DATA4 *, const long ) ;
    int d4writeKeys( DATA4 *, const long ) ;
@@ -975,7 +934,6 @@ int d4verify( DATA4 *, const int ) ;
          int d4validateMemoIds( DATA4 * ) ;
       #endif
    #endif
-#endif
 #ifndef S4OFF_MULTI
    #ifdef S4STAND_ALONE
       #define d4lockTestIndex( d4 ) ( dfile4lockTestIndex( (d4)->dataFile, 1L ) )
@@ -1001,16 +959,16 @@ void error4out( CODE4 *, int, long, const char *, const char *, const char * ) ;
    extern int s4lineNo ;
 
 #endif /* E4FILE_LINE */
-   S4EXPORT int S4FUNCTION code4lineNo( void ) ;
+   PUBLIC int S4FUNCTION code4lineNo( void ) ;
 /*
 #ifdef S4CONSOLE
    #define code4lineNoSet( val ) ( s4lineNo = val )
    #define code4fileNameSet( name ) ( s4fileName = name )
 #else
 */
-   S4EXPORT const char *S4FUNCTION code4fileName( void ) ;
-   S4EXPORT void S4FUNCTION code4lineNoSet( int ) ;
-   S4EXPORT void S4FUNCTION code4fileNameSet( const char * ) ;
+   PUBLIC const char *S4FUNCTION code4fileName( void ) ;
+   PUBLIC void S4FUNCTION code4lineNoSet( int ) ;
+   PUBLIC void S4FUNCTION code4fileNameSet( const char * ) ;
 /*
 #endif
 */
@@ -1038,7 +996,7 @@ int file4changeSize( FILE4 *, FILE4LONG ) ;
 #endif /* S4WRITE_DELAY */
 
 #ifdef S4READ_ADVANCE
-   S4EXPORT int S4FUNCTION file4advanceRead( FILE4 *, unsigned, void *, const unsigned, S4ADVANCE_FUNCTION *, void * ) ;
+   PUBLIC int S4FUNCTION file4advanceRead( FILE4 *, unsigned, void *, const unsigned, S4ADVANCE_FUNCTION *, void * ) ;
    void file4advanceReadWriteOver( FILE4 *, unsigned long, const unsigned, const void *, const int ) ;
    int file4advanceCancel( FILE4 * ) ;
    void opt4advanceReadBuf( FILE4 *, unsigned long, unsigned ) ;
@@ -1059,7 +1017,7 @@ int file4changeSize( FILE4 *, FILE4LONG ) ;
 #endif
 
 #ifndef S4OFF_WRITE
-   S4EXPORT int S4FUNCTION f4memoSetLen( FIELD4 *, const unsigned int ) ; /* need to export for ++ API */
+   PUBLIC int S4FUNCTION f4memoSetLen( FIELD4 *, const unsigned int ) ; /* need to export for ++ API */
 #endif
 
 #ifndef S4OFF_INDEX
@@ -1071,12 +1029,9 @@ int file4changeSize( FILE4 *, FILE4LONG ) ;
       void index4swapBlockClipper(void *, int, int ) ;
    #endif
     /* #ifdef OLEDB5BUILD */
-      S4EXPORT int S4FUNCTION tfile4versionCheckFree( TAG4FILE * ) ;
+      PUBLIC int S4FUNCTION tfile4versionCheckFree( TAG4FILE * ) ;
     /* #endif */
 
-   #ifdef S4CLIENT
-      int i4setup( CODE4 *, DATA4 *, const char *, int, INDEX4 * ) ;
-   #else
       int i4check( INDEX4 * ) ;
       void i4deleteRemoveKeys( INDEX4 * ) ;
       int i4flush( INDEX4 * ) ;
@@ -1085,7 +1040,7 @@ int file4changeSize( FILE4 *, FILE4LONG ) ;
       int i4unlock( INDEX4 * ) ;
       int i4update( INDEX4 * ) ;
       int i4updateHeader( INDEX4 * ) ;
-      S4EXPORT int S4FUNCTION i4versionCheck( INDEX4 S4PTR *, const int, const int ) ;
+      PUBLIC int S4FUNCTION i4versionCheck( INDEX4 S4PTR *, const int, const int ) ;
       #ifndef S4OFF_TRAN
          TAG4KEY_REMOVED *t4keyFind( TAG4 *, long, char * ) ;
       #endif
@@ -1093,7 +1048,7 @@ int file4changeSize( FILE4 *, FILE4LONG ) ;
          int i4setup( CODE4 *, DATA4 *, const char *, int ) ;
          int tfile4lockTest( TAG4FILE * ) ;
          int i4lock( INDEX4 * ) ;
-         S4EXPORT int S4FUNCTION tfile4versionCheck( TAG4FILE S4PTR *, const int, const int ) ;
+         PUBLIC int S4FUNCTION tfile4versionCheck( TAG4FILE S4PTR *, const int, const int ) ;
          #define t4versionCheck( t4, a, b ) ( tfile4versionCheck( (t4)->tagFile, (a), (b) ) )
       #else
          int index4flush( INDEX4FILE * ) ;
@@ -1106,9 +1061,8 @@ int file4changeSize( FILE4 *, FILE4LONG ) ;
          int index4updateHeader( INDEX4FILE * ) ;
          int index4versionCheck( INDEX4FILE *, const int ) ;
          long index4extend( INDEX4FILE * ) ;   /* Allocates a block at the end of the file */
-         S4EXPORT int S4FUNCTION t4versionCheck( TAG4 *, const int, const int ) ;
+         PUBLIC int S4FUNCTION t4versionCheck( TAG4 *, const int, const int ) ;
       #endif  /* S4CLIPPER */
-   #endif /* S4CLIENT */
 #endif /* S4OFF_INDEX */
    #ifndef S4OFF_MULTI
       int lock4verify( LOCK4 *, const int ) ;
@@ -1116,7 +1070,7 @@ int file4changeSize( FILE4 *, FILE4LONG ) ;
       int lock4unlock( LOCK4 * ) ;
    #endif /* S4OFF_MULTI */
 
-S4EXPORT int S4FUNCTION l4check( LIST4 * ) ;
+PUBLIC int S4FUNCTION l4check( LIST4 * ) ;
 int l4seek( const LIST4 *, const void * ) ;
 
 int l4lockCheck( void ) ;
@@ -1168,7 +1122,7 @@ int mem4reset( void ) ;
             int memo4fileChainFlush( MEMO4FILE *, MEMO4CHAIN_ENTRY * ) ;
             int memo4fileChainSkip( MEMO4FILE *, MEMO4CHAIN_ENTRY * ) ;
             #ifndef S4SERVER
-               S4EXPORT int S4FUNCTION f4memoCheck( MEMO4FILE S4PTR *, DATA4 S4PTR * ) ;
+               PUBLIC int S4FUNCTION f4memoCheck( MEMO4FILE S4PTR *, DATA4 S4PTR * ) ;
             #endif
          #endif /* S4MNDX  */
       #endif /* S4MFOX  */
@@ -1182,43 +1136,43 @@ int mem4reset( void ) ;
    #ifdef S4SERVER
       #define t4uniqueSetLow( t4, val, dum ) ( (t4)->errUnique = ( val ) )
    #else
-      S4EXPORT int S4FUNCTION t4uniqueSetLow( TAG4 *, const short, const char ) ;
+      PUBLIC int S4FUNCTION t4uniqueSetLow( TAG4 *, const short, const char ) ;
    #endif
 
       /* #ifdef S4HAS_DESCENDING */  /* removed from switch to facilatate index independant code */
-      S4EXPORT void S4FUNCTION tfile4descending( TAG4FILE *, const unsigned short int ) ;
+      PUBLIC void S4FUNCTION tfile4descending( TAG4FILE *, const unsigned short int ) ;
       /* #endif */
       int t4addCalc( TAG4 *, long ) ; /* Calculates expression and adds */
       #define tfile4alias( t4 ) ( (t4)->alias )
       B4BLOCK *tfile4block( TAG4FILE * ) ;
-      S4EXPORT int S4FUNCTION tfile4bottom( TAG4FILE * ) ;
+      PUBLIC int S4FUNCTION tfile4bottom( TAG4FILE * ) ;
       int t4check( TAG4 * ) ;
-      S4EXPORT long S4FUNCTION tfile4dskip( TAG4FILE *, long ) ;
+      PUBLIC long S4FUNCTION tfile4dskip( TAG4FILE *, long ) ;
       int tfile4down( TAG4FILE * ) ;
       int tfile4dump( TAG4FILE *, int, const int ) ;
       int tfile4empty( TAG4FILE * ) ;
-      S4EXPORT int S4FUNCTION tfile4eof( TAG4FILE S4PTR * ) ;
-      S4EXPORT int S4FUNCTION tfile4exprKey( TAG4FILE S4PTR *, unsigned char S4PTR * S4PTR * ) ;
+      PUBLIC int S4FUNCTION tfile4eof( TAG4FILE S4PTR * ) ;
+      PUBLIC int S4FUNCTION tfile4exprKey( TAG4FILE S4PTR *, unsigned char S4PTR * S4PTR * ) ;
       int tfile4freeAll( TAG4FILE * ) ;
       int tfile4freeSaved( TAG4FILE * ) ;
-      S4EXPORT int S4FUNCTION tfile4go( TAG4FILE *, const unsigned char *, const long, const int ) ;
+      PUBLIC int S4FUNCTION tfile4go( TAG4FILE *, const unsigned char *, const long, const int ) ;
       int tfile4goEof( TAG4FILE * ) ;
       int tfile4go2( TAG4FILE *, const unsigned char *, const long, const int ) ;
       int tfile4initSeekConv( TAG4FILE *, int ) ;    /* Initialize 'stok' and 'dtok' */
-      S4EXPORT char * S4FUNCTION tfile4key( TAG4FILE * ) ;
+      PUBLIC char * S4FUNCTION tfile4key( TAG4FILE * ) ;
       B4KEY_DATA *tfile4keyData( TAG4FILE * ) ;              /* The current key */
       int tfile4outOfDate( TAG4FILE * ) ;
       int tfile4position2( TAG4FILE *, double * ) ;
       double tfile4position( TAG4FILE * ) ;              /* Returns the position as a percent */
       double tfile4positionDbl( TAG4FILE * ) ;              /* Returns the position as a percent */
       int tfile4positionSet( TAG4FILE *, const double ) ;  /* Positions a percentage */
-      S4EXPORT long S4FUNCTION tfile4recNo( TAG4FILE * ) ;
+      PUBLIC long S4FUNCTION tfile4recNo( TAG4FILE * ) ;
       int tfile4removeCurrent( TAG4FILE * ) ;        /* Remove the current key */
       int tfile4remove( TAG4FILE *, const unsigned char *, const long ) ;  /* Remove specified key */
       int tfile4removeCalc( TAG4FILE *, long ) ; /* Calculates expression and removes */
       int tfile4rlBottom( TAG4FILE * ) ;
       int tfile4rlTop( TAG4FILE * ) ;
-      S4EXPORT int S4FUNCTION tfile4seek( TAG4FILE *, const void *, const int ) ;    /* r4success, r4found, r4after, r4eof */
+      PUBLIC int S4FUNCTION tfile4seek( TAG4FILE *, const void *, const int ) ;    /* r4success, r4found, r4after, r4eof */
       #ifdef S4FOX
          #ifdef S4VFP_KEY
             int tfile4vfpKey( TAG4FILE * ) ;
@@ -1226,8 +1180,8 @@ int mem4reset( void ) ;
          int tfile4setCollatingSeq( TAG4FILE *, const int ) ;
          int tfile4setCodePage( TAG4FILE *, const int ) ;
       #endif
-      S4EXPORT long S4FUNCTION tfile4skip( TAG4FILE *, long ) ;
-      S4EXPORT int S4FUNCTION tfile4top( TAG4FILE * ) ;
+      PUBLIC long S4FUNCTION tfile4skip( TAG4FILE *, long ) ;
+      PUBLIC int S4FUNCTION tfile4top( TAG4FILE * ) ;
       int tfile4type( TAG4FILE * ) ;
       int tfile4up( TAG4FILE * ) ;
       int tfile4update( TAG4FILE * ) ;
@@ -1251,20 +1205,20 @@ int mem4reset( void ) ;
 
 #ifdef S4TESTING
    #ifdef S4WINDOWS
-      S4EXPORT void S4FUNCTION u4terminate( void );
+      PUBLIC void S4FUNCTION u4terminate( void );
    #endif
    #ifndef S4SERVER
       void u4setField( const char *, const char *, const long, const char *, const char * ) ;
       int ats4readInfo( char *, void *, const unsigned int ) ;
-      S4EXPORT void S4FUNCTION ats4setSuiteStatus( const char * ) ;
+      PUBLIC void S4FUNCTION ats4setSuiteStatus( const char * ) ;
    #endif
-   S4EXPORT void S4FUNCTION u4writeErr( const char S4PTR *, int ) ;
+   PUBLIC void S4FUNCTION u4writeErr( const char S4PTR *, int ) ;
    void u4writeOut( char *, int, long  ) ;
 #else
    #ifdef S4TRACK_FILES
       void u4writeErr( const char *, int ) ;
    #else
-      S4EXPORT void S4FUNCTION u4writeErr( const char S4PTR *, int ) ;
+      PUBLIC void S4FUNCTION u4writeErr( const char S4PTR *, int ) ;
    #endif
 #endif
 
@@ -1286,13 +1240,13 @@ int mem4reset( void ) ;
       #define code4memLineNoSet( val ) ( m4lineNo = val )
       #define code4memFileNameSet( val ) ( m4fileName = val )
    #else
-      S4EXPORT void S4FUNCTION code4memLineNoSet( int ) ;
-      S4EXPORT void S4FUNCTION code4memFileNameSet( const char S4PTR * ) ;
+      PUBLIC void S4FUNCTION code4memLineNoSet( int ) ;
+      PUBLIC void S4FUNCTION code4memFileNameSet( const char S4PTR * ) ;
    #endif
 #endif
 
-S4EXPORT FIXED4MEM S4FUNCTION u4allocFixedDefault( CODE4 S4PTR *, long ) ;    /* exported for server */
-S4EXPORT void S4FUNCTION u4delayHundredth( const unsigned int ) ;  /* exported for testing */
+PUBLIC FIXED4MEM S4FUNCTION u4allocFixedDefault( CODE4 S4PTR *, long ) ;    /* exported for server */
+PUBLIC void S4FUNCTION u4delayHundredth( const unsigned int ) ;  /* exported for testing */
 void u4delaySec( void ) ;
 char *u4environ( char *, const int ) ;
 #ifdef S4WINTEL
@@ -1301,8 +1255,8 @@ FILE4LONG u4filelength( HANDLE ) ;
 FILE4LONG u4filelength( int ) ;
 #endif
 void u4nameMake( char *, const int, const char *, const char *, const char * ) ;
-S4EXPORT void S4FUNCTION u4nameMakeFindDrive( char *, const int, const char *, const char * ) ;
-S4EXPORT int S4FUNCTION u4namePath( char S4PTR *, const unsigned int, const char S4PTR * ) ;
+PUBLIC void S4FUNCTION u4nameMakeFindDrive( char *, const int, const char *, const char * ) ;
+PUBLIC int S4FUNCTION u4namePath( char S4PTR *, const unsigned int, const char S4PTR * ) ;
 int u4nameRetExt( char *, const int, const char * ) ;
 #ifndef S4NO_RENAME
    int u4rename( const char *, const char * ) ;
@@ -1329,8 +1283,8 @@ int u4nameRetExt( char *, const int, const char * ) ;
 #endif
 
 /* MISC */
-S4EXPORT short S4FUNCTION x4reverseShort( const void S4PTR * ) ;  /* exported for communications DLL */
-S4EXPORT S4LONG S4FUNCTION x4reverseLong( const void S4PTR * ) ;  /* exported for OLEDB */
+PUBLIC short S4FUNCTION x4reverseShort( const void S4PTR * ) ;  /* exported for communications DLL */
+PUBLIC S4LONG S4FUNCTION x4reverseLong( const void S4PTR * ) ;  /* exported for OLEDB */
 double S4FUNCTION x4reverseDouble( const void S4PTR * ) ;
 
 #ifndef S4FOX
@@ -1350,7 +1304,7 @@ double S4FUNCTION x4reverseDouble( const void S4PTR * ) ;
 /* VISUAL BASIC */
 #ifdef S4VBASIC
    #ifndef S4SERVER
-      S4EXPORT int c4parm_check( const void S4PTR *, int, const long ) ;
+      PUBLIC int c4parm_check( const void S4PTR *, int, const long ) ;
    #endif
 #endif
 
@@ -1410,7 +1364,7 @@ void t4dblToCur( char *, const double ) ;
       extern unsigned char CodePage_437[128] ;
    #endif
 
-   S4EXPORT int S4FUNCTION expr4currency( const EXPR4 * ) ;
+   PUBLIC int S4FUNCTION expr4currency( const EXPR4 * ) ;
    void t4dtstrToFox( char *, const char *, const int ) ;
    void t4noChangeStr( char *, const char *, const int ) ;
    void t4strToFox( char *, const char *, const int ) ;
@@ -1421,7 +1375,7 @@ void t4dblToCur( char *, const double ) ;
       int t4strToVFPKey( char *, const char *, const int, const int, T4VFP * ) ;
    #endif
 #endif
-S4EXPORT int S4FUNCTION expr4currency( const EXPR4 * ) ;
+PUBLIC int S4FUNCTION expr4currency( const EXPR4 * ) ;
 
 #ifdef S4CLIPPER
    void t4strToDoub( char *, const char *, const int ) ;

@@ -24,7 +24,7 @@ void S4FUNCTION f4assignInt( FIELD4 *field, const int iValue )
          case r4log:
          case r4memo:
          case r4gen:
-         #ifdef S4CLIENT_OR_FOX
+         #ifdef CLIENT_OR_FOX
             case r4dateTime:
             case r4system:
             case r4memoBin:
@@ -74,7 +74,7 @@ void S4FUNCTION f4assignInt( FIELD4 *field, const int iValue )
             *((int *)f4assignPtr( field )) = iValue ;
          #endif
          break ;
-      #ifdef S4CLIENT_OR_FOX
+      #ifdef CLIENT_OR_FOX
          case r4currency:
          case r4double:
             f4assignDouble( field, (double)iValue ) ;
@@ -92,7 +92,7 @@ void S4FUNCTION f4assignInt( FIELD4 *field, const int iValue )
 
 int S4FUNCTION f4int( const FIELD4 *field )
 {
-   #ifdef S4CLIENT_OR_FOX
+   #ifdef CLIENT_OR_FOX
       const char *ptr ;
    #endif
    #ifdef S4BYTE_SWAP
@@ -115,7 +115,7 @@ int S4FUNCTION f4int( const FIELD4 *field )
          case r4log:
          case r4memo:
          case r4gen:
-         #ifdef S4CLIENT_OR_FOX
+         #ifdef CLIENT_OR_FOX
             case r4dateTime:
             case r4system:
             case r4memoBin:
@@ -140,7 +140,7 @@ int S4FUNCTION f4int( const FIELD4 *field )
          #else
             return *((int *)f4ptr( field )) ;
          #endif
-      #ifdef S4CLIENT_OR_FOX
+      #ifdef CLIENT_OR_FOX
          case r4double:
             return (int)(*((double *)f4ptr( field ))) ;
          case r4currency:

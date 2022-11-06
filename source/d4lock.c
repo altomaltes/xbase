@@ -346,9 +346,6 @@ int S4FUNCTION d4lockAppend( DATA4 *data )
       return 0 ;
    #else
       CODE4 *c4 ;
-      #ifdef S4CLIENT
-         int rc ;
-      #endif
 
       #ifdef S4VBASIC
          if ( c4parm_check( data, 2, E92708 ) )
@@ -366,16 +363,6 @@ int S4FUNCTION d4lockAppend( DATA4 *data )
 
       if ( d4lockTestAppend( data ) == 0 )
       {
-         #ifdef S4CLIENT
-            rc = dfile4lockAppend( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
-            if ( rc == 0 )
-               data->dataFile->appendLock = data ;
-            #ifdef E4LOCK
-               return request4lockTest( d4, LOCK4APPEND, 0L, rc ) ;
-            #else
-               return rc ;
-            #endif
-         #else
             /* in append case, unlock records only with unlock auto in order to avoid memo reset */
             /* changed 06/16 because is failing on lock due to not unlocking */
             switch( code4unlockAuto( c4 ) )
@@ -396,7 +383,6 @@ int S4FUNCTION d4lockAppend( DATA4 *data )
                   break ;
             }
             return dfile4lockAppend( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
-         #endif
       }
       else
          return 0 ;
@@ -431,9 +417,6 @@ int S4FUNCTION d4lockFile( DATA4 *data )
       if ( d4lockTestFile( data ) )
          return 0 ;
 
-      #ifdef S4CLIENT
-         return dfile4lockFile( data->dataFile, data4clientId( data ), data4serverId( data ), data ) ;
-      #else
          switch( code4unlockAuto( c4 ) )
          {
             case LOCK4ALL :
@@ -449,56 +432,9 @@ int S4FUNCTION d4lockFile( DATA4 *data )
          if( rc < 0 )
             return error4stack( c4, e4unlock, E92709 ) ;
          return dfile4lockFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
-      #endif
    #endif
 }
 
-#ifndef S4SINGLE
-#ifdef S4CLIENT
-#ifdef E4LOCK
-/* this function does a compare of a lock with the server.  client and server
-   should always return the same result (input value) */
-static int request4lockTest( DATA4 *data, short int lockType, long rec, int clientVal )
-{
-   CONNECTION4 *connection ;
-   CONNECTION4LOCK_INFO_IN *info ;
-   int rc ;
-   long recNum ;
-
-   if ( error4code( data->codeBase )
-      return -1 ;
-
-   connection = data->dataFile->connection ;
-   if ( connection == 0 )
-      rc = e4connection ;
-   else
-   {
-      connection4assign( connection, CON4LOCK, data4clientId( data ), data4serverId( data ) ) ;
-      connection4addData( connection, NULL, sizeof( CONNECTION4LOCK_INFO_IN ), &info ) ;
-      info->type = htons(lockType) ;
-      info->test = htons(1) ;
-      if ( lockType == LOCK4RECORD )
-      {
-         recNum = htonl(rec) ;
-         connection4addData( connection, &recNum, sizeof( recNum ), NULL ) ;
-      }
-      connection4send( connection ) ;
-      rc = connection4receive( connection ) ;
-      if ( rc == 0 )
-      {
-         rc = connection4status( connection ) ;
-         if ( rc < 0 )
-            return connection4error( connection, data->codeBase, rc, E92722 ) ;
-      }
-   }
-   if ( rc != clientVal )
-      return error4( data->codeBase, e4info, E92722 ) ;
-
-   return rc ;
-}
-#endif
-#endif
-#endif
 
 /* for client, this function also checks the data's CODE4 to see if another
    access point for the DATA4 has the desired lock.
@@ -518,13 +454,6 @@ int S4FUNCTION d4lockTest( DATA4 *data, const long rec )
 
       rc = dfile4lockTest( data->dataFile, data4clientId( data ), data4serverId( data ), rec ) ;
 
-      #ifdef S4CLIENT
-         if ( rc < 0 )
-            return rc ;
-         #ifdef E4LOCK
-            return request4lockTest( data, LOCK4RECORD, rec, rc )  ;
-         #endif
-      #endif
 
       return rc ;
    #else
@@ -547,12 +476,6 @@ int S4FUNCTION d4lockTestAppendLow( DATA4 *data )
             return 1 ;
 
       rc = dfile4lockTestAppend( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
-
-      #ifdef S4CLIENT
-         #ifdef E4LOCK
-            return request4lockTest( data, LOCK4APPEND, 0L, rc )  ;
-         #endif
-      #endif
 
       return rc ;
    #else

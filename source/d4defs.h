@@ -247,44 +247,9 @@
 #endif
 
 #ifdef S4FOX
-      #define S4CLIENT_OR_FOX
+      #define CLIENT_OR_FOX
 #endif
 
-#ifdef S4CLIENT
-   #ifndef S4OFF_WRITE_DELAY
-      #define S4OFF_WRITE_DELAY
-   #endif
-   #ifndef S4OFF_READ_ADVANCE
-      #define S4OFF_READ_ADVANCE
-   #endif
-   #ifndef S4CLIENT_OR_FOX
-      #define S4CLIENT_OR_FOX
-   #endif
-   #ifndef S4OFF_OPTIMIZE
-      #define S4OFF_OPTIMIZE
-   #endif
-   #ifndef S4OPTIMIZE_OFF
-      #define S4OPTIMIZE_OFF
-   #endif
-   #ifdef S4OFF_INDEX
-      #undef S4OFF_INDEX
-   #endif
-   #ifdef S4INDEX_OFF
-      #undef S4INDEX_OFF
-   #endif
-   #ifdef S4OFF_MEMO
-      #undef S4OFF_MEMO
-   #endif
-   #ifdef S4MEMO_OFF
-      #undef S4MEMO_OFF
-   #endif
-   #ifdef S4OFF_MULTI
-      #undef S4OFF_MULTI
-   #endif
-   #ifdef S4SINGLE
-      #undef S4SINGLE
-   #endif
-#else
    #ifndef S4MDX
       #ifndef S4FOX
          #ifndef S4CLIPPER
@@ -294,13 +259,6 @@
          #endif
       #endif
    #endif
-
-   #ifndef S4SERVER
-      #ifndef S4STAND_ALONE
-         #error - Must compile with one of the configuration options (S4SERVER, S4CLIENT, S4STAND_ALONE)
-      #endif
-   #endif
-#endif
 
 #ifndef S4WIN16
    #ifndef __WIN32
@@ -498,17 +456,7 @@
 #endif
 #endif
 
-#ifdef S4STAND_ALONE
-#ifdef S4CLIENT
-   #error - Both S4STAND_ALONE and S4CLIENT switches set - only one is allowed.
-#endif
-#endif
 
-#ifdef S4SERVER
-#ifdef S4CLIENT
-   #error - Both S4CLIENT and S4SERVER switches set - only one is allowed.
-#endif
-#endif
 
 #ifdef S4STAND_ALONE
 #ifdef S4SERVER
@@ -848,7 +796,7 @@
          #ifdef S4CBPP
             #define S4CLASS __declspec(dllexport)
          #endif
-         #define S4EXPORT __declspec(dllexport)
+         #define PUBLIC __declspec(dllexport)
          #define S4FUNCTION __stdcall
       #else
          #ifdef S4CBPP
@@ -901,8 +849,8 @@
    #define S4CLASS
 #endif
 
-#ifndef S4EXPORT
-   #define S4EXPORT
+#ifndef PUBLIC
+   #define PUBLIC
 #endif
 
 #ifdef S4DLL
@@ -1126,20 +1074,6 @@
    #define MEMORY4EXPAND_CONNECT_BUFFER 4
    #ifdef S4DEAD_CHECK
       #define DEAD4CHECK_SERVER_WAITTIME 4000
-   #endif
-#endif
-
-#ifdef S4CLIENT
-   #define MEMORY4START_CONNECT_LOW 2
-   #define MEMORY4EXPAND_CONNECT_LOW 5
-   #define MEMORY4START_CONNECT 2
-   #define MEMORY4EXPAND_CONNECT 5
-   #define MEMORY4START_CONNECT_BUFFER 2
-   #define MEMORY4EXPAND_CONNECT_BUFFER 2
-   #ifdef S4DEAD_CHECK
-      #define INTER4WAITTIME 10
-      #define DEAD4CHECK_LOOP    100
-      #define DEAD4CHECK_TIMEOUT 1500
    #endif
 #endif
 
@@ -1414,10 +1348,6 @@
    #define CONNECT4NORMAL 3
    #define CONNECT4WORKING 4
    #define CONNECT4SHUTDOWN 5
-   #ifdef S4CLIENT
-      #define MEMORY4START_EVENT 4
-      #define MEMORY4EXPAND_EVENT 8
-   #endif
    #ifdef S4SERVER
       #define MEMORY4START_EVENT 20
       #define MEMORY4EXPAND_EVENT 40
@@ -1757,9 +1687,6 @@
 
 /* if S4NO_NEGATIVE_LOCK is defined, there is no dBASE IV compatibility */
 
-#ifdef S4CLIENT
-   #define L4LOCK_POS     1000000000L
-#else
    #ifndef S4SINGLE
       #ifdef N4OTHER
          #define L4LOCK_POS     1000000000L
@@ -1778,7 +1705,6 @@
          #endif
       #endif
    #endif
-#endif
 
 #ifdef S4MDX
    #define I4MAX_EXPR_SIZE 220

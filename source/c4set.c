@@ -98,7 +98,7 @@
 
    short S4FUNCTION code4indexBlockSize( CODE4 *c4 )
    {
-      #if !defined( S4CLIENT_OR_FOX ) || defined( S4OFF_INDEX ) || defined( S4PALM )
+      #if !defined( CLIENT_OR_FOX ) || defined( S4OFF_INDEX ) || defined( S4PALM )
          return error4( c4, e4notSupported, E96701 ) ;
       #else
          if ( !s5fox )
@@ -146,7 +146,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
             return error4( c4, e4notSupported, E96701 ) ;
          #endif
       #else
-         #ifdef S4CLIENT_OR_FOX
+         #ifdef CLIENT_OR_FOX
             if ( code4indexFormat( c4 ) == r4cdx )
                return c4->foxCreateIndexMultiplier ;
             else
@@ -162,7 +162,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
    // CS 1999/08/26 return short for VB
    short S4FUNCTION code4indexBlockSizeSet( CODE4 *c4, short val )
    {
-      #if defined( S4CLIENT_OR_FOX ) && !defined( S4OFF_INDEX ) && !defined( S4PALM )
+      #if defined( CLIENT_OR_FOX ) && !defined( S4OFF_INDEX ) && !defined( S4PALM )
          // AS Jul 5/06 - it is ok to set this if we are not connected yet...
          // if ( s5fox )
          if ( s5clipper == 0 && s5mdx == 0 )
@@ -230,7 +230,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
    Bool5 S4FUNCTION c4getCompressedMemos( const CODE4 *c4 )
    {
-      #if defined( S4CLIENT_OR_FOX ) && defined( S4COMPRESS )
+      #if defined( CLIENT_OR_FOX ) && defined( S4COMPRESS )
          return c4->compressedMemos ;
       #else
          return 0;
@@ -509,7 +509,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
    void S4FUNCTION c4setCompressedMemos( CODE4 *c4, Bool5 val )
    {
-      #if defined( S4CLIENT_OR_FOX ) && defined( S4COMPRESS )
+      #if defined( CLIENT_OR_FOX ) && defined( S4COMPRESS )
          c4->compressedMemos = val ;
       #else
          error4describe(c4, e4notSupported, 0, "c4setCompressedMemos", 0, 0);
@@ -799,7 +799,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
    void S4FUNCTION code4collateNameSet( CODE4 *c4, enum Collate4name val )
    {
-      #ifdef S4CLIENT_OR_FOX
+      #ifdef CLIENT_OR_FOX
          c4->collateName = val ;
       #endif
    }
@@ -807,7 +807,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
 enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
    {
-      #ifdef S4CLIENT_OR_FOX
+      #ifdef CLIENT_OR_FOX
          return c4->collateName ;
       #else
          return collate4none ;
@@ -817,7 +817,7 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
 
    void S4FUNCTION code4collateNameUnicodeSet( CODE4 *c4, enum Collate4name val )
    {
-      #ifdef S4CLIENT_OR_FOX
+      #ifdef CLIENT_OR_FOX
          c4->collateNameUnicode = val ;
       #endif
    }
@@ -825,7 +825,7 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
 
    enum Collate4name S4FUNCTION code4collateNameUnicode ( CODE4 *c4 )
    {
-      #ifdef S4CLIENT_OR_FOX
+      #ifdef CLIENT_OR_FOX
          return c4->collateNameUnicode ;
       #else
          return collate4none ;
@@ -906,25 +906,6 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
 
 
 
-// AS Jan 9/02 - code written for use via OLE-DB to timeout on accepting a connection (was previously a define
-// set to 300 seconds).
-#if defined( __WIN32 ) && !defined( S4OFF_THREAD ) && defined( S4CLIENT )
-   void S4FUNCTION c4setAcceptTimeOut( CODE4 *c4, long val )
-   {
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-         {
-            error4( 0, e4parm_null, E96702 ) ;
-            return ;
-         }
-      #endif
-      // setting this value to 0 or -1 means to retry forever
-      // any value is valid, but at the low level we actually perform a connection retry in 2 second intervals, a minimum
-      // of twise.  So any value between 1 and 3 is equivalent to 4.
-      c4->acceptTimeOut = val ;
-   }
-#endif
-
 
 // AS Jun 24/02 - function to perform data movement counting for testing
 #if  (defined( E4ANALYZE ) || defined( S4TESTING ))
@@ -978,7 +959,7 @@ void *S4FUNCTION c4getPreprocess( CODE4 *c4 )
       }
    #endif
 
-   #if defined( S4ENCRYPT_FILE ) || ( defined( S4PREPROCESS_COM ) && defined ( S4CLIENT ) )
+   #if defined( S4ENCRYPT_FILE )  )
        #ifdef S4ENCRYPT_DLL   // LY Jul 16/04
           return c4->encrypt->preprocess ;
        #else

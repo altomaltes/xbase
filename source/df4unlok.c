@@ -90,10 +90,6 @@ int dfile4unlockFile( DATA4FILE *data, const long clientId, const long serverId 
       if ( code4unlockAuto( c4 ) == LOCK4OFF )
          return 0 ;
 
-      #ifdef S4CLIENT
-         data->fileLock =  0 ;
-         data->numRecs = -1 ;
-      #else
          if ( data->fileServerLock == serverId && ( clientId == 0 || clientId == data->fileClientLock ) )
          {
             #ifndef S4OFF_WRITE
@@ -133,7 +129,6 @@ int dfile4unlockFile( DATA4FILE *data, const long clientId, const long serverId 
             data->fileClientLock =  0 ;
             data->numRecs = -1 ;
          }
-      #endif
       if ( error4code( c4 ) < 0 )
          return error4code( c4 ) ;
    #endif
@@ -326,5 +321,5 @@ int dfile4unlockData( DATA4FILE *data, const long clientId, const long serverId 
    return 0 ;
 }
 
-#endif  /* S4CLIENT */
+#endif
 #endif  /* S4OFF_MULTI */

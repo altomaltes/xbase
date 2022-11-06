@@ -136,7 +136,7 @@ void S4FUNCTION f4assignUnicode( FIELD4 *field, const WSTR5 *wideString )
       {
          case r4memo :
          case r4gen :
-         #if defined(S4MDX) || defined(S4CLIENT)
+         #if defined(S4MDX)
             case r4bin :
          #endif
             /* LY 2001/07/13 : changed to c4wcslen for 4 byte wchar on Linux */

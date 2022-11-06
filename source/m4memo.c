@@ -19,57 +19,6 @@
 
 #include "d4all.h"
 
-#ifndef S4OFF_MEMO
-
-#ifdef S4CLIENT
-#ifndef S4OFF_WRITE
-int S4FUNCTION d4memoCompress( DATA4 *data )
-{
-   int rc ;
-   CONNECTION4 *connection ;
-   CODE4 *c4 ;
-
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E95201 ) )
-         return -1 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E95201 ) ;
-   #endif
-
-   c4 = data->codeBase ;
-   if ( error4code( c4 ) < 0 )
-      return e4codeBase ;
-
-   if ( data->readOnly == 1 )
-      return error4describe( c4, e4write, E80606, d4alias( data ), 0, 0 ) ;
-
-   if ( data->dataFile->nFieldsMemo == 0 )
-      return 0 ;
-
-   rc = d4update( data ) ;
-   if ( rc )
-      return rc ;
-
-   connection = data->dataFile->connection ;
-   if ( connection == 0 )
-      return error4stack( c4, e4connection, E95201 ) ;
-
-   data->count = -1 ;
-   data->dataFile->numRecs = -1 ;
-   connection4assign( connection, CON4MEMO_COMPRESS, data4clientId( data ), data4serverId( data ) ) ;
-   rc = connection4repeat( connection ) ;
-   if ( rc < 0 )
-      connection4error( connection, c4, rc, E95201 ) ;
-
-   return rc ;
-}
-#endif /* S4OFF_WRITE */
-#endif /* S4CLIENT */
-#endif /* S4OFF_MEMO */
-
 
 #ifndef S4OFF_MEMO
 #ifdef S4MFOX

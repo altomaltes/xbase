@@ -31,7 +31,7 @@ static void opt4listLruBottomShift( OPT4BLOCK * ) ;
 static void opt4fileReadSpBuffer( FILE4 *, const unsigned long, int, int ) ;
 static void opt4timeReset( OPT4 *, int, int ) ;
 #ifdef S4ADVANCE_TEST
-   S4EXPORT unsigned S4FUNCTION opt4fileReadFile( FILE4 S4PTR *, const unsigned long, char S4PTR * ) ;
+   PUBLIC unsigned S4FUNCTION opt4fileReadFile( FILE4 S4PTR *, const unsigned long, char S4PTR * ) ;
 #else
    static unsigned opt4fileReadFile( FILE4 *, const unsigned long, char * ) ;
 #endif

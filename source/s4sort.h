@@ -75,17 +75,17 @@ void  sort4initPointers( SORT4 S4PTR *, char S4PTR *, unsigned ) ;
 long  s4needed(SORT4 S4PTR *) ; /* Returns an estimate on the amount of memory needed */
 int   s4nextSpoolEntry(SORT4 S4PTR *) ;
 
-S4EXPORT int   S4FUNCTION sort4free( SORT4 S4PTR * ) ;    /* Frees any allocated memory and uninitializes */
-S4EXPORT int   S4FUNCTION sort4get( SORT4 S4PTR *,  S4LONG S4PTR *, void S4PTR * S4PTR *, void S4PTR * S4PTR * ) ;
-S4EXPORT int   S4FUNCTION sort4getInit( SORT4 S4PTR * ) ;
-S4EXPORT int   S4FUNCTION sort4getInitFree( SORT4 *, struct RELATE4St * ) ;
-S4EXPORT int   S4FUNCTION sort4getMemInit( SORT4 * ) ;
-S4EXPORT int   S4FUNCTION sort4init( SORT4 S4PTR *, CODE4 S4PTR *, const int, const int ) ;
-S4EXPORT int   S4FUNCTION sort4initAlloc( SORT4 S4PTR * ) ;
-S4EXPORT int   S4FUNCTION sort4initFree( SORT4 S4PTR *, CODE4 S4PTR *, const int, const int, struct RELATE4St * ) ;
-S4EXPORT int   S4FUNCTION sort4initSet( SORT4 S4PTR *, CODE4 S4PTR *, const int, const int ) ;
-S4EXPORT int   S4FUNCTION sort4put( SORT4 S4PTR *, const S4LONG, const void S4PTR *, const void S4PTR * ) ;
-S4EXPORT int   S4FUNCTION sort4spoolsInit( SORT4 S4PTR *, const int ) ;
+PUBLIC int   S4FUNCTION sort4free( SORT4 S4PTR * ) ;    /* Frees any allocated memory and uninitializes */
+PUBLIC int   S4FUNCTION sort4get( SORT4 S4PTR *,  S4LONG S4PTR *, void S4PTR * S4PTR *, void S4PTR * S4PTR * ) ;
+PUBLIC int   S4FUNCTION sort4getInit( SORT4 S4PTR * ) ;
+PUBLIC int   S4FUNCTION sort4getInitFree( SORT4 *, struct RELATE4St * ) ;
+PUBLIC int   S4FUNCTION sort4getMemInit( SORT4 * ) ;
+PUBLIC int   S4FUNCTION sort4init( SORT4 S4PTR *, CODE4 S4PTR *, const int, const int ) ;
+PUBLIC int   S4FUNCTION sort4initAlloc( SORT4 S4PTR * ) ;
+PUBLIC int   S4FUNCTION sort4initFree( SORT4 S4PTR *, CODE4 S4PTR *, const int, const int, struct RELATE4St * ) ;
+PUBLIC int   S4FUNCTION sort4initSet( SORT4 S4PTR *, CODE4 S4PTR *, const int, const int ) ;
+PUBLIC int   S4FUNCTION sort4put( SORT4 S4PTR *, const S4LONG, const void S4PTR *, const void S4PTR * ) ;
+PUBLIC int   S4FUNCTION sort4spoolsInit( SORT4 S4PTR *, const int ) ;
 
 #ifdef __cplusplus
    }

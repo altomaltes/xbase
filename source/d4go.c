@@ -2,106 +2,6 @@
 
 #include "d4all.h"
 
-#ifdef S4CLIENT
-/* d4go, d4skip, d4seek, after complete, perform the record information transferral... */
-int d4goVirtual( DATA4 *data, const long recNo, const int rc, const void *outVoid, void *connectionVoid )
-{
-   const CONNECTION4GO_INFO_OUT *out ;
-   CONNECTION4 *connection ;
-   CODE4 *c4 ;
-
-   out = (CONNECTION4GO_INFO_OUT *)outVoid ;
-   connection = (CONNECTION4 *)connectionVoid ;
-   c4  = data->codeBase ;
-
-   if ( rc == r4entry )   /* invalid record (beyond eof) */
-   {
-      data->recNum = -1 ;
-      d4blankLow( data, data->record ) ;
-      if ( c4->errGo )
-         return error4describe( c4, e4read, E93101, d4alias( data ), 0, 0 ) ;
-   }
-
-   if ( rc > 0 )  /* eg. r4entry */
-      return rc ;
-
-   if ( rc < 0 )
-   {
-      data->recNum = -1 ;
-      if ( c4->errGo )
-         connection4errorDescribe( connection, c4, rc, E93101, d4alias( data ), 0, 0 ) ;
-      return rc ;
-   }
-
-   if ( (long)ntohl(out->recNo) != recNo )
-      return error4( c4, e4info, E83101 ) ;
-   /* now copy the data into the record */
-   memcpy( data->record, ((char *)out) + sizeof( CONNECTION4GO_INFO_OUT ), dfile4recWidth( data->dataFile ) ) ;
-
-   data->recNum = recNo ;
-   data->bofFlag = data->eofFlag = 0 ;
-
-   if ( out->recordLocked )
-   {
-      d4localLockSet( data, recNo ) ;
-      memcpy( data->recordOld, data->record, dfile4recWidth( data->dataFile ) ) ;
-      data->recNumOld = recNo ;
-      #ifndef S4OFF_MULTI
-         #ifndef S4OFF_MEMO
-            data->memoValidated = 1 ;
-         #endif
-      #endif
-   }
-
-   return 0 ;
-}
-
-int S4FUNCTION d4go( DATA4 *data, const long recNo )
-{
-   int rc ;
-   CONNECTION4 *connection ;
-   CONNECTION4GO_INFO_IN *info ;
-   CODE4 *c4 ;
-
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93101 ) )
-         return -1 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E93101 ) ;
-   #endif
-
-   c4 = data->codeBase ;
-
-   #ifdef S4OFF_WRITE
-      if ( error4code( c4 ) < 0 )
-         return e4codeBase ;
-   #else
-      rc = d4updateRecord( data, 0 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-      if ( rc )
-         return rc ;
-   #endif
-
-   connection = data->dataFile->connection ;
-   if ( connection == 0 )
-      return e4connection ;
-
-   connection4assign( connection, CON4GO, data4clientId( data ), data4serverId( data ) ) ;
-   connection4addData( connection, NULL, sizeof( CONNECTION4GO_INFO_IN ), (void **)&info ) ;
-   info->recNo = htonl(recNo) ;
-   rc = connection4repeat( connection ) ;
-   /* AS 06/22/98 rc == r4entry gets caucht in d4goVirtual - ex9.c test program
-      in client/server, or see d4goVirtual() */
-/*   if ( rc == r4locked || rc == r4entry ) */
-   if ( rc == r4locked )
-      return rc ;
-
-   return d4goVirtual( data, recNo, rc, connection4data( connection ), connection ) ;
-}
-
-#else
 
 int S4FUNCTION d4go( DATA4 *data, const long recNo )
 {
@@ -320,7 +220,6 @@ int d4goData( DATA4 *data, long rec )
       data->recNum = rec ;
    return rc ;
 }
-#endif  /* S4CLIENT */
 
 int  S4FUNCTION d4goEof( DATA4 *data )
 {

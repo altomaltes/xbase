@@ -48,60 +48,6 @@ void i4deleteRemoveKeys( INDEX4 *index )
 #endif /* S4OFF_TRAN */
 
 #ifndef N4OTHER
-#ifdef S4CLIENT
-int S4FUNCTION i4reindex( INDEX4 *index )
-{
-   int rc ;
-   CONNECTION4 *connection ;
-   CONNECTION4REINDEX_INFO_OUT *out ;
-   CODE4 *c4 ;
-   DATA4 *d4 ;
-
-   #ifdef S4VBASIC
-      if ( c4parm_check( index, 0, E92101 ) )
-         return -1 ;
-   #endif  /* S4VBASIC */
-
-   #ifdef E4PARM_HIGH
-      if ( index == 0 )
-         return error4( 0, e4parm_null, E92101 ) ;
-   #endif
-
-   d4 = index->data ;
-   if ( error4code( d4->codeBase ) < 0 )
-      return e4codeBase ;
-
-   rc = 0 ;
-
-   connection = d4->dataFile->connection ;
-   if ( connection == 0 )
-      return e4connection ;
-
-   c4 = d4->codeBase ;
-   rc = connection4assign( connection, CON4INDEX_REINDEX, data4clientId( d4 ), data4serverId( d4 ) ) ;
-   if ( rc < 0 )
-      return rc ;
-   connection4addData( connection, index->indexFile->accessName, sizeof( index->indexFile->accessName ), NULL ) ;
-   rc = connection4repeat( connection ) ;
-   if ( rc == r4locked )
-      return r4locked ;
-   if ( rc != 0 )
-      return connection4error( connection, c4, rc, E92101 ) ;
-
-   if ( connection4len( connection ) != sizeof( CONNECTION4REINDEX_INFO_OUT ) )
-      return error4( c4, e4packetLen, E92101 ) ;
-   out = (CONNECTION4REINDEX_INFO_OUT *)connection4data( connection ) ;
-   if ( out->lockedDatafile )
-      d4->dataFile->fileLock = d4 ;
-
-   d4->recNum = -1 ;
-   d4->recNumOld = -1 ;
-   memset( d4->record, ' ', dfile4recWidth( d4->dataFile ) ) ;
-
-   return 0 ;
-}
-#else
-
 #include "r4reinde.h"
 
 int S4FUNCTION i4reindex( INDEX4 *i4 )
@@ -2113,7 +2059,6 @@ int r4reindexFinish( R4REINDEX *r4, char *keyValue )
 }
 
 #endif  /* S4FOX */
-#endif  /* S4CLIENT */
 #endif  /* N4OTHER  */
 #endif  /* S4INDEX_OFF */
 #endif  /* S4WRITE_OFF */

@@ -5,13 +5,7 @@
 #ifndef S4OFF_WRITE
 int S4FUNCTION d4pack( DATA4 *d4 )
 {
-   #ifdef S4CLIENT
       int rc ;
-      CONNECTION4PACK_INFO_OUT *out ;
-      CONNECTION4 *connection ;
-   #else
-      int rc ;
-   #endif
    CODE4 *c4 ;
 
    #ifdef S4VBASIC
@@ -32,36 +26,6 @@ int S4FUNCTION d4pack( DATA4 *d4 )
    if ( d4->readOnly == 1 )
       return error4describe( c4, e4write, E80606, d4alias( d4 ), 0, 0 ) ;
 
-   #ifdef S4CLIENT
-      rc = d4update( d4 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-      if ( rc )
-         return rc ;
-
-      connection = d4->dataFile->connection ;
-      if ( connection == 0 )
-         return error4stack( c4, e4connection, E94601 ) ;
-
-      d4->count = -1 ;
-      d4->dataFile->numRecs = -1 ;
-      connection4assign( connection, CON4PACK, data4clientId( d4 ), data4serverId( d4 ) ) ;
-      rc = connection4repeat( connection ) ;
-      if ( rc == r4locked )
-         return r4locked ;
-      if ( rc < 0 )
-         return connection4error( connection, c4, rc, E94601 ) ;
-
-      if ( connection4len( connection ) != sizeof( CONNECTION4PACK_INFO_OUT ) )
-         return error4( c4, e4packetLen, E94601 ) ;
-      out = (CONNECTION4PACK_INFO_OUT *)connection4data( connection ) ;
-      if ( out->lockedDatafile )
-         d4->dataFile->fileLock = d4 ;
-
-      d4->recNum = -1 ;
-      d4->recNumOld = -1 ;
-      memset( d4->record, ' ', dfile4recWidth( d4->dataFile ) ) ;
-
-      return rc ;
-   #else
       #ifndef S4SINGLE
          rc = d4lockAll( d4 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
          if ( rc )
@@ -88,7 +52,6 @@ int S4FUNCTION d4pack( DATA4 *d4 )
       }
 
       return rc ;
-   #endif  /* S4CLIENT */
 }
 
 int d4packData( DATA4 *d4 )

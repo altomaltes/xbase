@@ -251,45 +251,45 @@ extern const E4FUNCTIONS v4functions[EXPR4NUM_FUNCTIONS] ;
 #ifdef __cplusplus
    extern "C" {
 #endif
-   S4EXPORT int S4FUNCTION expr4context( EXPR4 *, DATA4 * ) ;
+   PUBLIC int S4FUNCTION expr4context( EXPR4 *, DATA4 * ) ;
 
 /* EXTERNAL FUNCTIONS : */
 
 #define expr4data( e4 ) ( (e4)->data )
-S4EXPORT double  S4FUNCTION expr4double( EXPR4 S4PTR * ) ;
-S4EXPORT int     S4FUNCTION expr4double2( EXPR4 S4PTR *, double * ) ;
+PUBLIC double  S4FUNCTION expr4double( EXPR4 S4PTR * ) ;
+PUBLIC int     S4FUNCTION expr4double2( EXPR4 S4PTR *, double * ) ;
 #define expr4free( e4 ) ( u4free( e4 ), (e4) = 0 )
 #define expr4len( e4 ) ( (e4)->len )
-S4EXPORT EXPR4 S4PTR *S4FUNCTION expr4parseLow( DATA4 S4PTR *, const char S4PTR *, TAG4FILE * ) ;
-S4EXPORT S4CONST char S4PTR *S4FUNCTION expr4source( const EXPR4 S4PTR * ) ;
-S4EXPORT const char S4PTR *S4FUNCTION expr4str( EXPR4 S4PTR * ) ;
-S4EXPORT int     S4FUNCTION expr4true( EXPR4 S4PTR * ) ;
+PUBLIC EXPR4 S4PTR *S4FUNCTION expr4parseLow( DATA4 S4PTR *, const char S4PTR *, TAG4FILE * ) ;
+PUBLIC S4CONST char S4PTR *S4FUNCTION expr4source( const EXPR4 S4PTR * ) ;
+PUBLIC const char S4PTR *S4FUNCTION expr4str( EXPR4 S4PTR * ) ;
+PUBLIC int     S4FUNCTION expr4true( EXPR4 S4PTR * ) ;
 #define expr4type( e4 ) ( (e4)->type )
-S4EXPORT int     S4FUNCTION expr4vary( EXPR4 S4PTR *, char S4PTR * S4PTR * ) ;
+PUBLIC int     S4FUNCTION expr4vary( EXPR4 S4PTR *, char S4PTR * S4PTR * ) ;
 #ifndef S4INLINE
-   S4EXPORT EXPR4 S4PTR *S4FUNCTION expr4parse( DATA4 S4PTR *, char S4PTR * ) ;
+   PUBLIC EXPR4 S4PTR *S4FUNCTION expr4parse( DATA4 S4PTR *, char S4PTR * ) ;
 #endif
-S4EXPORT const E4FUNCTIONS *S4FUNCTION e4functions();
+PUBLIC const E4FUNCTIONS *S4FUNCTION e4functions();
 
 /* Relate Module and Report Writer Functions */
-S4EXPORT EXPR4CALC *S4FUNCTION code4calcCreate( CODE4 S4PTR *, EXPR4 S4PTR *, const char S4PTR * ) ;
-S4EXPORT void S4FUNCTION code4calcReset( CODE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION expr4execute( EXPR4 S4PTR *, const int, void S4PTR * S4PTR * ) ;
-S4EXPORT void S4FUNCTION expr4functions( const E4FUNCTIONS S4PTR * S4PTR *) ;
-S4EXPORT EXPR4 S4PTR *S4FUNCTION expr4calcParse( DATA4 S4PTR *, const char S4PTR * ) ;
-S4EXPORT void S4FUNCTION expr4calcDelete( EXPR4CALC S4PTR * ) ;
-S4EXPORT void S4FUNCTION expr4calcMassage( EXPR4CALC S4PTR * );
-S4EXPORT EXPR4CALC *S4FUNCTION expr4calcLookup( CODE4 S4PTR *, const char S4PTR *, const unsigned ) ;
-S4EXPORT int S4FUNCTION expr4calcNameChange( EXPR4 S4PTR * S4PTR *, const char S4PTR *, const char S4PTR * ) ;
-S4EXPORT void S4FUNCTION expr4calcResultPos( EXPR4CALC S4PTR *, const int ) ;
+PUBLIC EXPR4CALC *S4FUNCTION code4calcCreate( CODE4 S4PTR *, EXPR4 S4PTR *, const char S4PTR * ) ;
+PUBLIC void S4FUNCTION code4calcReset( CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION expr4execute( EXPR4 S4PTR *, const int, void S4PTR * S4PTR * ) ;
+PUBLIC void S4FUNCTION expr4functions( const E4FUNCTIONS S4PTR * S4PTR *) ;
+PUBLIC EXPR4 S4PTR *S4FUNCTION expr4calcParse( DATA4 S4PTR *, const char S4PTR * ) ;
+PUBLIC void S4FUNCTION expr4calcDelete( EXPR4CALC S4PTR * ) ;
+PUBLIC void S4FUNCTION expr4calcMassage( EXPR4CALC S4PTR * );
+PUBLIC EXPR4CALC *S4FUNCTION expr4calcLookup( CODE4 S4PTR *, const char S4PTR *, const unsigned ) ;
+PUBLIC int S4FUNCTION expr4calcNameChange( EXPR4 S4PTR * S4PTR *, const char S4PTR *, const char S4PTR * ) ;
+PUBLIC void S4FUNCTION expr4calcResultPos( EXPR4CALC S4PTR *, const int ) ;
 int S4FUNCTION e4lookup( const unsigned char S4PTR *, const int, const int, const int ) ;
 
 /* INTERNAL FUNCTIONS : */
 int expr4start( EXPR4 * ) ;
-S4EXPORT int S4FUNCTION expr4keyLen( EXPR4 S4PTR * ) ;
-   S4EXPORT int S4FUNCTION expr4key( EXPR4 S4PTR *, char S4PTR * S4PTR *, TAG4FILE * ) ;
+PUBLIC int S4FUNCTION expr4keyLen( EXPR4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION expr4key( EXPR4 S4PTR *, char S4PTR * S4PTR *, TAG4FILE * ) ;
    int expr4keyConvert( EXPR4 *, char **, const int, const int, TAG4FILE * ) ;
-S4EXPORT int S4FUNCTION expr4nullLow( const EXPR4 S4PTR *, const int ) ;
+PUBLIC int S4FUNCTION expr4nullLow( const EXPR4 S4PTR *, const int ) ;
 #define expr4null( e4 ) ( expr4nullLow( (e4), 1 ) )
 
 /* Parsing Functions */

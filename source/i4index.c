@@ -4,128 +4,6 @@
 
 #ifndef S4INDEX_OFF
 
-#ifdef S4CLIENT
-/* if i4old is set to a value, then it is used instead of creating a new i4 */
-/* if doFull is set to false and i4old is valid, a tag update between i4file
-   and i4 are done only */
-
-static INDEX4 *i4setup2( CODE4 *c4, INDEX4FILE *i4file, DATA4 *d4, const char *name, INDEX4 *i4old, int doFull )
-{
-   INDEX4 *i4 ;
-   TAG4FILE *tagOn ;
-   TAG4 *tag, *tag2 ;
-   int doUpdate ;
-
-   if ( i4old == 0 )
-   {
-      if ( c4->indexMemory == 0 )
-      {
-         c4->indexMemory = mem4create( c4, c4->memStartIndex, sizeof(INDEX4), c4->memExpandIndex, 0 ) ;
-         if ( c4->indexMemory == 0 )
-            return 0 ;
-      }
-
-      i4 = (INDEX4 *)mem4alloc( c4->indexMemory ) ;
-      i4->codeBase = c4 ;
-      i4->data = d4 ;
-      i4->indexFile = i4file ;
-      l4add( &d4->indexes, i4 ) ;
-      u4ncpy( i4->alias, name, sizeof( i4->alias ) - 1 ) ;
-   }
-   else
-      i4 = i4old ;
-
-   for ( tagOn = 0 ;; )
-   {
-      tagOn = (TAG4FILE *)l4next( &i4file->tags, tagOn ) ;
-      if ( tagOn == 0 )
-         break ;
-      if ( doFull == 0 )   /* check that tag doesn't already exit */
-      {
-         doUpdate = 1 ;
-         for ( tag2 = 0 ;; )
-         {
-            tag2 = (TAG4 *)l4next( &i4->tags, tag2 ) ;
-            if ( tag2 == 0 )
-               break ;
-            if ( tag2->tagFile == tagOn )
-            {
-               doUpdate = 0 ;
-               break ;
-            }
-         }
-         if ( doUpdate == 0 )
-            continue ;
-      }
-      tag = (TAG4 *)mem4alloc( c4->tagMemory ) ;
-      if ( tag == 0 )
-         return 0 ;
-      tag->tagFile = tagOn ;
-      tag->index = i4 ;
-      tag->errUnique = tagOn->errUniqueHold ;
-      l4add( &i4->tags, tag ) ;
-   }
-
-   return i4 ;
-}
-
-/* if i4old is set to a value, then it is used instead of creating a new i4 */
-int i4setup( CODE4 *c4, DATA4 *d4, const char *name, int autoOpened, INDEX4 *i4old )
-{
-   INDEX4FILE *i4file ;
-   INDEX4 *i4 ;
-   int addIndex, addTags ;
-
-   /* now set up the tags */
-   if ( c4->tagMemory == 0 )
-   {
-      c4->tagMemory = mem4create( c4, c4->memStartTag, sizeof(TAG4), c4->memExpandTag, 0 ) ;
-      if ( c4->tagMemory == 0 )
-      {
-         d4close( d4 ) ;
-         return 0 ;
-      }
-   }
-
-   for ( i4file = 0 ;; )
-   {
-      i4file = (INDEX4FILE *)l4next( &d4->dataFile->indexes, i4file ) ;
-      if ( i4file == 0 )
-         break ;
-      addIndex = 1 ;
-      addTags = 0 ;
-      for ( i4 = 0 ;; )   /* only set up for i4file's not in i4's of d4 */
-      {
-         i4 = (INDEX4 *)l4next( &d4->indexes, i4 ) ;
-         if ( i4 == 0 )
-            break ;
-         if ( i4->indexFile == i4file )
-         {
-            if ( l4numNodes( &i4->tags ) < l4numNodes( &i4file->tags ) )
-               addTags = 1 ;
-            addIndex = 0 ;
-            break ;
-         }
-      }
-      if ( addIndex == 0 )
-      {
-         if ( addTags == 0 )
-            continue ;
-      }
-      else
-         i4file->userCount++ ;
-      i4 = i4setup2( c4, i4file, d4, name, i4old, addIndex ) ;
-      if ( i4 == 0 )
-      {
-         d4close( d4 ) ;
-         return 0 ;
-      }
-      i4file->autoOpened = autoOpened ;    /* if in i4open, must be a manual open */
-   }
-
-   return 0 ;
-}
-#else
 #ifdef S4CLIPPER
 #ifdef P4ARGS_USED
    #pragma argsused
@@ -167,7 +45,6 @@ int i4setup( CODE4 *c4, DATA4 *d4, const char *name, int autoOpened )
    return 0 ;
 }
 #endif
-#endif /* S4CLIENT */
 
 int S4FUNCTION i4close( INDEX4 *i4 )
 {
@@ -191,154 +68,8 @@ int S4FUNCTION i4close( INDEX4 *i4 )
    return i4closeLow( i4 ) ;
 }
 
-#ifdef S4CLIENT
-int index4close( INDEX4FILE *i4 )
-{
-   CONNECTION4 *connection ;
-   CODE4 *c4 ;
-   TAG4FILE *tagOn ;
-   int finalRc, rc, saveRc ;
-
-   #ifdef E4PARM_LOW
-      if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91702 ) ;
-   #endif
-   #ifdef E4ANALYZE
-      if ( i4->userCount <= 0 )
-         return error4( i4->codeBase, e4struct, E81702 ) ;
-      if ( i4->codeBase == 0 )
-         return error4( i4->codeBase, e4struct, E91702 ) ;
-   #endif
-
-   i4->userCount-- ;
-   c4 = i4->codeBase ;
-   saveRc = error4set( c4, 0 ) ;
-   finalRc = 0 ;
-   if ( i4->userCount == 0 )
-   {
-      if ( i4->autoOpened == 0 )   /* must manually close ... */
-      {
-         #ifndef S4OFF_TRAN
-            if ( code4transEnabled( c4 ) )
-               if ( code4trans( c4 )->currentTranStatus == r4active )  /* disallow on current active only */
-               {
-                  if ( saveRc >= 0 )
-                     return error4( c4, e4transViolation, E81522 ) ;
-
-                  error4set( c4, saveRc ) ;
-                  return saveRc ;
-               }
-         #endif
-         connection = i4->dataFile->connection ;
-         #ifdef E4ANALYZE
-            if ( connection == 0 )
-            {
-               if ( saveRc == 0 )
-                  finalRc = error4( c4, e4struct, E91702 ) ;
-            }
-            else
-            {
-         #endif
-            connection4assign( connection, CON4INDEX_CLOSE, i4->clientId, i4->serverId ) ;
-            connection4addData( connection, i4->accessName, strlen( i4->accessName ) + 1, NULL ) ;
-            connection4sendMessage( connection ) ;
-            rc = connection4receiveMessage( connection ) ;
-            if ( rc < 0 )
-               finalRc = error4( c4, rc, E81701 ) ;
-            else
-            {
-               rc = connection4status( connection ) ;
-               if ( rc != 0 )
-                  if ( saveRc == 0 )
-                     finalRc = connection4error( connection, c4, rc, E91702 ) ;
-            }
-         #ifdef E4ANALYZE
-            }
-         #endif
-      }
-      for( ;; )
-      {
-         tagOn = (TAG4FILE *)l4pop( &i4->tags ) ;
-         if ( tagOn == 0 )
-            break ;
-         if ( tagOn->exprPtr != 0 )
-         {
-            u4free( tagOn->exprPtr ) ;
-            tagOn->exprPtr = 0 ;
-         }
-         if ( tagOn->filterPtr != 0 )
-         {
-            u4free( tagOn->filterPtr ) ;
-            tagOn->filterPtr = 0 ;
-         }
-         mem4free( c4->tagFileMemory, tagOn ) ;
-         tagOn = 0 ;
-      }
-      l4remove( &i4->dataFile->indexes, i4 ) ;
-      mem4free( c4->index4fileMemory, i4 ) ;
-      i4 = 0 ;
-      if ( saveRc < 0 )
-         error4set( c4, saveRc ) ;
-      return finalRc ;
-   }
-
-   return 0 ;
-}
-
-int S4FUNCTION i4closeLow( INDEX4 *i4 )
-{
-   int rc, finalRc ;
-   TAG4 *tagOn ;
-   CODE4 *c4 ;
-
-   c4 = i4->codeBase ;
-
-   finalRc = 0 ;
-
-   #ifndef S4OFF_WRITE
-      if ( i4->data )
-         if ( d4update( i4->data ) < 0 )
-            finalRc = error4set( c4, 0 ) ;
-   #endif
-
-   #ifdef E4ANALYZE
-      if ( i4->data == 0 )
-         return error4( 0, e4struct, E91701 ) ;
-      if ( i4->data->dataFile == 0 )
-         return error4( 0, e4struct, E91701 ) ;
-   #endif
-
-   if ( i4->data->tagSelected != 0 )
-      if ( i4->data->tagSelected->index == i4 )
-         i4->data->tagSelected = 0 ;
-
-   for( ;; )
-   {
-      tagOn = (TAG4 *)l4pop( &i4->tags ) ;
-      if ( tagOn == 0 )
-         break ;
-      mem4free( c4->tagMemory, tagOn ) ;
-      tagOn = 0 ;
-   }
-
-   l4remove( &i4->data->indexes, i4 ) ;
-   rc = index4close( i4->indexFile ) ;
-   mem4free( c4->indexMemory, i4 ) ;
-   i4 = 0 ;
-   if ( rc < 0 )
-      return rc ;
-   return finalRc ;
-}
-
-#endif /* S4CLIENT */
-
 const char *S4FUNCTION t4fileName( TAG4 *t4 )
 {
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      int rc ;
-   #endif
-
    #ifdef E4PARM_HIGH
       if ( t4 == 0 )
       {
@@ -347,38 +78,11 @@ const char *S4FUNCTION t4fileName( TAG4 *t4 )
       }
    #endif
 
-   #ifdef S4CLIENT
-      if ( error4code( t4->index->codeBase ) < 0 )
-         return 0 ;
-
-      connection = t4->index->data->dataFile->connection ;
-      connection4assign( connection, CON4TAG_FNAME, data4clientId( t4->index->data ), data4serverId( t4->index->data ) ) ;
-      connection4addData( connection, t4->tagFile->alias, strlen( t4->tagFile->alias ) + 1, NULL ) ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-      {
-         #ifdef E4STACK
-            error4stack( t4->index->codeBase, rc, E95501 ) ;
-         #endif
-         return 0 ;
-      }
-
-      rc = connection4status( connection ) ;
-      if ( rc < 0 )
-      {
-         connection4error( connection, t4->index->codeBase, rc, E95501 ) ;
-         return 0 ;
-      }
-
-      return connection4data( connection ) ;
-   #else
       #ifdef S4CLIPPER
          return t4->tagFile->file.name ;
       #else
          return i4fileName( t4->index ) ;
       #endif
-   #endif
 }
 
 const char *S4FUNCTION i4fileName( INDEX4 *i4 )
@@ -761,13 +465,8 @@ INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
 {
    CODE4  *c4 ;
    INDEX4 *i4 ;
-   #ifdef S4CLIENT
-      INDEX4FILE *i4file ;
-      unsigned char buf[258] ;
-   #else
       TAG4 *tag ;
       TAG4FILE *tagFile ;
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
@@ -786,66 +485,6 @@ INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
    if ( error4code( c4 ) < 0 )
       return 0 ;
 
-   #ifdef S4CLIENT
-      if ( fileName == 0 )
-         u4ncpy( (char *)buf, d4->dataFile->accessName, sizeof( buf ) - 1 ) ;
-      else
-      {
-         if ( strlen( fileName ) > sizeof( buf ) - 1 )
-         {
-            error4( c4, e4name, E91706 ) ;
-            return 0 ;
-         }
-         strcpy( (char*)buf, fileName ) ;
-      }
-      c4upper( (char*)buf ) ;
-      i4 = d4index( d4, (char S4PTR*)buf ) ;
-      if ( i4 != 0 )   /* duplicates not allowed */
-         error4( c4, e4instance, E91706 ) ;
-      i4file = index4open( d4, (char S4PTR*)buf, 0 ) ;
-      if ( error4code( c4 ) < 0 )
-         return 0 ;
-      i4 = d4index( d4, (char S4PTR*)buf ) ;
-      if ( i4file == 0 )
-      {
-         if ( i4 == 0 )
-            return 0 ;
-         #ifdef E4ANALZE
-            if ( i4->indexFile == 0 )
-            {
-               error4( c4, e4info, E91706 ) ;
-               return 0 ;
-            }
-         #endif
-         i4file = i4->indexFile ;
-         i4file->clientId = data4clientId( d4 ) ;
-         i4file->serverId = data4serverId( d4 ) ;
-      }
-      else  /* indexfile already exists so set up another index4 structure */
-      {
-         i4 = i4setup2( c4, i4file, d4, (char S4PTR*)buf, 0, 1 ) ;
-         if ( i4 == 0 )
-         {
-            index4close( i4file ) ;
-            return 0 ;
-         }
-      }
-      #ifdef E4ANALZE
-         else
-         {
-            if ( i4->indexFile != i4file )
-            {
-               error4( c4, e4info, E91706 ) ;
-               return 0 ;
-            }
-         }
-      #endif
-      i4->codeBase = c4 ;
-      #ifndef S4OFF_TRAN
-         i4->isValid = 1 ;
-      #endif
-      return i4 ;
-   #else
       if ( c4->indexMemory == 0 )
       {
          c4->indexMemory = mem4create( c4, c4->memStartIndex, sizeof(INDEX4), c4->memExpandIndex, 0 ) ;
@@ -935,7 +574,6 @@ INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
          i4->isValid = 1 ;
       #endif
       return i4 ;
-   #endif
 }
 
 INDEX4FILE *index4open( DATA4 *d4, const char *fileName, INDEX4 *index )
@@ -1959,59 +1597,6 @@ INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
    if ( error4code( c4 ) < 0 )
       return 0 ;
 
-   #ifdef S4CLIENT
-      if ( fileName == 0 )
-         u4ncpy( (char *)buf, d4->dataFile->accessName, sizeof( buf ) - 1 ) ;
-      else
-      {
-         if ( strlen( fileName ) > sizeof( buf ) - 1 )
-         {
-            error4( c4, e4name, E91707 ) ;
-            return 0 ;
-         }
-         strcpy( (char*)buf, fileName ) ;
-      }
-      c4upper( (char*)buf ) ;
-      i4file = index4open( d4, (char S4PTR*)buf, 0 ) ;
-      if ( error4code( c4 ) < 0 )
-         return 0 ;
-      i4 = d4index( d4, (char S4PTR*)buf ) ;
-      if ( i4file == 0 )
-      {
-         if ( i4 == 0 )
-            return 0 ;
-         #ifdef E4ANALZE
-            if ( i4->indexFile == 0 )
-            {
-               error4( c4, e4info, E91706 ) ;
-               return 0 ;
-            }
-         #endif
-         i4file = i4->indexFile ;
-         i4file->clientId = data4clientId( d4 ) ;
-         i4file->serverId = data4serverId( d4 ) ;
-      }
-      else  /* indexfile already exists so set up another index4 structure */
-      {
-         i4 = i4setup2( c4, i4file, d4, (char S4PTR*)buf ) ;
-         if ( i4 == 0 )
-         {
-            index4close( i4file ) ;
-            return 0 ;
-         }
-      }
-      #ifdef E4ANALZE
-         else
-         {
-            if ( i4->indexFile != i4file )
-            {
-               error4( c4, e4info, E91706 ) ;
-               return 0 ;
-            }
-         }
-      #endif
-      i4->codeBase = c4 ;
-   #else
       if ( fileName == 0 )
       {
          u4ncpy( buf, d4->dataFile->file.name, sizeof( buf ) - 1 ) ;
@@ -2233,8 +1818,6 @@ INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
             }
          }
       }
-   #endif
-
    #ifndef S4OFF_TRAN
       i4->isValid = 1 ;
    #endif

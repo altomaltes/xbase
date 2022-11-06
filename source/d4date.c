@@ -221,11 +221,6 @@ const char *S4FUNCTION code4dateFormat( CODE4 *c4 )
 
 int S4FUNCTION code4dateFormatSet( CODE4 *c4, const char *str )
 {
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      CONNECTION4DATE_FORMAT_SET_INFO_IN *infoIn ;
-      int rc ;
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( c4 == 0 || str == 0 )
@@ -238,27 +233,6 @@ int S4FUNCTION code4dateFormatSet( CODE4 *c4, const char *str )
       strcpy( c4->currentClient->trans.dateFormat, str ) ;
    #else
       strcpy( c4->c4trans.trans.dateFormat, str ) ;
-      #ifdef S4CLIENT
-         if ( c4->defaultServer.connected )
-         {
-            connection = &c4->defaultServer ;
-            #ifdef E4ANALYZE
-               if ( connection == 0 )
-                  return error4( c4, e4struct, E96302 ) ;
-            #endif
-            connection4assign( connection, CON4DATE_FORMAT, 0L, 0L ) ;
-            connection4addData( connection, NULL, sizeof(CONNECTION4DATE_FORMAT_SET_INFO_IN), (void **)&infoIn ) ;
-            memcpy( infoIn->dateFormat, &c4->c4trans.trans.dateFormat, sizeof( c4->c4trans.trans.dateFormat ) ) ;
-            connection4sendMessage( connection ) ;
-            rc = connection4receiveMessage( connection ) ;
-            if ( rc < 0 )
-               return error4stack( c4, rc, E96302 ) ;
-            rc = connection4status( connection ) ;
-            if ( rc < 0 )
-               connection4error( connection, c4, rc, E96302 ) ;
-            return rc ;
-         }
-      #endif
    #endif
 
    return 0 ;

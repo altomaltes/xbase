@@ -155,7 +155,7 @@
          if ( c4parm_check( cb, 1, 0 ) ) return -1 ;
       #endif
 
-      #if defined( S4CLIENT_OR_FOX ) && defined( S4COMPRESS )
+      #if defined( CLIENT_OR_FOX ) && defined( S4COMPRESS )
          if ( value == (Bool5)r4check ) return( cb->compressedMemos ) ;
          temp = cb->compressedMemos ;
          cb->compressedMemos = value ;
@@ -1085,7 +1085,7 @@
       void* buffer;
    } FILE4SEQWRITEVB ;
 
-   S4EXPORT unsigned S4FUNCTION file4seqReadInitVB( FILE4* f4, long startPos, unsigned bufferLen)
+   PUBLIC unsigned S4FUNCTION file4seqReadInitVB( FILE4* f4, long startPos, unsigned bufferLen)
    {
       FILE4SEQREADVB* fsrvb = NULL;
       fsrvb = (FILE4SEQREADVB*)u4alloc(sizeof(FILE4SEQREADVB));
@@ -1102,14 +1102,14 @@
       return (unsigned)fsrvb;
    }
 
-   S4EXPORT void S4FUNCTION file4seqReadFreeVB(FILE4SEQREADVB* fsrvb)
+   PUBLIC void S4FUNCTION file4seqReadFreeVB(FILE4SEQREADVB* fsrvb)
    {
       u4free(fsrvb->buffer);
       u4free(fsrvb->fsr);
       u4free(fsrvb);
    }
 
-   S4EXPORT unsigned S4FUNCTION file4seqWriteInitVB( FILE4* f4, long startPos, unsigned bufferLen)
+   PUBLIC unsigned S4FUNCTION file4seqWriteInitVB( FILE4* f4, long startPos, unsigned bufferLen)
    {
       char* buffer = NULL;
       FILE4SEQWRITEVB* fswvb = NULL;
@@ -1126,14 +1126,14 @@
       return (unsigned)fswvb;
    }
 
-   S4EXPORT void S4FUNCTION file4seqWriteFreeVB(FILE4SEQWRITEVB* fswvb)
+   PUBLIC void S4FUNCTION file4seqWriteFreeVB(FILE4SEQWRITEVB* fswvb)
    {
       u4free(fswvb->buffer);
       u4free(fswvb->fsw);
       u4free(fswvb);
    }
 
-   S4EXPORT unsigned S4FUNCTION file4createVB(CODE4 *code, char *name)
+   PUBLIC unsigned S4FUNCTION file4createVB(CODE4 *code, char *name)
    {
       FILE4 *file = (FILE4*)u4alloc(sizeof(FILE4));
 
@@ -1145,7 +1145,7 @@
       }
    }
 
-   S4EXPORT unsigned S4FUNCTION file4openVB(CODE4 *code, char *name)
+   PUBLIC unsigned S4FUNCTION file4openVB(CODE4 *code, char *name)
    {
       FILE4 *file = (FILE4*)u4alloc(sizeof(FILE4));
 
@@ -1157,7 +1157,7 @@
       }
    }
 
-   S4EXPORT int S4FUNCTION file4closeVB(FILE4 *file)
+   PUBLIC int S4FUNCTION file4closeVB(FILE4 *file)
    {
       int retVal;
       retVal = file4close(file);
@@ -1165,17 +1165,17 @@
       return retVal;
    }
 
-   S4EXPORT int S4FUNCTION file4seqWriteRepeatVB( FILE4SEQWRITEVB *seqWriteVB, const long nRepeat, char *character)
+   PUBLIC int S4FUNCTION file4seqWriteRepeatVB( FILE4SEQWRITEVB *seqWriteVB, const long nRepeat, char *character)
    {
       return file4seqWriteRepeat(seqWriteVB->fsw,nRepeat,*character);
    }
 
-   S4EXPORT int S4FUNCTION file4seqWriteRepeatP( FILE4SEQWRITEVB *seqWriteVB, const long nRepeat, char character)
+   PUBLIC int S4FUNCTION file4seqWriteRepeatP( FILE4SEQWRITEVB *seqWriteVB, const long nRepeat, char character)
    {
       return file4seqWriteRepeat(seqWriteVB->fsw,nRepeat,character);
    }
 
-   S4EXPORT unsigned S4FUNCTION file4compressCreateVB( FILE4 *originalFile, const char *name, short blockSize)
+   PUBLIC unsigned S4FUNCTION file4compressCreateVB( FILE4 *originalFile, const char *name, short blockSize)
    {
       #if defined( S4STAND_ALONE ) && defined( S4COMPRESS )
          FILE4 *newFile;
@@ -1196,7 +1196,7 @@
       #endif
    }
 
-   S4EXPORT unsigned S4FUNCTION file4compressOpenVB( CODE4 *code, const char *name)
+   PUBLIC unsigned S4FUNCTION file4compressOpenVB( CODE4 *code, const char *name)
    {
       #if defined( S4STAND_ALONE ) && defined( S4COMPRESS )
          FILE4 *newFile;
@@ -1217,27 +1217,27 @@
       #endif
    }
 
-   S4EXPORT int S4FUNCTION file4seqReadVB(FILE4SEQREADVB* fsrvb, char *info, unsigned infoLen)
+   PUBLIC int S4FUNCTION file4seqReadVB(FILE4SEQREADVB* fsrvb, char *info, unsigned infoLen)
    {
       return file4seqRead(fsrvb->fsr,info,infoLen);
    }
 
-   S4EXPORT int S4FUNCTION file4seqReadAllVB(FILE4SEQREADVB* fsrvb, char *info, unsigned infoLen)
+   PUBLIC int S4FUNCTION file4seqReadAllVB(FILE4SEQREADVB* fsrvb, char *info, unsigned infoLen)
    {
       return file4seqReadAll(fsrvb->fsr,info,infoLen);
    }
 
-   S4EXPORT int S4FUNCTION file4seqWriteVB(FILE4SEQWRITEVB* fswvb, const char *info, unsigned infoLen)
+   PUBLIC int S4FUNCTION file4seqWriteVB(FILE4SEQWRITEVB* fswvb, const char *info, unsigned infoLen)
    {
       return file4seqWrite(fswvb->fsw,info,infoLen);
    }
 
-   S4EXPORT int S4FUNCTION file4seqWriteFlushVB(FILE4SEQWRITEVB* fswvb)
+   PUBLIC int S4FUNCTION file4seqWriteFlushVB(FILE4SEQWRITEVB* fswvb)
    {
       return file4seqWriteFlush(fswvb->fsw);
    }
 
-   S4EXPORT int S4FUNCTION file4nameLenVB( FILE4* f4 )
+   PUBLIC int S4FUNCTION file4nameLenVB( FILE4* f4 )
    {
       if(f4->name != NULL) {
          return strlen(f4->name);
@@ -1246,7 +1246,7 @@
       }
    }
 
-   S4EXPORT void S4FUNCTION file4nameVB( FILE4* f4, char* fileName, int fileNameLength)
+   PUBLIC void S4FUNCTION file4nameVB( FILE4* f4, char* fileName, int fileNameLength)
    {
       u4ncpy(fileName,f4->name,fileNameLength);
    }
@@ -1635,7 +1635,7 @@
       long msgPtr ;
    } ;
 
-   S4EXPORT struct PIPE4VBINFO S4FUNCTION pipe4recvMessageVB( PIPE4RECV *pipe )
+   PUBLIC struct PIPE4VBINFO S4FUNCTION pipe4recvMessageVB( PIPE4RECV *pipe )
    {
       struct PIPE4VBINFO info ;
 
@@ -1668,7 +1668,7 @@
       short int dummy ;
    } FIELD4INFOVB32 ;
 
-   S4EXPORT DATA4 * S4FUNCTION d4createVB( CODE4 *cb, char *name, FIELD4INFOVB32* fldInfo, TAG4INFO *tagInfo)
+   PUBLIC DATA4 * S4FUNCTION d4createVB( CODE4 *cb, char *name, FIELD4INFOVB32* fldInfo, TAG4INFO *tagInfo)
    {
       int i = 0, numFlds = 0, numTags = 0 ;
       FIELD4INFO *fldInfoC ;
@@ -1701,7 +1701,7 @@
 
    #else
 
-   S4EXPORT DATA4 * S4FUNCTION d4createVB( CODE4 *cb, char *name, FIELD4INFO* fldInfo, TAG4INFO *tagInfo)
+   PUBLIC DATA4 * S4FUNCTION d4createVB( CODE4 *cb, char *name, FIELD4INFO* fldInfo, TAG4INFO *tagInfo)
    {
       return d4create( cb, name, fldInfo, tagInfo ) ;
    }
@@ -1725,9 +1725,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION code4dateFormatW( CODE4 *c4, WSTR5 *buff )
+   PUBLIC void S4FUNCTION code4dateFormatW( CODE4 *c4, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION code4dateFormatW( CODE4 *c4, char *buff )
+   PUBLIC void S4FUNCTION code4dateFormatW( CODE4 *c4, char *buff )
 #endif
    {
       const char *ptr = code4dateFormat( c4 ) ;
@@ -1747,9 +1747,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION code4indexExtensionW( CODE4 *c4, WSTR5 *buff )
+   PUBLIC void S4FUNCTION code4indexExtensionW( CODE4 *c4, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION code4indexExtensionW( CODE4 *c4, char *buff )
+   PUBLIC void S4FUNCTION code4indexExtensionW( CODE4 *c4, char *buff )
 #endif
    {
       const char *ptr = code4indexExtension( c4 ) ;
@@ -1769,9 +1769,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION code4lockFileNameW( CODE4 *c4, WSTR5 *buff )
+   PUBLIC void S4FUNCTION code4lockFileNameW( CODE4 *c4, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION code4lockFileNameW( CODE4 *c4, char *buff )
+   PUBLIC void S4FUNCTION code4lockFileNameW( CODE4 *c4, char *buff )
 #endif
    {
       const char *ptr = code4lockFileName( c4 ) ;
@@ -1787,9 +1787,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION code4lockUserIdW( CODE4 *c4, WSTR5 *buff )
+   PUBLIC void S4FUNCTION code4lockUserIdW( CODE4 *c4, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION code4lockUserIdW( CODE4 *c4, char *buff )
+   PUBLIC void S4FUNCTION code4lockUserIdW( CODE4 *c4, char *buff )
 #endif
    {
       const char *ptr = code4lockUserId( c4 ) ;
@@ -1805,9 +1805,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION code4lockNetworkIdW( CODE4 *c4, WSTR5 *buff )
+   PUBLIC void S4FUNCTION code4lockNetworkIdW( CODE4 *c4, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION code4lockNetworkIdW( CODE4 *c4, char *buff )
+   PUBLIC void S4FUNCTION code4lockNetworkIdW( CODE4 *c4, char *buff )
 #endif
    {
       const char *ptr = code4lockNetworkId( c4 ) ;
@@ -1824,9 +1824,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION code4logFileNameW( CODE4 *c4, WSTR5 *buff )
+   PUBLIC void S4FUNCTION code4logFileNameW( CODE4 *c4, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION code4logFileNameW( CODE4 *c4, char *buff )
+   PUBLIC void S4FUNCTION code4logFileNameW( CODE4 *c4, char *buff )
 #endif
    {
       const char *ptr = code4logFileName( c4 ) ;
@@ -1842,9 +1842,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION d4aliasW( DATA4 *db, WSTR5 *buff )
+   PUBLIC void S4FUNCTION d4aliasW( DATA4 *db, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION d4aliasW( DATA4 *db, char *buff )
+   PUBLIC void S4FUNCTION d4aliasW( DATA4 *db, char *buff )
 #endif
    {
       const char *ptr = d4alias( db ) ;
@@ -1863,7 +1863,7 @@
    }
 
 
-   S4EXPORT CODE4* S4FUNCTION d4code( DATA4 *db )
+   PUBLIC CODE4* S4FUNCTION d4code( DATA4 *db )
    {
       if ( db )
          return db->codeBase ;
@@ -1872,7 +1872,7 @@
    }
 
 
-   S4EXPORT DATA4* S4FUNCTION d4createW( CODE4 *cb, WSTR5 *name, FIELD4INFO *fldInfo, TAG4INFO *tagInfo )
+   PUBLIC DATA4* S4FUNCTION d4createW( CODE4 *cb, WSTR5 *name, FIELD4INFO *fldInfo, TAG4INFO *tagInfo )
    {
       DATA4 *db ;
       WSTR5 wideBuff[512] ;
@@ -1895,9 +1895,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION d4fileNameW( DATA4 *db, WSTR5 *buff )
+   PUBLIC void S4FUNCTION d4fileNameW( DATA4 *db, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION d4fileNameW( DATA4 *db, char *buff )
+   PUBLIC void S4FUNCTION d4fileNameW( DATA4 *db, char *buff )
 #endif
    {
       const char *ptr = d4fileName( db ) ;
@@ -1912,7 +1912,7 @@
    }
 
 
-   S4EXPORT INDEX4* S4FUNCTION d4nextIndex( CODE4 *cb, DATA4 *db, INDEX4 *index )
+   PUBLIC INDEX4* S4FUNCTION d4nextIndex( CODE4 *cb, DATA4 *db, INDEX4 *index )
    {
       INDEX4 *idx = 0 ;
 
@@ -1926,7 +1926,7 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION d4positionW( DATA4 *db, WSTR5 *buff )
+   PUBLIC void S4FUNCTION d4positionW( DATA4 *db, WSTR5 *buff )
    {
       char pszValue[15] ;
       memset( pszValue, 0, 15 ) ;
@@ -1936,7 +1936,7 @@
 #endif
 
 
-   S4EXPORT char * S4FUNCTION date4alloc( CODE4 *cb, char *pict )
+   PUBLIC char * S4FUNCTION date4alloc( CODE4 *cb, char *pict )
    {
       char *ptr ;
       ptr = (char *) u4allocErr( cb, strlen(pict)+1 ) ;
@@ -1945,26 +1945,26 @@
 
    /* LY Aug 6/04 : added d4seekUnicodeN() & d4seekNextUnicodeN() for seeking Unicode strings
       in environments that support Unicode, like .NET */
-   S4EXPORT int S4FUNCTION d4seekUnicodeN( DATA4 *db, unsigned short *inputKey, short inputKeyLen )
+   PUBLIC int S4FUNCTION d4seekUnicodeN( DATA4 *db, unsigned short *inputKey, short inputKeyLen )
    {
       return d4seekN( db, (const char *)inputKey, inputKeyLen ) ;
    }
 
 
-   S4EXPORT int S4FUNCTION d4seekNextUnicodeN( DATA4 *db, WSTR5 *inputKey, short inputKeyLen )
+   PUBLIC int S4FUNCTION d4seekNextUnicodeN( DATA4 *db, WSTR5 *inputKey, short inputKeyLen )
    {
       return d4seekNextN( db, (const char *)inputKey, inputKeyLen ) ;
    }
 
 
-   S4EXPORT void S4FUNCTION date4assignW( char *ptr, char *d)
+   PUBLIC void S4FUNCTION date4assignW( char *ptr, char *d)
    {
       u4ncpy( ptr, d, 8 ) ;
    }
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION date4cdowW( unsigned short *ptr, WSTR5 *buff )
+   PUBLIC void S4FUNCTION date4cdowW( unsigned short *ptr, WSTR5 *buff )
    {
       WSTR5 tempDate[9] ;
       const char *result ;
@@ -1981,7 +1981,7 @@
       }
    }
 
-   S4EXPORT void S4FUNCTION date4cmonthW( unsigned short *ptr, WSTR5 *buff )
+   PUBLIC void S4FUNCTION date4cmonthW( unsigned short *ptr, WSTR5 *buff )
    {
       WSTR5 tempDate[9] ;
       const char *result ;
@@ -2001,9 +2001,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION date4formatW( WSTR5 *ptr, WSTR5 *result, WSTR5 *pict )
+   PUBLIC void S4FUNCTION date4formatW( WSTR5 *ptr, WSTR5 *result, WSTR5 *pict )
 #else
-   S4EXPORT char * S4FUNCTION date4formatW( char *ptr, char *result, char *pict )
+   PUBLIC char * S4FUNCTION date4formatW( char *ptr, char *result, char *pict )
 #endif
    {
       #ifdef S4WINCE
@@ -2038,7 +2038,7 @@
    }
 
 
-   S4EXPORT char * S4FUNCTION date4timeNowW( char *result )
+   PUBLIC char * S4FUNCTION date4timeNowW( char *result )
    {
       date4timeNow( result ) ;
       return result ;
@@ -2046,9 +2046,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION error4textW( CODE4 *c4, const long errCode2, WSTR5 *buff )
+   PUBLIC void S4FUNCTION error4textW( CODE4 *c4, const long errCode2, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION error4textW( CODE4 *c4, const long errCode2, char *buff )
+   PUBLIC void S4FUNCTION error4textW( CODE4 *c4, const long errCode2, char *buff )
 #endif
    {
       char *ptr = (char *)error4text( c4, errCode2 ) ;
@@ -2061,9 +2061,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION expr4sourceW( const EXPR4 *e4expr, WSTR5 *buff )
+   PUBLIC void S4FUNCTION expr4sourceW( const EXPR4 *e4expr, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION expr4sourceW( const EXPR4 *e4expr, char *buff )
+   PUBLIC void S4FUNCTION expr4sourceW( const EXPR4 *e4expr, char *buff )
 #endif
    {
       char *ptr = (char *)expr4source( e4expr ) ;
@@ -2076,7 +2076,7 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION expr4doubleW( EXPR4 *expr, WSTR5 *buff )
+   PUBLIC void S4FUNCTION expr4doubleW( EXPR4 *expr, WSTR5 *buff )
    {
       if ( expr )
       {
@@ -2102,9 +2102,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION expr4strW( EXPR4 *e4expr, WSTR5 *buff )
+   PUBLIC void S4FUNCTION expr4strW( EXPR4 *e4expr, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION expr4strW( EXPR4 *e4expr, char *buff )
+   PUBLIC void S4FUNCTION expr4strW( EXPR4 *e4expr, char *buff )
 #endif
    {
       const char *ptr = expr4str( e4expr ) ;
@@ -2124,7 +2124,7 @@
    }
 
 
-   S4EXPORT void S4FUNCTION f4assignBytesW( FIELD4 *field, char *buff, int buffLen )
+   PUBLIC void S4FUNCTION f4assignBytesW( FIELD4 *field, char *buff, int buffLen )
    {
       char *ptr = f4ptr( field ) ;
       if ( ptr )
@@ -2139,7 +2139,7 @@
    }
 
 
-   S4EXPORT void S4FUNCTION f4bytesW( FIELD4 *field, char *buff, int buffLen )
+   PUBLIC void S4FUNCTION f4bytesW( FIELD4 *field, char *buff, int buffLen )
    {
       char *ptr = f4ptr( field ) ;
       if ( ptr )
@@ -2152,9 +2152,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION f4currencyW( FIELD4 *field, short dec, WSTR5 *buff )
+   PUBLIC void S4FUNCTION f4currencyW( FIELD4 *field, short dec, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION f4currencyW( FIELD4 *field, short dec, char *buff )
+   PUBLIC void S4FUNCTION f4currencyW( FIELD4 *field, short dec, char *buff )
 #endif
    {
       const char *ptr = f4currency( field, dec ) ;
@@ -2175,9 +2175,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION f4dateTimeW( FIELD4 *field, WSTR5 *buff )
+   PUBLIC void S4FUNCTION f4dateTimeW( FIELD4 *field, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION f4dateTimeW( FIELD4 *field, char *buff )
+   PUBLIC void S4FUNCTION f4dateTimeW( FIELD4 *field, char *buff )
 #endif
    {
       const char *ptr = f4dateTime( field ) ;
@@ -2197,7 +2197,7 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION f4doubleW( FIELD4 *fld, WSTR5 *buff )
+   PUBLIC void S4FUNCTION f4doubleW( FIELD4 *fld, WSTR5 *buff )
    {
       if ( fld )
       {
@@ -2242,7 +2242,7 @@
 #endif
 
 
-   S4EXPORT FIELD4INFO * S4FUNCTION f4infoAdd( CODE4 *cb, FIELD4INFO *fldInfo,
+   PUBLIC FIELD4INFO * S4FUNCTION f4infoAdd( CODE4 *cb, FIELD4INFO *fldInfo,
 #ifdef S4WINCE
       int fldInfoSize, WSTR5 *name, unsigned short type, int len,
 #else
@@ -2315,7 +2315,7 @@
    }
 
 
-   S4EXPORT int S4FUNCTION f4infoDel( CODE4 *cb, FIELD4INFO *fldInfo, int fldInfoSize, int index )
+   PUBLIC int S4FUNCTION f4infoDel( CODE4 *cb, FIELD4INFO *fldInfo, int fldInfoSize, int index )
    {
       u4free( fldInfo[index].name ) ;
       memcpy( fldInfo+index, fldInfo+index+1, sizeof(FIELD4INFO) * (fldInfoSize-index) ) ;
@@ -2324,9 +2324,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT FIELD4INFO * S4FUNCTION f4infoInit( CODE4 *cb, WSTR5 *name,
+   PUBLIC FIELD4INFO * S4FUNCTION f4infoInit( CODE4 *cb, WSTR5 *name,
 #else
-   S4EXPORT FIELD4INFO * S4FUNCTION f4infoInit( CODE4 *cb, char *name,
+   PUBLIC FIELD4INFO * S4FUNCTION f4infoInit( CODE4 *cb, char *name,
 #endif
       unsigned short type, int len, int dec, int nulls )
    {
@@ -2336,7 +2336,7 @@
    }
 
 
-   S4EXPORT void S4FUNCTION f4infoFree( FIELD4INFO *fldInfo, int fldInfoSize )
+   PUBLIC void S4FUNCTION f4infoFree( FIELD4INFO *fldInfo, int fldInfoSize )
    {
       for( int i = fldInfoSize-1 ; i >= 0 ; i-- )
       {
@@ -2348,9 +2348,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION f4infoName( CODE4 *code, FIELD4INFO *fldInfo, int fldNum, WSTR5 *buff )
+   PUBLIC void S4FUNCTION f4infoName( CODE4 *code, FIELD4INFO *fldInfo, int fldNum, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION f4infoName( CODE4 *code, FIELD4INFO *fldInfo, int fldNum, char *buff )
+   PUBLIC void S4FUNCTION f4infoName( CODE4 *code, FIELD4INFO *fldInfo, int fldNum, char *buff )
 #endif
    {
       if ( fldInfo )
@@ -2369,7 +2369,7 @@
    }
 
 
-   S4EXPORT int S4FUNCTION f4memoAssignBytesW( FIELD4 *fld, char *buff,  unsigned int len )
+   PUBLIC int S4FUNCTION f4memoAssignBytesW( FIELD4 *fld, char *buff,  unsigned int len )
    {
       // AS Feb 8/06 - compile fix
       #ifdef S4OFF_WRITE
@@ -2391,7 +2391,7 @@
    }
 
 
-   S4EXPORT unsigned int S4FUNCTION f4memoBytesW( FIELD4 *fld, char *buff,
+   PUBLIC unsigned int S4FUNCTION f4memoBytesW( FIELD4 *fld, char *buff,
       unsigned int len )
    {
       unsigned int retLen = 0 ;
@@ -2411,7 +2411,7 @@
    }
 
 
-   S4EXPORT void S4FUNCTION f4memoChanged( FIELD4 *fld, int value )
+   PUBLIC void S4FUNCTION f4memoChanged( FIELD4 *fld, int value )
    {
       fld->data->recordChanged = value ;
       #ifndef S4OFF_MEMO
@@ -2421,7 +2421,7 @@
    }
 
 
-   S4EXPORT int S4FUNCTION f4memoSetLenW( FIELD4 *field, unsigned int newLen )
+   PUBLIC int S4FUNCTION f4memoSetLenW( FIELD4 *field, unsigned int newLen )
    {
       #if defined( S4OFF_MEMO ) || defined( S4OFF_WRITE )
          return e4notSupported ;
@@ -2451,9 +2451,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void f4memoReadW( FIELD4 *field, unsigned int readLen, unsigned int startPos, WSTR5 *buff )
+   PUBLIC void f4memoReadW( FIELD4 *field, unsigned int readLen, unsigned int startPos, WSTR5 *buff )
 #else
-   S4EXPORT void f4memoReadW( FIELD4 *field, unsigned int readLen, unsigned int startPos, char *buff )
+   PUBLIC void f4memoReadW( FIELD4 *field, unsigned int readLen, unsigned int startPos, char *buff )
 #endif
    {
       #ifdef S4OFF_MEMO
@@ -2476,9 +2476,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION f4memoStrW( FIELD4 *field, WSTR5 *buff )
+   PUBLIC void S4FUNCTION f4memoStrW( FIELD4 *field, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION f4memoStrW( FIELD4 *field, char *buff )
+   PUBLIC void S4FUNCTION f4memoStrW( FIELD4 *field, char *buff )
 #endif
    {
       const char *ptr = f4memoStr( field ) ;
@@ -2499,7 +2499,7 @@
 
 
 //#ifdef S4WINCE
-   S4EXPORT void S4FUNCTION f4memoUnicodeStrW( FIELD4 *field, unsigned short *buff )
+   PUBLIC void S4FUNCTION f4memoUnicodeStrW( FIELD4 *field, unsigned short *buff )
    {
       const char *ptr = f4memoPtr( field ) ;
       if ( ptr )
@@ -2512,9 +2512,9 @@
 //#endif
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION f4nameW( FIELD4 *field, WSTR5 *buff )
+   PUBLIC void S4FUNCTION f4nameW( FIELD4 *field, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION f4nameW( FIELD4 *field, char *buff )
+   PUBLIC void S4FUNCTION f4nameW( FIELD4 *field, char *buff )
 #endif
    {
       const char *ptr = f4name( field ) ;
@@ -2535,9 +2535,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION f4strW( FIELD4 *field, WSTR5 *buff )
+   PUBLIC void S4FUNCTION f4strW( FIELD4 *field, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION f4strW( FIELD4 *field, char *buff )
+   PUBLIC void S4FUNCTION f4strW( FIELD4 *field, char *buff )
 #endif
    {
       const char *ptr = f4str( field ) ;
@@ -2558,14 +2558,14 @@
 
    /* LY Jun 23/04 : Return Unicode strings without removing upper byte of Unicode chars
       for .NET and other environments that support Unicode */
-   S4EXPORT void S4FUNCTION f4strUnicodeW( FIELD4 *field, unsigned short *buff )
+   PUBLIC void S4FUNCTION f4strUnicodeW( FIELD4 *field, unsigned short *buff )
    {
       const char *ptr = f4ptr( field ) ;
       if ( ptr )
          memcpy( buff, ptr, f4len( field ) ) ;
    }
 
-   S4EXPORT void S4FUNCTION f4strUnicode( FIELD4 *field, char *buff )
+   PUBLIC void S4FUNCTION f4strUnicode( FIELD4 *field, char *buff )
    {
       WSTR5 *workBuff ;
       int len = f4len( field ) ;
@@ -2586,7 +2586,7 @@
    }
 
 
-   S4EXPORT int S4FUNCTION file4isValid( FILE4 *file )
+   PUBLIC int S4FUNCTION file4isValid( FILE4 *file )
    {
       if ( file )
          return ( file->hand == INVALID4HANDLE ? 0 : 1 ) ;
@@ -2595,7 +2595,7 @@
    }
 
 
-   S4EXPORT char * S4FUNCTION file4nameW( FILE4 *file )
+   PUBLIC char * S4FUNCTION file4nameW( FILE4 *file )
    {
       if ( file )
          return (char *)file->name ;
@@ -2604,7 +2604,7 @@
    }
 
 
-   S4EXPORT CODE4* S4FUNCTION i4code( INDEX4 *idx )
+   PUBLIC CODE4* S4FUNCTION i4code( INDEX4 *idx )
    {
       if ( idx )
          return idx->codeBase ;
@@ -2614,9 +2614,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION i4fileNameW( INDEX4 *idx, WSTR5 *buff )
+   PUBLIC void S4FUNCTION i4fileNameW( INDEX4 *idx, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION i4fileNameW( INDEX4 *idx, char *buff )
+   PUBLIC void S4FUNCTION i4fileNameW( INDEX4 *idx, char *buff )
 #endif
    {
       const char *ptr = i4fileName( idx ) ;
@@ -2632,9 +2632,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT INDEX4 * S4FUNCTION i4openW( DATA4 *data, WSTR5 *name )
+   PUBLIC INDEX4 * S4FUNCTION i4openW( DATA4 *data, WSTR5 *name )
 #else
-   S4EXPORT INDEX4 * S4FUNCTION i4openW( DATA4 *data, const char *name )
+   PUBLIC INDEX4 * S4FUNCTION i4openW( DATA4 *data, const char *name )
 #endif
    {
       // AS Apr 4/06 - name can optionally be null (means open production index)
@@ -2660,9 +2660,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION relate4masterExprW( RELATE4 *relate, WSTR5 *buff )
+   PUBLIC void S4FUNCTION relate4masterExprW( RELATE4 *relate, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION relate4masterExprW( RELATE4 *relate, char *buff )
+   PUBLIC void S4FUNCTION relate4masterExprW( RELATE4 *relate, char *buff )
 #endif
    {
       const char *ptr = relate4masterExpr( relate ) ;
@@ -2678,9 +2678,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION t4aliasW( TAG4 *tag, WSTR5 *buff )
+   PUBLIC void S4FUNCTION t4aliasW( TAG4 *tag, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION t4aliasW( TAG4 *tag, char *buff )
+   PUBLIC void S4FUNCTION t4aliasW( TAG4 *tag, char *buff )
 #endif
    {
       const char *ptr = t4alias( tag ) ;
@@ -2702,9 +2702,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION t4exprW( TAG4 *tag, WSTR5 *buff )
+   PUBLIC void S4FUNCTION t4exprW( TAG4 *tag, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION t4exprW( TAG4 *tag, char *buff )
+   PUBLIC void S4FUNCTION t4exprW( TAG4 *tag, char *buff )
 #endif
    {
       const char *ptr ;
@@ -2722,9 +2722,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION t4filterW( TAG4 *tag, WSTR5 *buff )
+   PUBLIC void S4FUNCTION t4filterW( TAG4 *tag, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION t4filterW( TAG4 *tag, char *buff )
+   PUBLIC void S4FUNCTION t4filterW( TAG4 *tag, char *buff )
 #endif
    {
       const char *ptr ;
@@ -2741,7 +2741,7 @@
    }
 
 
-   S4EXPORT TAG4INFO * S4FUNCTION t4infoAdd( CODE4 *cb, TAG4INFO *tagInfo, int tagInfoSize,
+   PUBLIC TAG4INFO * S4FUNCTION t4infoAdd( CODE4 *cb, TAG4INFO *tagInfo, int tagInfoSize,
 #ifdef S4WINCE
       WSTR5 *name, WSTR5 *expr, WSTR5 *filter, short unique, unsigned short descending )
 #else
@@ -2871,10 +2871,10 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT TAG4INFO * S4FUNCTION t4infoInit( CODE4 *cb, WSTR5 *name, WSTR5 *expr,
+   PUBLIC TAG4INFO * S4FUNCTION t4infoInit( CODE4 *cb, WSTR5 *name, WSTR5 *expr,
       WSTR5 *filter, short unique, unsigned short descending )
 #else
-   S4EXPORT TAG4INFO * S4FUNCTION t4infoInit( CODE4 *cb, char *name, char *expr,
+   PUBLIC TAG4INFO * S4FUNCTION t4infoInit( CODE4 *cb, char *name, char *expr,
       char *filter, short unique, unsigned short descending )
 #endif
    {
@@ -2884,7 +2884,7 @@
    }
 
 
-   S4EXPORT int S4FUNCTION t4infoDel( CODE4 *cb, TAG4INFO *tagInfo, int tagInfoSize, int index )
+   PUBLIC int S4FUNCTION t4infoDel( CODE4 *cb, TAG4INFO *tagInfo, int tagInfoSize, int index )
    {
       if ( tagInfo )
       {
@@ -2904,7 +2904,7 @@
    }
 
 
-   S4EXPORT unsigned short S4FUNCTION t4infoDescend( CODE4 *cb, TAG4INFO *tagInfo,
+   PUBLIC unsigned short S4FUNCTION t4infoDescend( CODE4 *cb, TAG4INFO *tagInfo,
       int tagPos )
    {
       if ( tagInfo )
@@ -2920,9 +2920,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION t4infoExpr( CODE4 *cb, TAG4INFO *tagInfo, int tagPos, WSTR5 *buff )
+   PUBLIC void S4FUNCTION t4infoExpr( CODE4 *cb, TAG4INFO *tagInfo, int tagPos, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION t4infoExpr( CODE4 *cb, TAG4INFO *tagInfo, int tagPos, char *buff )
+   PUBLIC void S4FUNCTION t4infoExpr( CODE4 *cb, TAG4INFO *tagInfo, int tagPos, char *buff )
 #endif
    {
       if ( tagInfo )
@@ -2942,9 +2942,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION t4infoFilter( CODE4 *cb, TAG4INFO *tagInfo, int tagPos, WSTR5 *buff )
+   PUBLIC void S4FUNCTION t4infoFilter( CODE4 *cb, TAG4INFO *tagInfo, int tagPos, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION t4infoFilter( CODE4 *cb, TAG4INFO *tagInfo, int tagPos, char *buff )
+   PUBLIC void S4FUNCTION t4infoFilter( CODE4 *cb, TAG4INFO *tagInfo, int tagPos, char *buff )
 #endif
    {
       if ( tagInfo )
@@ -2967,14 +2967,14 @@
 
 
    /* for TAG4INFO returned by i4tagInfo() */
-   S4EXPORT void S4FUNCTION t4infoFreeInternal( TAG4INFO *tagInfo )
+   PUBLIC void S4FUNCTION t4infoFreeInternal( TAG4INFO *tagInfo )
    {
       u4free( tagInfo ) ;
    }
 
 
    /* for TAG4INFO returned by t4infoAdd() */
-   S4EXPORT void S4FUNCTION t4infoFree( TAG4INFO *tagInfo, int tagInfoSize )
+   PUBLIC void S4FUNCTION t4infoFree( TAG4INFO *tagInfo, int tagInfoSize )
    {
       if ( tagInfo )
       {
@@ -2991,9 +2991,9 @@
 
 
 #ifdef S4WINCE
-   S4EXPORT void S4FUNCTION t4infoName( CODE4 *cb, TAG4INFO *tagInfo, int tagPos, WSTR5 *buff )
+   PUBLIC void S4FUNCTION t4infoName( CODE4 *cb, TAG4INFO *tagInfo, int tagPos, WSTR5 *buff )
 #else
-   S4EXPORT void S4FUNCTION t4infoName( CODE4 *cb, TAG4INFO *tagInfo, int tagPos, char *buff )
+   PUBLIC void S4FUNCTION t4infoName( CODE4 *cb, TAG4INFO *tagInfo, int tagPos, char *buff )
 #endif
    {
       if ( tagInfo )
@@ -3017,7 +3017,7 @@
    }
 
 
-   S4EXPORT int S4FUNCTION t4infoSize( CODE4 *cb, TAG4INFO *tagInfo )
+   PUBLIC int S4FUNCTION t4infoSize( CODE4 *cb, TAG4INFO *tagInfo )
    {
       int i = 0 ;
 
@@ -3032,7 +3032,7 @@
    }
 
 
-   S4EXPORT short S4FUNCTION t4infoUnique( CODE4 *cb, TAG4INFO *tagInfo, int tagPos )
+   PUBLIC short S4FUNCTION t4infoUnique( CODE4 *cb, TAG4INFO *tagInfo, int tagPos )
    {
       if ( tagInfo )
       {
@@ -3047,13 +3047,13 @@
 
 
    // LY Aug 10/04 : added for environments where Unicode strings supported (.NET)
-   S4EXPORT int S4FUNCTION t4seekNW( TAG4 S4PTR *tag, unsigned short S4PTR *inputKey, const short inputKeyLen, short doDataPosition )
+   PUBLIC int S4FUNCTION t4seekNW( TAG4 S4PTR *tag, unsigned short S4PTR *inputKey, const short inputKeyLen, short doDataPosition )
    {
       return t4seekN( tag, (const char *)inputKey, inputKeyLen, doDataPosition ) ;
    }
 
 
-   S4EXPORT TAG4INFO * S4FUNCTION t4tagInfo( TAG4 S4PTR *tag )
+   PUBLIC TAG4INFO * S4FUNCTION t4tagInfo( TAG4 S4PTR *tag )
    {
       TAG4INFO *tagInfo = 0 ;
 

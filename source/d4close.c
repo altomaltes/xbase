@@ -154,11 +154,6 @@ int dfile4close( DATA4FILE *data )
    #ifndef S4STAND_ALONE
       CODE4 *c4 ;
    #endif
-   #ifdef S4CLIENT
-      int finalRc, saveRc ;
-      INDEX4FILE *i4 ;
-      CONNECTION4 *connection ;
-   #endif
 
    #ifdef E4PARM_LOW
       if ( data == 0 )
@@ -174,55 +169,10 @@ int dfile4close( DATA4FILE *data )
       c4 = data->c4 ;
    #endif
 
-   #ifdef S4CLIENT
-      saveRc = error4set( c4, 0 ) ;
-      finalRc = 0 ;
-   #endif
 
    data->userCount-- ;
    if ( data->userCount == 0 )
    {
-      #ifdef S4CLIENT
-         if ( data->info != 0 )
-         {
-            u4free( data->info ) ;
-            data->info = 0 ;
-         }
-
-         connection = data->connection ;
-         if ( connection == 0 )
-            finalRc = e4connection ;
-         else
-         {
-            connection4assign( connection, CON4CLOSE, 0, data->serverId ) ;
-            connection4sendMessage( connection ) ;
-            finalRc = connection4receiveMessage( connection ) ;
-            if ( finalRc >= 0 )
-               finalRc = connection4status( connection ) ;
-         }
-         #ifndef S4OFF_INDEX
-            for ( ;; )
-            {
-               i4 = (INDEX4FILE *)l4first( &data->indexes ) ;
-               if ( i4 == 0 )
-                  break ;
-               index4close( i4 ) ;
-            }
-         #endif
-
-         l4remove( &c4->dataFileList, data ) ;
-         mem4free( c4->data4fileMemory, data ) ;
-         if ( saveRc != 0 )
-         {
-            error4set( c4, saveRc ) ;
-            return saveRc ;
-         }
-         else
-         {
-            error4set( c4, finalRc ) ;
-            return finalRc ;
-         }
-      #else
          #ifdef S4SERVER
             if ( c4->server->keepOpen == 0 || data->valid != 1 )    /* not a valid datafile (failure in dfile4open) so close */
                return dfile4closeLow( data ) ;
@@ -233,7 +183,6 @@ int dfile4close( DATA4FILE *data )
          #else
             return dfile4closeLow( data ) ;
          #endif
-      #endif  /* S4CLIENT */
    }
 
    return 0 ;
@@ -270,11 +219,7 @@ void code4lockClearData( CODE4 *c4, DATA4 *data )
                continue ;
             }
          #else
-            #ifdef S4CLIENT
-               if ( lock->data != data )
-            #else
                if ( lock->data != data->dataFile )
-            #endif
                {
                   single4distantNext( &lockList ) ;
                   continue ;
@@ -376,13 +321,8 @@ int S4FUNCTION d4close( DATA4 *data )
 
       #ifndef S4OFF_TRAN
          #ifndef S4OFF_WRITE
-            #ifdef S4CLIENT
-               if ( code4transEnabled( c4 ) )   /* can't unlock in this instance */
-                  if ( code4tranStatus( c4 ) == r4active )
-            #else
                if ( trans != 0 )   /* just add to list */
                   if ( trans->currentTranStatus == r4active )
-            #endif
                {
                   l4remove( tran4dataList( data->trans ), data ) ;
                   l4add( &(code4trans( c4 )->closedDataFiles), data ) ;
@@ -437,11 +377,9 @@ int S4FUNCTION d4close( DATA4 *data )
             data->dataFile->exclusiveOpen = 0 ;
       #endif
 
-      #ifdef S4CLIENT
          if ( c4getDoRemove( c4 ) == 1 )
             rc = dfile4remove( data->dataFile ) ;
          else
-      #endif
          rc = dfile4close( data->dataFile ) ;
       if ( rc < 0 )
          saveRc = rc ;

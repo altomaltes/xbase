@@ -173,15 +173,6 @@ int S4FUNCTION d4tagSync( DATA4 *data, TAG4 * const tag )
       return 0 ;
    #else
       CODE4 *c4 ;
-      #ifdef S4CLIENT
-         int rc, saveRc ;
-         CONNECTION4 *connection ;
-         CONNECTION4TAG_SYNCH_INFO_IN *info ;
-         CONNECTION4TAG_SYNCH_INFO_OUT *out ;
-         #ifndef S4OFF_MEMO
-            int i ;
-         #endif
-      #endif
 
       #ifdef S4VBASIC
          if ( c4parm_check( data, 2, E94803 ) )
@@ -200,78 +191,7 @@ int S4FUNCTION d4tagSync( DATA4 *data, TAG4 * const tag )
       if ( error4code( c4 ) < 0 )
          return error4code( c4 ) ;
 
-      #ifdef S4CLIENT
-         if ( data->recNum <= 0 || d4eof( data ) )
-         {
-            #ifndef S4OFF_MEMO
-               for ( i = 0; i < data->dataFile->nFieldsMemo; i++ )
-                  f4memoReset( data->fieldsMemo[i].field ) ;
-            #endif
-            data->recordChanged = 0 ;
-            return 0 ;
-         }
-
-         if ( data->recordChanged == 0 )
-         {
-            rc = d4updateRecord( data, 0 ) ;
-            if ( rc )
-               return rc ;
-         }
-
-         connection = data->dataFile->connection ;
-         if ( connection == 0 )
-            return error4stack( data->codeBase, e4connection, E94803 ) ;
-
-         connection4assign( connection, CON4TAG_SYNCH, data4clientId( data ), data4serverId( data ) ) ;
-         connection4addData( connection, NULL, sizeof( CONNECTION4TAG_SYNCH_INFO_IN ), (void **)&info ) ;
-         memcpy( info->tagName, tag->tagFile->alias, LEN4TAG_ALIAS  ) ;
-         info->tagName[LEN4TAG_ALIAS] = 0 ;
-         info->recno = htonl(d4recNo( data )) ;
-         saveRc = connection4repeat( connection ) ;
-
-         if ( saveRc == r4eof || saveRc == r4noRecords )
-         {
-            data->bofFlag = 0 ;
-            rc = d4goEof( data ) ;
-            if ( rc == 0 )
-               rc = r4eof ;
-            if ( saveRc == r4noRecords )
-               data->bofFlag = 1 ;
-            return rc ;
-         }
-
-         if ( saveRc == r4bof )
-         {
-            data->eofFlag = 0 ;
-            rc = d4goBof( data ) ;
-            data->bofFlag = 1 ;
-            if ( rc == 0 )
-               rc = r4bof ;
-            return rc ;
-         }
-
-         if ( saveRc != 0 && saveRc != r4after )
-         {
-            if ( saveRc < 0 )
-               return connection4errorDescribe( connection, c4, saveRc, E94803, tag->tagFile->alias, 0, 0 ) ;
-            return saveRc ;
-         }
-
-         if ( connection4len( connection ) != sizeof( CONNECTION4TAG_SYNCH_INFO_OUT ) )
-            return error4( c4, e4packetLen, E94803 ) ;
-         out = (CONNECTION4TAG_SYNCH_INFO_OUT *)connection4data( connection ) ;
-         out->recNo = ntohl(out->recNo) ;
-         if ( out->recNo != 0 && out->recNo != d4recNo( data ) )
-         {
-            rc = d4go( data, out->recNo ) ;
-            if ( rc < 0 )
-               return rc ;
-         }
-
-         return saveRc ;
-      #else
          return d4tagSyncDo( data, tag, 1 ) ;
-      #endif
    #endif /* S4OFF_INDEX */
 }
 
@@ -471,12 +391,6 @@ int S4FUNCTION d4skip( DATA4 *data, const long nSkip )
 {
    int rc ;
    CODE4 *c4 ;
-   #ifdef S4CLIENT
-      int saveRc ;
-      CONNECTION4 *connection ;
-      CONNECTION4GO_INFO_OUT *out ;
-      CONNECTION4SKIP_INFO_IN *info ;
-   #else
       #ifndef S4OFF_INDEX
          unsigned char *keyValue ;
          long nSkipped, recno ;
@@ -488,7 +402,6 @@ int S4FUNCTION d4skip( DATA4 *data, const long nSkip )
       #endif
       long startRec, newRec ;
       int oldEofFlag, c1 ;
-   #endif
    #ifndef S4OFF_INDEX
       TAG4 *tag ;
    #endif
@@ -516,87 +429,6 @@ int S4FUNCTION d4skip( DATA4 *data, const long nSkip )
       return e4info ;
    }
 
-   #ifdef S4CLIENT
-      rc = d4updateRecord( data, 0 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-      if ( rc )
-         return rc ;
-
-      connection = data->dataFile->connection ;
-      if ( connection == 0 )
-         return error4stack( data->codeBase, e4connection, E94802 ) ;
-
-      connection4assign( connection, CON4SKIP, data4clientId( data ), data4serverId( data ) ) ;
-      connection4addData( connection, NULL, sizeof( CONNECTION4SKIP_INFO_IN ), (void **)&info ) ;
-      info->startPos = htonl(data->recNum) ;
-      info->numSkip = htonl(nSkip) ;
-      #ifdef S4OFF_INDEX
-         info->usesTag = 0 ;
-      #else
-         tag = data->tagSelected ;
-         if ( tag == 0 )
-            info->usesTag = 0 ;
-         else
-         {
-            info->usesTag = 1 ;
-            memcpy( info->tagName, tag->tagFile->alias, LEN4TAG_ALIAS  ) ;
-            info->tagName[LEN4TAG_ALIAS] = 0 ;
-         }
-      #endif
-      rc = connection4repeat( connection ) ;
-      if ( rc == r4locked )
-         return r4locked ;
-
-      if ( (long)connection4len( connection ) < (long)sizeof( CONNECTION4GO_INFO_OUT ) )
-         return error4( c4, e4packetLen, E94802 ) ;
-      out = (CONNECTION4GO_INFO_OUT *)connection4data( connection ) ;
-
-      saveRc = ntohs(out->skipRc) ;
-      if ( saveRc < 0 )
-      {
-         if ( tag == 0 )
-            return connection4error( connection, c4, saveRc, E94802 ) ;
-         else
-            return connection4errorDescribe( connection, c4, saveRc, E94802, tag->tagFile->alias, 0, 0 ) ;
-      }
-
-      if ( saveRc == r4eof || saveRc == r4noRecords )
-      {
-         data->bofFlag = 0 ;
-         rc = d4goEof( data ) ;
-         if ( rc == 0 )
-            rc = r4eof ;
-         if ( saveRc == r4noRecords )
-            data->bofFlag = 1 ;
-         return rc ;
-      }
-
-      if ( saveRc == r4bof )
-      {
-         data->eofFlag = 0 ;
-         rc = d4goBof( data ) ;
-         data->bofFlag = 1 ;
-         if ( rc == 0 )
-            rc = r4bof ;
-         return rc ;
-      }
-
-      if ( saveRc != 0 )
-      {
-         if ( saveRc < 0 )
-            return error4( c4, saveRc, E94802 ) ;
-         return saveRc ;
-      }
-
-      rc = connection4status( connection ) ;
-      if ( out->recNo )
-      {
-         if ( (long)connection4len( connection ) != (long)sizeof( CONNECTION4GO_INFO_OUT ) + (long)dfile4recWidth( data->dataFile ) )
-            return connection4errorDescribe( connection, c4, rc, E94802, tag->tagFile->alias, 0, 0 ) ;
-         return d4goVirtual( data, ntohl(out->recNo), rc, out, connection ) ;  /* maybe r4locked, or whatever */
-      }
-
-      return rc ;
-   #else
       n = nSkip ;
 
       #ifndef S4OFF_INDEX
@@ -776,5 +608,4 @@ int S4FUNCTION d4skip( DATA4 *data, const long nSkip )
          }
          return 0 ;
       #endif
-   #endif
 }

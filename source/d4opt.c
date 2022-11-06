@@ -440,9 +440,6 @@ int S4FUNCTION code4optSuspend( CODE4 *c4 )
 #ifndef S4SERVER
 int S4FUNCTION d4optimize( DATA4 *d4, const int optFlag )
 {
-   #ifdef S4CLIENT
-      return 0 ;
-   #else
       #ifdef S4VBASIC
          if ( c4parm_check( d4, 2, E92504 ) )
             return -1 ;
@@ -453,7 +450,6 @@ int S4FUNCTION d4optimize( DATA4 *d4, const int optFlag )
             return error4( 0, e4parm, E92504 ) ;
       #endif
       return dfile4optimize( d4->dataFile, optFlag ) ;
-   #endif
 }
 #endif /* S4SERVER */
 
@@ -522,9 +518,6 @@ int dfile4optimize( DATA4FILE *d4, const int optFlag )
 
 int S4FUNCTION d4optimizeWrite( DATA4 *d4, const int optFlag )
 {
-   #ifdef S4CLIENT
-      return 0 ;
-   #else
       #ifdef S4VBASIC
          if ( c4parm_check( d4, 2, E92506 ) )
             return -1 ;
@@ -535,7 +528,6 @@ int S4FUNCTION d4optimizeWrite( DATA4 *d4, const int optFlag )
             return error4( 0, e4parm, E92506 ) ;
       #endif
       return dfile4optimizeWrite( d4->dataFile, optFlag ) ;
-   #endif
 }
 
 #ifdef P4ARGS_USED

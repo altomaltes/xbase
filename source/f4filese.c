@@ -318,7 +318,7 @@ int S4FUNCTION file4seqReadInit( FILE4SEQ_READ *seqRead, FILE4 *file, long start
 
 /* note that setting do-advance to '1' means that an un-init routine for the
    file4seqRead must be called (to ensure that there are no outstanding reads) */
-S4EXPORT int S4FUNCTION file4seqReadInitDo( FILE4SEQ_READ *seqRead, FILE4 *file, FILE4LONG startPos, void *ptr, const unsigned ptrLen, const int doAdvance )
+PUBLIC int S4FUNCTION file4seqReadInitDo( FILE4SEQ_READ *seqRead, FILE4 *file, FILE4LONG startPos, void *ptr, const unsigned ptrLen, const int doAdvance )
 {
    #ifdef E4PARM_HIGH
       if ( file4longError( startPos ) < 0 || seqRead == 0 || file == 0 || ( ptrLen == 0 && ptr == 0 ) )

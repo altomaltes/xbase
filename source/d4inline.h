@@ -38,10 +38,6 @@
 
 #endif  /* S4INDEX_OFF */
 
-#ifdef S4CLIENT
-   #define code4tranInit2( a, b, c )  ( 0 )
-   #define code4tranInitUndo( a )
-#endif
 
 /* D4DATA.C */
 #ifdef S4STAND_ALONE
@@ -64,19 +60,11 @@
       #ifndef S4OFF_WRITE
       #endif
       #ifndef S4OFF_WRITE
-         #ifdef S4CLIENT
-            #define code4transEnabled( c4 ) ( (c4)->c4trans.enabled )
-         #else
             #define code4transEnabled( c4 ) ( (c4)->c4trans.enabled && ( code4tranStatus( (c4) ) != r4rollback ) && ( code4tranStatus( (c4) ) != r4off ) )
-         #endif
       #endif
    #endif
 #endif  /* S4SERVER */
 
-#ifdef S4CLIENT
-   #define data4serverId( d4 ) ( (d4)->dataFile->serverId )
-   #define data4clientId( d4 ) ( (d4)->clientId )
-#endif
 
 #ifdef S4SERVER
    #define code4dateFormat( c4 ) ( (c4)->currentClient == 0 ? 0 : ( (c4)->currentClient->trans.dateFormat ) )
@@ -119,12 +107,12 @@
 #ifdef __cplusplus
    extern "C" {
 #endif
-S4EXPORT void S4PTR * S4FUNCTION l4first( const LIST4 S4PTR * ) ;  /* Returns 0 if none */
-S4EXPORT void S4PTR * S4FUNCTION l4last( const LIST4 S4PTR * ) ;   /* Returns 0 if none */
-S4EXPORT void S4PTR * S4FUNCTION l4next( const LIST4 S4PTR *, const void S4PTR * ) ;  /* Returns 0 if none */
-S4EXPORT void S4FUNCTION l4add( LIST4 S4PTR *, void S4PTR * ) ;
+PUBLIC void S4PTR * S4FUNCTION l4first( const LIST4 S4PTR * ) ;  /* Returns 0 if none */
+PUBLIC void S4PTR * S4FUNCTION l4last( const LIST4 S4PTR * ) ;   /* Returns 0 if none */
+PUBLIC void S4PTR * S4FUNCTION l4next( const LIST4 S4PTR *, const void S4PTR * ) ;  /* Returns 0 if none */
+PUBLIC void S4FUNCTION l4add( LIST4 S4PTR *, void S4PTR * ) ;
 
-S4EXPORT int S4FUNCTION error4code( CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION error4code( CODE4 S4PTR * ) ;
 
 LIST4 * S4FUNCTION tran4dataList( TRAN4 * ) ;
 int tran4dataListSet( TRAN4 *, LIST4 * ) ;
@@ -157,7 +145,7 @@ TRAN4 *code4trans( CODE4 * ) ;
 unsigned short int tran4entryLen( LOG4HEADER * ) ;
 #endif
 
-S4EXPORT int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) ;
+PUBLIC int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) ;
 
 #ifdef __cplusplus
    }
@@ -177,9 +165,6 @@ S4EXPORT int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) 
       #define code4date_format( a )  ( code4dateFormat( a ) )
       #define code4date_format_set( a, b ) ( code4dateFormatSet( a, b ) )
 /*   #endif*/
-   #endif
-   #ifdef S4CLIENT
-      #define code4freeBlocks( a )   ( 0 )
    #endif
    #define d4alias_set( a, b )       ( d4aliasSet( a, b ) )
    #define d4append_blank( a )       ( d4appendBlank( a ) )

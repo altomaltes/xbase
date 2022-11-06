@@ -55,7 +55,7 @@ int S4FUNCTION code4unlockAuto( CODE4 *c4 )
    return c4->c4trans.trans.unlockAuto ;
 }
 
-S4EXPORT void S4FUNCTION code4unlockAutoSet( CODE4 *c4, int val )
+PUBLIC void S4FUNCTION code4unlockAutoSet( CODE4 *c4, int val )
 {
    c4->c4trans.trans.unlockAuto = val ;
 }
@@ -68,7 +68,7 @@ int S4FUNCTION code4tranStatus( CODE4 *c4 )
    return c4->c4trans.trans.currentTranStatus ;
 }
 
-S4EXPORT int S4FUNCTION code4tranStatusSet( CODE4 *c4, const int val )
+PUBLIC int S4FUNCTION code4tranStatusSet( CODE4 *c4, const int val )
 {
    return c4->c4trans.trans.currentTranStatus = val ;
 }
@@ -104,11 +104,7 @@ int S4FUNCTION code4tranStatusSet( CODE4 *c4, const int val )
 
 int code4transEnabled( CODE4 *c4 )
 {
-   #ifdef S4CLIENT
-      return ( c4->currentClient->trans.c4trans->enabled ) ;
-   #else
       return ( c4->currentClient->trans.c4trans->enabled && code4tranStatus( c4 ) != r4rollback && code4tranStatus( c4 ) != r4off ) ;
-   #endif
 }
 #endif  /* S4OFF_TRAN */
 #endif  /* S4OFF_WRITE */
@@ -121,11 +117,7 @@ TRAN4 *code4trans( CODE4 *c4 )
 #ifndef S4OFF_TRAN
 int code4transEnabled( CODE4 *c4 )
 {
-   #ifdef S4CLIENT
-      return c4->c4trans.enabled ;
-   #else
       return ( c4->c4trans.enabled && code4tranStatus( c4 ) != r4rollback && code4tranStatus( c4 ) != r4off ) ;
-   #endif
 }
 #endif  /* S4OFF_TRAN */
 

@@ -702,7 +702,7 @@ typedef struct N4CHANGE_st
    extern "C" {
 #endif
 
-S4EXPORT PREPORT4 S4FUNCTION   report4init( RELATE4 S4PTR *);
+PUBLIC PREPORT4 S4FUNCTION   report4init( RELATE4 S4PTR *);
 #ifdef S4WINDOWS
    #ifndef S4CR2
       #define report4free( r4, i1, i2 ) report4freeLow( r4, (i1), (i2), 1 )
@@ -712,128 +712,128 @@ S4EXPORT PREPORT4 S4FUNCTION   report4init( RELATE4 S4PTR *);
 #else
    #define report4free( r4, i1, i2 ) report4freeLow( r4, (i1), (i2), 0 )
 #endif
-S4EXPORT void S4FUNCTION       report4freeLow( PREPORT4, int, int, int ) ;
-S4EXPORT void S4FUNCTION       report4free_styles( REPORT4 *report );
+PUBLIC void S4FUNCTION       report4freeLow( PREPORT4, int, int, int ) ;
+PUBLIC void S4FUNCTION       report4free_styles( REPORT4 *report );
 
-S4EXPORT PGROUP4 S4FUNCTION    group4create( PREPORT4, char S4PTR *, char S4PTR * );
-S4EXPORT void S4FUNCTION       group4free( PGROUP4 );
-S4EXPORT void S4FUNCTION       group4positionSet( PGROUP4, int );
-S4EXPORT PGROUP4 S4FUNCTION    group4create_title_summary( PREPORT4 );
-S4EXPORT PGROUP4 S4FUNCTION    group4create_pgheader_pgfooter( PREPORT4 );
-S4EXPORT int      S4FUNCTION   group4numHeaders( PGROUP4 );
-S4EXPORT int      S4FUNCTION   group4swapHeader( PGROUP4, int );
-S4EXPORT int      S4FUNCTION   group4swapFooter( PGROUP4, int );
-S4EXPORT int      S4FUNCTION   group4repeatHeader( PGROUP4, int );
-S4EXPORT int      S4FUNCTION   group4resetPage( PGROUP4, int );
-S4EXPORT int      S4FUNCTION   group4resetPageNum( PGROUP4, int );
+PUBLIC PGROUP4 S4FUNCTION    group4create( PREPORT4, char S4PTR *, char S4PTR * );
+PUBLIC void S4FUNCTION       group4free( PGROUP4 );
+PUBLIC void S4FUNCTION       group4positionSet( PGROUP4, int );
+PUBLIC PGROUP4 S4FUNCTION    group4create_title_summary( PREPORT4 );
+PUBLIC PGROUP4 S4FUNCTION    group4create_pgheader_pgfooter( PREPORT4 );
+PUBLIC int      S4FUNCTION   group4numHeaders( PGROUP4 );
+PUBLIC int      S4FUNCTION   group4swapHeader( PGROUP4, int );
+PUBLIC int      S4FUNCTION   group4swapFooter( PGROUP4, int );
+PUBLIC int      S4FUNCTION   group4repeatHeader( PGROUP4, int );
+PUBLIC int      S4FUNCTION   group4resetPage( PGROUP4, int );
+PUBLIC int      S4FUNCTION   group4resetPageNum( PGROUP4, int );
 
 
-S4EXPORT PAREA4 S4FUNCTION     area4create( PGROUP4, long, short, char S4PTR * );
-S4EXPORT void S4FUNCTION       area4free( PAREA4 );
-S4EXPORT void S4FUNCTION       area4add_object( PAREA4, POBJ4 );
+PUBLIC PAREA4 S4FUNCTION     area4create( PGROUP4, long, short, char S4PTR * );
+PUBLIC void S4FUNCTION       area4free( PAREA4 );
+PUBLIC void S4FUNCTION       area4add_object( PAREA4, POBJ4 );
 
-S4EXPORT int S4FUNCTION        report4save( PREPORT4, char S4PTR *, int );
+PUBLIC int S4FUNCTION        report4save( PREPORT4, char S4PTR *, int );
 
-S4EXPORT int S4FUNCTION        relate4save( RELATE4 S4PTR *, char S4PTR *, int );
-S4EXPORT PREPORT4 S4FUNCTION  report4retrieve( CODE4 S4PTR *, char S4PTR *, int, char S4PTR * );
-S4EXPORT RELATE4 S4PTR * S4FUNCTION  relate4retrieve( CODE4 S4PTR *, char S4PTR *, int, char S4PTR * );
+PUBLIC int S4FUNCTION        relate4save( RELATE4 S4PTR *, char S4PTR *, int );
+PUBLIC PREPORT4 S4FUNCTION  report4retrieve( CODE4 S4PTR *, char S4PTR *, int, char S4PTR * );
+PUBLIC RELATE4 S4PTR * S4FUNCTION  relate4retrieve( CODE4 S4PTR *, char S4PTR *, int, char S4PTR * );
 
-S4EXPORT RELATE4 * S4FUNCTION relate4retrieve2( CODE4 *c4, char *file_name,
+PUBLIC RELATE4 * S4FUNCTION relate4retrieve2( CODE4 *c4, char *file_name,
                       int open_files, char *pathname, char *buf, char *name_buf );
-S4EXPORT REPORT4 * S4FUNCTION  report4retrieve2(CODE4 *c4, char *file_name, int open_files,
+PUBLIC REPORT4 * S4FUNCTION  report4retrieve2(CODE4 *c4, char *file_name, int open_files,
                         char *pathname, char *buf, char *name_buf );
-S4EXPORT int S4FUNCTION   relate4save2( RELATE4 *relate, char *file_name,
+PUBLIC int S4FUNCTION   relate4save2( RELATE4 *relate, char *file_name,
                         int save_paths, char *buf, char *name_buf );
 
 
-S4EXPORT POBJ4 S4FUNCTION      obj4create( PAREA4, long, long, long, long );
-S4EXPORT void S4FUNCTION       obj4free( POBJ4 );
+PUBLIC POBJ4 S4FUNCTION      obj4create( PAREA4, long, long, long, long );
+PUBLIC void S4FUNCTION       obj4free( POBJ4 );
 
-S4EXPORT POBJ4 S4FUNCTION      obj4fieldCreate( PAREA4, FIELD4 S4PTR *, long, long, long, long );
-S4EXPORT void S4FUNCTION       obj4fieldFree( POBJ4 );
+PUBLIC POBJ4 S4FUNCTION      obj4fieldCreate( PAREA4, FIELD4 S4PTR *, long, long, long, long );
+PUBLIC void S4FUNCTION       obj4fieldFree( POBJ4 );
 
-S4EXPORT POBJ4 S4FUNCTION      obj4totalCreate( PAREA4, PTOTAL4, long, long, long, long );
-S4EXPORT void S4FUNCTION       obj4totalFree( POBJ4 );
+PUBLIC POBJ4 S4FUNCTION      obj4totalCreate( PAREA4, PTOTAL4, long, long, long, long );
+PUBLIC void S4FUNCTION       obj4totalFree( POBJ4 );
 
-S4EXPORT POBJ4 S4FUNCTION      obj4calcCreate( PAREA4, EXPR4CALC S4PTR *, long, long, long, long );
-S4EXPORT void S4FUNCTION       obj4calcFree( POBJ4 );
+PUBLIC POBJ4 S4FUNCTION      obj4calcCreate( PAREA4, EXPR4CALC S4PTR *, long, long, long, long );
+PUBLIC void S4FUNCTION       obj4calcFree( POBJ4 );
 
-S4EXPORT POBJ4 S4FUNCTION      obj4exprCreate( PAREA4, EXPR4 S4PTR *, long, long, long, long );
-S4EXPORT void S4FUNCTION       obj4exprFree( POBJ4 );
+PUBLIC POBJ4 S4FUNCTION      obj4exprCreate( PAREA4, EXPR4 S4PTR *, long, long, long, long );
+PUBLIC void S4FUNCTION       obj4exprFree( POBJ4 );
 
-S4EXPORT POBJ4 S4FUNCTION      obj4textCreate( PAREA4, char S4PTR *, long, long, long, long );
-S4EXPORT void S4FUNCTION       obj4textFree( POBJ4 );
+PUBLIC POBJ4 S4FUNCTION      obj4textCreate( PAREA4, char S4PTR *, long, long, long, long );
+PUBLIC void S4FUNCTION       obj4textFree( POBJ4 );
 
-S4EXPORT POBJ4 S4FUNCTION      obj4lineCreate( PAREA4, int, long, long, long );
-S4EXPORT void S4FUNCTION       obj4lineFree( POBJ4 );
-S4EXPORT int S4FUNCTION obj4lineWidth( POBJ4, long );
+PUBLIC POBJ4 S4FUNCTION      obj4lineCreate( PAREA4, int, long, long, long );
+PUBLIC void S4FUNCTION       obj4lineFree( POBJ4 );
+PUBLIC int S4FUNCTION obj4lineWidth( POBJ4, long );
 
-S4EXPORT POBJ4 S4FUNCTION      obj4frameCreate( PAREA4, long, long, long, long );
-S4EXPORT void S4FUNCTION       obj4frameFree( POBJ4 );
+PUBLIC POBJ4 S4FUNCTION      obj4frameCreate( PAREA4, long, long, long, long );
+PUBLIC void S4FUNCTION       obj4frameFree( POBJ4 );
 
-S4EXPORT void S4FUNCTION       obj4delete( POBJ4 );
-S4EXPORT void S4FUNCTION       obj4sort_obj_tree( POBJ4 );
+PUBLIC void S4FUNCTION       obj4delete( POBJ4 );
+PUBLIC void S4FUNCTION       obj4sort_obj_tree( POBJ4 );
 void                           obj4evaluate( POBJ4 );
 void                           obj4evaluate_lookahead( POBJ4 );
-S4EXPORT int S4FUNCTION obj4justify( POBJ4, int );
-S4EXPORT int S4FUNCTION obj4dateFormat( POBJ4, char S4PTR * );
-S4EXPORT int S4FUNCTION obj4decimals( POBJ4, int );
-S4EXPORT int S4FUNCTION obj4displayOnce( POBJ4, char S4PTR * );
-S4EXPORT int S4FUNCTION obj4displayZero( POBJ4, int );
-S4EXPORT int S4FUNCTION obj4numericType( POBJ4, int );
-S4EXPORT int S4FUNCTION obj4leadingZero( POBJ4, int );
-S4EXPORT int S4FUNCTION obj4brackets( POBJ4, int );
-S4EXPORT int S4FUNCTION obj4style( POBJ4, PSTYLE4 );
+PUBLIC int S4FUNCTION obj4justify( POBJ4, int );
+PUBLIC int S4FUNCTION obj4dateFormat( POBJ4, char S4PTR * );
+PUBLIC int S4FUNCTION obj4decimals( POBJ4, int );
+PUBLIC int S4FUNCTION obj4displayOnce( POBJ4, char S4PTR * );
+PUBLIC int S4FUNCTION obj4displayZero( POBJ4, int );
+PUBLIC int S4FUNCTION obj4numericType( POBJ4, int );
+PUBLIC int S4FUNCTION obj4leadingZero( POBJ4, int );
+PUBLIC int S4FUNCTION obj4brackets( POBJ4, int );
+PUBLIC int S4FUNCTION obj4style( POBJ4, PSTYLE4 );
 
-S4EXPORT int S4FUNCTION report4dateFormat( PREPORT4, char S4PTR * );
-S4EXPORT int S4FUNCTION report4querySet( PREPORT4, char S4PTR * );
-S4EXPORT int S4FUNCTION report4sortSet( PREPORT4, char S4PTR * );
+PUBLIC int S4FUNCTION report4dateFormat( PREPORT4, char S4PTR * );
+PUBLIC int S4FUNCTION report4querySet( PREPORT4, char S4PTR * );
+PUBLIC int S4FUNCTION report4sortSet( PREPORT4, char S4PTR * );
 
 int report4conv_double( POBJ4, double, char * );
 
-S4EXPORT PTOTAL4 S4FUNCTION    total4create( PREPORT4, char S4PTR *, char S4PTR *, int, char S4PTR * );
-S4EXPORT void S4FUNCTION       total4value_reset( PTOTAL4 );
-S4EXPORT void S4FUNCTION       total4free( PTOTAL4 );
-S4EXPORT void                  total4value_update( PTOTAL4 );
+PUBLIC PTOTAL4 S4FUNCTION    total4create( PREPORT4, char S4PTR *, char S4PTR *, int, char S4PTR * );
+PUBLIC void S4FUNCTION       total4value_reset( PTOTAL4 );
+PUBLIC void S4FUNCTION       total4free( PTOTAL4 );
+PUBLIC void                  total4value_update( PTOTAL4 );
 
 #ifdef S4WINDOWS
-S4EXPORT PSTYLE4 S4FUNCTION     style4create( PREPORT4, PR4LOGFONT, char S4PTR *, R4COLORREF, int );
+PUBLIC PSTYLE4 S4FUNCTION     style4create( PREPORT4, PR4LOGFONT, char S4PTR *, R4COLORREF, int );
 #else
-S4EXPORT PSTYLE4 S4FUNCTION     style4create( PREPORT4, char S4PTR *, int, char S4PTR *, int, char S4PTR * );
+PUBLIC PSTYLE4 S4FUNCTION     style4create( PREPORT4, char S4PTR *, int, char S4PTR *, int, char S4PTR * );
 #endif
-S4EXPORT PSTYLE4 S4FUNCTION     style4lookup( PREPORT4, char S4PTR * );
-S4EXPORT BOOL S4FUNCTION        style4delete( PREPORT4, char S4PTR * );
-S4EXPORT BOOL S4FUNCTION        style4free( PREPORT4, PSTYLE4 );
-S4EXPORT int S4FUNCTION         style4color( PSTYLE4, R4COLORREF );
-S4EXPORT int S4FUNCTION         style4default_set( PREPORT4, PSTYLE4 );
+PUBLIC PSTYLE4 S4FUNCTION     style4lookup( PREPORT4, char S4PTR * );
+PUBLIC BOOL S4FUNCTION        style4delete( PREPORT4, char S4PTR * );
+PUBLIC BOOL S4FUNCTION        style4free( PREPORT4, PSTYLE4 );
+PUBLIC int S4FUNCTION         style4color( PSTYLE4, R4COLORREF );
+PUBLIC int S4FUNCTION         style4default_set( PREPORT4, PSTYLE4 );
 
-S4EXPORT int S4FUNCTION report4do( PREPORT4 );
+PUBLIC int S4FUNCTION report4do( PREPORT4 );
 
-S4EXPORT int S4FUNCTION report4save_object( FILE4SEQ_WRITE S4PTR *, POBJ4 );
-S4EXPORT int S4FUNCTION report4save_area( FILE4SEQ_WRITE S4PTR *, PAREA4 );
-S4EXPORT int S4FUNCTION report4save_group( FILE4SEQ_WRITE S4PTR *, PGROUP4 );
-S4EXPORT int S4FUNCTION report4save_style( FILE4SEQ_WRITE S4PTR *, PSTYLE4 );
-S4EXPORT int S4FUNCTION report4save_calc( FILE4SEQ_WRITE S4PTR *, EXPR4CALC S4PTR * );
-S4EXPORT int S4FUNCTION report4save_report( PREPORT4, FILE4SEQ_WRITE S4PTR * );
+PUBLIC int S4FUNCTION report4save_object( FILE4SEQ_WRITE S4PTR *, POBJ4 );
+PUBLIC int S4FUNCTION report4save_area( FILE4SEQ_WRITE S4PTR *, PAREA4 );
+PUBLIC int S4FUNCTION report4save_group( FILE4SEQ_WRITE S4PTR *, PGROUP4 );
+PUBLIC int S4FUNCTION report4save_style( FILE4SEQ_WRITE S4PTR *, PSTYLE4 );
+PUBLIC int S4FUNCTION report4save_calc( FILE4SEQ_WRITE S4PTR *, EXPR4CALC S4PTR * );
+PUBLIC int S4FUNCTION report4save_report( PREPORT4, FILE4SEQ_WRITE S4PTR * );
 
-S4EXPORT int S4FUNCTION report4retrieve_object( FILE4SEQ_READ S4PTR *, PAREA4 );
-S4EXPORT int S4FUNCTION report4retrieve_area( FILE4SEQ_READ S4PTR *, PGROUP4 );
-S4EXPORT int S4FUNCTION report4retrieve_group( FILE4SEQ_READ S4PTR *, PREPORT4 );
-S4EXPORT int S4FUNCTION report4retrieve_page_header_footer( FILE4SEQ_READ S4PTR *, PREPORT4 );
-S4EXPORT PSTYLE4 S4FUNCTION report4retrieve_style( FILE4SEQ_READ S4PTR *, PREPORT4 );
-S4EXPORT int S4FUNCTION report4retrieve_calc2( FILE4SEQ_READ S4PTR *, PREPORT4 );
-S4EXPORT int S4FUNCTION report4retrieve_calc( FILE4SEQ_READ S4PTR *, PREPORT4 );
-S4EXPORT REPORT4 * S4FUNCTION   report4retrieve_report( FILE4SEQ_READ S4PTR *, RELATE4 S4PTR * );
+PUBLIC int S4FUNCTION report4retrieve_object( FILE4SEQ_READ S4PTR *, PAREA4 );
+PUBLIC int S4FUNCTION report4retrieve_area( FILE4SEQ_READ S4PTR *, PGROUP4 );
+PUBLIC int S4FUNCTION report4retrieve_group( FILE4SEQ_READ S4PTR *, PREPORT4 );
+PUBLIC int S4FUNCTION report4retrieve_page_header_footer( FILE4SEQ_READ S4PTR *, PREPORT4 );
+PUBLIC PSTYLE4 S4FUNCTION report4retrieve_style( FILE4SEQ_READ S4PTR *, PREPORT4 );
+PUBLIC int S4FUNCTION report4retrieve_calc2( FILE4SEQ_READ S4PTR *, PREPORT4 );
+PUBLIC int S4FUNCTION report4retrieve_calc( FILE4SEQ_READ S4PTR *, PREPORT4 );
+PUBLIC REPORT4 * S4FUNCTION   report4retrieve_report( FILE4SEQ_READ S4PTR *, RELATE4 S4PTR * );
 
-S4EXPORT int S4FUNCTION retrieve4string( FILE4SEQ_READ S4PTR *, char S4PTR *, int );
-S4EXPORT DATA4 S4PTR *  S4FUNCTION relate4lookup_data( RELATE4 S4PTR *, char S4PTR * );
+PUBLIC int S4FUNCTION retrieve4string( FILE4SEQ_READ S4PTR *, char S4PTR *, int );
+PUBLIC DATA4 S4PTR *  S4FUNCTION relate4lookup_data( RELATE4 S4PTR *, char S4PTR * );
 
-S4EXPORT int S4FUNCTION report4caption( PREPORT4, char S4PTR * );
-S4EXPORT int S4FUNCTION obj4frameCorners( POBJ4, int );
-S4EXPORT int S4FUNCTION obj4frameFill( POBJ4, int );
-S4EXPORT int S4FUNCTION area4pageBreak( PAREA4, int );
+PUBLIC int S4FUNCTION report4caption( PREPORT4, char S4PTR * );
+PUBLIC int S4FUNCTION obj4frameCorners( POBJ4, int );
+PUBLIC int S4FUNCTION obj4frameFill( POBJ4, int );
+PUBLIC int S4FUNCTION area4pageBreak( PAREA4, int );
 
-S4EXPORT int S4FUNCTION report4groupHardResets( PREPORT4, int );
+PUBLIC int S4FUNCTION report4groupHardResets( PREPORT4, int );
 
 int report4alloc_records( PREPORT4 );
 int report4swap_old_rec( PREPORT4 );
@@ -841,23 +841,23 @@ int report4make_old_rec( PREPORT4 );
 int report4output_area_break( PAREA4 );
 
 #ifdef S4WINDOWS
-S4EXPORT int S4FUNCTION report4generatePage( PREPORT4, HDC );
+PUBLIC int S4FUNCTION report4generatePage( PREPORT4, HDC );
 int report4output_object( OBJ4 *, HDC );
 int report4output_area( AREA4 *, HDC, int );
 void report4output_pgheader( REPORT4 *, HDC hDC );
 void report4output_pgfooter( REPORT4 *, HDC hDC );
 void report4output_repeat_headers( REPORT4 *, HDC, GROUP4 * );
 void report4output_swapped_footer( GROUP4 *, HDC );
-S4EXPORT HDC S4FUNCTION report4get_printerDC ( void );
+PUBLIC HDC S4FUNCTION report4get_printerDC ( void );
 void report4output_screen_fonts( REPORT4 * );
 int report4register_classes( PREPORT4 );
 void report4calc_obj_dev( REPORT4 *, HDC );
-S4EXPORT void S4FUNCTION obj4bitmapFileFree( POBJ4 obj );
-S4EXPORT POBJ4 S4FUNCTION obj4bitmapFileCreate( PAREA4 area, char *filename, long x, long y, long w, long h );
-S4EXPORT void S4FUNCTION obj4bitmapFieldFree( POBJ4 obj );
-S4EXPORT POBJ4 S4FUNCTION obj4bitmapFieldCreate( PAREA4 area, FIELD4 *field, long x, long y, long w, long h );
+PUBLIC void S4FUNCTION obj4bitmapFileFree( POBJ4 obj );
+PUBLIC POBJ4 S4FUNCTION obj4bitmapFileCreate( PAREA4 area, char *filename, long x, long y, long w, long h );
+PUBLIC void S4FUNCTION obj4bitmapFieldFree( POBJ4 obj );
+PUBLIC POBJ4 S4FUNCTION obj4bitmapFieldCreate( PAREA4 area, FIELD4 *field, long x, long y, long w, long h );
 #else
-S4EXPORT int S4FUNCTION report4generatePage( PREPORT4 );
+PUBLIC int S4FUNCTION report4generatePage( PREPORT4 );
 int report4output_object( OBJ4 *, PAGE4 *);
 int report4output_area( AREA4 *, PAGE4 *, int );
 void report4output_pgheader( REPORT4 *, PAGE4 *);
@@ -868,18 +868,18 @@ void report4calc_obj_dev( REPORT4 * );
 void style4flagsGet( PSTYLE4 style, int *pt_size, int *bold, int *italic, int *underline, int *strikeout );
 int style4equivFontGet( CODE4 *codeBase, PSTYLE4 style, char *buf, int bufsize );
 void style4equivFontsRemove( CODE4 *codeBase );
-S4EXPORT int S4FUNCTION style4equivFontRegister( CODE4 *codeBase, char *winfont, char *equivfont );
+PUBLIC int S4FUNCTION style4equivFontRegister( CODE4 *codeBase, char *winfont, char *equivfont );
 #endif
 
 #ifdef S4DLL
-   S4EXPORT HINSTANCE S4FUNCTION c4dllInst(void );
+   PUBLIC HINSTANCE S4FUNCTION c4dllInst(void );
 #endif
 
 void report4evaluate_lookahead( GROUP4 * );
 void report4check_lookahead( REPORT4 * );
 void report4check_display_once( PREPORT4 );
 
-S4EXPORT GROUP4 * S4FUNCTION report4calc_first_change_group( REPORT4 * );
+PUBLIC GROUP4 * S4FUNCTION report4calc_first_change_group( REPORT4 * );
 
 #ifdef S4WINDOWS
 HDC S4FUNCTION report4get_printerIC ( PREPORT4 );
@@ -889,126 +889,126 @@ long CALLBACK _export OutputPageProc( HWND, UINT, WPARAM, LPARAM );
 long CALLBACK _export MouseEatProc( HWND, UINT, WPARAM, LPARAM );
 long CALLBACK _export PageStatProc( HWND, UINT, WPARAM, LPARAM );
 #else
-S4EXPORT long CALLBACK PreViewProc( HWND, UINT, WPARAM, LPARAM );
-S4EXPORT long CALLBACK OutputPageProc( HWND, UINT, WPARAM, LPARAM );
-S4EXPORT long CALLBACK MouseEatProc( HWND, UINT, WPARAM, LPARAM );
+PUBLIC long CALLBACK PreViewProc( HWND, UINT, WPARAM, LPARAM );
+PUBLIC long CALLBACK OutputPageProc( HWND, UINT, WPARAM, LPARAM );
+PUBLIC long CALLBACK MouseEatProc( HWND, UINT, WPARAM, LPARAM );
 #endif
-S4EXPORT void S4FUNCTION obj4bitmapStaticFree( POBJ4 obj );
-S4EXPORT POBJ4 S4FUNCTION obj4bitmapStaticCreate( PAREA4 area, HANDLE hDIB, long x, long y, long w, long h );
+PUBLIC void S4FUNCTION obj4bitmapStaticFree( POBJ4 obj );
+PUBLIC POBJ4 S4FUNCTION obj4bitmapStaticCreate( PAREA4 area, HANDLE hDIB, long x, long y, long w, long h );
 
-S4EXPORT LPSTR S4FUNCTION bmp4FindDIBBits (LPSTR );
-S4EXPORT WORD S4FUNCTION bmp4PaletteSize (LPSTR );
-S4EXPORT WORD S4FUNCTION bmp4DIBNumColors (LPSTR );
+PUBLIC LPSTR S4FUNCTION bmp4FindDIBBits (LPSTR );
+PUBLIC WORD S4FUNCTION bmp4PaletteSize (LPSTR );
+PUBLIC WORD S4FUNCTION bmp4DIBNumColors (LPSTR );
 
-S4EXPORT BOOL S4FUNCTION bmp4WriteDIB ( LPSTR, HANDLE );
-S4EXPORT HANDLE S4FUNCTION bmp4ReadDIBFile (int);
-S4EXPORT HANDLE S4FUNCTION bmp4GetDIB ( LPSTR, CODE4 S4PTR * );
+PUBLIC BOOL S4FUNCTION bmp4WriteDIB ( LPSTR, HANDLE );
+PUBLIC HANDLE S4FUNCTION bmp4ReadDIBFile (int);
+PUBLIC HANDLE S4FUNCTION bmp4GetDIB ( LPSTR, CODE4 S4PTR * );
 
-S4EXPORT void S4FUNCTION report4printerSelect( PREPORT4 report );
-S4EXPORT int S4FUNCTION report4parent( PREPORT4, HWND );
-S4EXPORT HDC S4FUNCTION report4printerDC( PREPORT4, HDC );
+PUBLIC void S4FUNCTION report4printerSelect( PREPORT4 report );
+PUBLIC int S4FUNCTION report4parent( PREPORT4, HWND );
+PUBLIC HDC S4FUNCTION report4printerDC( PREPORT4, HDC );
 #endif
 
-S4EXPORT int S4FUNCTION expr4calc_remove( EXPR4CALC *calc, int remove_all );
+PUBLIC int S4FUNCTION expr4calc_remove( EXPR4CALC *calc, int remove_all );
 
-S4EXPORT int S4FUNCTION expr4calcModify( EXPR4CALC *calc, char *expr_source );
+PUBLIC int S4FUNCTION expr4calcModify( EXPR4CALC *calc, char *expr_source );
 
-S4EXPORT int S4FUNCTION report4output( PREPORT4 report, int output_handle, int use_styles );
-S4EXPORT int S4FUNCTION report4margins( PREPORT4 report, long left, long right, long top, long bottom, int unit_type );
-S4EXPORT int S4FUNCTION report4pageSize( PREPORT4 report, long pg_height, long pg_width, int unit_type );
+PUBLIC int S4FUNCTION report4output( PREPORT4 report, int output_handle, int use_styles );
+PUBLIC int S4FUNCTION report4margins( PREPORT4 report, long left, long right, long top, long bottom, int unit_type );
+PUBLIC int S4FUNCTION report4pageSize( PREPORT4 report, long pg_height, long pg_width, int unit_type );
 
-S4EXPORT int S4FUNCTION report4deleteCalc( PREPORT4 report, EXPR4CALC S4PTR *del_calc );
+PUBLIC int S4FUNCTION report4deleteCalc( PREPORT4 report, EXPR4CALC S4PTR *del_calc );
 
-S4EXPORT int S4FUNCTION report4styleSheetSave( REPORT4 *report, char *file_name );
-S4EXPORT int S4FUNCTION report4styleSheetLoad( REPORT4 *report, char *file_name, int override );
-S4EXPORT int S4FUNCTION report4currency( PREPORT4, char * );
-S4EXPORT int S4FUNCTION report4decimal( PREPORT4, char );
-S4EXPORT int S4FUNCTION report4separator( PREPORT4, char );
+PUBLIC int S4FUNCTION report4styleSheetSave( REPORT4 *report, char *file_name );
+PUBLIC int S4FUNCTION report4styleSheetLoad( REPORT4 *report, char *file_name, int override );
+PUBLIC int S4FUNCTION report4currency( PREPORT4, char * );
+PUBLIC int S4FUNCTION report4decimal( PREPORT4, char );
+PUBLIC int S4FUNCTION report4separator( PREPORT4, char );
 
-S4EXPORT int S4FUNCTION report4pageInit( PREPORT4 report );
-S4EXPORT int S4FUNCTION report4pageFree( PREPORT4 report );
-S4EXPORT POBJECT4 S4FUNCTION report4pageObjNext( PREPORT4 report );
-S4EXPORT POBJECT4 S4FUNCTION report4pageObjFirst( PREPORT4 report );
-S4EXPORT int S4FUNCTION report4toScreen( PREPORT4 report, int to_screen );
+PUBLIC int S4FUNCTION report4pageInit( PREPORT4 report );
+PUBLIC int S4FUNCTION report4pageFree( PREPORT4 report );
+PUBLIC POBJECT4 S4FUNCTION report4pageObjNext( PREPORT4 report );
+PUBLIC POBJECT4 S4FUNCTION report4pageObjFirst( PREPORT4 report );
+PUBLIC int S4FUNCTION report4toScreen( PREPORT4 report, int to_screen );
 
-S4EXPORT PSTYLE4 S4FUNCTION report4styleFirst( PREPORT4 report );
-S4EXPORT PSTYLE4 S4FUNCTION report4styleNext( PREPORT4 report, PSTYLE4 style );
-S4EXPORT PSTYLE4 S4FUNCTION report4styleLast( PREPORT4 report );
-S4EXPORT PSTYLE4 S4FUNCTION report4stylePrev( PREPORT4 report, PSTYLE4 style );
-S4EXPORT int S4FUNCTION report4numStyles( PREPORT4 report );
+PUBLIC PSTYLE4 S4FUNCTION report4styleFirst( PREPORT4 report );
+PUBLIC PSTYLE4 S4FUNCTION report4styleNext( PREPORT4 report, PSTYLE4 style );
+PUBLIC PSTYLE4 S4FUNCTION report4styleLast( PREPORT4 report );
+PUBLIC PSTYLE4 S4FUNCTION report4stylePrev( PREPORT4 report, PSTYLE4 style );
+PUBLIC int S4FUNCTION report4numStyles( PREPORT4 report );
 
-S4EXPORT PGROUP4 S4FUNCTION report4groupFirst( PREPORT4 report );
-S4EXPORT PGROUP4 S4FUNCTION report4groupNext( PREPORT4 report, PGROUP4 group );
-S4EXPORT PGROUP4 S4FUNCTION report4groupLast( PREPORT4 report );
-S4EXPORT PGROUP4 S4FUNCTION report4groupPrev( PREPORT4 report, PGROUP4 group );
-S4EXPORT int S4FUNCTION report4numGroups( PREPORT4 report );
-S4EXPORT PGROUP4 S4FUNCTION report4titleSummary( PREPORT4 report );
-S4EXPORT PGROUP4 S4FUNCTION report4pageHeaderFooter( PREPORT4 report );
+PUBLIC PGROUP4 S4FUNCTION report4groupFirst( PREPORT4 report );
+PUBLIC PGROUP4 S4FUNCTION report4groupNext( PREPORT4 report, PGROUP4 group );
+PUBLIC PGROUP4 S4FUNCTION report4groupLast( PREPORT4 report );
+PUBLIC PGROUP4 S4FUNCTION report4groupPrev( PREPORT4 report, PGROUP4 group );
+PUBLIC int S4FUNCTION report4numGroups( PREPORT4 report );
+PUBLIC PGROUP4 S4FUNCTION report4titleSummary( PREPORT4 report );
+PUBLIC PGROUP4 S4FUNCTION report4pageHeaderFooter( PREPORT4 report );
 
-S4EXPORT PAREA4 S4FUNCTION group4headerFirst( PGROUP4 group );
-S4EXPORT PAREA4 S4FUNCTION group4headerNext( PGROUP4 group, PAREA4 area );
-S4EXPORT PAREA4 S4FUNCTION group4headerLast( PGROUP4 group );
-S4EXPORT PAREA4 S4FUNCTION group4headerPrev( PGROUP4 group, PAREA4 area );
-S4EXPORT int S4FUNCTION area4numHeaders( PGROUP4 group );
-S4EXPORT PAREA4 S4FUNCTION group4footerFirst( PGROUP4 group );
-S4EXPORT PAREA4 S4FUNCTION group4footerNext( PGROUP4 group, PAREA4 area );
-S4EXPORT PAREA4 S4FUNCTION group4footerLast( PGROUP4 group );
-S4EXPORT PAREA4 S4FUNCTION group4footerPrev( PGROUP4 group, PAREA4 area );
-S4EXPORT int S4FUNCTION group4numFooters( PGROUP4 group );
+PUBLIC PAREA4 S4FUNCTION group4headerFirst( PGROUP4 group );
+PUBLIC PAREA4 S4FUNCTION group4headerNext( PGROUP4 group, PAREA4 area );
+PUBLIC PAREA4 S4FUNCTION group4headerLast( PGROUP4 group );
+PUBLIC PAREA4 S4FUNCTION group4headerPrev( PGROUP4 group, PAREA4 area );
+PUBLIC int S4FUNCTION area4numHeaders( PGROUP4 group );
+PUBLIC PAREA4 S4FUNCTION group4footerFirst( PGROUP4 group );
+PUBLIC PAREA4 S4FUNCTION group4footerNext( PGROUP4 group, PAREA4 area );
+PUBLIC PAREA4 S4FUNCTION group4footerLast( PGROUP4 group );
+PUBLIC PAREA4 S4FUNCTION group4footerPrev( PGROUP4 group, PAREA4 area );
+PUBLIC int S4FUNCTION group4numFooters( PGROUP4 group );
 
-S4EXPORT int S4FUNCTION report4titlePage( PREPORT4 report, int title_page );
+PUBLIC int S4FUNCTION report4titlePage( PREPORT4 report, int title_page );
 
-S4EXPORT TOTAL4 * S4FUNCTION total4lookup( REPORT4 *report, char *name );
-S4EXPORT RELATE4 * S4FUNCTION   relate4retrieve_relate( FILE4SEQ_READ *seq, int open_files, char *spath, int file_type );
-S4EXPORT int S4FUNCTION report4index_type( void );
-S4EXPORT int S4FUNCTION report4off_write( void );
+PUBLIC TOTAL4 * S4FUNCTION total4lookup( REPORT4 *report, char *name );
+PUBLIC RELATE4 * S4FUNCTION   relate4retrieve_relate( FILE4SEQ_READ *seq, int open_files, char *spath, int file_type );
+PUBLIC int S4FUNCTION report4index_type( void );
+PUBLIC int S4FUNCTION report4off_write( void );
 
-S4EXPORT PGROUP4 S4FUNCTION report4groupLookup( PREPORT4 report, char *group_name );
-S4EXPORT int S4FUNCTION group4resetExprSet( PGROUP4 group, char *expr_src );
+PUBLIC PGROUP4 S4FUNCTION report4groupLookup( PREPORT4 report, char *group_name );
+PUBLIC int S4FUNCTION group4resetExprSet( PGROUP4 group, char *expr_src );
 
-S4EXPORT PREPORT4 S4FUNCTION report4retrieve_old(CODE4 *c4,char *file_name,int open_files);
+PUBLIC PREPORT4 S4FUNCTION report4retrieve_old(CODE4 *c4,char *file_name,int open_files);
 
 #ifdef S4CR2
-S4EXPORT int S4FUNCTION AlternateDataFile( char S4PTR *dname_buf, int len );
-S4EXPORT int S4FUNCTION AlternateIndexFile( char S4PTR *iname_buf, int len );
-S4EXPORT int S4FUNCTION AlternateTagName( char S4PTR *tname_buf, int len );
-S4EXPORT int S4FUNCTION AlternateMasterExpression( char S4PTR *expr_buf, RELATE4 S4PTR *relate, int len );
-S4EXPORT int S4FUNCTION AlternateSortExpression(  char S4PTR *expr_buf, RELATE4 S4PTR *relate, int len );
-S4EXPORT int S4FUNCTION AlternateQueryExpression( char S4PTR *expr_buf, RELATE4 S4PTR *relate, int len );
+PUBLIC int S4FUNCTION AlternateDataFile( char S4PTR *dname_buf, int len );
+PUBLIC int S4FUNCTION AlternateIndexFile( char S4PTR *iname_buf, int len );
+PUBLIC int S4FUNCTION AlternateTagName( char S4PTR *tname_buf, int len );
+PUBLIC int S4FUNCTION AlternateMasterExpression( char S4PTR *expr_buf, RELATE4 S4PTR *relate, int len );
+PUBLIC int S4FUNCTION AlternateSortExpression(  char S4PTR *expr_buf, RELATE4 S4PTR *relate, int len );
+PUBLIC int S4FUNCTION AlternateQueryExpression( char S4PTR *expr_buf, RELATE4 S4PTR *relate, int len );
 #endif
 
 #ifdef S4VBASIC
 #ifdef S4WINDOWS
-   S4EXPORT long S4FUNCTION vbRepWndProc( HWND, UINT, WPARAM, LPARAM ) ;
-   S4EXPORT void S4FUNCTION report4registerVBClass( REPORT4 * ) ;
+   PUBLIC long S4FUNCTION vbRepWndProc( HWND, UINT, WPARAM, LPARAM ) ;
+   PUBLIC void S4FUNCTION report4registerVBClass( REPORT4 * ) ;
 #endif
-   S4EXPORT int S4FUNCTION report4decimal_v( PREPORT4 report, char *decimal ) ;
-   S4EXPORT int S4FUNCTION report4separator_v( PREPORT4, char * ) ;
+   PUBLIC int S4FUNCTION report4decimal_v( PREPORT4 report, char *decimal ) ;
+   PUBLIC int S4FUNCTION report4separator_v( PREPORT4, char * ) ;
 #endif
 
-S4EXPORT POBJ4 S4FUNCTION area4objFirst( PAREA4 area );
-S4EXPORT POBJ4 S4FUNCTION area4objNext( PAREA4 area, POBJ4 aobj );
-S4EXPORT POBJ4 S4FUNCTION area4objPrev( PAREA4 area, POBJ4 aobj );
-S4EXPORT POBJ4 S4FUNCTION area4objLast( PAREA4 area );
+PUBLIC POBJ4 S4FUNCTION area4objFirst( PAREA4 area );
+PUBLIC POBJ4 S4FUNCTION area4objNext( PAREA4 area, POBJ4 aobj );
+PUBLIC POBJ4 S4FUNCTION area4objPrev( PAREA4 area, POBJ4 aobj );
+PUBLIC POBJ4 S4FUNCTION area4objLast( PAREA4 area );
 
-S4EXPORT void S4FUNCTION obj4remove( POBJ4 obj );
-S4EXPORT int S4FUNCTION area4numObjects( PAREA4 area );
-S4EXPORT void S4FUNCTION area4sort_obj_tree( PAREA4 area );
-S4EXPORT int S4FUNCTION report4pageMarginsGet( PREPORT4, long S4PTR *, long S4PTR*, long S4PTR *, long S4PTR * );
-S4EXPORT int S4FUNCTION report4pageSizeGet( PREPORT4, long S4PTR *,long S4PTR * );
+PUBLIC void S4FUNCTION obj4remove( POBJ4 obj );
+PUBLIC int S4FUNCTION area4numObjects( PAREA4 area );
+PUBLIC void S4FUNCTION area4sort_obj_tree( PAREA4 area );
+PUBLIC int S4FUNCTION report4pageMarginsGet( PREPORT4, long S4PTR *, long S4PTR*, long S4PTR *, long S4PTR * );
+PUBLIC int S4FUNCTION report4pageSizeGet( PREPORT4, long S4PTR *,long S4PTR * );
 void report4nchange( CODE4 *, char **, int, int );
 void report4free_name_list( void );
-S4EXPORT PSTYLE4 S4FUNCTION report4styleSelected( PREPORT4 );
-S4EXPORT int S4FUNCTION report4styleSelect( PREPORT4, PSTYLE4 );
-S4EXPORT PSTYLE4 S4FUNCTION style4index( PREPORT4, int );
+PUBLIC PSTYLE4 S4FUNCTION report4styleSelected( PREPORT4 );
+PUBLIC int S4FUNCTION report4styleSelect( PREPORT4, PSTYLE4 );
+PUBLIC PSTYLE4 S4FUNCTION style4index( PREPORT4, int );
 
-S4EXPORT int S4FUNCTION total4addCondition( PTOTAL4, char *, int );
-S4EXPORT int S4FUNCTION obj4dataFieldSet( POBJ4 obj, char *fname, char ftype, int flength, int fdec );
-S4EXPORT int S4FUNCTION report4dataFileSet( PREPORT4 report, char *fname );
-S4EXPORT int S4FUNCTION report4dataDo( PREPORT4 report );
-S4EXPORT int S4FUNCTION report4dataGroup( PREPORT4, PGROUP4 );
+PUBLIC int S4FUNCTION total4addCondition( PTOTAL4, char *, int );
+PUBLIC int S4FUNCTION obj4dataFieldSet( POBJ4 obj, char *fname, char ftype, int flength, int fdec );
+PUBLIC int S4FUNCTION report4dataFileSet( PREPORT4 report, char *fname );
+PUBLIC int S4FUNCTION report4dataDo( PREPORT4 report );
+PUBLIC int S4FUNCTION report4dataGroup( PREPORT4, PGROUP4 );
 
-S4EXPORT int S4FUNCTION obj4lookAhead( POBJ4, int );
+PUBLIC int S4FUNCTION obj4lookAhead( POBJ4, int );
 
 
 #ifdef __cplusplus

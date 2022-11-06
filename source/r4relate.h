@@ -185,31 +185,31 @@ typedef struct BITMAP4St
 #endif
 
 /* exported functions */
-S4EXPORT int S4FUNCTION relate4bottom( RELATE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION relate4changed( RELATE4 S4PTR * ) ;  /* Slave has been added or freed */
-S4EXPORT RELATE4 S4PTR * S4FUNCTION relate4createSlave( RELATE4 S4PTR *, DATA4 S4PTR *, const char S4PTR *, TAG4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION relate4doAll( RELATE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION relate4doOne( RELATE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION relate4eof( RELATE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION relate4errorAction( RELATE4 S4PTR *, const int ) ;  /* Set the error action */
-S4EXPORT int S4FUNCTION relate4free( RELATE4 S4PTR *, const int ) ;
+PUBLIC int S4FUNCTION relate4bottom( RELATE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4changed( RELATE4 S4PTR * ) ;  /* Slave has been added or freed */
+PUBLIC RELATE4 S4PTR * S4FUNCTION relate4createSlave( RELATE4 S4PTR *, DATA4 S4PTR *, const char S4PTR *, TAG4 S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4doAll( RELATE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4doOne( RELATE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4eof( RELATE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4errorAction( RELATE4 S4PTR *, const int ) ;  /* Set the error action */
+PUBLIC int S4FUNCTION relate4free( RELATE4 S4PTR *, const int ) ;
 #ifdef S4SERVER
-S4EXPORT RELATE4 S4PTR * S4FUNCTION relate4init( DATA4 S4PTR *, char S4PTR * ) ;
+PUBLIC RELATE4 S4PTR * S4FUNCTION relate4init( DATA4 S4PTR *, char S4PTR * ) ;
 #else
-S4EXPORT RELATE4 S4PTR * S4FUNCTION relate4init( DATA4 S4PTR * ) ;
+PUBLIC RELATE4 S4PTR * S4FUNCTION relate4init( DATA4 S4PTR * ) ;
 #endif
-S4EXPORT int S4FUNCTION relate4matchLen( RELATE4 S4PTR *, const int ) ;
-S4EXPORT int S4FUNCTION relate4next( RELATE4 S4PTR * S4PTR * ) ;
-S4EXPORT int S4FUNCTION relate4querySet( RELATE4 S4PTR *, const char S4PTR * ) ;
-S4EXPORT int S4FUNCTION relate4skip( RELATE4 S4PTR *, const long ) ;        /* Extended record skip */
-S4EXPORT int S4FUNCTION relate4skipEnable( RELATE4 S4PTR *, const int ) ;
-S4EXPORT int S4FUNCTION relate4sortSet( RELATE4 S4PTR *, const char S4PTR * ) ;
-S4EXPORT int S4FUNCTION relate4top( RELATE4 S4PTR * ) ;
-S4EXPORT int S4FUNCTION relate4type( RELATE4 S4PTR *, int ) ;          /* Set the relate type */
+PUBLIC int S4FUNCTION relate4matchLen( RELATE4 S4PTR *, const int ) ;
+PUBLIC int S4FUNCTION relate4next( RELATE4 S4PTR * S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4querySet( RELATE4 S4PTR *, const char S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4skip( RELATE4 S4PTR *, const long ) ;        /* Extended record skip */
+PUBLIC int S4FUNCTION relate4skipEnable( RELATE4 S4PTR *, const int ) ;
+PUBLIC int S4FUNCTION relate4sortSet( RELATE4 S4PTR *, const char S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4top( RELATE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4type( RELATE4 S4PTR *, int ) ;          /* Set the relate type */
 /* used by codeReporter */
-S4EXPORT int S4FUNCTION relate4freeRelate( RELATE4 S4PTR *, const int ) ;
-S4EXPORT int   S4FUNCTION relate4lock( RELATE4 S4PTR * ) ;
-S4EXPORT int   S4FUNCTION relate4unlock( RELATE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4freeRelate( RELATE4 S4PTR *, const int ) ;
+PUBLIC int   S4FUNCTION relate4lock( RELATE4 S4PTR * ) ;
+PUBLIC int   S4FUNCTION relate4unlock( RELATE4 S4PTR * ) ;
 #ifndef S4CB51
    #define relate4data( r4 ) ( (r4)->data )
    #define relate4dataTag( r4 ) ( (r4)->dataTag )
@@ -218,12 +218,12 @@ S4EXPORT int   S4FUNCTION relate4unlock( RELATE4 S4PTR * ) ;
 #endif
 #ifdef S4COMPILE_TEST
    #ifndef S4OFF_MULTI
-      S4EXPORT int S4FUNCTION relate4lockAdd( RELATE4 S4PTR * ) ;
+      PUBLIC int S4FUNCTION relate4lockAdd( RELATE4 S4PTR * ) ;
    #endif
 #else
-   S4EXPORT int S4FUNCTION relate4lockAdd( RELATE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION relate4lockAdd( RELATE4 S4PTR * ) ;
 #endif
-S4EXPORT int S4FUNCTION relate4optimizeable( RELATE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4optimizeable( RELATE4 S4PTR * ) ;
 
 /* internally used functions */
 int bitmap4evaluate( L4LOGICAL *, const int ) ;

@@ -34,11 +34,6 @@ TAG4 *S4FUNCTION d4tag( DATA4 *d4, const char* const tagName )
             break ;
          if ( strcmp( tagOn->tagFile->alias, tagLookup ) == 0 )
             return tagOn ;
-         #ifdef S4CLIENT
-            if ( code4indexFormat( d4->codeBase ) == r4ntx )  /* also check index file access name */
-               if ( strcmp( tagOn->tagFile->indexFile->accessName, tagLookup ) == 0 )
-                  return tagOn ;
-         #endif
       }
 
       if ( d4->codeBase->errTagName )

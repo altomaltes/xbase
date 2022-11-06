@@ -328,7 +328,7 @@ int S4FUNCTION u4ptrEqual( const void *p1, const void *p2 )
 
 #ifdef S4TESTING
 #ifdef S4WINDOWS
-S4EXPORT void S4FUNCTION u4terminate( void )
+PUBLIC void S4FUNCTION u4terminate( void )
 {
    #ifdef __WIN32
       ExitProcess(1) ;
@@ -451,7 +451,7 @@ int ats4readInfo( char *filename, void *info, const unsigned int len )
    return 1 ;   /* info successfully read */
 }
 
-S4EXPORT void S4FUNCTION ats4setSuiteStatus( const char *newValue )
+PUBLIC void S4FUNCTION ats4setSuiteStatus( const char *newValue )
 {
    ATS4RECINFO info ;
    const char *fieldStatus = "STATUS" ;
