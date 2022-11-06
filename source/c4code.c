@@ -521,11 +521,7 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
    }
 
       #ifndef S4SINGLE
-         #ifdef S4CB51
-            code4unlockAutoSet( c4, LOCK4DATA ) ;
-         #else
             code4unlockAutoSet( c4, LOCK4ALL ) ;
-         #endif
       #endif
 
    #ifndef S4OFF_OPTIMIZE
@@ -1541,12 +1537,6 @@ const char *S4FUNCTION code4indexExtension( CODE4 *c4 )
    #error Must choose one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, __unix__, S4MACINTOSH or S4PASCAL_WIN
 #endif
 
-#ifdef S4CB51
-   #define S4CB51_VAL  0x1000
-#else
-   #define S4CB51_VAL  0
-#endif
-
 #ifdef S4SAFE
    #define S4SAFE_VAL  0x2000
 #else
@@ -1686,7 +1676,7 @@ const char *S4FUNCTION code4indexExtension( CODE4 *c4 )
 long S4FUNCTION u4switch()
 {
    return (long)
-          ( S4FORMAT + S4OPERATING + S4CB51_VAL + S4SAFE_VAL
+          ( S4FORMAT + S4OPERATING + S4SAFE_VAL
           + S4LOCK_HOOK_VAL + S4MAX_VAL + S4TIMEOUT_HOOK_VAL + E4ANALYZE_VAL
           + E4DEBUG_VAL + E4HOOK_VAL + E4LINK_VAL + E4MISC_VAL + E4OFF_VAL
           + E4OFF_STRING_VAL + E4PARM_HIGH_VAL + E4PAUSE_VAL + E4STOP_VAL +
@@ -1707,7 +1697,6 @@ DATA4 *d4data_v( CODE4 *c4, char *alias )
 
 #endif
 
-/*#ifdef S4CB51*/
 #ifdef S4DLL_BUILD
 #ifndef S4WINCE
 #ifndef S4PASCAL_DOS

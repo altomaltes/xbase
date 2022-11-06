@@ -64,16 +64,6 @@
    what extension that was saved in the report file  */
 #define S4DEFAULT_INDEX 1
 
-/* defines used for specifying current index format: these are for report
-   function use only -- redefined in d4defs.h, previously used in cb51
-#ifndef S4CB51
-   #define r4mdx 1
-   #define r4ndx 2
-   #define r4ntx 3
-   #define r4cdx 4
-#endif
-*/
-
 /* these defines are for running the report module under windows  */
 #ifdef S4WINDOWS
    /* user defined message sent by the report popup output window

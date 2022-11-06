@@ -192,14 +192,13 @@ PUBLIC int S4FUNCTION relate4top( RELATE4 S4PTR * ) ;
 PUBLIC int S4FUNCTION relate4type( RELATE4 S4PTR *, int ) ;          /* Set the relate type */
 /* used by codeReporter */
 PUBLIC int S4FUNCTION relate4freeRelate( RELATE4 S4PTR *, const int ) ;
-PUBLIC int   S4FUNCTION relate4lock( RELATE4 S4PTR * ) ;
-PUBLIC int   S4FUNCTION relate4unlock( RELATE4 S4PTR * ) ;
-#ifndef S4CB51
-   #define relate4data( r4 ) ( (r4)->data )
-   #define relate4dataTag( r4 ) ( (r4)->dataTag )
-   #define relate4master( r4 ) ( (r4)->master )
+PUBLIC int S4FUNCTION relate4lock( RELATE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4unlock( RELATE4 S4PTR * ) ;
+   #define relate4data(       r4 ) ( (r4)->data )
+   #define relate4dataTag(    r4 ) ( (r4)->dataTag )
+   #define relate4master(     r4 ) ( (r4)->master )
    #define relate4masterExpr( r4 ) ( ( (r4)->masterExpr == 0 ) ? ( 0 ) : ( (r4)->masterExpr->source ) )
-#endif
+
 #ifdef S4COMPILE_TEST
    #ifndef S4OFF_MULTI
       PUBLIC int S4FUNCTION relate4lockAdd( RELATE4 S4PTR * ) ;

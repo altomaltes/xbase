@@ -81,9 +81,6 @@ typedef struct ERROR4DATASt
 #ifdef E4FILE_LINE
    #define error4( a, b, c ) ( code4fileNameSet( __FILE__ ), code4lineNoSet( __LINE__ ), error4default( a, b, c ) )
    #define error4describe( a, b, c, d, e, f ) ( code4fileNameSet( __FILE__ ), code4lineNoSet( __LINE__ ), error4describeDefault( a, b, c, d, e, f ) )
-   #ifdef S4CB51
-      #define e4( a, b, c ) ( code4fileNameSet( __FILE__ ), code4lineNoSet( __LINE__ ), error4describeExecute( a, b, 0L, c, 0, 0 ) )
-   #endif
    #ifdef E4STACK
       #define error4stack( a, b, c ) ( code4fileNameSet( __FILE__ ), code4lineNoSet( __LINE__ ), error4stackDefault( a, b, c ) )
    #else
@@ -92,9 +89,6 @@ typedef struct ERROR4DATASt
 #else
    #define error4( a, b, c ) error4default( a, b, c )
    #define error4describe( a, b, c, d, e, f ) error4describeDefault( a, b, c, d, e, f )
-   #ifdef S4CB51
-      #define e4( a, b, c )  error4describeExecute( a, b, 0L, c, 0, 0 )
-   #endif
    #ifdef E4STACK
       #define error4stack( a, b, c ) error4stackDefault( a, b, c )
    #else

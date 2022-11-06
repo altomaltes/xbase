@@ -702,25 +702,6 @@ RELATE4 *S4FUNCTION relate4createSlave( RELATE4 *master, DATA4 *slaveData, const
    return slave ;
 }
 
-/* checks if the given dbf belongs to one of the relations in relation */
-#ifdef S4CB51
-static int relate4dbfInRelation( RELATE4 *relate, const DATA4 *dbf )
-{
-   RELATE4 *relateOn ;
-
-   relateOn = &relate->relation->relate ;
-   while( relateOn->master )
-      relateOn = relateOn->master ;
-
-   do
-   {
-      if ( relateOn->data == dbf )
-         return 1 ;
-   } while( relate4next( &relateOn ) != 2 ) ;
-
-   return 0 ;
-}
-#endif /* S4CB51 */
 
 int S4FUNCTION relate4doAll( RELATE4 *relate )
 {
@@ -930,11 +911,6 @@ int S4FUNCTION relate4free( RELATE4 *relate, const int closeFiles )
    c4 = relate->codeBase ;
    oldErrorCode = error4set(c4, 0 ) ;
 
-   #ifdef S4CB51
-      #ifndef S4SINGLE
-         relate4unlock( relate ) ;
-      #endif
-   #endif
 
    relate4changed( relate ) ;
    relation = relate->relation ;
@@ -1079,96 +1055,6 @@ int S4FUNCTION relate4lockAdd( RELATE4 *relate )
    #endif
 }
 
-#ifdef S4CB51
-
-/* new form does not allow combining lockAdds spaced around relate4locks()
-   if required to do that, S4OLD_RELATE_LOCK code will allow */
-int S4FUNCTION relate4lock( RELATE4 *relate )
-{
-   int rc ;
-
-   rc = relate4lockAdd( relate ) ;
-   if ( rc < 0 )
-      return rc ;
-   rc = code4lock( relate->codeBase ) ;
-   if ( rc == 0 )
-      relate->relation->locked = 1 ;
-   return rc ;
-}
-#endif
-
-#ifdef S4OLD_RELATE_LOCK
-int S4FUNCTION relate4lock( RELATE4 *relate )
-{
-   #ifdef S4SINGLE
-      return 0 ;
-   #else
-      CODE4 *c4 ;
-      int rc, oldAttempts, count ;
-      RELATE4 *relateOn ;
-
-      #ifdef E4PARM_HIGH
-         if ( relate == 0 )
-            return error4( 0, e4parm_null, E94411 ) ;
-      #endif
-
-      #ifdef S4VBASIC
-         if ( c4parm_check( relate, 5, E94411 ) )
-            return -1 ;
-      #endif
-
-      c4 = relate->codeBase ;
-      if ( error4code( c4 ) < 0 )
-         return e4codeBase ;
-
-      relate->relation->locked = 1 ;
-
-      count = oldAttempts = c4->lockAttempts ;  /* take care of wait here */
-      c4->lockAttempts = 1 ;
-
-      for( ;; )
-      {
-         rc = 0 ;
-         for( relateOn = &relate->relation->relate ;; )
-         {
-            if ( relateOn == 0 )
-               break ;
-               rc = d4lockAll( relateOn->data ) ;
-            if ( rc != 0 )
-               break ;
-            if ( relate4next( &relateOn ) == 2 )
-               break ;
-         }
-
-         if ( rc != r4locked )
-            break ;
-
-         relate4unlock( relate ) ;
-         if ( count == 0 )
-            break ;
-
-         if ( count > 0 )
-            count-- ;
-
-         #ifdef S4TEMP
-            if ( d4displayQuit( &display ) )
-            {
-               rc = error4( c4, e4result, E84409 ) ;
-               break ;
-            }
-         #endif
-
-         u4delayHundredth( c4->lockDelay ) ;   /* wait a second & try lock again */
-      }
-
-      c4->lockAttempts = oldAttempts ;
-      if ( error4code( c4 ) < 0 )
-         return error4code( c4 ) ;
-
-      return rc ;
-   #endif
-}
-#endif  /* S4OLD_RELATE_LOCK */
 
 /* direction : -1 = look backwards, 0 = lookup only, 1 = look forwards */
 static int relate4lookup( RELATE4 *relate, const char direction )
@@ -3074,31 +2960,6 @@ int S4FUNCTION relate4type( RELATE4 *relate, int relateType )
    }
    return rc ;
 }
-
-#ifdef S4CB51
-int S4FUNCTION relate4unlock( RELATE4 *relate )
-{
-   #ifndef S4SINGLE
-      DATA4 *dataOn ;
-
-      #ifdef E4PARM_HIGH
-         if ( relate == 0 )
-            return error4( 0, e4parm_null, E94424 ) ;
-      #endif
-
-      if ( !relate->relation->locked )
-         return 0 ;
-
-      for ( dataOn = (DATA4 *)l4first( tran4dataList( code4trans( relate->codeBase ) ) ) ;
-            dataOn ; dataOn = (DATA4 *)l4next( tran4dataList ( code4trans( relate->codeBase ) ), dataOn ) )
-         if ( relate4dbfInRelation( relate, dataOn ) )
-            d4unlockLow( dataOn, 0, 0 ) ;
-
-      relate->relation->locked = 0 ;
-   #endif
-   return 0 ;
-}
-#endif
 
 #ifdef S4VB_DOS
 

@@ -269,11 +269,7 @@ int file4writeOpt( FILE4 *f4, unsigned long pos, const void *ptr, const unsigned
       if ( f4->fileCreated == 0 )
       {
          c4->opt.forceCurrent = 1 ;
-         #ifdef S4CB51
-            file4temp( f4, c4, (char *)f4->name, 1 );
-         #else
             file4tempLow( f4, c4, 1, 1, NULL ) ;
-         #endif
          c4->opt.forceCurrent = 0 ;
       }
 

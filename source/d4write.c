@@ -461,14 +461,6 @@ int d4writeKeys( DATA4 *d4, const long rec )
       c4 = d4->codeBase ;
       d4->bofFlag = d4->eofFlag = 0 ;
 
-      #ifdef S4CB51
-         #ifndef S4OFF_MULTI
-               rc = d4lock( d4, rec ) ;
-            if ( rc )
-               return rc ;
-         #endif  /* S4OFF_MULTI */
-      #endif
-
       #ifdef S4CLIPPER
          if ( d4->dataFile->tagfiles.nLink > 0 )
       #else

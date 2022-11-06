@@ -36,7 +36,7 @@
 #endif
 #ifdef __unix__
    #include <sys/times.h>
-   #ifndef S4LINUX
+   #ifndef __linux__
       #ifdef S4NO_USLEEP
          #ifdef S4NO_SELECT
             #include <stropts.h>

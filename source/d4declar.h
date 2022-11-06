@@ -54,9 +54,6 @@ PUBLIC const char S4PTR *S4FUNCTION code4lockUserId( CODE4 S4PTR * ) ;
 PUBLIC int S4FUNCTION code4optStart( CODE4 S4PTR * ) ;
 PUBLIC int S4FUNCTION code4optSuspend( CODE4 S4PTR * ) ;
 PUBLIC int S4FUNCTION code4unlock( CODE4 S4PTR * ) ;
-#ifdef S4CB51
-   PUBLIC int S4FUNCTION code4freeBlocks( CODE4 S4PTR * ) ;
-#endif
 
    #define code4alloc( c4 ) ( code4allocLow( (c4), 0, S4VERSION ) )
    #define code4init( c4 ) ( code4initLow( (c4), 0, S4VERSION, sizeof( CODE4 ) ) )
@@ -195,11 +192,9 @@ PUBLIC int S4FUNCTION d4zap( DATA4 S4PTR *, const long, const long ) ;
       PUBLIC int S4FUNCTION d4unlock( DATA4 S4PTR * ) ;
    PUBLIC int S4FUNCTION d4unlockRecord( DATA4 *, long ) ;  /* exported for SQL */
 #endif
-#ifndef S4CB51
-   PUBLIC int S4FUNCTION d4seekNext( DATA4 S4PTR *, const char S4PTR * ) ;
+   PUBLIC int S4FUNCTION d4seekNext(       DATA4 S4PTR *, const char S4PTR * ) ;
    PUBLIC int S4FUNCTION d4seekNextDouble( DATA4 S4PTR *, const double ) ;
-   PUBLIC int S4FUNCTION d4seekNextN( DATA4 S4PTR *, const char S4PTR *, const short ) ;
-#endif  /* S4CB51 */
+   PUBLIC int S4FUNCTION d4seekNextN(      DATA4 S4PTR *, const char S4PTR *, const short ) ;
 #ifndef S4COMP_OFF_MULTI
    PUBLIC int S4FUNCTION dfile4lockTestFile( DATA4FILE S4PTR *, const long, const long ) ;
 #endif
@@ -222,9 +217,6 @@ PUBLIC int S4FUNCTION d4remove( DATA4 S4PTR * ) ;
    PUBLIC int S4FUNCTION d4positionSet( DATA4 S4PTR *, const double ) ;
    PUBLIC void S4FUNCTION d4recall( DATA4 S4PTR * ) ;
    PUBLIC int S4FUNCTION d4refreshRecord( DATA4 S4PTR * ) ;
-   #ifdef S4CB51
-      PUBLIC int S4FUNCTION d4lock_group( DATA4 S4PTR *, const long S4PTR *, const int ) ;
-   #endif
 #ifndef S4OFF_MULTI
    PUBLIC int S4FUNCTION dfile4lockTestAppend( DATA4FILE S4PTR *, const long, const long ) ;
    PUBLIC int S4FUNCTION dfile4unlockRecord( DATA4FILE *, const long, const long, const long ) ;
@@ -261,18 +253,6 @@ PUBLIC void S4FUNCTION error4hook( CODE4 S4PTR *, int, long, const char S4PTR *,
 PUBLIC int S4FUNCTION error4set( CODE4 S4PTR *, const int ) ;
 PUBLIC int S4FUNCTION error4set2( CODE4 S4PTR *, const long ) ;
 PUBLIC const char S4PTR * S4FUNCTION error4text( CODE4 S4PTR *, const long ) ;
-#ifdef S4CB51
-   PUBLIC S4CONST char S4PTR *S4FUNCTION e4text( const int ) ;
-   PUBLIC int S4FUNCTION e4describe( CODE4 S4PTR *, int, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
-   PUBLIC void S4FUNCTION e4hook( CODE4 S4PTR *, int, const char S4PTR *, const char S4PTR *, const char S4PTR * ) ;
-   PUBLIC int S4FUNCTION e4log( CODE4 S4PTR *, const char S4PTR * ) ;
-   #define e4exitTest( c4 ) ( error4exitTest( c4 ) )
-      PUBLIC void S4FUNCTION e4severe( const int, const char S4PTR * ) ;
-      PUBLIC void S4FUNCTION error4exitTest( CODE4 S4PTR * ) ;
-      #ifdef S4VBASIC
-         PUBLIC void S4FUNCTION e4severe_vbasic( int, const char S4PTR * ) ;
-      #endif
-#endif /* S4CB51 */
    PUBLIC void S4FUNCTION error4exitTest( CODE4 S4PTR * ) ;
 #ifdef E4STACK
    PUBLIC int S4FUNCTION error4stackDefault( CODE4 S4PTR *, const int, const long ) ;
@@ -367,14 +347,10 @@ int file4writeInternal( FILE4 *, FILE4LONG, const void *, unsigned ) ;
 #ifndef S4INTERNAL_COMPILE_CHECK
    PUBLIC int    S4FUNCTION file4write( FILE4 S4PTR *, const long, const void S4PTR *, const unsigned int ) ;
 #endif
-#ifdef S4CB51
-   int S4FUNCTION file4temp( FILE4 *file, CODE4 *c4, char *buf, const int auto_remove ) ;
-#else
    PUBLIC int    S4FUNCTION file4temp( FILE4 S4PTR *, CODE4 S4PTR *, char *, const int ) ;
    #ifdef E4LOCK_HOOK
       PUBLIC int S4FUNCTION file4lockHook( CODE4 S4PTR *, const char S4PTR *, long, long, int ) ;
    #endif
-#endif
 
 /* FILE4SEQ_READ */
 PUBLIC int S4FUNCTION file4seqReadInitDo( FILE4SEQ_READ *, FILE4 *, FILE4LONG, void *, const unsigned, const int ) ;
@@ -818,9 +794,7 @@ int d4verify( DATA4 *, const int ) ;
 long S4FUNCTION error4number2( const long ) ;
 void error4logAppend( CODE4 *c4, int, long, const char *, const char *, const char * ) ;
 void error4out( CODE4 *, int, long, const char *, const char *, const char * ) ;
-#ifndef S4CB51
    S4CONST char * e4text( const int ) ;
-#endif
 
 #ifdef E4FILE_LINE
    extern const char *s4fileName ;

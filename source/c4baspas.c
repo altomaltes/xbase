@@ -18,7 +18,7 @@
 
 #define r4check -5
 
-#if defined(S4DLL_BUILD) || defined(S4LINUX)
+#if defined(S4DLL_BUILD) || defined(__unix__)
    #include <math.h>
 
    #ifdef S4WINDOWS
@@ -70,7 +70,6 @@
       return c4setLog( &(cb->autoOpen), value ) ;
    }
 
-   #ifndef S4CB51
       short S4FUNCTION code4codePage( CODE4 *cb, short value )
       {
          short temp ;
@@ -129,7 +128,6 @@
 
          return temp ;
       }
-   #endif
 
    short S4FUNCTION code4compatibility( CODE4 *cb, short value )
    {
@@ -193,11 +191,7 @@
       return c4setLog( &(cb->errCreate), value ) ;
    }
 
-   #ifdef S4CB51
-   short S4FUNCTION code4defaultUniqueError( CODE4 *cb, short value )
-   #else
    short S4FUNCTION code4errDefaultUnique( CODE4 *cb, short value )
-   #endif
    {
       short temp ;
 
@@ -243,11 +237,7 @@
       return( temp ) ;
    }
 
-   #ifdef S4CB51
-   short S4FUNCTION code4exclusive( CODE4 *cb, short value )
-   #else
    short S4FUNCTION code4accessMode( CODE4 *cb, short value )
-   #endif
    {
       short temp ;
 
@@ -262,11 +252,7 @@
       return( temp ) ;
    }
 
-   #ifdef S4CB51
-   short S4FUNCTION code4exprError( CODE4 *cb, short value )
-   #else
    short S4FUNCTION code4errExpr( CODE4 *cb, short value )
-   #endif
    {
       #ifdef E4VBASIC
          if ( c4parm_check( cb, 1, E40107 ) ) return -1 ;
@@ -276,11 +262,7 @@
    }
 
 
-   #ifdef S4CB51
-   short S4FUNCTION code4fieldNameError( CODE4 *cb, short value )
-   #else
    short S4FUNCTION code4errFieldName( CODE4 *cb, short value )
-   #endif
    {
       #ifdef E4VBASIC
          if ( c4parm_check( cb, 1, E40108 ) ) return -1 ;
@@ -298,11 +280,7 @@
       return c4setLog( &(cb->fileFlush), value ) ;
    }
 
-   #ifdef S4CB51
-   short S4FUNCTION code4goError( CODE4 *cb, short value )
-   #else
    short S4FUNCTION code4errGo( CODE4 *cb, short value )
-   #endif
    {
       #ifdef E4VBASIC
          if ( c4parm_check( cb, 1, E40109 ) ) return -1 ;
@@ -419,7 +397,6 @@
       return c4setLog( &(cb->lockEnforce), value ) ;
    }
 
-   #ifndef S4CB51
    short S4FUNCTION code4log( CODE4 *cb, short value )
    {
       short temp ;
@@ -434,7 +411,6 @@
       cb->log = value ;
       return( temp ) ;
    }
-   #endif
 
    short S4FUNCTION code4memExpandBlock( CODE4 *cb, short value )
    {
@@ -678,11 +654,7 @@
       return( temp ) ;
    }
 
-   #ifdef S4CB51
-   short S4FUNCTION code4offError( CODE4 *cb, short value )
-   #else
    short S4FUNCTION code4errOff( CODE4 *cb, short value )
-   #endif
    {
       #ifdef E4VBASIC
          if ( c4parm_check( cb, 1, E40128 ) ) return -1 ;
@@ -691,11 +663,7 @@
       return c4setLog( &(cb->errOff), value ) ;
    }
 
-   #ifdef S4CB51
-   short S4FUNCTION code4openError( CODE4 *cb, short value )
-   #else
    short S4FUNCTION code4errOpen( CODE4 *cb, short value )
-   #endif
    {
       #ifdef E4VBASIC
          if ( c4parm_check( cb, 1, E40129 ) ) return -1 ;
@@ -760,11 +728,7 @@
       return c4setLog( &(cb->readOnly), value ) ;
    }
 
-   #ifdef S4CB51
-   short S4FUNCTION code4relateError( CODE4 *cb, short value )
-   #else
    short S4FUNCTION code4errRelate( CODE4 *cb, short value )
-   #endif
    {
       #ifdef E4VBASIC
          if ( c4parm_check( cb, 1, E40101 ) ) return -1 ;
@@ -795,11 +759,7 @@
       return c4setLog( &(cb->singleOpen), value ) ;
    }
 
-   #ifdef S4CB51
-   short S4FUNCTION code4skipError( CODE4 *cb, short value )
-   #else
    short S4FUNCTION code4errSkip( CODE4 *cb, short value )
-   #endif
    {
       #ifdef E4VBASIC
          if ( c4parm_check( cb, 1, E40136 ) ) return -1 ;
@@ -808,11 +768,7 @@
       return c4setLog( &(cb->errSkip), value ) ;
    }
 
-   #ifdef S4CB51
-   short S4FUNCTION code4tagNameError( CODE4 *cb, short value )
-   #else
    short S4FUNCTION code4errTagName( CODE4 *cb, short value )
-   #endif
    {
       #ifdef E4VBASIC
          if ( c4parm_check( cb, 1, E40137 ) ) return -1 ;
@@ -1256,40 +1212,24 @@
 
    DATA4 S4PTR* S4FUNCTION relate4dataCB( RELATE4 *r4 )
    {
-      #ifdef S4CB51
-         error4( r4->codeBase, e4notSupported, E40140 ) ;
-         return 0 ;
-      #else
          #ifdef E4VBASIC
             if ( c4parm_check( r4, 5, E40140 ) )
                return 0 ;
          #endif
 
          return relate4data( r4 ) ;
-      #endif
    }
 
    TAG4 S4PTR* S4FUNCTION relate4dataTagCB( RELATE4 *r4 )
    {
-      #ifdef S4CB51
-         error4( r4->codeBase, e4notSupported, E40141 ) ;
-         return 0 ;
-      #else
          #ifdef E4VBASIC
             if ( c4parm_check( r4, 5, E40141 ) )
                return 0 ;
          #endif
 
          return relate4dataTag( r4 ) ;
-      #endif
    }
 
-   #ifdef S4CB51
-      short S4FUNCTION relate4do_v( RELATE4 *r4 )
-      {
-         return relate4do( r4 ) ;
-      }
-   #endif
 
    short S4FUNCTION relate4errorActionVB( RELATE4* r4, short action )
    {
@@ -1303,30 +1243,20 @@
 
    RELATE4 S4PTR* S4FUNCTION relate4masterCB( RELATE4 *r4 )
    {
-      #ifdef S4CB51
-         error4( r4->codeBase, e4notSupported, E40142 ) ;
-         return 0 ;
-      #else
          #ifdef E4VBASIC
             if ( c4parm_check( r4, 5, E40142 ) ) return 0 ;
          #endif
 
          return relate4master( r4 ) ;
-      #endif
    }
 
    const char S4PTR* S4FUNCTION relate4masterExprCB( RELATE4 *r4 )
    {
-      #ifdef S4CB51
-         error4( r4->codeBase, e4notSupported, E40144 ) ;
-         return 0 ;
-      #else
          #ifdef E4VBASIC
             if ( c4parm_check( r4, 5, E40144 ) ) return 0 ;
          #endif
 
          return relate4masterExpr( r4 ) ;
-      #endif
    }
 
    short S4FUNCTION relate4matchLenVB( RELATE4* r4, short len )
@@ -1345,11 +1275,7 @@
          if ( c4parm_check( r4, 5, E40143 ) ) return 0 ;
       #endif
 
-      #ifdef S4CB51
-         return (RELATE4 *)r4->relation ;
-      #else
          return relate4master( r4 ) ;
-      #endif
    }
 
    short S4FUNCTION relate4typeVB( RELATE4* r4, short type )
@@ -1562,7 +1488,6 @@
       return (short)t4uniqueSet( t4, uniqueCode ) ;
    }
 
-   #ifdef S4CB51
       short S4FUNCTION tag4uniqueError( TAG4 *t4, short value )
       {
          short rc, temp ;
@@ -1582,7 +1507,6 @@
          return( temp ) ;
 
       }
-   #endif /* ifdef S4CB51 */
 
 
    #ifndef S4LUPACH  /* LY July 7/03 */

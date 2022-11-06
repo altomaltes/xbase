@@ -657,11 +657,7 @@ int S4FUNCTION error4set2( CODE4 *c4, const long newErrCode2 )
    return oldErrCode2 ;
 }
 
-#ifdef S4CB51
-S4CONST char *S4FUNCTION e4text( const int errCode )
-#else
 S4CONST char *e4text( const int errCode )
-#endif
 {
    #ifndef E4ERROR_OFF
       int i ;
@@ -1284,24 +1280,3 @@ void S4FUNCTION error4exitTest( CODE4 *c4 )
       code4exit( c4 ) ;
 }
 
-#ifdef S4CB51
-void S4FUNCTION e4severe( const int errCode, const char *desc )
-{
-   #ifdef E4HOOK
-      error4hook( 0, errCode, 0, desc, 0, 0 ) ;
-   #else
-      error4out( 0, errCode, 0, desc, 0, 0 ) ;
-      #ifdef S4CONSOLE
-      #ifdef E4PAUSE
-         error4pause() ;
-      #endif
-      #endif
-   #endif
-   code4exit( 0 ) ;
-}
-
-int S4FUNCTION e4describe( CODE4 *c4, int errCode, const char *s1, const char *s2, const char *s3 )
-{
-   return error4describe( c4, errCode, 0L, s1, s2, s3 ) ;
-}
-#endif

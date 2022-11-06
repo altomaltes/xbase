@@ -3,58 +3,6 @@
 #include "d4all.h"
 
 
-#ifdef S4CB51
-int S4FUNCTION d4lock_group( DATA4 *data, const long *recs, const int n_recs )
-{
-   CODE4 *c4 ;
-   #ifndef S4SINGLE
-      int i, rc ;
-   #endif
-
-   #ifdef E4PARM_LOW
-      if ( data == 0 || recs == 0 || n_recs < 0 )
-         return error4( 0, e4parm_null, E92724 ) ;
-   #endif
-
-   c4 = data->codeBase ;
-
-   #ifndef S4SINGLE
-      if ( error4code( c4 ) < 0 )
-         return e4codeBase ;
-
-      if( d4lockTestFile( data ) )
-         return 0 ;
-
-         switch( code4unlockAuto( c4 ) )
-         {
-            case LOCK4ALL :
-               code4lockClear( c4 ) ;
-               rc = error4code( c4 ) ;
-               break ;
-            case LOCK4DATA :
-               rc = d4unlockLow( data, data4clientId( data ), 0 ) ;
-               break ;
-         }
-         if( rc < 0 )
-            return error4stack( c4, rc, E92724 ) ;
-
-      for ( i = 0 ; i < n_recs ; i++ )
-      {
-         rc = d4lockAdd( data, recs[i] ) ;
-         if ( rc != 0 )
-         {
-            code4lockClear( c4 ) ;
-            return rc ;
-         }
-      }
-
-      return code4lock( c4 ) ;
-   #else
-      return 0 ;
-   #endif
-}
-#endif  /* S4CB51 */
-
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -421,13 +369,15 @@ int S4FUNCTION d4lockFile( DATA4 *data )
          {
             case LOCK4ALL :
                rc = code4unlockDo( tran4dataList( data->trans ) ) ;
-               break ;
+            break ;
+
             case LOCK4DATA :
                rc = d4unlockLow( data, data4clientId( data ), 0 ) ;
-               break ;
+            break ;
+
             default:
                rc = 0 ;
-               break ;
+            break ;
          }
          if( rc < 0 )
             return error4stack( c4, e4unlock, E92709 ) ;

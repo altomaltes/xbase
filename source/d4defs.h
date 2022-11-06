@@ -125,22 +125,6 @@
 /* catalog files not supported in version 6.0 */
 #define S4OFF_CATALOG
 
-#ifdef S4CB51
-   #ifndef S4API_51_ONLY
-      #ifndef S4OFF_TRAN
-         #define S4OFF_TRAN
-      #endif
-      #ifndef S4OFF_CATALOG
-         #define S4OFF_CATALOG
-      #endif
-      #ifndef S4OFF_SECURITY
-         #define S4OFF_SECURITY
-      #endif
-      #ifndef S4OFF_ENFORCE_LOCK
-         #define S4OFF_ENFORCE_LOCK
-      #endif
-   #endif
-#endif
 
 #ifdef S4UTILS
    #ifndef S4OFF_ENFORCE_LOCK
@@ -1621,13 +1605,7 @@
 #define S4MAX_SERVER_NAME_SIZE 80
 
 
-#ifndef S4CB51
    #define S4CONST const
-#else
-   #ifndef S4CONST
-      #define S4CONST
-   #endif
-#endif
 
 #define even4up( a ) ( (a) + ( ( (a) / 2 ) * 2 != (a) ) )
 #define q4oddUp( a ) ( (a) + 2 * ( (((a)/4)*4) == (a) ) )
@@ -1635,42 +1613,9 @@
 #define quad4oddUp(a)  q4oddUp(even4up(a)) /* returns 'a' so that 'a' mod 4 = 2 */
 #define quad4up(a) q4up(even4up(a) )  /* returns 'a' so that 'a' mod 4 = 0 */
 
-#ifndef S4CONV_REP  /* required for building crep2.exe */
-#ifdef S4CB51
-   #ifndef S4DLL_BUILD
-      #ifndef S4LIB_BUILD
-         #ifndef S4CBPP
-            #define S4CONV( a, b )  b    /* arguement 'b' is the old naming convention*/
-         #else
-            #define S4CONV( a, b )  union { a ; b ; }  /* creating union declaration*/
-         #endif
-      #endif
-   #endif
-#endif
-#endif
 
 #ifndef S4CONV
    #define S4CONV( a, b )  a
-#endif
-
-#ifdef S4CONV
-   #ifdef S4CB51
-      #ifndef S4CBPP
-         #define lastNode  last_node
-         #define errorCode error_code
-      #else
-         #define createError        create_error
-         #define defaultUniqueError default_unique_error
-         #define exprError          expr_error
-         #define fieldNameError     field_name_error
-         #define goError            go_error
-         #define offError           off_error
-         #define openError          open_error
-         #define relateError        relate_error
-         #define skipError          skip_error
-         #define tagNameError       tag_name_error
-      #endif
-   #endif
 #endif
 
 #ifdef S464BIT

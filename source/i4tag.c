@@ -27,11 +27,7 @@ int tfile4unique( TAG4FILE *tag, const short int errUnique )
 short int S4FUNCTION t4unique( const TAG4 *tag )
 {
    #ifdef S4VBASIC
-      #ifdef S4CB51
-         if ( c4parm_check ( tag, 4, E40150 ) ) return 0 ;
-      #else
          if ( c4parm_check ( tag, 4, E91639 ) ) return 0 ;
-      #endif
    #endif
 
    #ifdef E4PARM_HIGH

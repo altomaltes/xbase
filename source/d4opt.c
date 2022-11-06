@@ -46,11 +46,7 @@ void code4memStartMaxSet( CODE4 *c4, const int percent )
 }
 #endif
 
-#ifdef S4CB51
-int S4FUNCTION code4freeBlocks( CODE4 *c4 )
-#else
 static int code4freeBlocks( CODE4 *c4 )
-#endif
 {
       DATA4 *data ;
 

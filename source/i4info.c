@@ -6,11 +6,7 @@
 char *S4FUNCTION t4alias( TAG4 *t4 )
 {
    #ifdef S4VBASIC
-   #ifdef S4CB51
-      if ( c4parm_check( t4, 4, E40146 ) ) return 0 ;
-   #else
       if ( c4parm_check( t4, 4, E91640 ) ) return 0 ;
-   #endif
    #endif
 
    #ifdef E4PARM_HIGH

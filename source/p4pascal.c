@@ -152,7 +152,6 @@ int S4FUNCTION code4autoOpen( CODE4 *cb, int value )
 }
 
 /* New for CP6 */
-#ifndef S4CB51
 int S4FUNCTION code4codePage( CODE4 *cb, int value )
 {
    int temp ;
@@ -180,7 +179,6 @@ int S4FUNCTION code4collatingSequence( CODE4 *cb, int value )
 
    return( temp ) ;
 }
-#endif
 
 int S4FUNCTION code4createTemp( CODE4 *cb, int value )
 {

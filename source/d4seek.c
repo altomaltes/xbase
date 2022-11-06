@@ -180,7 +180,6 @@ int S4FUNCTION d4seek( DATA4 *data, const char *str )
       return d4seekN( data, str, (short)strlen( str ) ) ;
 }
 
-#ifndef S4CB51
 int S4FUNCTION d4seekNext( DATA4 *data, const char *str )
 {
    #ifdef E4PARM_HIGH
@@ -393,7 +392,6 @@ int S4FUNCTION d4seekNextN( DATA4 *data, const char *str, const short l )
          return r4entry ;
       return rc2 ;
 }
-#endif /* S4CB51 */
 
 int S4FUNCTION d4seekN( DATA4 *data, const char *str, const short l )
 {
@@ -658,7 +656,6 @@ int S4FUNCTION d4seekDouble( DATA4 *data, const double dkey )
       return d4seekCheck( data, tfile, rc, buf, tfile->header.keyLen ) ;  /* return a valid value */
 }
 
-#ifndef S4CB51
 int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
 {
    CODE4 *c4 ;
@@ -861,7 +858,6 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
          return r4entry ;
       return rc2 ;
 }
-#endif  /* S4CB51 */
 
 #endif  /* S4INDEX_OFF */
 

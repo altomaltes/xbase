@@ -93,9 +93,6 @@
    #ifndef S4OFF_N4OTHER_INDEX_WRITE
       #define S4OFF_N4OTHER_INDEX_WRITE
    #endif
-   #ifndef S4OFF_INDEX_ON_CB51
-      #define S4OFF_INDEX_ON_CB51
-   #endif
    #ifndef S4OFF_INDEX_WRITE_OR_CLIENT
       #define S4OFF_INDEX_WRITE_OR_CLIENT
    #endif
@@ -153,12 +150,6 @@
    #endif
 #endif
 
-
-#ifdef S4CB51
-   #ifndef S4OFF_INDEX_ON_CB51
-      #define S4OFF_INDEX_ON_CB51
-   #endif
-#endif
 
 
 #ifndef E4MISC
@@ -1492,7 +1483,6 @@ int S4FUNCTION t4close( TAG4 *t4 )
 }
 #endif
 
-#ifndef S4CB51
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -1524,7 +1514,6 @@ int S4FUNCTION relate4unlock( RELATE4 *relate )
 {
    return error4( 0, e4notSupported, E94424 ) ;
 }
-#endif /* S4CB51 */
 
 int S4FUNCTION code4serverRestart( CODE4 S4PTR *c4 )
 {
@@ -2154,11 +2143,7 @@ const char *S4FUNCTION i4fileName( INDEX4 *i4 )
 char *S4FUNCTION t4alias( TAG4 *t4 )
 {
    #ifdef S4VBASIC
-   #ifdef S4CB51
-      if ( c4parm_check( t4, 4, E40146 ) ) return 0 ;
-   #else
       if ( c4parm_check( t4, 4, E91640 ) ) return 0 ;
-   #endif
    #endif
 
    #ifdef E4PARM_HIGH
@@ -2176,11 +2161,7 @@ char *S4FUNCTION t4alias( TAG4 *t4 )
 short int S4FUNCTION t4unique( const TAG4 *tag )
 {
    #ifdef S4VBASIC
-      #ifdef S4CB51
-         if ( c4parm_check ( tag, 4, E40150 ) ) return 0 ;
-      #else
          if ( c4parm_check ( tag, 4, E91639 ) ) return 0 ;
-      #endif
    #endif
 
    #ifdef E4PARM_HIGH
@@ -2334,73 +2315,6 @@ TAG4INFO *S4FUNCTION i4tagInfo( INDEX4 *index )
 }
 #endif /* S4OFF_INDEX */
 
-#ifdef S4OFF_INDEX_ON_CB51
-#ifdef P4ARGS_USED
-   #pragma argsused
-#endif
-int S4FUNCTION d4seekNext( DATA4 *d4, const char *str )
-{
-   #ifdef S4VBASIC
-      if ( c4parm_check( d4, 2, E92908 ) )
-         return 0 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( d4 == 0 )
-         return error4( 0, e4parm_null, E92908 ) ;
-   #endif
-
-   #ifdef S4CB51
-      return error4( d4->codeBase, e4notSupported, E92908 ) ;
-   #else
-      return error4( d4->codeBase, e4notIndex, E92908 ) ;
-   #endif
-}
-
-#ifdef P4ARGS_USED
-   #pragma argsused
-#endif
-int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
-{
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E92909 ) )
-         return 0 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E92909 ) ;
-   #endif
-
-   #ifdef S4CB51
-      return error4( data->codeBase, e4notSupported, E92909 ) ;
-   #else
-      return error4( data->codeBase, e4notIndex, E92909 ) ;
-   #endif
-}
-
-#ifdef P4ARGS_USED
-   #pragma argsused
-#endif
-int S4FUNCTION d4seekNextN( DATA4 S4PTR *d4, const char *str, const short len )
-{
-   #ifdef S4VBASIC
-      if ( c4parm_check( d4, 2, E92905 ) )
-         return 0 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( d4 == 0 )
-         return error4( 0, e4parm_null, E92905 ) ;
-   #endif
-
-   #ifdef S4CB51
-      return error4( d4->codeBase, e4notSupported, E92905 ) ;
-   #else
-      return error4( d4->codeBase, e4notIndex, E92905 ) ;
-   #endif
-}
-#endif  /* S4OFF_INDEX_ON_CB51 */
 
 #ifndef S4TESTING
 #ifdef P4ARGS_USED
@@ -2548,10 +2462,6 @@ int S4FUNCTION file4seqWriteDelay( FILE4SEQ_WRITE *seqWrite )
 
 #ifdef S4OFF_N4OTHER_INDEX_WRITE
    #undef S4OFF_N4OTHER_INDEX_WRITE
-#endif
-
-#ifdef S4OFF_INDEX_ON_CB51
-   #undef S4OFF_INDEX_ON_CB51
 #endif
 
 #ifdef S4OFF_WRITE_REPORT

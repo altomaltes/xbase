@@ -45,14 +45,17 @@
 #define DEF4SERVER_ID "localhost"
 #define DEF4PROCESS_ID "23165"
 
-/* General Configuration Options */
-/* #define S4CB51         */
+/* General Configuration Options
+ */
+
 /* #define S4LOCK_HOOK    */
 /* #define S4MAX          */
 /* #define S4SAFE         */
 /* #define S4TIMEOUT_HOOK */
 
-/* Error Configuration Options */
+/* Error Configuration Options
+ */
+
 /* #define E4ANALYZE    */
 /* #define E4DEBUG      */
 /* #define E4HOOK       */
@@ -76,7 +79,8 @@
 /* #define S4OFF_TRAN     */
 /* #define S4OFF_WRITE    */
 
-/* Spoken Language Switches */
+/* Spoken Language Switches
+ */
 /* #define S4ANSI         */
 /* #define S4DICTIONARY   */
 /* #define S4FINNISH      */

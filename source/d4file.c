@@ -24,6 +24,7 @@ int dfile4read( DATA4FILE *data, long recNum, char *ptr, int fromDisk )
             if ( data->file.doBuffer )
                data->c4->opt.forceCurrent = 1 ;
       #endif
+
       len = file4readInternal( &data->file, dfile4recordPosition( data, recNum ), ptr, data->recWidth ) ;
       #ifndef S4OPTIMIZE_OFF
          if ( fromDisk )
@@ -65,9 +66,12 @@ long S4FUNCTION dfile4recCount( DATA4FILE *data, const long serverId )
       {
          #ifndef S4SINGLE
             if ( serverId == -2L )
-               return data->numRecs ;
+            {  return data->numRecs ;
+            }
+
             if ( dfile4lockTestAppend( data, 0L, serverId ) != 1 )
-               return data->minCount ;
+            {  return data->minCount ;
+            }
             else
          #endif
                return data->numRecs ;

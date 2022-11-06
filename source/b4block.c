@@ -194,10 +194,7 @@ int b4flush( B4BLOCK *b4 )
       short shortVal ;
    #endif  /* S4BYTE_SWAP */
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 );
 
    if ( b4->changed )
    {
@@ -270,8 +267,7 @@ int b4flush( B4BLOCK *b4 )
 #ifndef S4INLINE
 void b4goEof( B4BLOCK *b4 )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
+   E4PARMLOW( b4 == 0 )
       {
          error4( 0, e4parm_null, E90438 ) ;
          return ;
