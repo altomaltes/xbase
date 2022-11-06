@@ -8,38 +8,6 @@
    extern "C" {
 #endif
 
-#ifdef S4SERVER
-   #ifndef S4OFF_TRAN
-      #ifndef S4OFF_WRITE
-         #define S4TRAN_DEFINED
-         #ifdef S4INLINE
-            #define code4tranStart( c4 )        ( tran4lowStart( &((c4)->currentClient->trans), (c4)->currentClient->id, 0 ) )
-            #define code4tranStartSingle( c4 )  ( tran4lowStart( &((c4)->currentClient->trans), (c4)->currentClient->id, 0 ) )
-            #define code4tranCommitPhaseOne( c4 ) (tran4lowCommitPhaseOne( &(c4)->currentClient->trans, (c4)->currentClient->id ))
-            #define code4tranCommitPhaseTwo( c4, d ) (tran4lowCommitPhaseTwo( &(c4)->currentClient->trans, (c4)->currentClient->id, d ) )
-            #define code4tranRollback( c4 )     ( tran4lowRollback( &((c4)->currentClient->trans), (c4)->currentClient->id, 1 ) )
-            #define code4tranRollbackSingle( c4 )     ( tran4lowRollback( &((c4)->currentClient->trans), (c4)->currentClient->id, 0 ) )
-            #define code4tranStatus( c4 ) ( (c4)->currentClient->trans.currentTranStatus )
-            #define code4tranStatusSet( c4, val ) ( (c4)->currentClient->trans.currentTranStatus = (val) )
-         #else
-            PUBLIC int S4FUNCTION code4tranCommitPhaseOne( CODE4 S4PTR * ) ;
-            PUBLIC int S4FUNCTION code4tranCommitPhaseTwo( CODE4 S4PTR *, int ) ;
-            PUBLIC int S4FUNCTION code4tranStart( CODE4 S4PTR * ) ;
-            PUBLIC int S4FUNCTION code4tranStartSingle( CODE4 S4PTR * ) ;
-            PUBLIC int S4FUNCTION code4tranRollback( CODE4 S4PTR * ) ;
-            PUBLIC int S4FUNCTION code4tranStatus( CODE4 * ) ;
-            PUBLIC int S4FUNCTION code4tranStatusSet( CODE4 *, const int val ) ;
-         #endif
-      #endif
-   #endif
-   #ifdef S4TRAN_DEFINED
-      #undef S4TRAN_DEFINED
-   #else
-      #define code4tranStart( c4 ) ( 0 )
-      #define code4tranRollback( c4 ) ( 0 )
-      #define code4tranStatus( c4 ) ( r4inactive )
-   #endif
-#else
    #ifdef __cplusplus
       extern "C" {
    #endif
@@ -72,7 +40,6 @@
    #ifdef __cplusplus
       }
    #endif
-#endif  /* S4SERVER */
 
 PUBLIC int S4FUNCTION code4tranCommit( CODE4 S4PTR * ) ;
 PUBLIC int S4FUNCTION code4tranCommitSingle( CODE4 S4PTR * ) ;
@@ -167,9 +134,6 @@ PUBLIC int S4FUNCTION code4tranCommitSingle( CODE4 S4PTR * ) ;
 
    int tran4closeAll( struct TRAN4St * ) ;
    #ifndef S4SINGLE
-      #ifdef S4SERVER
-         int tran4lock( TRAN4 * ) ;
-      #endif
       PUBLIC int  S4FUNCTION code4tranLockTransactions( CODE4TRANS S4PTR *, long ) ;
       PUBLIC int  S4FUNCTION code4tranUnlockTransactions( CODE4TRANS S4PTR *, long ) ;
    #endif  /* S4SINGLE */

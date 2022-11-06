@@ -244,11 +244,7 @@ int t4check( TAG4 *t4 )
    }
 
    #ifndef S4OFF_MULTI
-      #ifdef S4SERVER
-         rc = dfile4lockFile( d4->dataFile, data4clientId( d4 ), data4serverId( d4 ) ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-      #else
          rc = d4lockFile( d4 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-      #endif
       if ( rc != 0 )
          return rc ;
       #ifdef S4CLIPPER
@@ -828,11 +824,7 @@ int S4FUNCTION d4check( DATA4 *d4 )
       #endif
 
       #ifndef S4OFF_MULTI
-         #ifdef S4SERVER
-            rc = dfile4lockFile( d4->dataFile, data4clientId( d4 ), data4serverId( d4 ) ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-         #else
             rc = d4lockFile( d4 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-         #endif
          if ( rc )
             return rc ;
       #endif

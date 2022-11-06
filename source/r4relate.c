@@ -26,11 +26,7 @@
    static int relate4prevRecordInScan( RELATE4 * ) ;
    static int relate4prevRelationList( RELATION4 *, int ) ;
 
-#ifdef S4SERVER
-static int relate4initRelate( RELATE4 *, RELATION4 *, DATA4 *, CODE4 *, int, char * ) ;
-#else
 static int relate4initRelate( RELATE4 *, RELATION4 *, DATA4 *, CODE4 *, int ) ;
-#endif
 static int relate4lookup( RELATE4 *, const char ) ;
 static int relate4readRest( RELATE4 *, char ) ;
 static void relate4setNotRead( RELATE4 * ) ;
@@ -626,9 +622,6 @@ RELATE4 *S4FUNCTION relate4createSlave( RELATE4 *master, DATA4 *slaveData, const
    RELATE4 *slave ;
    CODE4 *c4 ;
    int rc ;
-   #ifdef S4SERVER
-      LIST4 *oldList ;
-   #endif
 
    if ( master == 0 )
       return 0 ;
@@ -668,24 +661,13 @@ RELATE4 *S4FUNCTION relate4createSlave( RELATE4 *master, DATA4 *slaveData, const
    if ( slave == 0 )
       return 0 ;
 
-   #ifdef S4SERVER
-      rc = relate4initRelate( slave, relation, slaveData, c4, 0, 0 ) ;
-   #else
       rc = relate4initRelate( slave, relation, slaveData, c4, 1 ) ;
-   #endif
    if ( rc < 0 )
    {
       mem4free( c4->relateMemory, slave ) ;
       return 0 ;
    }
-   #ifdef S4SERVER
-      oldList = tran4dataList( code4trans( c4 ) ) ;
-      tran4dataListSet( code4trans( c4 ), &relation->localDataList ) ;
-   #endif
    slave->masterExpr = expr4parseLow( master->data, masterExpr, 0 ) ;
-   #ifdef S4SERVER
-      tran4dataListSet( code4trans( c4 ), oldList ) ;
-   #endif
    if ( slave->masterExpr == 0 )
    {
       mem4free( c4->relateMemory, slave ) ;
@@ -889,9 +871,6 @@ int S4FUNCTION relate4freeRelate( RELATE4 *relate, const int closeFiles )
    int rc ;
    RELATE4 *relateOn ;
    CODE4 *c4 ;
-   #ifdef S4SERVER
-      LIST4 *oldList ;
-   #endif
 
    rc = 0 ;
    if ( relate->master == 0 )
@@ -903,15 +882,8 @@ int S4FUNCTION relate4freeRelate( RELATE4 *relate, const int closeFiles )
 
    if( closeFiles )
    {
-      #ifdef S4SERVER
-         oldList = tran4dataList( code4trans( c4 ) ) ;
-         tran4dataListSet( code4trans( c4 ), &relate->relation->localDataList ) ;
-      #endif
       if( d4close( relate->data ) < 0 )
          rc = -1 ;
-      #ifdef S4SERVER
-         tran4dataListSet( code4trans( c4 ), oldList ) ;
-      #endif
       relate->data = 0 ;
    }
 
@@ -943,9 +915,6 @@ int S4FUNCTION relate4free( RELATE4 *relate, const int closeFiles )
    RELATION4 *relation ;
    RELATE4 *relateOn ;
    CODE4 *c4 ;
-   #ifdef S4SERVER
-      LIST4 *oldList ;
-   #endif
    int oldErrorCode ;
 
    if ( relate == 0 )
@@ -971,21 +940,10 @@ int S4FUNCTION relate4free( RELATE4 *relate, const int closeFiles )
    relation = relate->relation ;
    relate = &relation->relate ;
 
-   #ifdef S4SERVER
-      if( closeFiles || relate->freeData == 1 )
-   #else
       if( closeFiles )
-   #endif
    {
-      #ifdef S4SERVER
-         oldList = tran4dataList( code4trans( c4 ) ) ;
-         tran4dataListSet( code4trans( c4 ), &relation->localDataList ) ;
-      #endif
       if( d4close( relate->data ) < 0 )
          rc = -1 ;
-      #ifdef S4SERVER
-         tran4dataListSet( code4trans( c4 ), oldList ) ;
-      #endif
       relate->data = 0 ;
    }
 
@@ -1007,50 +965,8 @@ int S4FUNCTION relate4free( RELATE4 *relate, const int closeFiles )
    return rc ;
 }
 
-#ifdef S4SERVER
-static DATA4 *relate4dataOpen( RELATE4 *relate, DATA4 *oldData )
-{
-   DATA4 *d4 ;
-   int oldAccessMode, oldReadOnly ;
-   CODE4 *c4 ;
 
-   #ifdef E4PARM_LOW
-      if ( relate == 0 || oldData == 0 )
-      {
-         error4( 0, e4parm_null, E94427 ) ;
-         return 0 ;
-      }
-   #endif
-
-   c4 = relate->codeBase ;
-
-   relate->dataOld = oldData ;
-
-   oldAccessMode = c4->accessMode ;
-   c4->accessMode = OPEN4DENY_NONE ;
-   oldReadOnly = c4getReadOnly( c4 ) ;
-   c4setReadOnly( c4, 1 ) ;
-   d4 = d4openClone( oldData ) ;
-   if ( d4 == 0 )
-   {
-      error4( c4, e4info, E94409 ) ;
-      return 0 ;
-   }
-   #ifdef S4SERVER
-      d4->trans = &c4->currentClient->trans ;
-   #endif
-   c4->accessMode = oldAccessMode ;
-   c4setReadOnly( c4, oldReadOnly ) ;
-
-   return d4 ;
-}
-#endif /* S4SERVER */
-
-#ifdef S4SERVER
-RELATE4 *S4FUNCTION relate4init( DATA4 *master, char *masterAliasName )
-#else
 RELATE4 *S4FUNCTION relate4init( DATA4 *master )
-#endif
 {
    RELATION4 *relation ;
    CODE4 *c4 ;
@@ -1088,20 +1004,13 @@ RELATE4 *S4FUNCTION relate4init( DATA4 *master )
       relation->sort.file.hand = INVALID4HANDLE ;
       relation->sortedFile.hand = INVALID4HANDLE ;
 
-   #ifdef S4SERVER
-      rc = relate4initRelate( &relation->relate, relation, master, c4, 1, masterAliasName ) ;
-   #else
       rc = relate4initRelate( &relation->relate, relation, master, c4, 1 ) ;
-   #endif
    if ( rc < 0 )
    {
       mem4free( c4->relationMemory, relation ) ;
       return 0 ;
    }
 
-   #ifdef S4SERVER
-      relation->relate.freeData = 1 ;
-   #endif
 
    return &relation->relate ;
 }
@@ -1109,15 +1018,8 @@ RELATE4 *S4FUNCTION relate4init( DATA4 *master )
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
-#ifdef S4SERVER
-static int relate4initRelate( RELATE4 *relate, RELATION4 *relation, DATA4 *data, CODE4 *c4, int doOpen, char *dataAliasName )
-#else
 static int relate4initRelate( RELATE4 *relate, RELATION4 *relation, DATA4 *data, CODE4 *c4, int doOpen )
-#endif
 {
-   #ifdef S4SERVER
-      LIST4 *oldList ;
-   #endif
 
    relate->codeBase = c4 ;
    relate->relationType = relate4exact ;
@@ -1126,21 +1028,7 @@ static int relate4initRelate( RELATE4 *relate, RELATION4 *relation, DATA4 *data,
          error4( relate->codeBase, e4info, E84406 ) ;
    #endif
 
-   #ifdef S4SERVER
-      if ( doOpen == 0 )
-         relate->data = data ;
-      else
-      {
-         oldList = tran4dataList( code4trans( c4 ) ) ;
-         tran4dataListSet( code4trans( c4 ), &relation->localDataList ) ;
-         relate->data = relate4dataOpen( relate, data ) ;
-         if ( dataAliasName != NULL )
-            d4aliasSet( relate->data, dataAliasName ) ;
-         tran4dataListSet( code4trans( c4 ), oldList ) ;
-      }
-   #else
       relate->data = data ;
-   #endif
    relate->errorAction = relate4blank ;
    relate->relation = relation ;
    if ( relate->data == 0 )
@@ -1218,10 +1106,6 @@ int S4FUNCTION relate4lock( RELATE4 *relate )
       CODE4 *c4 ;
       int rc, oldAttempts, count ;
       RELATE4 *relateOn ;
-      #ifdef S4SERVER
-         RELATE4 *relateSkip ;
-         DATA4 *dataTemp ;
-      #endif
 
       #ifdef E4PARM_HIGH
          if ( relate == 0 )
@@ -1249,34 +1133,7 @@ int S4FUNCTION relate4lock( RELATE4 *relate )
          {
             if ( relateOn == 0 )
                break ;
-            #ifdef S4SERVER
-               if ( relateOn->dataOld->dataFile->fileServerLock == data4serverId( relateOn->dataOld ) )  /* check for duplicate lock */
-               {
-                  dataTemp = tran4data( code4trans( c4 ), relateOn->dataOld->dataFile->fileServerLock, relateOn->dataOld->dataFile->fileClientLock ) ;
-                  if ( dataTemp == 0 )
-                     rc = r4locked ;
-                  else
-                  {
-                     /* check for data in relation via relate search */
-                     for ( relateSkip = &relate->relation->relate ;; )
-                     {
-                        if ( relateSkip == 0 )
-                        {
-                           rc = r4locked ;
-                           break ;
-                        }
-                        if ( relateSkip->dataOld == dataTemp )
-                           break ;
-                        if ( relate4next( &relateSkip ) == 2 )
-                           break ;
-                     }
-                  }
-               }
-               else
-                  rc = dfile4lockAll( relateOn->dataOld->dataFile, data4clientId( relateOn->dataOld ), data4serverId( relateOn->dataOld ), relateOn->dataOld ) ;
-            #else
                rc = d4lockAll( relateOn->data ) ;
-            #endif
             if ( rc != 0 )
                break ;
             if ( relate4next( &relateOn ) == 2 )
@@ -2674,9 +2531,6 @@ static int relate4sort( RELATE4 *relate )
    R4DATA_LIST *r4data ;
    RELATION4 *relation ;
    CODE4 *c4 ;
-   #ifdef S4SERVER
-      LIST4 *oldList ;
-   #endif
 
    zero = 0L ;
 
@@ -2695,14 +2549,7 @@ static int relate4sort( RELATE4 *relate )
    relation = relate->relation ;
    relate = &relation->relate ;
    rc = 0 ;
-   #ifdef S4SERVER
-      oldList = tran4dataList( code4trans( c4 ) ) ;
-      tran4dataListSet( code4trans( c4 ), &relation->localDataList ) ;
-   #endif
    sortExpr = expr4parseLow( relate->data, relation->sortSource, 0 ) ;
-   #ifdef S4SERVER
-      tran4dataListSet( code4trans( c4 ), oldList ) ;
-   #endif
 
    relation->inSort = relate4sortSkip ;
    relation->sortDoneFlag = 0 ;
@@ -2997,9 +2844,6 @@ static int relate4topInit( RELATE4 *relate )
    #ifndef S4OPTIMIZE_OFF
       int has_opt ;
    #endif
-   #ifdef S4SERVER
-      LIST4 *oldList ;
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( relate, 5, E94422 ) )
@@ -3035,14 +2879,7 @@ static int relate4topInit( RELATE4 *relate )
       relation->bitmapsFreed = 0 ;
       if ( relation->exprSource )
       {
-         #ifdef S4SERVER
-            oldList = tran4dataList( code4trans( c4 ) ) ;
-            tran4dataListSet( code4trans( c4 ), &relation->localDataList ) ;
-         #endif
          relation->log.expr = expr4parseLow( relate->data, relation->exprSource, 0 ) ;
-         #ifdef S4SERVER
-            tran4dataListSet( code4trans( c4 ), oldList ) ;
-         #endif
          if ( relation->log.expr == 0 )
             return error4( c4, e4relate, E83703 ) ;
          if ( expr4type( relation->log.expr ) != r4log )

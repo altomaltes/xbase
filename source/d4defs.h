@@ -7,12 +7,6 @@
    #define __WIN32
 #endif
 
-#ifdef S4SERVER
-   #ifndef OLEDB5BUILD
-      #define OLEDB5BUILD
-   #endif
-#endif
-
 #ifdef S4OFF_MULTI
    #ifdef OLEDB5BUILD
       /* ole-db requires multi-user */
@@ -34,15 +28,9 @@
       #define __WIN32
       #include <windows.h>
    #endif
-   #ifdef S4SERVER
-      #ifndef S4WINDOWS
-         #define S4WINDOWS
-      #endif
-   #else
       #ifndef S4CONSOLE
          #define S4CONSOLE
       #endif
-   #endif
    #ifndef S4DLL
       #define S4DLL
    #endif
@@ -134,15 +122,6 @@
    #endif
 #endif
 
-#ifdef S4SERVER
-   #ifdef S4CB51
-      #error - CodeBase Server cannot be built with S4CB51. Comment the S4CB51 switch.
-   #endif
-
-   /* for 5.1 version, ... */
-   #define S4OFF_REPORT
-#endif
-
 /* catalog files not supported in version 6.0 */
 #define S4OFF_CATALOG
 
@@ -225,18 +204,12 @@
    #define S4DISTRIBUTED
 #endif
 
-#ifdef S4SERVER
-   #ifdef S4OFF_SECURITY
-      #undef S4OFF_SECURITY
-   #endif
-#else
    #ifndef S4OFF_CATALOG
       #define S4OFF_CATALOG
    #endif
    #ifndef S4OFF_SECURITY
       #define S4OFF_SECURITY
    #endif
-#endif
 
 #ifdef S4OFF_WRITE
    #ifndef S4OFF_TRAN
@@ -362,15 +335,6 @@
    #endif
 #endif
 
-#ifndef S4PROFILE
-   #ifdef S4SERVER
-      #ifdef __WIN32
-         #ifndef S4COMTHREADS
-            #define S4COMTHREADS
-         #endif
-      #endif
-   #endif
-#endif
 
 #ifdef S4OS2
    #ifndef S4CONSOLE
@@ -455,12 +419,6 @@
 #endif
 
 
-
-#ifdef S4STAND_ALONE
-#ifdef S4SERVER
-   #error - Both S4SERVER and S4STAND_ALONE switches set - only one is allowed.
-#endif
-#endif
 
 #ifdef S4MDX
    #ifdef S4FOX
@@ -947,12 +905,6 @@
    typedef  const void S4PTR *  S4CMP_PARM ;
 #endif
 
-#ifdef S4SERVER
-   #ifndef S4OFF_REPORT
-      #define S4OFF_REPORT
-   #endif
-#endif
-
 #ifdef S4DOS
    #ifndef S4LOW_MEMORY
       #define S4LOW_MEMORY
@@ -1060,18 +1012,6 @@
       #define ATS_FILENAME_REC "RECINFO.ATS"
       #define ATS_FILENAME_CS "CSINFO.ATS"
    #endif
-
-#ifdef S4SERVER
-   #define MEMORY4START_CONNECT_LOW 20
-   #define MEMORY4EXPAND_CONNECT_LOW 10
-   #define MEMORY4START_CONNECT 20
-   #define MEMORY4EXPAND_CONNECT 10
-   #define MEMORY4START_CONNECT_BUFFER 20
-   #define MEMORY4EXPAND_CONNECT_BUFFER 4
-   #ifdef S4DEAD_CHECK
-      #define DEAD4CHECK_SERVER_WAITTIME 4000
-   #endif
-#endif
 
 #define TYPE4TEMP 'T'
 #define TYPE4PERMANENT 'P'
@@ -1324,11 +1264,7 @@
 
 
    #ifdef S4SPX
-      #ifdef S4SERVER
-         #define DEF4PROTOCOL "S4SPX.DLL"
-      #else
          #define DEF4PROTOCOL "C4SPX.DLL"
-      #endif
    #endif
    #define CON4LOW_ACCEPT_TIME  15
    #define MEMORY4EXPAND_SIGNAL_ROUTINE 20
@@ -1344,10 +1280,6 @@
    #define CONNECT4NORMAL 3
    #define CONNECT4WORKING 4
    #define CONNECT4SHUTDOWN 5
-   #ifdef S4SERVER
-      #define MEMORY4START_EVENT 20
-      #define MEMORY4EXPAND_EVENT 40
-   #endif
    #define S4MAX_WRITES 2
 #endif
 
@@ -1768,75 +1700,6 @@
    #endif
 #endif
 
-#ifdef S4SERVER
-   #ifdef S4OFF_MEMO
-      #error - CodeBase Server incorrectly built with S4OFF_MEMO
-   #endif
-   #ifdef S4OFF_INDEX
-      #error - CodeBase Server incorrectly built with S4OFF_INDEX
-   #endif
-   #ifdef S4OFF_WRITE
-      #error - CodeBase Server incorrectly built with S4OFF_WRITE
-   #endif
-   #ifdef S4OFF_MULTI
-      #error - CodeBase Server incorrectly built with S4OFF_MULTI
-   #endif
-   #ifdef S4OFF_TRAN
-      #error - CodeBase Server incorrectly built with S4OFF_TRAN
-   #endif
-   #ifdef S4OS2
-      #error - CodeBase Server incorrectly built with S4OS2
-   #endif
-   #ifdef S4CONTROLS
-      #error - CodeBase Server incorrectly built with S4CONTROLS
-   #endif
-   #ifdef S4VB_DOS
-      #error - CodeBase Server incorrectly built with S4VB_DOS
-   #endif
-   #ifdef S4NETBIOS
-      #error - CodeBase Server incorrectly built with S4NETBIOS
-   #endif
-   #ifdef S4COMFILE
-      #error - CodeBase Server incorrectly built with S4COMFILE
-   #endif
-   #ifndef E4HOOK
-      #error - CodeBase Server incorrectly built without E4HOOK
-   #endif
-   #ifdef S4VBX
-      #error - CodeBase Server incorrectly built with S4VBX
-   #endif
-   #ifdef S4SQL
-      #error - CodeBase Server incorrectly built with S4SQL
-   #endif
-   #ifdef S4OS2DLL
-      #error - CodeBase Server incorrectly built with S4OS2DLL
-   #endif
-   #ifdef S4OS2PM
-      #error - CodeBase Server incorrectly built with S4OS2PM
-   #endif
-   #ifdef __unix__
-      #error - CodeBase Server incorrectly built with __unix__
-   #endif
-   #ifdef S4MACINTOSH
-      #error - CodeBase Server incorrectly built with S4MACINTOSH
-   #endif
-   #ifdef S4CODE_SCREENS
-      #error - CodeBase Server incorrectly built with S4CODE_SCREENS
-   #endif
-   #ifdef S4PASCAL_DOS
-      #error - CodeBase Server incorrectly built with S4PASCAL_DOS
-   #endif
-   #ifdef S4PASCAL_WIN
-      #error - CodeBase Server incorrectly built with S4PASCAL_WIN
-   #endif
-   #ifdef S4NT_DOS
-      #error - CodeBase Server incorrectly built with S4NT_DOS
-   #endif
-   #ifdef S4DEBUG_LOG
-      #error - CodeBase Server incorrectly built with S4DEBUG_LOG
-   #endif
-#endif
-
 #ifdef S4NWSDK
    #ifdef S4DOS
       #error S4NWSDK unsupported in DOS configuration
@@ -1899,13 +1762,6 @@
    #define AR4EMPTY  1
    #define AR4SET    2
    #define AR4FULL   3
-#endif
-
-#ifdef S4SERVER
-   #ifndef S4MAX_USERS
-      /* unlimited users */
-      #define S4MAX_USERS 0
-   #endif
 #endif
 
 #ifdef __WIN32
@@ -2010,10 +1866,6 @@
 
 #ifdef S4TRACK_FILES
    #define S4TRACK_FILES_OR_SERVER
-#else
-   #ifdef S4SERVER
-      #define S4TRACK_FILES_OR_SERVER
-   #endif
 #endif
 
 #ifndef OLEDB5BUILD

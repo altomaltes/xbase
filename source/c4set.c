@@ -120,11 +120,7 @@
          // CS 2007/01/30
          return e4notSupported;
       #else
-         #ifdef S4SERVER
-            return c4->currentClient->foxCreateIndexBlockSize ;
-         #else
             return c4->foxCreateIndexBlockSize ;
-         #endif
       #endif
    }
 #endif
@@ -137,20 +133,12 @@ short c4indexMultiplierGet( CODE4 *c4 )
       // CS 2007/01/30
       return e4notSupported;
    #else
-      #ifdef S4SERVER
-         #ifdef S4FOX
-            return c4->currentClient->foxCreateIndexMultiplier ;
-         #else
-            return error4( c4, e4notSupported, E96701 ) ;
-         #endif
-      #else
          #ifdef CLIENT_OR_FOX
             if ( code4indexFormat( c4 ) == r4cdx )
                return c4->foxCreateIndexMultiplier ;
             else
          #endif
             return error4( c4, e4notSupported, E96701 ) ;
-      #endif
    #endif
 }
 
@@ -873,12 +861,6 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
 
 
 
-#ifdef S4SERVER
-   void S4FUNCTION c4setRunAsService( CODE4 *c4, int val )
-   {
-      c4->runAsService = val ;
-   }
-#endif /* S4SERVER */
 
 
    // AS Feb 12/03 - Added new switch odbc for internal use.
@@ -909,11 +891,7 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
          }
       #endif
       // reset count to 0
-      #ifdef S4SERVER
-         c4->currentClient->testCount = 0 ;
-      #else
          c4->testCount = 0 ;
-      #endif
    }
 
 
@@ -928,11 +906,7 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
          }
       #endif
       // return current count
-      #ifdef S4SERVER
-         return c4->currentClient->testCount ;
-      #else
          return c4->testCount ;
-      #endif
    }
 #endif
 
@@ -991,16 +965,12 @@ Bool5 S4FUNCTION c4getFileAccessed( CODE4 *c4 )
       // AS Jul 16/03 - this was wrnong, just don't load
       if ( c4->encrypt == 0 )
       {
-         #ifdef S4SERVER
-            return e4notSupported ;
-         #else
             {
                // AS Apr 24/03 - if not initialized, attempt to do so
                int rc = code4encryptInit( c4, 0, -1 ) ;
                if ( rc != 0 )
                   return rc ;
             }
-         #endif
       }
       return c4->encrypt->setEncryptFile( c4, val ) ;
    }

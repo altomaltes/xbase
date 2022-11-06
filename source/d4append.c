@@ -54,11 +54,7 @@ int S4FUNCTION d4lockAppendRecord( DATA4 *data )
       oldUnlock = code4unlockAuto( data->codeBase ) ;
       if ( d4lockTestAppend( data ) == 0 )
       {
-         #ifdef S4SERVER
-            rc = dfile4lockAppend( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
-         #else
             rc = d4lockAppend( data ) ;
-         #endif
 
          if ( rc == 0 )
          {
@@ -67,11 +63,7 @@ int S4FUNCTION d4lockAppendRecord( DATA4 *data )
             #ifndef S4OPTIMIZE_OFF
                data->codeBase->opt.forceCurrent = 1 ;  /* force the recCount to be current */
             #endif
-            #ifdef S4SERVER
-               rc = dfile4lock( data->dataFile, data4clientId( data ), data4serverId( data ), d4recCount( data ) + 1 ) ;
-            #else
                rc = d4lock( data, d4recCount( data ) + 1 ) ;
-            #endif
 
             #ifndef S4OPTIMIZE_OFF
                data->codeBase->opt.forceCurrent = 0 ;
@@ -81,18 +73,10 @@ int S4FUNCTION d4lockAppendRecord( DATA4 *data )
       else
       {
          code4unlockAutoSet( data->codeBase, 0 ) ;
-         #ifdef S4SERVER
-            rc = dfile4lock( data->dataFile, data4clientId( data ), data4serverId( data ), d4recCount( data ) + 1 ) ;
-         #else
             rc = d4lock( data, d4recCount( data ) + 1 ) ;
-         #endif
       }
       if ( rc )
-         #ifdef S4SERVER
-            dfile4unlockData( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
-         #else
             d4unlockData( data ) ;
-         #endif
 
       code4unlockAutoSet( data->codeBase, oldUnlock ) ;
    }
@@ -100,53 +84,6 @@ int S4FUNCTION d4lockAppendRecord( DATA4 *data )
    return rc ;
 }
 
-#ifdef S4SERVER
-int dfile4lockAppendRecord( DATA4FILE *data, const long clientId, const long serverId )
-{
-   int rc, oldUnlock, wasLocked ;
-
-   #ifdef E4PARM_LOW
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
-   #endif
-
-   if ( dfile4lockTestFile( data, clientId, serverId ) == 1 )
-      return 0 ;
-
-   wasLocked = dfile4lockTestAppend( data, clientId, serverId ) ;
-   if ( wasLocked == 1 )
-      rc = 0 ;
-   else
-      rc = dfile4lockAppend( data, clientId, serverId ) ;
-
-   if ( rc == 0 )
-   {
-      oldUnlock = code4unlockAuto( data->c4 ) ;
-      code4unlockAutoSet( data->c4, 0 ) ;
-
-      if ( wasLocked == 0 )
-      {
-         data->numRecs = -1 ;
-         #ifndef S4OPTIMIZE_OFF
-            data->c4->opt.forceCurrent = 1 ;  /* force the recCount to be current */
-         #endif
-      }
-      rc = dfile4lock( data, clientId, serverId, dfile4recCount( data, serverId ) + 1 ) ;
-      if ( wasLocked == 0 )
-      {
-         #ifndef S4OPTIMIZE_OFF
-            data->c4->opt.forceCurrent = 0 ;
-         #endif
-      }
-
-      if ( rc )
-         dfile4unlockData( data, clientId, serverId ) ;
-      code4unlockAutoSet( data->c4, oldUnlock ) ;
-   }
-
-   return rc ;
-}
-#endif
 #endif  /* S4OFF_MULTI */
 
 static int dfile4appendData( DATA4FILE *data, const void *record, S4LONG *recNum )
@@ -277,25 +214,13 @@ static int d4doAppend( DATA4 *data )
          #endif
          {
             #ifndef S4OFF_MULTI
-               #ifdef S4SERVER
-                  indexLocked = dfile4lockTestIndex( d4file, serverId ) ;
-               #else
                   indexLocked = d4lockTestIndex( data ) ;
-               #endif
                if ( !indexLocked )
                {
-                  #ifdef S4SERVER
-                     rc = dfile4lockIndex( d4file, serverId ) ;
-                  #else
                      rc = d4lockIndex( data ) ;
-                  #endif
                   if ( rc )
                   {
-                     #ifdef S4SERVER
-                        dfile4unlockAppend( d4file, clientId, serverId ) ;
-                     #else
                         d4unlockAppend( data ) ;
-                     #endif
                      return rc ;
                   }
                }
@@ -331,11 +256,7 @@ static int d4doAppend( DATA4 *data )
                   error4set( c4, (short)saveError ) ;
                   data->recNum = 0 ;
                   #ifndef S4OFF_MULTI
-                     #ifdef S4SERVER
-                        dfile4unlockAppend( d4file, clientId, serverId ) ;
-                     #else
                         d4unlockAppend( data ) ;
-                     #endif
                      if ( !indexLocked )
                         dfile4unlockIndex( d4file, serverId ) ;
                   #endif
@@ -407,11 +328,7 @@ static int d4doAppend( DATA4 *data )
             if ( d4file->file.lowAccessMode != OPEN4DENY_RW )
                rc = dfile4updateHeader( d4file, 1, 1 ) ;
 
-         #ifdef S4SERVER
-            dfile4unlockAppend( d4file, clientId, serverId ) ;
-         #else
             d4unlockAppend( data ) ;
-         #endif
       #endif  /* S4OFF_MULTI */
 
       return rc ;
@@ -596,11 +513,7 @@ int S4FUNCTION d4append( DATA4 *data )
          #ifndef S4OFF_MULTI
             if ( code4unlockAuto( c4 ) != LOCK4OFF )
             {
-               #ifdef S4SERVER
-                  saveRc = dfile4unlockAppend( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
-               #else
                   saveRc = d4unlockAppend( data ) ;
-               #endif
                #ifndef S4OFF_INDEX
                   if ( saveRc == 0 )
                      saveRc = dfile4unlockIndex( data->dataFile, data4serverId( data ) ) ;
@@ -687,20 +600,6 @@ int S4FUNCTION d4appendStart( DATA4 *data, int useMemoEntries )
       }
    #endif
 
-   #ifdef S4SERVER
-      /* the client performs these operations seperately through d4appendStart
-         so the record should never be marked as changed at this point
-         - no longer true for java */
-      #ifdef E4ANALYZE
-         if ( useMemoEntries != 0 )
-            return error4( c4, e4info, E91107 ) ;
-      #endif
-      data->recNum = 0 ;
-      #ifndef S4OFF_MEMO
-         for ( i = 0 ; i < data->dataFile->nFieldsMemo ; i++ )
-            f4memoReset( data->fieldsMemo[i].field ) ;
-      #endif
-   #else
       rc = d4updateRecord( data, 1 ) ;   /* returns -1 if error4code( c4 ) < 0 */
       if ( rc )
          return rc ;
@@ -757,16 +656,11 @@ int S4FUNCTION d4appendStart( DATA4 *data, int useMemoEntries )
       data->recNum = 0 ;
 
       #ifndef S4OFF_MULTI
-            #ifdef S4SERVER
-               rc = dfile4unlockData( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
-            #else
                if ( d4lockTestFile( data ) != 1 )
                   rc = d4unlockData( data ) ;
-            #endif
             if ( rc )
                return rc ;
          #endif
-   #endif  /* S4SERVER */
 
    return 0 ;
 }
@@ -807,19 +701,8 @@ int S4FUNCTION d4unappend( DATA4 *data )
       3. Update data file */
 
    #ifndef S4OFF_MULTI
-      #ifdef S4SERVER
-         #ifdef E4MISC
-            if ( dfile4lockTestAppend( data->dataFile, tran4clientDataId( data->trans ), tran4serverDataId( data->trans ) ) != 1 )
-               return error4( c4, e4struct, E91108 ) ;
-            if ( dfile4lockTest( data->dataFile, tran4clientDataId( data->trans ), tran4serverDataId( data->trans ), (unsigned long)data->dataFile->numRecs ) != 1 )
-               return error4( c4, e4struct, E91108 ) ;
-         #endif
-/*         dfile4lockAppend( data->dataFile, tran4clientDataId( data->trans ), tran4serverDataId( data->trans ), data ) ;*/
-/*         dfile4lock( data->dataFile, tran4clientDataId( data->trans ), tran4serverDataId( data->trans ), (unsigned long)data->dataFile->numRecs, data ) ;*/
-      #else
          d4lockAppend( data ) ;
          d4lock( data, data->dataFile->numRecs ) ;
-      #endif
    #endif  /* S4OFF_MULTI */
 
    data->bofFlag = data->eofFlag = 0 ;
@@ -834,18 +717,6 @@ int S4FUNCTION d4unappend( DATA4 *data )
 
    #ifndef S4INDEX_OFF
       #ifndef S4OFF_MULTI
-         #ifdef S4SERVER
-            indexLocked = dfile4lockTestIndex( data->dataFile, tran4serverDataId( data->trans ) ) ;
-            if ( !indexLocked )
-            {
-               rc = dfile4lockIndex( data->dataFile, tran4serverDataId( data->trans ) ) ;
-               if ( rc )
-               {
-                  dfile4unlockAppend( data->dataFile, tran4clientDataId( data->trans ), tran4serverDataId( data->trans ) ) ;
-                  return rc ;
-               }
-            }
-         #else
             indexLocked = d4lockTestIndex( data ) ;
             if ( !indexLocked )
             {
@@ -856,7 +727,6 @@ int S4FUNCTION d4unappend( DATA4 *data )
                   return rc ;
                }
             }
-         #endif /* S4SERVER */
       #endif  /* not S4OFF_MULTI */
 
       for( tagOn = 0 ;; )
@@ -907,11 +777,7 @@ int S4FUNCTION d4unappend( DATA4 *data )
    data->record[dfile4recWidth( data->dataFile )] = 0x1A ;
 
    #ifndef S4OFF_MULTI
-      #ifdef S4SERVER
-         rc = dfile4unappendData( data->dataFile, tran4clientDataId( data->trans ), tran4serverDataId( data->trans ) ) ;
-      #else
          rc = dfile4unappendData( data->dataFile, data->dataFile->fileClientLock, data->dataFile->fileServerLock ) ;
-      #endif
    #endif
 
    #ifndef S4OFF_MULTI
@@ -921,11 +787,7 @@ int S4FUNCTION d4unappend( DATA4 *data )
    #endif
 
    #ifndef S4OFF_MULTI
-      #ifdef S4SERVER
-         dfile4unlockAppend( data->dataFile, tran4clientDataId( data->trans ), tran4serverDataId( data->trans ) ) ;
-      #else
          d4unlockAppend( data ) ;
-      #endif
    #endif  /* S4OFF_MULTI */
 
    error4set( c4, (short)saveError ) ;

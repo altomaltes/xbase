@@ -808,9 +808,6 @@ static int i4tagAssociate( INDEX4 *i4 )
    LIST4 *list ;
    CODE4 *c4 ;
    TAG4 *tagOn, *newTag, *oldTag ;
-   #ifdef S4SERVER
-      SERVER4CLIENT *client ;
-   #endif
 
    #ifdef E4PARM_LOW
       if ( i4 == 0 )
@@ -819,17 +816,7 @@ static int i4tagAssociate( INDEX4 *i4 )
 
    c4 = i4->codeBase ;
 
-   #ifdef S4SERVER
-       list4mutexWait(&c4->server->clients) ;
-       for( client = 0 ;; )
-       {
-          client = (SERVER4CLIENT *)l4next( &c4->server->clients.list, client ) ;
-          if ( client == 0 )
-             break ;
-          list = tran4dataList( &client->trans ) ;
-   #else
       list = tran4dataList( &c4->c4trans.trans ) ;
-   #endif
       for( dataOn = 0 ;; )
       {
          dataOn = (DATA4 *)l4next( list, dataOn ) ;
@@ -860,26 +847,16 @@ static int i4tagAssociate( INDEX4 *i4 )
                      newTag = (TAG4 *)mem4alloc( c4->tagMemory ) ;
                      if ( newTag == 0 )
                      {
-                     #ifdef S4SERVER
-                        list4mutexRelease(&c4->server->clients) ;
-                     #endif
                         return error4stack( c4, e4memory, E91718 ) ;
                      }
                      newTag->index = indexOn ;
                      newTag->tagFile = tagOn->tagFile ;
-                     #ifdef S4SERVER
-                        newTag->errUnique = t4unique( tagOn ) ;
-                     #endif
                      l4add( &indexOn->tags, newTag ) ;
                   }
                }
             }
          }
       }
-   #ifdef S4SERVER
-      }
-      list4mutexRelease(&c4->server->clients) ;
-   #endif
 
    return 0 ;
 }
@@ -1028,11 +1005,7 @@ int i4indexRemove( INDEX4 *index )
    if ( i4file != 0 )  /* means still around, force closure */
    {
       if ( index4isProduction( i4file ) )
-         #ifdef S4SERVER
-            index->data->dataFile->hasMdxMemo = 0 ;
-         #else
             index->data->dataFile->openMdx = 0 ;
-         #endif
       i4closeLow( index ) ;
    }
 
@@ -1121,14 +1094,7 @@ int S4FUNCTION i4tagRemove( TAG4 *tag )
          {
             if ( index4isProduction( i4file ) )
             {
-               #ifdef S4SERVER
-                  #ifdef S4MDX
-                     i4file->header.isProduction = 0 ;
-                  #endif
-                  data->hasMdxMemo = 0 ;
-               #else
                   data->openMdx = 0 ;
-               #endif
             }
             index4close( i4file ) ;
          }

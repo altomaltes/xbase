@@ -149,9 +149,6 @@
 #include "f4flag.h"
 #include "e4expr.h"
 #include "s4sort.h"
-#ifdef S4SERVER
-   #include "d4secure.h"
-#endif
 #include "e4string.h"
 #include "e4error.h"
 
@@ -166,9 +163,6 @@
 
 #ifdef OLEDB5BUILD
    #include "oledb5.hpp"
-#endif
-#ifdef S4SERVER
-   #include "d4server.h"
 #endif
 
 #include "r4relate.h"
