@@ -1177,7 +1177,7 @@
 
    PUBLIC unsigned S4FUNCTION file4compressCreateVB( FILE4 *originalFile, const char *name, short blockSize)
    {
-      #if defined( S4STAND_ALONE ) && defined( S4COMPRESS )
+      #if  defined( S4COMPRESS )
          FILE4 *newFile;
          int returnCode;
 
@@ -1198,7 +1198,7 @@
 
    PUBLIC unsigned S4FUNCTION file4compressOpenVB( CODE4 *code, const char *name)
    {
-      #if defined( S4STAND_ALONE ) && defined( S4COMPRESS )
+      #if  defined( S4COMPRESS )
          FILE4 *newFile;
          int returnCode;
 

@@ -1507,7 +1507,7 @@ const char *S4FUNCTION code4indexExtension( CODE4 *c4 )
    #define S4OPERATING 0x40
 #endif
 
-   #define S4STAND_ALONE_VAL 0x80
+//   #define S4STAND _ALONE _VAL 0x80
 
 #ifdef S4OS2
    #ifdef S4OPERATING
@@ -1691,11 +1691,11 @@ long S4FUNCTION u4switch()
           + E4DEBUG_VAL + E4HOOK_VAL + E4LINK_VAL + E4MISC_VAL + E4OFF_VAL
           + E4OFF_STRING_VAL + E4PARM_HIGH_VAL + E4PAUSE_VAL + E4STOP_VAL +
           E4STOP_CRITICAL_VAL + S4OFF_INDEX_VAL + S4OFF_MEMO_VAL +
-          S4OFF_MULTI_VAL + S4OFF_OPTIMIZE_VAL +
+          S4OFF_MULTI_VAL + S4OFF_OPTIMIZE_VAL
 /*          S4OFF_REPORT_VAL + S4OFF_TRAN_VAL + S4OFF_WRITE_VAL +  S4CLIEN T_VAL +  no room */
 
 
-           S4STAND_ALONE_VAL ) ;
+           ) ;
 }
 
 #ifdef S4VB_DOS

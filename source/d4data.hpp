@@ -130,7 +130,6 @@ public:
    void lockClear()           { code4lockClear( this ) ; }
    const char *lockFileName() {return code4lockFileName( this ); }
    long lockItem()            { return code4lockItem( this ) ; }
-   #ifdef S4STAND_ALONE
       #ifndef S4OFF_WRITE
          #ifndef S4OFF_TRAN
             int logCreate( const char *name,const char *userId ) { return code4logCreate( this, name,userId ) ; }
@@ -139,7 +138,6 @@ public:
             void logOpenOff() { code4logOpenOff( this ) ; }
          #endif
       #endif
-   #endif
    int optAll()               { return code4optAll( this ) ; }
    int optStart()             { return code4optStart( this ) ; }
    int optSuspend()           { return code4optSuspend( this ) ; }

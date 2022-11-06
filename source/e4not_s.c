@@ -1551,7 +1551,7 @@ TAG4 *S4FUNCTION t4openLow( DATA4 *d4, INDEX4 *i4ndx, const char *fileName, cons
 
    return 0 ;
 }
-#endif /* S4STAND_ALONE */
+#endif
 
 #ifdef S4OFF_STAND_WRITE_TRAN
 #ifdef P4ARGS_USED

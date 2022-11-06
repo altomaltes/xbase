@@ -513,7 +513,6 @@ INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
          #endif
          u4ncpy( i4->accessName, fileName, sizeof( i4->accessName ) - 1 ) ;
       }
-      #ifdef S4STAND_ALONE
          else
          {
             u4namePiece( i4->accessName, sizeof( i4->accessName ), d4->alias, 0, 0 ) ;
@@ -521,7 +520,6 @@ INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
          #ifndef S4CASE_SEN
             c4upper( i4->accessName ) ;
          #endif
-      #endif
 
       i4->indexFile = index4open( d4, fileName, i4 ) ;
       if ( i4->indexFile == 0 )

@@ -53,14 +53,14 @@
       #include <math.h>
 
       //CJ July 17/01-include some of the powerplant header files for Macintosh client software.
-      #if !defined(S4STAND_ALONE) && defined(S4MAC_TCP)
+      #if ! defined(S4MAC_TCP)
         #include <LInternetAddress.h>
         #include <UNetworkFactory.h>
         #include <LInternetMapper.h>
         #include <LTCPEndpoint.h>
         #include <LPeriodical.h>
       #endif
-      #if !defined(S4STAND_ALONE) && defined(S4MACOT_TCP)
+      #if ! defined(S4MACOT_TCP)
          #include <carbon.h>
          #include <Types.h>
       #endif

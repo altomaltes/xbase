@@ -351,7 +351,6 @@
    #endif
 #endif
 
-#ifdef S4STAND_ALONE
    #ifndef S4OFF_TRAN
       #define S4STAND_ALONE_TRANS
    #endif
@@ -366,7 +365,6 @@
          #define S4OFF_COMMUNICATIONS
       #endif
    /* #endif */
-#endif
 
 #ifndef S4MACINTOSH
    #ifndef S4WINDOWS

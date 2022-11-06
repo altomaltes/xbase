@@ -1523,7 +1523,7 @@ int S4FUNCTION code4tranCommitPhaseOne( CODE4 *c4 )
    return rc ;
 }
 
-/* S4STAND_ALONE */
+
 int S4FUNCTION code4tranCommitPhaseTwo( CODE4 *c4, int doUnlock )
 {
    int saveErr, rc ;
@@ -1550,7 +1550,7 @@ int S4FUNCTION code4tranCommitPhaseTwo( CODE4 *c4, int doUnlock )
    return rc ;
 }
 
-/* S4STAND_ALONE */
+
 int S4FUNCTION code4tranStart( CODE4 *c4 )
 {
    #ifdef E4PARM_HIGH
@@ -1561,7 +1561,7 @@ int S4FUNCTION code4tranStart( CODE4 *c4 )
    return tran4lowStart( &c4->c4trans.trans, 0, 0 ) ;
 }
 
-/* S4STAND_ALONE */
+
 int S4FUNCTION code4tranStartSingle( CODE4 *c4 )
 {
    #ifdef E4PARM_HIGH
@@ -1572,7 +1572,7 @@ int S4FUNCTION code4tranStartSingle( CODE4 *c4 )
    return tran4lowStart( &c4->c4trans.trans, 0, 0 ) ;
 }
 
-/* S4STAND_ALONE */
+
 int S4FUNCTION code4tranRollback( CODE4 *c4 )
 {
    int rc ;

@@ -19,7 +19,6 @@
 
 #include "d4all.h"
 
-#ifdef S4STAND_ALONE
 
 /* not supported for FoxPro FPT memo files or dBase III and Clipper memo files */
 #ifndef S4MFOX
@@ -97,4 +96,3 @@ int S4FUNCTION f4memoCheck( MEMO4FILE *f4memo, DATA4 *data )
 #endif  /*   ifndef S4MFOX   */
 #endif  /*   ifndef S4MNDX   */
 
-#endif /* S4STAND_ALONE */

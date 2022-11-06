@@ -632,9 +632,7 @@ typedef struct S4CLASS TRAN4St
       char      *space12 ;
    #endif
 
-   #ifdef S4STAND_ALONE
       int userIdNo ;    /* used to determine the id of user */
-   #endif
 
    LIST4 closedDataFiles ;  /* during a transaction */
 
@@ -960,7 +958,6 @@ typedef struct CODE4St
       struct FIELD4St *typeFld, *fileNameFld, *offsetFld, *lengthFld ;
    #endif
 
-   #ifdef S4STAND_ALONE
       #ifndef S4OFF_TRAN
          #ifndef S4OFF_WRITE
             TRAN4FILE transFile ;
@@ -973,33 +970,6 @@ typedef struct CODE4St
             i.e. for same program to have multiple transactions */
          int doTransLocking ;
       #endif
-   #else
-      MEM4 S4PTR *connectBufferMemory ;
-      MEM4 S4PTR *connectLowMemory ;
-      MEM4 S4PTR *writeMemory ; /*Memory for NET4MESSAGE for writes Memory */
-      #ifdef S4DISTRIBUTED
-         LIST4 servers ;       /* list of connected servers */
-      #endif
-
-      int ver4 ;
-
-      int readMessageBufferLen ;  /*Buffer size for communications reading */
-      int readMessageNumBuffers ; /*# of buffers per connection for reading*/
-      int writeMessageNumOutstanding ; /*# of outstanding writes per connection*/
-      int writeMessageBufferLen ; /*buffer size for communications writing */
-
-      #ifndef S4OFF_THREAD
-         LIST4 eventsAvail ;        /* List of available EVENT4 objects */
-         MEM4 S4PTR *eventMemory ;
-         LIST4MUTEX writeBuffersAvail ; /* list of unused NET4MESSAG for writes */
-         LIST4MUTEX connectBufferListMutex ;  /* list of CONNECT4BUFFERs */
-      #endif
-
-      #ifdef S4COMM_THREAD
-         INTER4 *inter ;
-         unsigned long interThreadHandle ;
-      #endif
-   #endif
 
    #ifdef S4WRITE_DELAY
       int delayWritesEnabled ;

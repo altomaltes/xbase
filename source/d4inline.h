@@ -40,10 +40,8 @@
 
 
 /* D4DATA.C */
-#ifdef S4STAND_ALONE
    #define data4serverId( d4 ) ( (d4)->clientId )
    #define data4clientId( d4 ) ( (d4)->clientId )
-#endif
 
    #ifndef S4SINGLE
    #endif
@@ -58,9 +56,7 @@
 
 
 /* C4TRANS.C */
-#ifdef S4STAND_ALONE /* temp patch */
    #define code4tranRollbackSingle( c4 )     ( tran4lowRollback( &((c4)->c4trans.trans), 0, 0 ) )
-#endif
 #ifndef S4OFF_TRAN
    #define tran4bottom( t4 )        ( tran4fileBottom( (t4)->c4trans->transFile, (t4) ) )
    #define tran4entryLen( t4 )      ( sizeof( LOG4HEADER ) + (t4)->dataLen + sizeof( TRAN4ENTRY_LEN ) )

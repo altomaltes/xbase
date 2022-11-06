@@ -363,12 +363,12 @@ short c4indexMultiplierGet( CODE4 *c4 )
    }
 
 
-   #if defined(S4STAND_ALONE) && !defined(S4OFF_TRAN) && !defined(S4OFF_WRITE)
+   #if  !defined(S4OFF_TRAN) && !defined(S4OFF_WRITE)
       int S4FUNCTION c4getLogOpen( const CODE4 *c4 )
       {
          return c4->logOpen ;
       }
-   #endif /* !S4OFF_WRITE && !S4OFF_TRAN && S4STAND_ALONE */
+   #endif /* !S4OFF_WRITE && !S4OFF_TRAN  */
 
 
 
@@ -453,7 +453,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
    // to allow multiple transactions at one time (we will then cycle through a list of log file names).
    void S4FUNCTION c4setLogAccessMode( CODE4 *c4, char val )
    {
-      #if defined( S4STAND_ALONE ) && !defined( S4OFF_TRAN )
+      #if  !defined( S4OFF_TRAN )
          c4->logAccessMode = val ;
       #endif
    }
@@ -630,12 +630,12 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
 
 
-   #if defined(S4STAND_ALONE) && !defined(S4OFF_TRAN) && !defined(S4OFF_WRITE)
+   #if  !defined(S4OFF_TRAN) && !defined(S4OFF_WRITE)
       void S4FUNCTION c4setLogOpen( CODE4 *c4, int val )
       {
          c4->logOpen = val ;
       }
-   #endif /* !S4OFF_WRITE && !S4OFF_TRAN && !S4STAND_ALONE */
+   #endif /* !S4OFF_WRITE && !S4OFF_TRAN  */
 
 
 
@@ -897,7 +897,7 @@ Bool5 S4FUNCTION c4getFileAccessed( CODE4 *c4 )
       }
    #endif
 
-   #if defined( S4PREPROCESS_FILE  ) && defined( S4STAND_ALONE )
+   #if defined( S4PREPROCESS_FILE  )
       return c4->fileAccessed ;
    #else
       return 0 ;

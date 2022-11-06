@@ -211,11 +211,7 @@ PUBLIC int S4FUNCTION d4zap( DATA4 S4PTR *, const long, const long ) ;
    #endif
    PUBLIC int S4FUNCTION dfile4remove( DATA4FILE S4PTR * ) ;
 #ifndef S4COMP_OFF_MULTI
-   #ifdef S4STAND_ALONE
       #define d4lockTestAppend( d4 ) ( dfile4lockTestAppend( (d4)->dataFile, data4clientId( d4 ), data4serverId( d4 ) ) )
-   #else
-      #define d4lockTestAppend( d4 ) ( d4lockTestAppendLow( d4 ) )
-   #endif
 #endif
 PUBLIC int S4FUNCTION d4deleted( DATA4 S4PTR * ) ;
 PUBLIC FIELD4INFO S4PTR * S4FUNCTION d4fieldInfo( DATA4 S4PTR * ) ;
@@ -708,11 +704,7 @@ PUBLIC int S4FUNCTION file4seqWriteDelay( FILE4SEQ_WRITE * ) ;
 PUBLIC int S4FUNCTION code4catalogSet( CODE4 S4PTR *, int, int ) ;
 PUBLIC int S4FUNCTION code4indexFormat( CODE4 * ) ;
 #ifndef S4OFF_TRAN
-   #ifdef S4STAND_ALONE
-      PUBLIC int S4FUNCTION code4transFileEnable( CODE4TRANS S4PTR *, const char S4PTR *logName, const int ) ;
-   #else
       int code4transFileEnable( CODE4TRANS *, const char * logName, const int ) ;
-   #endif
 #endif
 
 #define dfile4changed( a ) ( (a)->fileChanged = 1 )
@@ -817,9 +809,7 @@ int d4verify( DATA4 *, const int ) ;
       #endif
    #endif
 #ifndef S4OFF_MULTI
-   #ifdef S4STAND_ALONE
       #define d4lockTestIndex( d4 ) ( dfile4lockTestIndex( (d4)->dataFile, 1L ) )
-   #endif
 #endif
    #ifndef S4OFF_WRITE
       int d4flushData( DATA4 * ) ;
