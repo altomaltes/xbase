@@ -39,26 +39,6 @@ static int relate4sortGetRecord( RELATION4 *, const long ) ;
 static int relate4sortNextRecord( RELATION4 * ) ;
 static int relate4sortPrevRecord( RELATION4 * ) ;
 
-#ifdef S4CLIENT
-static int relate4flush( RELATE4 *root )
-{
-   RELATE4 *relateOn ;
-   int rc ;
-
-   for( relateOn = root ;; )
-   {
-      rc = d4updateRecord( relateOn->data, 0 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
-      if ( rc )
-         return rc ;
-
-      if ( relate4next( &relateOn ) == 2 )
-         break ;
-   }
-
-   return 0 ;
-}
-#endif
-
 static int relate4topInit( RELATE4 * ) ;
 
 static int f4flagIsSetFlip( F4FLAG *flagPtr, const unsigned long r )
@@ -382,80 +362,16 @@ static int relate4blankSet( RELATE4 *relate, const char direction )
    }
 }
 
-#ifdef S4CLIENT
-int relate4unpack( RELATION4 *relation, CONNECTION4 *connection )
-{
-   CONNECTION4RELATION_DATA_OUT *info ;
-   RELATE4 *relate ;
-   unsigned int pos ;
-   long recCount, len ;
-   const char *data ;
-   #ifndef S4MEMO_OFF
-      int i ;
-   #endif
-
-   len = connection4len( connection ) ;
-   data = connection4data( connection ) ;
-   if ( len < sizeof( CONNECTION4RELATION_DATA_OUT ) )
-      return error4( relation->relate.codeBase, e4packetLen, E94425 ) ;
-   info = (CONNECTION4RELATION_DATA_OUT *)data ;
-   if ( ntohl(info->relationId) != relation->relationId )
-      return error4( relation->relate.codeBase, e4connection, E84305 ) ;
-
-   pos = sizeof( CONNECTION4RELATION_DATA_OUT ) ;
-   for( relate = &relation->relate ;; )
-   {
-      #ifndef S4MEMO_OFF
-         if ( relate->data->dataFile->nFieldsMemo > 0 )
-         {
-            for ( i = 0; i < relate->data->dataFile->nFieldsMemo; i++ )
-               f4memoReset( relate->data->fieldsMemo[i].field ) ;
-         }
-      #endif
-      if ( len < (long)pos + (long)dfile4recWidth( relate->data->dataFile ) + (long)sizeof( relate->data->recNum ) + (long)sizeof(S4LONG) )
-         return error4( relation->relate.codeBase, e4packetLen, E94425 ) ;
-      memcpy( &relate->data->recNum, data + pos, sizeof( relate->data->recNum ) ) ;
-      relate->data->recNum = ntohl(relate->data->recNum) ;
-      pos += sizeof( relate->data->recNum ) ;
-      recCount = ntohl(*((long *)( data + pos ))) ;
-      pos += sizeof(S4LONG ) ;
-      if ( recCount < 0 )
-         return error4( relation->relate.codeBase, e4result, E84305 ) ;
-      if ( relate->data->recNum > recCount )
-         relate->data->eofFlag = 1 ;
-      else
-         relate->data->eofFlag = 0 ;
-      if ( recCount == 0 || relate->data->recNum == 0 )
-         relate->data->bofFlag = 1 ;
-      else
-         relate->data->bofFlag = 0 ;
-      memcpy( relate->data->record, data + pos, dfile4recWidth( relate->data->dataFile ) ) ;
-      pos += dfile4recWidth( relate->data->dataFile ) ;
-      if ( relate4next( &relate ) == 2 )
-         break ;
-   }
-
-   if ( len != (long)pos )
-      return error4( relation->relate.codeBase, e4packetLen, E94425 ) ;
-
-   return 0 ;
-}
-#endif
 
 int S4FUNCTION relate4bottom( RELATE4 *relate )
 {
    RELATION4 *relation ;
    int rc, rc2 ;
    CODE4 *c4 ;
-   #ifdef S4CLIENT
-      CONNECTION4 *connection ;
-      CONNECTION4RELATE_BOTTOM_INFO_IN *info ;
-   #else
       #ifndef S4OFF_MULTI
          char oldReadLock ;
       #endif
       long rec ;
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( relate, 5, E94401 ) )
@@ -474,58 +390,6 @@ int S4FUNCTION relate4bottom( RELATE4 *relate )
    relation = relate->relation ;
    relate = &relation->relate ;
 
-   #ifdef S4CLIENT
-      if ( relation->isInitialized == 0 )
-      {
-         rc = relate4clientInit( relate ) ;
-         if ( rc != 0 )
-            return rc ;
-      }
-      #ifdef S4CB51
-         #ifndef S4OFF_MULTI
-            if ( c4getReadLock( c4 ) )
-            {
-               rc = relate4lock( relate ) ;
-               if ( rc != 0 )
-                  return rc ;
-            }
-         #endif
-      #endif
-      #ifdef E4ANALYZE
-         if ( relate->data == 0 )
-            return error4( c4, e4parm, E94401 ) ;
-         if ( relate->data->dataFile == 0 )
-            return error4( c4, e4parm, E94401 ) ;
-      #endif
-      connection = relate->data->dataFile->connection ;
-      #ifdef E4ANALYZE
-         if ( connection == 0 )
-            return error4( c4, e4parm, E94401 ) ;
-      #endif
-
-      rc = relate4flush( relate ) ;
-      if ( rc )
-         return rc ;
-
-      connection4assign( connection, CON4RELATE_BOTTOM, 0, 0 ) ;
-      connection4addData( connection, NULL, sizeof( CONNECTION4RELATE_BOTTOM_INFO_IN ), (void **)&info ) ;
-      info->relationId = htonl(relation->relationId) ;
-      connection4sendMessage( connection ) ;
-      rc = connection4receiveMessage( connection ) ;
-      if ( rc < 0 )
-         return error4stack( c4, rc, E94401 ) ;
-      rc = connection4status( connection ) ;
-      if ( rc < 0 || rc == r4terminate )
-      {
-         relation->isInitialized = 0 ;
-         if ( rc < 0 )
-            return connection4error( connection, c4, rc, E94401 ) ;
-      }
-      rc2 = relate4unpack( relation, connection ) ;
-      if ( rc2 < 0 )
-         return error4stack( c4, rc, E94401 ) ;
-      return rc ;
-   #else
       #ifndef S4OFF_MULTI
          oldReadLock = c4getReadLock( c4 ) ;
          c4setReadLock( c4, 0 ) ;
@@ -646,7 +510,6 @@ int S4FUNCTION relate4bottom( RELATE4 *relate )
          c4setReadLock( c4, oldReadLock ) ;
       #endif
       return rc ;
-   #endif
 }
 
 static int relate4buildScanList( RELATE4 *master, RELATE4 *relate, RELATION4 *relation )
@@ -720,10 +583,6 @@ int S4FUNCTION relate4changed( RELATE4 *relate )
       relate->scanValue = 0 ;
    relation = relate->relation ;
 
-   #ifdef S4CLIENT
-      if ( relation->isInitialized != 0 )
-         relation->needsFreeing = 1 ;
-   #endif
 
    relation->isInitialized = 0 ;
    relate4sortFree( relation, 0 ) ;
@@ -863,157 +722,6 @@ RELATE4 *S4FUNCTION relate4createSlave( RELATE4 *master, DATA4 *slaveData, const
    return slave ;
 }
 
-#ifdef S4CLIENT
-int S4FUNCTION relate4doAll( RELATE4 *relate )
-{
-   CONNECTION4RELATE_DO_INFO_IN *info ;
-   CONNECTION4 *connection ;
-   int rc, rc2 ;
-   CODE4 *c4 ;
-   RELATION4 *relation ;
-
-   #ifdef E4PARM_HIGH
-      if ( relate == 0 )
-         return error4( 0, e4parm_null, E94404 ) ;
-   #endif
-
-   c4 = relate->codeBase ;
-   relation = relate->relation ;
-
-   #ifdef E4PARM_HIGH
-      if ( relate->master != 0 )
-         return error4( c4, e4parm, E84402 ) ;
-   #endif
-
-   if ( relation->isInitialized == 0 )  /* need to initialize on server first */
-   {
-      rc = relate4clientInit( relate ) ;
-      if ( rc != 0 )
-         return rc ;
-   }
-
-   connection = relate->data->dataFile->connection ;
-   #ifdef E4ANALYZE
-      if ( connection == 0 )
-         return error4( c4, e4struct, E94404 ) ;
-   #endif
-
-   rc = relate4flush( relate ) ;
-   if ( rc )
-      return rc ;
-
-   connection4assign( connection, CON4RELATE_DO, 0, 0 ) ;
-   connection4addData( connection, NULL, sizeof( CONNECTION4RELATE_DO_INFO_IN ), (void **)&info ) ;
-   info->relationId = htonl(relation->relationId) ;
-   info->relateId = htons(relate->id) ;
-   info->masterStartPos = htonl(d4recNo( relate->data )) ;
-   connection4sendMessage( connection ) ;
-   rc = connection4receiveMessage( connection ) ;
-   if ( rc < 0 )
-      return error4stack( c4, rc, E94404 ) ;
-   rc = connection4status( connection ) ;
-   if ( rc < 0 || rc == r4terminate )
-   {
-      relation->isInitialized = 0 ;
-      if ( rc < 0 )
-         return connection4error( connection, c4, rc, E94404 ) ;
-   }
-   rc2 = relate4unpack( relation, relate->data->dataFile->connection ) ;
-   if ( rc2 < 0 )
-      return error4stack( c4, rc, E94404 ) ;
-   return rc ;
-}
-
-int S4FUNCTION relate4doOne( RELATE4 *relate )
-{
-   CONNECTION4RELATE_DO_ONE_INFO_IN *info ;
-   CONNECTION4RELATE_DO_ONE_INFO_OUT *out ;
-   CONNECTION4 *connection ;
-   int rc, saveRc ;
-   CODE4 *c4 ;
-
-   #ifdef E4PARM_HIGH
-      if ( relate == 0 )
-         return error4( 0, e4parm_null, E94405 ) ;
-      if ( relate->master == 0 )
-         return error4( relate->codeBase, e4parm, E84405 ) ;
-   #endif
-
-   c4 = relate->codeBase ;
-
-   if ( relate->relation->isInitialized == 0 )  /* need to initialize on server first */
-   {
-      rc = relate4clientInit( &relate->relation->relate ) ;
-      if ( rc != 0 )
-         return rc ;
-   }
-
-   connection = relate->data->dataFile->connection ;
-   #ifdef E4ANALYZE
-      if ( connection == 0 )
-         return error4( 0, e4struct, E94405 ) ;
-   #endif
-
-   rc = relate4flush( relate ) ;
-   if ( rc )
-      return rc ;
-
-   connection4assign( connection, CON4RELATE_DO_ONE, 0, 0 ) ;
-   connection4addData( connection, NULL, sizeof( CONNECTION4RELATE_DO_ONE_INFO_IN ), (void **)&info ) ;
-   info->relationId = htonl(relate->relation->relationId) ;
-   info->relateId = htons(relate->id) ;
-   info->masterStartPos = htonl(d4recNo( relate->master->data )) ;
-   connection4sendMessage( connection ) ;
-   rc = connection4receiveMessage( connection ) ;
-   if ( rc < 0 )
-      return error4stack( c4, rc, E94405 ) ;
-   rc = connection4status( connection ) ;
-   if ( rc < 0 )
-      return connection4error( connection, c4, rc, E94405 ) ;
-
-   saveRc = rc ;
-   if ( saveRc != r4terminate )
-   {
-      if ( saveRc == r4eof )   /* end of file */
-      {
-         saveRc = 0 ;
-         rc = d4goEof( relate->data ) ;
-         if ( rc < 0 )
-            return error4stack( c4, rc, E94405 ) ;
-      }
-      else
-      {
-         if ( connection4len( connection ) != sizeof( CONNECTION4RELATE_DO_ONE_INFO_OUT ) )
-            return error4stack( c4, e4packetLen, E94405 ) ;
-
-         out = (CONNECTION4RELATE_DO_ONE_INFO_OUT *)connection4data( connection ) ;
-
-         rc = d4go( relate->data, ntohl(out->recNo) ) ;
-         if ( rc < 0 )
-            return error4stack( c4, rc, E94405 ) ;
-      }
-   }
-   return saveRc ;
-}
-#ifdef S4CB51
-static int relate4dbfInRelation( RELATE4 *relate, const DATA4 *dbf )
-{
-   RELATE4 *relateOn ;
-
-   relateOn = &relate->relation->relate ;
-   while( relateOn->master )
-      relateOn = relateOn->master ;
-
-   do
-   {
-      if ( relateOn->data == dbf )
-         return 1 ;
-   } while( relate4next( &relateOn ) != 2 ) ;
-
-   return 0 ;
-}
-#endif /* S4CB51 */
-#else
 /* checks if the given dbf belongs to one of the relations in relation */
 #ifdef S4CB51
 static int relate4dbfInRelation( RELATE4 *relate, const DATA4 *dbf )
@@ -1144,7 +852,6 @@ int S4FUNCTION relate4doOne( RELATE4 *relate )
    }
    return rc ;
 }
-#endif
 
 int S4FUNCTION relate4eof( RELATE4 *relate )
 {
@@ -1242,10 +949,6 @@ int S4FUNCTION relate4free( RELATE4 *relate, const int closeFiles )
    RELATION4 *relation ;
    RELATE4 *relateOn ;
    CODE4 *c4 ;
-   #ifdef S4CLIENT
-      CONNECTION4RELATE_FREE_INFO_IN *info ;
-      CONNECTION4 *connection ;
-   #endif
    #ifdef S4SERVER
       LIST4 *oldList ;
    #endif
@@ -1274,33 +977,6 @@ int S4FUNCTION relate4free( RELATE4 *relate, const int closeFiles )
    relation = relate->relation ;
    relate = &relation->relate ;
 
-   #ifdef S4CLIENT
-      #ifdef E4ANALYZE
-         if ( relate->data == 0 )
-            return error4( c4, e4struct, E94408 ) ;
-         if ( relate->data->dataFile == 0 )
-            return error4( c4, e4struct, E94408 ) ;
-      #endif
-
-      if ( relation->relationId != 0 )   /* if not freed on the server */
-      {
-         connection = relate->data->dataFile->connection ;
-         #ifdef E4ANALYZE
-            if ( connection == 0 )
-               return error4( c4, e4struct, E94408 ) ;
-         #endif
-         connection4assign( connection, CON4RELATE_FREE, 0, 0 ) ;
-         connection4addData( connection, NULL, sizeof( CONNECTION4RELATE_FREE_INFO_IN ), (void **)&info ) ;
-         info->relationId = htonl(relation->relationId) ;
-         connection4sendMessage( connection ) ;
-         rc = connection4receiveMessage( connection ) ;
-         if ( rc < 0 )
-            return error4stack( c4, rc, E94408 ) ;
-         rc = connection4status( connection ) ;
-         if ( rc != 0 )
-            return connection4error( connection, c4, rc, E94408 ) ;
-      }
-   #endif
    #ifdef S4SERVER
       if( closeFiles || relate->freeData == 1 )
    #else
@@ -2812,11 +2488,6 @@ int S4FUNCTION relate4skip( RELATE4 *relate, const long numSkip )
    long numskip ;
    RELATION4 *relation ;
    CODE4 *c4 ;
-   #ifdef S4CLIENT
-      CONNECTION4RELATE_SKIP_INFO_IN *info ;
-      CONNECTION4 *connection ;
-      int saveRc ;
-   #else
       int sortStatus, rc2 ;
       signed char sign ;
       #ifdef S4REPORT
@@ -2829,7 +2500,6 @@ int S4FUNCTION relate4skip( RELATE4 *relate, const long numSkip )
       #ifndef S4SINGLE
          char oldReadLock ;
       #endif
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( relate, 5, E94418 ) )
@@ -2854,44 +2524,6 @@ int S4FUNCTION relate4skip( RELATE4 *relate, const long numSkip )
 
    relate = &relation->relate ;
 
-   #ifdef S4CLIENT
-      #ifdef E4ANALYZE
-         if ( relate->data == 0 )
-            return error4( c4, e4struct, E94418 ) ;
-         if ( relate->data->dataFile == 0 )
-            return error4( c4, e4struct, E94418 ) ;
-      #endif
-      connection = relate->data->dataFile->connection ;
-      #ifdef E4ANALYZE
-         if ( connection == 0 )
-            return error4( c4, e4struct, E94418 ) ;
-      #endif
-
-      rc = relate4flush( relate ) ;
-      if ( rc )
-         return rc ;
-
-      connection4assign( connection, CON4RELATE_SKIP, 0, 0 ) ;
-      connection4addData( connection, NULL, sizeof( CONNECTION4RELATE_SKIP_INFO_IN ), (void **)&info ) ;
-      info->relationId = htonl(relation->relationId) ;
-      info->numSkips = htonl(numskip) ;
-      connection4sendMessage( connection ) ;
-      saveRc = connection4receiveMessage( connection ) ;
-      if ( saveRc < 0 )
-         return error4stack( c4, saveRc, E94418 ) ;
-      saveRc = connection4status( connection ) ;
-      if ( saveRc < 0 || saveRc == r4terminate )
-      {
-         relation->isInitialized = 0 ;
-         if ( saveRc < 0 )
-            return connection4error( connection, c4, saveRc, E94418 ) ;
-      }
-
-      rc = relate4unpack( relation, relate->data->dataFile->connection ) ;
-      if ( rc < 0 )
-         return error4stack( c4, rc, E94418 ) ;
-      return saveRc ;
-   #else
       if ( numskip < 0 )
       {
          if ( relation->skipBackwards == 0 )
@@ -3021,7 +2653,6 @@ int S4FUNCTION relate4skip( RELATE4 *relate, const long numSkip )
          relate->relation->sortEofFlag = r4eof ;
 
       return rc ;
-   #endif
 }
 
 int S4FUNCTION relate4skipEnable( RELATE4 *relate, const int doEnable )
@@ -3383,215 +3014,6 @@ int S4FUNCTION relate4sortSet( RELATE4 *relate, const char *expr )
    return 0 ;
 }
 
-#ifdef S4CLIENT
-static int relate4add( CONNECTION4 *connection, RELATE4 *relate, unsigned int *relatePos, unsigned short *flexPos, char *relateData )
-{
-   int len, savePos ;
-   RELATE4 *slaveOn ;
-   CONNECTION4RELATE *info ;
-   TAG4 *tag ;
-
-   /* add this relate's info */
-   savePos = *relatePos ;
-   info = (CONNECTION4RELATE *)( relateData + *relatePos ) ;
-   info->matchLen = htons(relate->matchLen) ;
-   info->relationType = htons(relate->relationType) ;
-   info->errorAction = htons(relate->errorAction) ;
-   info->numSlaves = htons(relate->slaves.nLink) ;
-   info->clientId = htonl(data4clientId( relate->data )) ;
-
-   tag = relate->dataTag ;
-   if ( tag == 0 )
-      info->dataTagName.offset = 0 ;
-   else
-   {
-      len = strlen( tag->tagFile->alias ) + 1 ;
-      info->dataTagName.offset = htons(*flexPos) ;
-      connection4addData( connection, tag->tagFile->alias, len, NULL ) ;
-      *flexPos += len ;
-   }
-
-   if ( relate->masterExpr == 0 )
-      info->masterExpr.offset = 0 ;
-   else
-   {
-      len = strlen( relate->masterExpr->source ) + 1 ;
-      info->masterExpr.offset = htons(*flexPos) ;
-      connection4addData( connection, relate->masterExpr->source, len, NULL ) ;
-      *flexPos += len ;
-   }
-
-   if ( relate->data == 0 )
-      info->dataAccessName.offset = 0 ;
-   else
-   {
-      len = strlen( dfile4name( relate->data->dataFile ) ) + 1 ;
-      info->dataAccessName.offset = htons(*flexPos) ;
-      connection4addData( connection, dfile4name( relate->data->dataFile ), len, NULL ) ;
-      *flexPos += len ;
-   }
-
-   if ( relate->data == 0 )
-      info->dataAliasName.offset = 0 ;
-   else
-   {
-      if ( relate->data->aliasSet == 0 )
-         info->dataAliasName.offset = 0 ;
-      else
-      {
-         len = strlen( d4alias( relate->data ) ) + 1 ;
-         info->dataAliasName.offset = htons(*flexPos) ;
-         connection4addData( connection, d4alias( relate->data ), len, NULL ) ;
-         *flexPos += len ;
-      }
-   }
-
-   *relatePos += sizeof( CONNECTION4RELATE ) ;
-
-   /* and do it's slaves:  */
-   for ( slaveOn = 0 ;; )
-   {
-      slaveOn = (RELATE4 *)l4next( &relate->slaves, slaveOn ) ;
-      if ( slaveOn == 0 )
-         break ;
-      relate4add( connection, slaveOn, relatePos, flexPos, relateData ) ;
-   }
-
-   return 0 ;
-}
-
-int relate4clientInit( RELATE4 *master )
-{
-   CONNECTION4RELATE_INIT_INFO_IN *info ;
-   CONNECTION4RELATE_INIT_INFO_OUT *out ;
-   int rc, i ;
-   unsigned short relateCount ;
-   RELATE4 *relateOn ;
-   CONNECTION4 *connection ;
-   unsigned int relatePos, sortLen ;
-   unsigned short flexPos, flexOffset, exprLen, relateOffset ;
-   char *relateData ;
-   CODE4 *c4 ;
-
-   #ifdef E4PARM_LOW
-      if ( master == 0 )
-         return error4( 0, e4parm_null, E94421 ) ;
-   #endif
-
-   c4 = master->codeBase ;
-   connection = master->data->dataFile->connection ;
-   relateCount = 1 ;
-
-   for( relateOn = master ;; relateCount++ )
-   {
-      if ( relate4next( &relateOn ) == 2 )
-         break ;
-      #ifdef E4MISC
-         if ( relateOn->data != 0 )
-         {
-            if ( connection == 0 )
-               connection = relateOn->data->dataFile->connection ;
-            else
-               if ( connection != relateOn->data->dataFile->connection )   /* multi-servers not supported on relations */
-                  return error4( c4, e4notSupported, E84414 ) ;
-         }
-      #endif
-   }
-
-   #ifdef E4ANALYZE
-      if ( connection == 0 )
-         return error4( c4, e4struct, E94421 ) ;
-   #endif
-   if ( relateCount == 0 || connection == 0 )
-      return error4( c4, e4relate, E84415 ) ;
-
-   connection4assign( connection, CON4RELATE_INIT, 0, 0 ) ;
-
-   connection4addData( connection, NULL, sizeof( CONNECTION4RELATE_INIT_INFO_IN ), (void **)&info ) ;
-   if ( master->relation->needsFreeing == 1 )
-      info->relationId = htonl(master->relation->relationId) ;
-   else
-      info->relationId = 0 ;
-   relateOffset = sizeof( CONNECTION4RELATE_INIT_INFO_IN ) ;
-   info->relateOffset = htons(relateOffset) ;
-   flexOffset = relateOffset + relateCount * sizeof( CONNECTION4RELATE ) ;
-   info->flexOffset = htons(flexOffset ) ;
-   info->relation.skipBackwards = htons(master->relation->skipBackwards) ;
-   info->bitmapDisable = htons(master->relation->bitmapDisable) ;
-   info->masterClientId = htonl(master->data->clientId) ;
-   if ( master->relation->exprSource == 0 )
-   {
-      info->relation.exprSource.offset = 0 ;
-      exprLen = 0 ;
-   }
-   else
-   {
-      exprLen = strlen( master->relation->exprSource ) + 1 ;
-      info->relation.exprSource.offset = info->flexOffset ;
-   }
-   if ( master->relation->sortSource == 0 )
-   {
-      info->relation.sortSource.offset = 0 ;
-      sortLen = 0 ;
-   }
-   else
-   {
-      sortLen = (unsigned int)strlen( master->relation->sortSource ) + 1 ;
-      info->relation.sortSource.offset = htons((unsigned short)(flexOffset + exprLen)) ;
-   }
-
-   connection4addData( connection, NULL, relateCount * sizeof( CONNECTION4RELATE ), (void **)&relateData ) ;
-   if ( exprLen != 0 )
-      connection4addData( connection, master->relation->exprSource, exprLen, NULL ) ;
-   if ( sortLen != 0 )
-      connection4addData( connection, master->relation->sortSource, sortLen, NULL ) ;
-
-   relatePos = 0 ;
-   flexPos = flexOffset + exprLen + sortLen ;
-   rc = relate4add( connection, master, &relatePos, &flexPos, relateData ) ;
-   if ( rc < 0 )
-   {
-      /* u4free( relateData ) ; */
-      return error4stack( c4, rc, E94421 ) ;
-   }
-
-   connection4sendMessage( connection ) ;
-   /* u4free( relateData ) ;*/
-   rc = connection4receiveMessage( connection ) ;
-   if ( rc < 0 )
-      return error4stack( c4, rc, E94421 ) ;
-   rc = connection4status( connection ) ;
-   if ( rc < 0 )
-      return connection4error( connection, c4, rc, E84401 ) ;
-   if ( rc != 0 )
-      return rc ;
-   if ( connection4len( connection ) != (long)sizeof( CONNECTION4RELATE_INIT_INFO_OUT ) + relateCount * (long)sizeof( relateOn->id ) )
-      return error4stack( c4, e4packetLen, E94421 ) ;
-   out = (CONNECTION4RELATE_INIT_INFO_OUT *)connection4data( connection ) ;
-   master->relation->relationId = ntohl(out->relationId) ;
-
-   #ifdef E4ANALYZE
-      if ( sizeof( relateOn->id ) != sizeof( unsigned short int ) )
-         return error4( c4, e4struct, E94421 ) ;
-   #endif
-
-   out++ ;   /* go to the end of out for the variable length data */
-
-   for( relateOn = master, i = 0 ;; i++ )
-   {
-      if ( relateOn == 0 )
-         break ;
-      relateOn->id = ntohs(*((unsigned short int *)(((char *)out) + i * sizeof( relateOn->id ) ) )) ;
-      rc = relate4next( &relateOn ) ;
-      if ( rc == 2 )
-         break ;
-   }
-
-   master->relation->isInitialized = 1 ;
-
-   return 0 ;
-}
-#endif
 
 static int relate4topInit( RELATE4 *relate )
 {
@@ -3683,17 +3105,11 @@ int S4FUNCTION relate4top( RELATE4 *relate )
    int rc ;
    CODE4 *c4 ;
    DATA4 *d4 ;
-   #ifdef S4CLIENT
-      CONNECTION4RELATE_TOP_INFO_IN *info ;
-      CONNECTION4 *connection ;
-      int saveRc ;
-   #else
       long rec ;
       int rc2 ;
       #ifndef S4OFF_MULTI
          char oldReadLock ;
       #endif
-   #endif
 
    #ifdef S4VBASIC
       if ( c4parm_check( relate, 5, E94422 ) )
@@ -3715,60 +3131,6 @@ int S4FUNCTION relate4top( RELATE4 *relate )
 
    rc = 0 ;
 
-   #ifdef S4CLIENT
-      #ifdef E4ANALYZE
-         if ( d4 == 0 )
-            return error4( c4, e4struct, E94422 ) ;
-         if ( d4->dataFile == 0 )
-            return error4( c4, e4struct, E94422 ) ;
-      #endif
-      if ( relation->isInitialized == 0 || relate->dataTag != d4->tagSelected )
-      {
-         relate->dataTag = d4->tagSelected ;
-         rc = relate4clientInit( relate ) ;
-         if ( rc != 0 )
-            return rc ;
-      }
-      #ifdef S4CB51
-         #ifndef S4OFF_MULTI
-            if ( c4getReadLock( c4 ) )
-            {
-               rc = relate4lock( relate ) ;
-               if ( rc != 0 )
-                  return rc ;
-            }
-         #endif
-      #endif
-      connection = d4->dataFile->connection ;
-      #ifdef E4ANALYZE
-         if ( connection == 0 )
-            return error4( c4, e4struct, E94422 ) ;
-      #endif
-
-      rc = relate4flush( relate ) ;
-      if ( rc )
-         return rc ;
-
-      connection4assign( connection, CON4RELATE_TOP, 0, 0 ) ;
-      connection4addData( connection, NULL, sizeof( CONNECTION4RELATE_TOP_INFO_IN ), (void **)&info ) ;
-      info->relationId = htonl(relation->relationId) ;
-      connection4sendMessage( connection ) ;
-      saveRc = connection4receiveMessage( connection ) ;
-      if ( saveRc < 0 )
-         return error4stack( c4, saveRc, E94422 ) ;
-      saveRc = connection4status( connection ) ;
-      if ( saveRc < 0 || saveRc == r4terminate )
-      {
-         relation->isInitialized = 0 ;
-         if ( saveRc < 0 )
-            return connection4error( connection, c4, saveRc, E94422 ) ;
-      }
-
-      rc = relate4unpack( relation, d4->dataFile->connection ) ;
-      if ( rc != 0 )
-         return error4stack( c4, rc, E94422 ) ;
-      return saveRc ;
-   #else
       #ifndef S4OFF_MULTI
          oldReadLock = c4getReadLock( c4 ) ;
          c4setReadLock( c4, 0 ) ;
@@ -3881,7 +3243,6 @@ int S4FUNCTION relate4top( RELATE4 *relate )
          c4setReadLock( c4, oldReadLock ) ;
       #endif
       return rc ;
-   #endif
 }
 
 int S4FUNCTION relate4type( RELATE4 *relate, int relateType )
