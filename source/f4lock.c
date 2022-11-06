@@ -81,11 +81,7 @@ int dfile4registerLocked( DATA4FILE *d4, const long lockId, int doExtra )
          return error4( c4, e4parm, E96701 ) ;
    #endif
 
-   #ifdef S4SERVER
-      c4->server->lockedLockItem = lockId ;
-   #else
       c4->lockedLockItem = lockId ;
-   #endif
 
    if ( doExtra )
    {
@@ -134,43 +130,15 @@ int dfile4registerLocked( DATA4FILE *d4, const long lockId, int doExtra )
          return 0 ;
       trans = lockedData->trans ;
 
-      #ifdef S4SERVER
-         c4->server->lockedFileName = lockedData->alias ;
-         c4->server->lockedUserName = trans->userId ;
-         c4->server->lockedNetName = trans->netId ;
-      #else
          c4->lockedFileName = lockedData->alias ;
          c4->lockedUserName = trans->userId ;
          c4->lockedNetName = trans->netId ;
-      #endif
    }
 
    return 0 ;
 }
 #endif /* S4SINGLE */
 
-#ifdef S4SERVER
-   /* leave non-inlined in order to force const returns */
-   const char *S4FUNCTION code4lockNetworkId( CODE4 *c4 )
-   {
-      return c4->server->lockedNetName ;
-   }
-
-   const char *S4FUNCTION code4lockUserId( CODE4 *c4 )
-   {
-      return c4->server->lockedUserName ;
-   }
-
-   const char *S4FUNCTION code4lockFileName( CODE4 *c4 )
-   {
-      return c4->server->lockedFileName ;
-   }
-
-   long S4FUNCTION code4lockItem( CODE4 *c4 )
-   {
-      return c4->server->lockedLockItem ;
-   }
-#else
    const char *S4FUNCTION code4lockNetworkId( CODE4 *c4 )
    {
       #ifdef E4PARM_HIGH
@@ -218,7 +186,6 @@ int dfile4registerLocked( DATA4FILE *d4, const long lockId, int doExtra )
       #endif
       return c4->lockedLockItem ;
    }
-#endif
 
 #ifdef P4ARGS_USED
    #pragma argsused

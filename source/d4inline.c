@@ -2,30 +2,6 @@
 
 #include "d4all.h"
 
-#ifdef S4SERVER
-#ifndef S4SINGLE
-int S4FUNCTION code4unlockAuto( CODE4 *c4 )
-{
-   int rc ;
-
-   rc = code4trans( c4 )->unlockAuto ;
-   #ifndef S4OFF_WRITE
-      #ifndef S4OFF_TRAN
-         if ( rc != 0 )
-         {
-            if ( code4tranStatus( c4 ) == r4rollback )
-               return 0 ;
-            if ( code4transEnabled( c4 ) )
-               if ( code4tranStatus( c4 ) == r4active )
-                  return 0 ;
-         }
-      #endif
-   #endif
-
-   return rc ;
-}
-#endif
-#endif
 
 #ifndef S4INLINE
 

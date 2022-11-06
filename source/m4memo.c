@@ -71,15 +71,7 @@ int S4FUNCTION d4memoCompress( DATA4 *data )
       return rc ;
 
    #ifndef S4OFF_MULTI
-/*
-      #ifdef S4SERVER
-         rc = dfile4lockFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
-      #else
-*/
          rc = d4lockFile( data ) ;
-/*
-      #endif
-*/
       if ( rc )
          return rc ;
    #endif
@@ -131,11 +123,7 @@ int dfile4memoCompress( DATA4FILE *data, DATA4 *d4 )
 
    #ifndef S4OFF_MULTI
       #ifndef N4OTHER
-         #ifdef S4SERVER
             rc = dfile4lockMemo( data ) ;
-         #else
-            rc = dfile4lockMemo( data ) ;
-         #endif
          if ( rc )
             return rc ;
       #endif
@@ -378,11 +366,7 @@ int d4validateMemoIds( DATA4 *data )
 
    if ( data->recNum > 0 )
    {
-      #ifdef S4SERVER
-         rc = dfile4lock( data->dataFile, data4clientId( data ), data4serverId( data ), data->recNum ) ;
-      #else
          rc = d4lock( data, data->recNum ) ;
-      #endif
       if ( rc )
          return rc ;
    }

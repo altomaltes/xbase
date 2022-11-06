@@ -304,9 +304,6 @@ int dfile4create( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, cons
       int isMemo ;
       MEMO4FILE m4file ;
    #endif
-   #ifdef S4SERVER
-      int oldKeepOpen ;
-   #endif
    #ifndef S4OFF_TRAN
       int oldStatus = 0 ;
    #endif
@@ -517,21 +514,6 @@ int dfile4create( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, cons
 
    if ( name != 0  )
    {
-      #ifdef S4SERVER
-         #ifndef S4OFF_CATALOG
-            if ( c4->createTemp != 1 && cat4avail( c4->catalog ) )
-            {
-               u4ncpy( buf, cat4pathName( c4->catalog ), (unsigned int)cat4pathNameLen( c4->catalog ) ) ;
-               for ( i = 0 ; i < cat4pathNameLen( c4->catalog ) ; i++ )
-                  if ( buf[i] == ' ' )
-                  {
-                     buf[i] = 0 ;
-                     break ;
-                  }
-            }
-         #endif  /* S4OFF_CATALOG */
-      #endif /* S4SERVER */
-
       if ( c4->createTemp == 1 )  /* take care of setting as temp later */
       {
          c4->createTemp = 0 ;
@@ -1003,9 +985,6 @@ int dfile4create( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, cons
       error4( c4, e4open, E91102 ) ;
    else
    {
-      #ifdef S4SERVER
-         data->accessMode = OPEN4DENY_RW ;
-      #endif
       #ifdef S4OFF_INDEX
          #ifdef E4MISC
             if ( tagInfo )
@@ -1047,16 +1026,7 @@ int dfile4create( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, cons
       if ( ( c4->createTemp != 1 && name != 0 ) || temp == 0 )  /* if temp is NULL must close even if temporary */
       {
          dfile = data->dataFile ;
-         #ifdef S4SERVER
-            oldKeepOpen = c4->server->keepOpen ;
-            c4->server->keepOpen = 1 ;
-         #endif
          d4createClose( c4, data, 0 ) ;
-         #ifdef S4SERVER
-            c4->server->keepOpen = oldKeepOpen ;
-            /* the server case requires an explict low close as well */
-            dfile4closeLow( dfile ) ;
-         #endif
       }
       else
          *temp = data ;

@@ -975,33 +975,8 @@ void e4recCount()
    double d ;
    long serverId = -2L ;
    DATA4FILE *dataFile ;
-   #ifdef S4SERVER
-      DATA4 *data ;
-      LIST4 *dataList ;
-   #endif
 
    dataFile = (DATA4FILE *)expr4infoPtr->p1 ;
-
-   #ifdef S4SERVER
-      /* need to get a DATA4 corresponding to the data4file for the current
-         client, in order to determine the context, which may affect the current
-         record count for the data file due to transactions */
-      dataList = tran4dataList( code4trans( dataFile->c4 ) ) ;
-      for ( data = 0 ;; )
-      {
-         data = (DATA4 *)l4next( dataList, data ) ;
-         if ( data == 0 )
-         {
-            serverId = -1 ;   /* get non-trans count */
-            break ;
-         }
-         if ( data->dataFile == dataFile )
-         {
-            serverId = data4serverId( data ) ;
-            break ;
-         }
-      }
-   #endif
 
    d = (double)dfile4recCount( dataFile, serverId ) ;
    memcpy( *expr4++ = expr4buf+ expr4infoPtr->resultPos, (void *)&d, sizeof(d) ) ;

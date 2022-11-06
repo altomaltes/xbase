@@ -910,9 +910,6 @@ typedef struct
 } NET4MESSAGE ;
 #endif /*!S4OFF_THREAD */
 
-#ifdef S4SERVER
-   struct SERVER4CLIENTSt ;
-#endif
 
 typedef struct CONNECT4BUFFERSt
 {
@@ -965,14 +962,6 @@ typedef struct CONNECT4St
    /* sturcture used to communicate with the communications thread */
    CONNECT4BUFFER connectBuffer ;
 
-   #ifdef S4SERVER
-      struct SERVER4CLIENTSt *client ;
-      int workState ; /* is this connection being serviced? How ?
-         because  the connectthread is used to communicate with the
-         intercommiunication thread, we need to track the workState at this
-         level, since the communications thread lets us know when data
-         is received */
-   #else
    /* some identification method used by the client to identify the server
       side of the connection is required...
       just use the pointer from the server. Then on the server side,
@@ -981,7 +970,6 @@ typedef struct CONNECT4St
       C4ADDRESS address ;
       short addrLen ;
       long clientId ;
-   #endif
    /* int connected ; */ /* Is this NOT in the process of disconnecting?*/
 } CONNECT4 ;
 
@@ -1033,9 +1021,6 @@ typedef struct CONNECTION4St
 
 #endif /* S4STAND_ALONE */
 
-#ifdef S4SERVER
-   class SERVER4 ;
-#endif
 
 #ifdef S4CBPP
 class S4CLASS CODE4
@@ -1245,55 +1230,6 @@ typedef struct CODE4St
 
    int doRemove ;
 
-   #ifdef S4SERVER
-      int singleClient ;
-      int displayErrors ;
-      int readOnlyRequest ;
-      unsigned memStartClient ;
-      unsigned memExpandClient ;
-      struct SERVER4CLIENTSt S4PTR *catalogClient ;
-      MEM4 S4PTR *clientMemory ;
-      SERVER4 *server ;
-      struct SERVER4CLIENTSt S4PTR *currentClient ;
-      long maxSockets ;
-
-      #ifdef S4DEBUG_LOG
-         char S4PTR *logFileName ;
-         FILE4 logFile ;
-         int log ;
-      #endif
-      #ifndef S4OFF_SECURITY
-         int idhandling ;
-      #endif
-      int shutdownWorkerThreads ;
-      int numWorkerThreads ;     /* configurable */
-      /*pointer to an array of threadHandles whose size is equal to */
-      /* sizeof(unsigned long)* CODE4.numWorkerThreads */
-      unsigned long *workerThreadHandles ;
-
-      /* must be long for interlocked functions */
-      long numWaitingWorkerThreads ;  /* of the worker threads, the # waiting to service a client */
-
-      LIST4MUTEX connectsToService ;   /* A list of CONNECT4's to service */
-   /* Semaphore that worker threads wait on */
-   /* Count equal to number of outstanding messages needing servicing */
-
-      SEMAPHORE4 workerSemaphore ;
-      /* LIST4MUTEX connectListMutex ; */   /*List of CONNECT4s Unused */
-
-      HANDLE accessMutex ;
-      int accessMutexCount ;
-      #ifdef S4HALFJAVA
-         MEM4 S4PTR *halfJavaMemory ;
-         LIST4MUTEX halfJavaListMutex ;
-      #endif
-      /* for the server, the values may not be available as they reside in
-         the SERVER4CLIENT structure.  Use defaults.  Also use defaults to
-         set SERVER4CLIENT values. */
-      int readOnlyDefault ;
-      int errorCodeDefault ;   /* used for when no client struct only */
-      long errorCode2Default ; /* used for when no client struct only */
-   #else
       S4CONV( int errCreate, int create_error ) ;           /* Do 'file4create' error ? */
       S4CONV( int errorCode, int error_code ) ;
       S4CONV( int readOnly, int read_only ) ;
@@ -1323,7 +1259,6 @@ typedef struct CODE4St
       S4CONV( int numReports, int num_reports ) ;
       short pageno ;
       long clientDataCount ;
-   #endif
 
       int doIndexVerify ;       /* for internal purposes only at this point */
       struct RELATION4St S4PTR *currentRelation ;
@@ -1572,20 +1507,6 @@ typedef struct  /* Creating Data File */
    unsigned short int nulls ;  /* are nulls allowed? */
 } FIELD4INFO ;
 
-#ifdef S4SERVER
-typedef struct
-{
-   char append ;
-   char delet ;
-   char update ;
-   char index ;
-   char alter ;
-   char refer ;
-   char compress ;
-   char read ;
-   char open ;    /* virtual field */
-} AUTHORIZE4 ;
-#endif
 
 typedef struct
 {
@@ -1636,13 +1557,8 @@ typedef struct DATA4FILESt
    unsigned short headerLen ; /* Header Length, Indicates start of data */
    /**** the previous set of lines must remain in order as they are a file view ****/
 
-   #ifdef S4SERVER
-      struct SERVER4CLIENTSt S4PTR *singleClient ;   /* only one client has access to the file */
-      time_t    nullTime ;   /* The last time the datafile had 0 handles, if any */
-   #else
       void S4PTR *space6 ;
       time_t space7 ;
-   #endif
       struct DATA4St S4PTR *space9 ;
       struct DATA4St S4PTR *space10 ;
 
@@ -1659,9 +1575,6 @@ typedef struct DATA4FILESt
       int tranStatus ;   /* is this data4file using transactions? */
       char valid ;    /* if valid, a close on a datafile will not low-close it */
       #ifndef S4OFF_MULTI
-         #ifdef S4SERVER
-            struct DATA4St *exclusiveOpen ;
-         #endif
          SINGLE4 lockedRecords ; /* list of LOCK4LINK's in client version, LOCK4's in stand-alone/server */
          long fileServerLock ;    /* which data holds file lock */
          long fileClientLock ;    /* which data holds file lock */
@@ -1744,25 +1657,7 @@ typedef struct DATA4St
       int debugInt ;      /* used to check structure integrity (set to 0x5281) */
    #endif
 
-   #ifdef S4SERVER
-      int accessMode ;              /* in what mode did the client open the data file */
       long clientId ;
-      long serverId ;
-      #ifdef S4JAVA
-         short int *fieldsDefined ;
-         short int numFieldsDefined ;
-      #endif
-      #ifndef S4OFF_SECURITY
-         Bool5 allowRead ;
-         Bool5 allowAppend ;
-         Bool5 allowDelete ;
-         Bool5 allowUpdate ;
-         Bool5 allowIndex ;
-         Bool5 allowCompress ;
-      #endif
-   #else
-      long clientId ;
-   #endif
 } DATA4 ;
 
 typedef void S4OPERATOR(void) ;

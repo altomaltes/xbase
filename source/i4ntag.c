@@ -795,9 +795,6 @@ int tfile4close( TAG4FILE *t4, DATA4FILE *d4 )
    #endif
 
    t4->userCount-- ;
-   #ifdef S4SERVER
-      if ( c4->server->keepOpen != 2 || t4->file.isTemp != 1 )
-   #endif
    if ( t4->userCount == 0 )
    {
       if ( tfile4freeAll( t4 ) < 0 )

@@ -44,12 +44,6 @@ const char *S4FUNCTION error4text( CODE4 *c4, const long errCode2 )
                   szArray = sizeof( error4array6 ) ;
                   break ;
             #endif
-            #ifdef S4SERVER
-               case 7:
-                  array = error4array7 ;
-                  szArray = sizeof( error4array7 ) ;
-                  break ;
-            #endif
             case 8:
                array = error4array8 ;
                szArray = sizeof( error4array8 ) ;
@@ -96,12 +90,6 @@ long S4FUNCTION error4number2( const long errCode2 )
             case 6:
                array = error4array6 ;
                szArray = sizeof( error4array6 ) ;
-               break ;
-         #endif
-         #ifdef S4SERVER
-            case 7:
-               array = error4array7 ;
-               szArray = sizeof( error4array7 ) ;
                break ;
          #endif
          case 8:
@@ -153,12 +141,6 @@ long error4seek( long errCode2 )
          case 6:
             array = error4array6 ;
             szArray = sizeof( error4array6 ) ;
-            break ;
-      #endif
-      #ifdef S4SERVER
-         case 7:
-            array = error4array7 ;
-            szArray = sizeof( error4array7 ) ;
             break ;
       #endif
       case 8:

@@ -251,9 +251,6 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
       #endif
    #endif
    #ifndef S4STAND_ALONE
-      #ifdef S4SERVER
-         int rc ;
-      #endif
       #ifdef S4WINTEL
          WSADATA WSAData ;
       #endif

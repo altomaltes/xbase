@@ -10,10 +10,6 @@ static int d4hasLocks( DATA4 *data, long clientId, long serverId )
       if ( serverId == 0 )   /* likely failed open */
          return 0 ;
 
-      #ifdef S4SERVER
-         if ( data->accessMode == OPEN4DENY_RW )
-            return 0 ;
-      #endif
 
       if ( ( data->dataFile->fileServerLock == serverId && ( data->dataFile->fileClientLock == clientId || clientId == 0 ) ) ||
            ( ( data->dataFile->appendClientLock == clientId || clientId == 0 ) && data->dataFile->appendServerLock == serverId ) )
@@ -37,10 +33,6 @@ static int d4unlockDo( DATA4 *data, const long clientId, char doReqdUpdate )
 {
    CODE4 *c4 ;
       int rc, saveUnlockAuto ;
-   #ifdef S4SERVER
-      unsigned short int mType ;
-      long ID ;
-   #endif
 
    c4 = data->codeBase ;
 
@@ -76,26 +68,7 @@ static int d4unlockDo( DATA4 *data, const long clientId, char doReqdUpdate )
       if ( saveUnlockAuto == 0 )   /* leave if 1 or 2 -- don't change 2 */
          code4unlockAutoSet( c4, 1 ) ;
 
-      #ifdef S4SERVER
-         dfile4unlockData( data->dataFile, clientId, data4serverId( data ) ) ;
-         #ifdef S4JAVA
-            if ( c4->currentClient->javaClient == 0 )
-         #endif
-            if ( code4unlockAuto( c4 ) == LOCK4DATA )
-               if ( &c4->currentClient->connection != 0 )
-               {
-                  /* send a STREAM4UNLOCK_DATA message to the client to tell it to unlock stuff */
-                  mType = htons(STREAM4UNLOCK_DATA) ;
-                  connection4send( &c4->currentClient->connection, &mType, sizeof( mType ) ) ;
-                  /* also send the clientId and serverId */
-                  ID = htonl( data->clientId ) ;
-                  connection4send( &c4->currentClient->connection, &ID, sizeof( ID ) ) ;
-                  ID = htonl( data->serverId ) ;
-                  connection4send( &c4->currentClient->connection, &ID, sizeof( ID ) ) ;
-               }
-      #else
          d4unlockData( data ) ;
-      #endif
       #ifndef N4OTHER
          #ifndef S4OFF_MEMO
             dfile4memoUnlock( data->dataFile ) ;
@@ -160,10 +133,6 @@ int d4unlockAppend( DATA4 *data )
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
          return 0 ;
 
-      #ifdef S4SERVER
-         if ( data->accessMode == OPEN4DENY_RW )
-            return 0 ;
-      #endif
 
       return dfile4unlockAppend( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
    #else
@@ -183,11 +152,6 @@ int d4unlockData( DATA4 *data )
       #endif
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
          return 0 ;
-
-      #ifdef S4SERVER
-         if ( data->accessMode == OPEN4DENY_RW )
-            return 0 ;
-      #endif
 
       d4unlockFile( data ) ;
       d4unlockAppend( data ) ;
@@ -218,11 +182,6 @@ int d4unlockFile( DATA4 *data )
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
          return 0 ;
 
-      #ifdef S4SERVER
-         if ( data->accessMode == OPEN4DENY_RW )
-            return 0 ;
-      #endif
-
       rc = dfile4unlockFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) ;
       if ( rc < 0 )
          return error4stack( data->codeBase, rc, E92804 ) ;
@@ -249,10 +208,6 @@ int S4FUNCTION d4unlockRecord( DATA4 *data, long rec )
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
          return 0 ;
 
-      #ifdef S4SERVER
-         if ( data->accessMode == OPEN4DENY_RW )
-            return 0 ;
-      #endif
 
       if ( rec == data->recNum )
       {
@@ -282,11 +237,6 @@ int d4unlockRecords( DATA4 *data )
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
          return 0 ;
 
-      #ifdef S4SERVER
-         if ( data->accessMode == OPEN4DENY_RW )
-            return 0 ;
-      #endif
-
       data->recNumOld = -1 ;
       #ifndef S4OFF_MEMO
          data->memoValidated =  0 ;
@@ -304,9 +254,6 @@ int code4unlockDo( LIST4 *dataList )
 {
    DATA4 *dataOn ;
    CODE4 *c4 ;
-   #ifdef S4SERVER
-      unsigned short int mType ;
-   #endif
 
    c4 = 0 ;
 
@@ -327,17 +274,6 @@ int code4unlockDo( LIST4 *dataList )
 
    if ( c4 != 0 )
    {
-      #ifdef S4SERVER
-         #ifdef S4JAVA
-            if ( c4->currentClient->javaClient == 0 )
-         #endif
-            if ( c4->currentClient->connection.connect != 0 && c4->currentClient->isStream == 0)
-            {
-               /* send a STREAM4UNLOCK_ALL message to the client to tell it to unlock stuff */
-               mType = htons(STREAM4UNLOCK_ALL) ;
-               connection4send( &c4->currentClient->connection, &mType, sizeof( mType ) ) ;
-            }
-      #endif
 
       if ( error4code( c4 ) < 0 )
          return error4code( c4 ) ;
@@ -362,11 +298,7 @@ int S4FUNCTION code4unlock( CODE4 *c4 )
          #endif
       #endif
 
-      #ifdef S4SERVER
-         return server4clientUnlock( c4->currentClient ) ;
-      #else
          return code4unlockDo( tran4dataList( (&(c4->c4trans.trans)) ) ) ;
-      #endif
    #endif
 }
 

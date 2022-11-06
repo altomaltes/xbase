@@ -104,11 +104,7 @@ int S4FUNCTION d4bottom( DATA4 *data )
                   if ( rc == 0 )
                      if ( code4transEnabled( c4 ) )
                         if ( t4unique( tag ) != 0 )
-                           #ifdef S4SERVER
-                              if ( !dfile4lockTestFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) )
-                           #else
                               if ( !d4lockTestFile( data ) )
-                           #endif
                               rc = d4tagSyncDo( data, tag, -1 ) ;
                #endif
             #endif

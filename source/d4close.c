@@ -173,16 +173,7 @@ int dfile4close( DATA4FILE *data )
    data->userCount-- ;
    if ( data->userCount == 0 )
    {
-         #ifdef S4SERVER
-            if ( c4->server->keepOpen == 0 || data->valid != 1 )    /* not a valid datafile (failure in dfile4open) so close */
-               return dfile4closeLow( data ) ;
-            if ( data->file.isTemp && c4->server->keepOpen != 2 )  /* cannot leave temp files open or they will never close */
-               return dfile4closeLow( data ) ;
-            data->singleClient = 0 ;
-            time( &data->nullTime ) ;
-         #else
             return dfile4closeLow( data ) ;
-         #endif
    }
 
    return 0 ;
@@ -199,11 +190,7 @@ void code4lockClearData( CODE4 *c4, DATA4 *data )
       SINGLE4DISTANT lockList ;
       TRAN4 *trans ;
 
-      #ifdef S4SERVER
-         trans = &c4->currentClient->trans ;
-      #else
          trans = &c4->c4trans.trans ;
-      #endif
 
       single4distantInitIterate( &lockList, &trans->locks ) ;
 
@@ -212,19 +199,11 @@ void code4lockClearData( CODE4 *c4, DATA4 *data )
          lock = (LOCK4 *)single4distantToItem( &lockList ) ;
          if ( lock == 0 )
             break ;
-         #ifdef S4SERVER
-            if ( lock->id.clientId != data4clientId( data ) || lock->id.serverId != data4serverId( data ) )
-            {
-               single4distantNext( &lockList ) ;
-               continue ;
-            }
-         #else
                if ( lock->data != data->dataFile )
                {
                   single4distantNext( &lockList ) ;
                   continue ;
                }
-         #endif
          single4distantPop( &lockList ) ;
          mem4free( c4->lockMemory, lock ) ;
       }
@@ -292,9 +271,6 @@ int S4FUNCTION d4close( DATA4 *data )
 
       #ifndef S4OFF_TRAN
          #ifndef S4OFF_WRITE
-               #ifdef S4SERVER
-                  if ( c4->currentClient != 0 )
-               #endif
                if ( code4transEnabled( c4 ) )
                {
                   trans = code4trans( c4 ) ;
@@ -371,11 +347,6 @@ int S4FUNCTION d4close( DATA4 *data )
          }
       #endif  /* S4MEMO_OFF */
 
-      #ifdef S4SERVER
-         /* 05/31/96 AS exclusive open not getting cleared with KEEPOPEN (t4code4.c) */
-         if ( data->dataFile->exclusiveOpen == data )
-            data->dataFile->exclusiveOpen = 0 ;
-      #endif
 
          if ( c4getDoRemove( c4 ) == 1 )
             rc = dfile4remove( data->dataFile ) ;

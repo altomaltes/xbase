@@ -625,11 +625,7 @@ int S4FUNCTION error4code( CODE4 *c4 )
       if ( c4 == 0 )
          return error4( 0, e4parm_null, E96602 ) ;
    #endif
-   #ifdef S4SERVER
-      return c4->currentClient->errorCode ;
-   #else
       return c4->errorCode ;
-   #endif
 }
 #endif
 
@@ -643,12 +639,7 @@ int S4FUNCTION error4set( CODE4 *c4, const int newErrCode )
    #endif
 
    oldErrCode = error4code( c4 ) ;
-   #ifdef S4SERVER
-      if ( c4->currentClient != 0 )
-         c4->currentClient->errorCode = newErrCode ;
-   #else
       c4->errorCode = newErrCode ;
-   #endif
    return oldErrCode ;
 }
 
@@ -662,12 +653,7 @@ int S4FUNCTION error4set2( CODE4 *c4, const long newErrCode2 )
    #endif
 
    oldErrCode2 = error4code2( c4 ) ;
-   #ifdef S4SERVER
-      if (c4->currentClient != 0 )
-         c4->currentClient->errorCode2 = newErrCode2 ;
-   #else
       c4->errorCode2 = newErrCode2 ;
-   #endif
    return oldErrCode2 ;
 }
 
@@ -819,9 +805,6 @@ void error4out( CODE4 *c4, int errCode1, long errCode2, const char *desc1, const
    #endif
    int pos=0,  descNumber = 1 ;
    #ifdef S4TESTING
-      #ifdef S4SERVER
-         WORD wType ;
-      #endif
    #else
       #ifndef S4WINCE
          WORD wType ;
@@ -924,14 +907,6 @@ void error4out( CODE4 *c4, int errCode1, long errCode2, const char *desc1, const
       #endif
 
       #ifdef S4TESTING
-         #ifdef S4SERVER
-            wType = MB_OK | MB_ICONSTOP ;
-            if ( errCode1 == e4memory )
-               wType |= MB_SYSTEMMODAL ;
-            /* server should not error, so ok to leave in */
-            if ( MessageBox( 0, errorStr, E4_ERROR_COD, wType ) == 0 )
-               FatalAppExit( 0, E4_MEMORY_ERR ) ;
-         #endif
       #else
          #ifndef S4WINCE
             wType = MB_OK | MB_ICONSTOP ;

@@ -62,29 +62,6 @@ int S4FUNCTION d4go( DATA4 *data, const long recNo )
 
       if ( c4getReadLock( c4 ) )
       {
-         #ifdef S4SERVER
-            if ( !dfile4lockTest( data->dataFile, data4clientId( data ), data4serverId(data ), recNo ) )  /* record not already locked */
-            {
-               switch( code4unlockAuto( c4 ) )
-               {
-                  case LOCK4ALL :
-                     rc = code4unlockDo( tran4dataList( data->trans ) ) ;
-                     break ;
-                  case LOCK4DATA :
-                     rc = d4unlockLow( data, data4clientId( data ), 0 ) ;
-                     break ;
-                  default:
-                     break ;
-               }
-               if ( rc < 0 )
-                  return error4stack( c4, rc, E93101 ) ;
-
-               rc = dfile4lock( data->dataFile, data4clientId( data ), data4serverId( data ), recNo ) ;
-               if ( rc )
-                  return rc ;
-               didLock = 1 ;
-            }
-         #else
             if ( !d4lockTest( data, recNo ) )  /* record not already locked */
             {
                rc = d4lock( data, recNo ) ;
@@ -92,18 +69,13 @@ int S4FUNCTION d4go( DATA4 *data, const long recNo )
                   return rc ;
                didLock = 1 ;
             }
-         #endif
       }
 
       #ifndef S4OFF_MEMO
          if ( !data->memoValidated )
-            #ifdef S4SERVER
-               if ( dfile4lockTest( data->dataFile, data4clientId( data ), data4serverId( data ), recNo ) )  /* record not already locked */
-            #else
                #ifndef S4OFF_MULTI
                   if ( d4lockTest( data, recNo ) )  /* record not already locked */
                #endif
-            #endif
                fromDisk = 1 ;
       #endif  /* S4OFF_MEMO */
    #endif
@@ -115,11 +87,7 @@ int S4FUNCTION d4go( DATA4 *data, const long recNo )
       data->recNum = -1 ;  /* at an invalid position */
       #ifndef S4OFF_MULTI
          if ( didLock == 1 )
-            #ifdef S4SERVER
-               dfile4unlockRecord( data->dataFile, data4clientId( data ), data4serverId( data ), recNo ) ;
-            #else
                d4unlockRecord( data, recNo ) ;
-            #endif
       #endif
       return rc ;
    }
@@ -129,11 +97,7 @@ int S4FUNCTION d4go( DATA4 *data, const long recNo )
    data->bofFlag = data->eofFlag = 0 ;
 
    #ifndef S4OFF_MULTI
-      #ifdef S4SERVER
-         if ( dfile4lockTest( data->dataFile, data4clientId( data ), data4serverId( data ), recNo ) )  /* record not already locked */
-      #else
          if ( d4lockTest( data, recNo ) )  /* record not already locked */
-      #endif
       {
    #endif
       memcpy( data->recordOld, data->record, dfile4recWidth( data->dataFile ) ) ;

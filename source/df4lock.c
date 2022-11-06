@@ -17,9 +17,6 @@ int dfile4lock( DATA4FILE *data, const long clientId, const long serverId, const
 
    #ifdef E4PARM_LOW
       if ( data == 0 || rec < 1L || clientId == 0
-           #ifdef S4SERVER
-              || serverId == 0
-           #endif
          )
          return error4( (data == 0 ? 0 : data->c4 ), e4parm, E91102 ) ;
    #endif
@@ -138,9 +135,6 @@ int dfile4lockAppend( DATA4FILE *data, const long clientId, const long serverId 
 
    #ifdef E4PARM_LOW
       if ( data == 0 || clientId == 0
-           #ifdef S4SERVER
-              || serverId == 0
-           #endif
          )
          return error4( 0, e4parm, E91102 ) ;
    #endif
@@ -195,9 +189,6 @@ int dfile4lockFile( DATA4FILE *data, const long clientId, const long serverId )
 
    #ifdef E4PARM_LOW
       if ( data == 0 || clientId == 0
-           #ifdef S4SERVER
-              || serverId == 0
-           #endif
          )
          return error4( 0, e4parm, E91102 ) ;
    #endif
@@ -532,10 +523,6 @@ int dfile4lockTestIndex( DATA4FILE *data, const long serverId )
             return 1 ;
       #endif
 
-      #ifdef S4SERVER
-         if ( data->exclusiveOpen != 0 )
-            return 1 ;
-      #endif
 
       #ifdef S4CLIPPER
          for( tagOn = 0 ; ; )
@@ -609,25 +596,8 @@ int S4FUNCTION dfile4lockTestFile( DATA4FILE *data, const long clientId, const l
                return 1 ;
          #endif
 
-         #ifdef S4SERVER
-            if ( data->exclusiveOpen != 0 )
-               /* 05/30/96 AS --> verify that the server id matches for the data which has exclusive open */
-               /*           return 1 ; */
-               if ( data->exclusiveOpen->serverId == serverId )
-                  return 1 ;
-               else
-                  if ( serverId == 0 )  /* set the lockIds */
-                  {
-                     data->tempServerLock = data->exclusiveOpen->serverId ;
-                     data->tempClientLock = data->exclusiveOpen->clientId ;
-                     return 1 ;
-                  }
-                  else
-                     return 0 ;
-         #else
             if ( data->file.lowAccessMode != OPEN4DENY_NONE )
                return 1 ;
-         #endif
 
          if ( serverId == 0 )
          {

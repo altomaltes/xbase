@@ -36,9 +36,6 @@ int i4setup( CODE4 *c4, DATA4 *d4, const char *name, int autoOpened )
       tag->tagFile = tagFile ;
       tag->tagFile->userCount++ ;
       tag->index = i4 ;
-      #ifdef S4SERVER
-         tag->errUnique = tfile4unique( tag->tagFile, (short int)d4->codeBase->errDefaultUnique ) ;
-      #endif
       l4add( &i4->tags, tag ) ;
    }
 
@@ -1870,19 +1867,11 @@ int index4isProduction( INDEX4FILE *i4 )
    #endif
 
    #ifdef S4MDX
-      #ifdef S4SERVER
-         return i4->header.isProduction ;
-      #else
          return i4->dataFile->openMdx ;
-      #endif
    #endif
 
    #ifdef S4FOX
-      #ifdef S4SERVER
-         if ( i4->dataFile->hasMdxMemo )
-      #else
          if ( i4->dataFile->openMdx )
-      #endif
       {
          /* AS 08/04/97 fix #94 */
          /* first check extension */

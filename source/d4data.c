@@ -31,17 +31,6 @@ unsigned long data4clientId( DATA4 *d4 )
 }
 #endif
 
-#ifdef S4SERVER
-unsigned long S4FUNCTION data4serverId( DATA4 *d4 )
-{
-   return d4->serverId ;
-}
-
-unsigned long data4clientId( DATA4 *d4 )
-{
-   return d4->clientId ;
-}
-#endif
 
 #endif  /* S4INLINE */
 

@@ -206,9 +206,6 @@ int S4FUNCTION tfile4unlock( TAG4FILE *t4, const long serverId )
 static INDEX4 *code4index( CODE4 *cb, const long id, const char *name )
 {
    DATA4 *data ;
-   #ifdef S4SERVER
-      SERVER4CLIENT *client ;
-   #endif
    INDEX4 *index ;
    LIST4 *list ;
 
@@ -226,17 +223,7 @@ static INDEX4 *code4index( CODE4 *cb, const long id, const char *name )
       else
    #endif
 
-   #ifdef S4SERVER
-   list4mutexWait(&cb->server->clients) ;
-   for( client = 0 ;; )
-   {
-      client = (SERVER4CLIENT *)l4next( &cb->server->clients.list, client ) ;
-      if ( client == 0 )
-         break ;
-      list = tran4dataList( &client->trans ) ;
-   #else
       list = tran4dataList( &cb->c4trans.trans ) ;
-   #endif
       for( data = 0 ;; )
       {
          data = (DATA4 *)l4next( list, data ) ;
@@ -249,25 +236,15 @@ static INDEX4 *code4index( CODE4 *cb, const long id, const char *name )
                index = (INDEX4 *)l4next( &data->indexes, index ) ;
                if ( index == 0 )
                {
-               #ifdef S4SERVER
-                  list4mutexRelease(&cb->server->clients) ;
-               #endif
                   return 0 ;
                }
                if ( strcmp( name, index->indexFile->file.name ) == 0 )
                {
-               #ifdef S4SERVER
-                  list4mutexRelease(&cb->server->clients) ;
-               #endif
                   return index ;
                }
             }
          }
       }
-   #ifdef S4SERVER
-   }
-   list4mutexRelease(&cb->server->clients) ;
-   #endif
 
    #ifndef S4OFF_CATALOG
       if ( cb->catalog != 0 )

@@ -352,16 +352,12 @@ int d4updateRecord( DATA4 *data, const int doUnlock )
       {
          if ( code4unlockAuto( data->codeBase ) != 0 )
          {
-            #ifdef S4SERVER
-               if ( dfile4lockTestFile( data->dataFile, data4clientId( data ), data4serverId( data ) ) == 0 )
-            #else
                #ifndef S4OFF_TRAN
                   if ( code4transEnabled( data->codeBase ) )
                      if ( code4tranStatus( data->codeBase ) == r4active )
                         return 0 ;
                #endif
                if ( d4lockTestFile( data ) == 0 )
-            #endif
             {
                rc = d4unlockLow( data, data4clientId( data ), 0 ) ;
                if ( rc == r4active )  /* just a transactional notification */
