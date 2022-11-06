@@ -2115,10 +2115,7 @@ int S4FUNCTION i4reindex( INDEX4 *i4 )
          return -1 ;
    #endif  /* S4VBASIC */
 
-   #ifdef E4PARM_LOW
-      if ( i4 == 0  )
-         return error4( 0, e4parm_null, E92101 ) ;
-   #endif
+   E4PARMLOW( i44, E92101 ) ;
 
    return error4( i4->codeBase, e4notSupported, E92101 ) ;
 }
@@ -2288,13 +2285,7 @@ TAG4 *S4FUNCTION i4tag( INDEX4 *i4, const char *tagName )
          return 0 ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( i4 == 0 )
-      {
-         error4( 0, e4parm_null, E91709 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARMLOW( i4, E91709 ) ;
 
    error4( i4->codeBase, e4notIndex, E91709 ) ;
    return 0 ;
@@ -2302,13 +2293,7 @@ TAG4 *S4FUNCTION i4tag( INDEX4 *i4, const char *tagName )
 
 TAG4INFO *S4FUNCTION i4tagInfo( INDEX4 *index )
 {
-   #ifdef E4PARM_LOW
-      if ( index == 0 )
-      {
-         error4( 0, e4parm_null, E95501 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARMLOW( index, E95501 );
 
    error4( index->codeBase, e4notIndex, E95501 ) ;
    return 0 ;

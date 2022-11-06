@@ -133,11 +133,7 @@ int dfile4lockAppend( DATA4FILE *data, const long clientId, const long serverId 
    int rc ;
    CODE4 *c4 ;
 
-   #ifdef E4PARM_LOW
-      if ( data == 0 || clientId == 0
-         )
-         return error4( 0, e4parm, E91102 ) ;
-   #endif
+   E4PARMLOW( data  && clientId, E91102 ) ;
 
    c4 = data->c4 ;
    if ( error4code( c4 ) < 0 )
@@ -187,11 +183,7 @@ int dfile4lockFile( DATA4FILE *data, const long clientId, const long serverId )
    int rc = 0 ;
    CODE4 *c4 ;
 
-   #ifdef E4PARM_LOW
-      if ( data == 0 || clientId == 0
-         )
-         return error4( 0, e4parm, E91102 ) ;
-   #endif
+   E4PARMLOW( data &&  clientId, E91102 ) ;
 
    c4 = data->c4 ;
    if ( error4code( c4 ) < 0 )
@@ -271,10 +263,7 @@ int S4FUNCTION dfile4lockIndex( DATA4FILE *data, const long serverId )
       #endif
       CODE4 *c4 ;
 
-      #ifdef E4PARM_LOW
-         if ( data == 0 || serverId == 0 )
-            return error4( 0, e4parm, E91102 ) ;
-      #endif
+      E4PARMLOW( data && serverId, E91102 ) ;
 
       c4 = data->c4 ;
 
@@ -371,10 +360,7 @@ int dfile4lockAll( DATA4FILE *data, const long clientId, const long serverId )
 {
    int rc, saveUnlockAuto ;
 
-   #ifdef E4PARM_LOW
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
-   #endif
+   E4PARMLOW( data, E91102 ) ;
 
    if ( error4code( data->c4 ) < 0 )
       return e4codeBase ;
@@ -426,10 +412,7 @@ int dfile4lockTest( DATA4FILE *data, const long clientId, const long serverId, c
          long recSave ;
       #endif
 
-   #ifdef E4PARM_LOW
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
-   #endif
+   E4PARMLOW( data, E91102 ) ;
 
    rc = dfile4lockTestFile( data, clientId, serverId ) ;
    if ( rc )
@@ -513,10 +496,7 @@ int dfile4lockTestIndex( DATA4FILE *data, const long serverId )
          INDEX4FILE *indexOn ;
       #endif
 
-      #ifdef E4PARM_LOW
-         if ( data == 0 )
-            return error4( 0, e4parm_null, E91102 ) ;
-      #endif
+      E4PARMLOW( data, E91102 ) ;
 
       #ifdef S4LOCK_MATCH
          if ( data->file.accessMode != OPEN4DENY_NONE )

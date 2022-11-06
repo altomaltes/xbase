@@ -890,10 +890,7 @@ int tran4lowUnappend( TRAN4 *trans )
    int rc ;
    S4LONG recNo ;
 
-   #ifdef E4PARM_LOW
-      if ( trans == 0 )
-         return error4( 0, e4parm_null, E93801 ) ;
-   #endif
+  E4PARMLOW( trans, E93801 ) ;
 
    recNo = *((S4LONG *)(tran4getData( trans, 0L ) ) ) ;
 
@@ -933,10 +930,7 @@ int tran4lowUnwrite( TRAN4 *trans )
       unsigned S4LONG ptrLen, pos ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( trans == 0 )
-         return error4( 0, e4parm_null, E93801 ) ;
-   #endif
+   E4PARMLOW( trans, E93801 ) ;
 
    c4 = trans->c4trans->c4 ;
    recNo = *((S4LONG *)(tran4getData( trans, 0L ) ) ) ;
@@ -1331,10 +1325,7 @@ int S4FUNCTION tran4lowCommitPhaseOne( TRAN4 *trans, long id )
    CODE4 *c4 ;
    int rc ;
 
-   #ifdef E4PARM_LOW
-      if ( trans == 0 )
-         return error4( 0, e4parm_null, E93801 ) ;
-   #endif
+   E4PARMLOW( trans, E93801 ) ;
 
    c4 = trans->c4trans->c4 ;
 
@@ -1382,10 +1373,8 @@ int S4FUNCTION tran4lowCommitPhaseTwo( TRAN4 *trans, long id, int doUnlock )
    CODE4 *c4 ;
    int rc ;
 
-   #ifdef E4PARM_LOW
-      if ( trans == 0 )
-         return error4( 0, e4parm_null, E93801 ) ;
-   #endif
+   E4PARMLOW( trans, E93801 ) ;
+
 
    c4 = trans->c4trans->c4 ;
 
@@ -1471,13 +1460,7 @@ static void code4invalidate( CODE4 *c4 )
 {
    DATA4 *dataOn ;
 
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 )
-      {
-         error4( 0, e4parm_null, E93827 ) ;
-         return ;
-      }
-   #endif
+   E4PARMLOW( c4, E93827 ) ;
 
    for ( dataOn = 0 ;; )
    {
@@ -1979,10 +1962,7 @@ int S4FUNCTION code4transInitUndo( CODE4TRANS *c4trans )
          #endif
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( c4trans == 0 )
-         return error4( 0, e4parm_null, E93835 ) ;
-   #endif
+   E4PARMLOW( c4trans, E93835 ) ;
 
    #ifdef S4OFF_WRITE
       return 0 ;

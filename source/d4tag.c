@@ -56,13 +56,7 @@ TAG4FILE *dfile4tag( DATA4FILE *d4, const char * const tagName )
             int l1, l2 ;
       #endif
 
-      #ifdef E4PARM_LOW
-         if ( d4 == 0 || tagName == 0 )
-         {
-            error4( 0, e4parm_null, E91102 ) ;
-            return 0 ;
-         }
-      #endif
+      E4PARMLOW( d4 && tagName, E91102 ) ;
 
       #ifdef N4OTHER
             u4nameCurrent( tagLookup2, sizeof( tagLookup2 ), tagName ) ;
@@ -147,13 +141,7 @@ TAG4FILE *dfile4tagDefault( DATA4FILE *d4 )
    #ifndef S4INDEX_OFF
       TAG4FILE *tag ;
 
-      #ifdef E4PARM_LOW
-         if ( d4 == 0 )
-         {
-            error4( 0, e4parm_null, E91102 ) ;
-            return 0 ;
-         }
-      #endif
+      E4PARMLOW( d4, E91102 ) ;
 
       tag = dfile4tagSelected( d4 ) ;
       if ( tag )
@@ -234,13 +222,7 @@ TAG4FILE *dfile4tagNext( DATA4FILE *d4, TAG4FILE *tagOn )
          INDEX4FILE *i4 ;
       #endif
 
-      #ifdef E4PARM_LOW
-         if ( d4 == 0 )
-         {
-            error4( 0, e4parm_null, E91102 ) ;
-            return 0 ;
-         }
-      #endif
+      E4PARMLOW( d4, E91102 ) ;
 
       #ifdef N4OTHER
          return (TAG4FILE *)l4next( &d4->tagfiles, tagOn ) ;
@@ -335,13 +317,7 @@ TAG4FILE *dfile4tagPrev( DATA4FILE *d4, TAG4FILE *tagOn )
          INDEX4FILE *i4 ;
       #endif
 
-      #ifdef E4PARM_LOW
-         if ( d4 == 0 )
-         {
-            error4( 0, e4parm_null, E91102 ) ;
-            return 0 ;
-         }
-      #endif
+      E4PARMLOW( d4, E91102 ) ;
 
       #ifdef N4OTHER
          return (TAG4FILE *)l4prev( &d4->tagfiles, tagOn ) ;
@@ -401,10 +377,7 @@ void S4FUNCTION d4tagSelect( DATA4 *d4, TAG4 *t4 )
 
 int dfile4tagSelect( DATA4FILE *d4, TAG4FILE *t4 )
 {
-   #ifdef E4PARM_LOW
-      if ( d4 == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
-   #endif
+   E4PARMLOW( d4, E91102 ) ;
 
    #ifdef S4INDEX_OFF
       if ( t4 != 0 )
@@ -463,13 +436,7 @@ TAG4FILE *dfile4tagSelected( DATA4FILE *d4 )
          TAG4FILE *tag ;
       #endif
 
-      #ifdef E4PARM_LOW
-         if ( d4 == 0 )
-         {
-            error4( 0, e4parm_null, E91102 ) ;
-            return 0 ;
-         }
-      #endif
+      E4PARMLOW( d4, E91102 ) ;
 
       #ifdef N4OTHER
          return (TAG4FILE *)d4->tagfiles.selected ;

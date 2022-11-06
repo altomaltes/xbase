@@ -286,10 +286,7 @@ int f4memoReadLow( FIELD4 *field )
       long mType ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( field == 0 )
-         return error4( 0, e4parm_null, E90526 ) ;
-   #endif
+   E4PARMLOW( field, E90526 ) ;
 
    if ( error4code( field->data->codeBase ) < 0 )
       return e4codeBase ;
@@ -339,10 +336,8 @@ int f4memoReadLow( FIELD4 *field )
 
 int f4memoReset( FIELD4 *field )
 {
-   #ifdef E4PARM_LOW
-      if ( field == 0 )
-         return error4( 0, e4parm_null, E90527 ) ;
-   #endif
+   E4PARMLOW( field, E90527 ) ;
+
 
    #ifdef E4ANALYZE
       if ( field->memo == 0 )
@@ -362,10 +357,8 @@ int S4FUNCTION f4memoSetLen( FIELD4 *field, const unsigned len )
    F4MEMO *mfield ;
    CODE4 *c4 ;
 
-   #ifdef E4PARM_LOW
-      if ( field == 0 )
-         return error4( 0, e4parm_null, E90528 ) ;
-   #endif
+   E4PARMLOW( field, E90528 ) ;
+
 
    c4 = field->data->codeBase ;
    if ( error4code( c4 ) < 0 )
@@ -439,10 +432,8 @@ S4CONST char *S4FUNCTION f4memoStr( FIELD4 *field )
 #ifndef S4OFF_MEMO
 int f4memoUpdate( FIELD4 *field )
 {
-   #ifdef E4PARM_LOW
-      if ( field == 0 )
-         return error4( 0, e4parm_null, E90530 ) ;
-   #endif
+   E4PARMLOW( field, E90530 ) ;
+
 
    if ( error4code( field->data->codeBase ) < 0 )
       return e4codeBase ;
@@ -459,10 +450,8 @@ int f4memoWrite( FIELD4 *field )
    int rc ;
    long memoId, newId ;
 
-   #ifdef E4PARM_LOW
-      if ( field == 0 )
-         return error4( 0, e4parm_null, E90531 ) ;
-   #endif
+   E4PARMLOW( field, E90531 ) ;
+
 
    if ( error4code( field->data->codeBase ) < 0 )
       return e4codeBase ;

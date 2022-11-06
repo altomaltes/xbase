@@ -314,12 +314,9 @@ int dfile4create( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, cons
          return -1 ;
    #endif  /* S4VBASIC */
 
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 || fieldData == 0 )
-         return error4( c4, e4parm_null, E91102 ) ;
+   E4PARMLOW( c4 && fieldData, E91102 ) ;
 /*    if ( name == 0 && c4->createTemp != 1 )
          return error4( c4, e4parm_null, E91102 ) ; */
-   #endif
 
    if ( error4code( c4 ) < 0 )
       return e4codeBase ;

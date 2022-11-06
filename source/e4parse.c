@@ -80,10 +80,7 @@ static int e4massage( E4PARSE *p4 )
       int rem ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( p4 == 0 )
-         return error4( 0, e4parm_null, E90901 ) ;
-   #endif
+   E4PARMLOW( p4, E90901 ) ;
 
    #ifdef E4MISC
       memset( types, 0, sizeof( types ) ) ;
@@ -598,10 +595,7 @@ int e4addConstant( E4PARSE *p4, const int iFunctions, const void *consPtr, const
 {
    E4INFO *info ;
 
-   #ifdef E4PARM_LOW
-      if ( p4 == 0 )
-         return error4( 0, e4parm_null, E90902 ) ;
-   #endif
+   E4PARMLOW( p4, E90902 ) ;
 
    info = e4functionAdd( &p4->expr, iFunctions ) ;
    if ( info == 0 )
@@ -615,13 +609,7 @@ E4INFO *e4functionAdd( EXPR4 *expr, const int iFunctions )
 {
    E4INFO *info ;
 
-   #ifdef E4PARM_LOW
-      if ( expr == 0 )
-      {
-         error4( 0, e4parm_null, E90903 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARMLOW( expr, E90903 ) ;
 
    if ( (unsigned)((expr->infoN+1)*sizeof(E4INFO)) > expr->codeBase->exprBufLen )
       if ( u4allocAgain( expr->codeBase, &expr->codeBase->exprWorkBuf, &expr->codeBase->exprBufLen, sizeof(E4INFO) * (expr->infoN+10) ) == e4memory )
@@ -823,10 +811,7 @@ static int opToExpr( E4PARSE *p4 )
 {
    E4INFO *info ;
 
-   #ifdef E4PARM_LOW
-      if ( p4 == 0 )
-         return error4( 0, e4parm_null, E90907 ) ;
-   #endif
+   E4PARMLOW( p4, E90907 ) ;
 
    info = e4functionAdd( &p4->expr, s4stackPop(&p4->op) ) ;
    if ( info == 0 )
@@ -866,10 +851,7 @@ int expr4parseExpr( E4PARSE *p4 )
 {
    int rc, opValue, opOnStack ;
 
-   #ifdef E4PARM_LOW
-      if ( p4 == 0 )
-         return error4( 0, e4parm_null, E90908 ) ;
-   #endif
+   E4PARMLOW( p4, E90908 ) ;
 
    rc = expr4parseValue( p4 ) ;
    if ( rc < 0 )
@@ -1214,10 +1196,7 @@ int expr4parseValue( E4PARSE *p4 )
    int tempErrFieldName ;
    CODE4 *c4 ;
 
-   #ifdef E4PARM_LOW
-      if ( p4 == 0 )
-         return error4( 0, e4parm_null, E90910 ) ;
-   #endif
+   E4PARMLOW( p4, E90910 ) ;
 
    c4 = p4->codeBase ;
    if ( error4code( c4 ) < 0 )

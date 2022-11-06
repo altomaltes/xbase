@@ -26,10 +26,7 @@ int S4FUNCTION d4lockAppendRecord( DATA4 *data )
 {
    int rc, oldUnlock ;
 
-   #ifdef E4PARM_LOW
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E91101 ) ;
-   #endif
+   E4PARMLOW( data, E91101 ) ;
 
    if ( d4lockTestFile( data ) == 1 )
       return 0 ;
@@ -92,10 +89,7 @@ static int dfile4appendData( DATA4FILE *data, const void *record, S4LONG *recNum
    FILE4LONG pos ;
    int  rc ;
 
-   #ifdef E4PARM_LOW
-      if ( data == 0 || record == 0 || recNum == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
-   #endif
+   E4PARMLOW( data && record && recNum, E91102 ) ;
 
    #ifdef S4OFF_MULTI
       count = dfile4recCount( data, 0L ) ;  /* returns -1 if error4code( codeBase ) < 0 */
@@ -675,10 +669,7 @@ int S4FUNCTION d4unappend( DATA4 *data )
          return -1 ;
    #endif  /* S4VBASIC */
 
-   #ifdef E4PARM_LOW
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E91108 ) ;
-   #endif
+   E4PARMLOW( data, E91108 ) ;
 
    c4 = data->codeBase ;
    rc = 0 ;
@@ -802,10 +793,7 @@ int dfile4unappendData( DATA4FILE *data, const long clientId, const long serverI
    int  rc ;
    char endMark;
 
-   #ifdef E4PARM_LOW
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
-   #endif
+   E4PARMLOW( data, E91102 ) ;
 
    count = dfile4recCount( data, serverId ) ;
    if ( count < 0L )

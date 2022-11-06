@@ -96,10 +96,7 @@ static int opt4blockAdd( OPT4BLOCK *block, FILE4 *file, unsigned blockLen, long 
 
 int opt4blockClear( OPT4BLOCK *block )
 {
-   #ifdef E4PARM_LOW
-      if ( block == 0 )
-         return error4( 0, e4parm_null, E92508 ) ;
-   #endif
+   E4PARMLOW( block, E92508 ) ;
 
    block->changed = 0 ;
    block->len = 0 ;
@@ -137,10 +134,7 @@ static int opt4blockFlush( OPT4 *opt, OPT4BLOCK *block, char buffer, int doDelay
       unsigned long long_val ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( block == 0 )
-         return error4( 0, e4parm_null, E92508 ) ;
-   #endif
+   E4PARMLOW( block, E92508 ) ;
 
    #ifdef E4ANALYZE_ALL
       if ( block->file->hasDup == 1 )
@@ -274,13 +268,7 @@ static int opt4blockFlush( OPT4 *opt, OPT4BLOCK *block, char buffer, int doDelay
 /*OPT4BLOCK *opt4blockRemove( OPT4 *opt, OPT4BLOCK *block, int doFlush )*/
 int opt4blockRemove( OPT4 *opt, OPT4BLOCK *block, int doFlush )
 {
-   #ifdef E4PARM_LOW
-      if ( block == 0 )
-      {
-         error4( 0, e4parm_null, E92508 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARMLOW( block, E92508 ) ;
 
    if ( doFlush && block->changed )
    {
@@ -381,10 +369,7 @@ int opt4flushAll( OPT4 *opt, char doFree )
    char i ;
    int rc, saveRc ;
 
-   #ifdef E4PARM_LOW
-      if ( opt == 0 )
-         return error4( 0, e4parm_null, E92508 ) ;
-   #endif
+   E4PARMLOW( opt, E92508 ) ;
 
    saveRc = opt4flushWriteBuffer( opt ) ;
 
@@ -423,10 +408,7 @@ int opt4fileFlushList( OPT4 *opt, FILE4 *file, LIST4 *flushList, int doFree )
    OPT4BLOCK *blockOn ;
    LINK4 *linkOn, *nextLink ;
 
-   #ifdef E4PARM_LOW
-      if ( file == 0 || flushList == 0 )
-         return error4( 0, e4parm, E92508 ) ;
-   #endif
+   E4PARMLOW( file && flushList, E92508 ) ;
 
    for( linkOn = (LINK4 *)l4first( flushList ) ; linkOn != 0; )
    {
@@ -468,10 +450,7 @@ int opt4flushWriteBuffer( OPT4 *opt )
    int rc, oldDoBuffer, oldBufferWrites ;
    FILE4 *file ;
 
-   #ifdef E4PARM_LOW
-      if ( opt == 0 )
-         return error4( 0, e4parm_null, E92508 ) ;
-   #endif
+   E4PARMLOW( opt, E92508 ) ;
 
    if ( opt->writeBlockCount != 0 )
    {
@@ -593,13 +572,7 @@ static OPT4BLOCK *opt4fileChooseBlock( FILE4 *file )
    int i, listAvg, l1, l2, l3 ;
    OPT4BLOCK *block ;
 
-   #ifdef E4PARM_LOW
-      if ( file == 0 )
-      {
-         error4( 0, e4parm_null, E92508 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARMLOW( file, E92508 ) ;
 
    opt = &file->codeBase->opt ;
 
@@ -822,14 +795,7 @@ static OPT4BLOCK *opt4fileGetBlock( OPT4 *opt, FILE4 *file, int hiPrio )
    OPT4BLOCK *block ;
    OPT4LIST *optList ;
 
-   #ifdef E4PARM_LOW
-      if ( file == 0 )
-      {
-         error4( 0, e4parm_null, E92508 ) ;
-         return 0 ;
-      }
-
-   #endif
+   E4PARMLOW( file, E92508 ) ;
 
    block = opt4fileChooseBlock( file ) ;
    opt4blockRemove( opt, block, 1 ) ;
@@ -1140,13 +1106,7 @@ void opt4blockLruTop( OPT4BLOCK *block )
    LIST4 *list ;
    LINK4 *l4link ;
 
-   #ifdef E4PARM_LOW
-      if ( block == 0 )
-      {
-         error4( 0, e4parm_null, E92508 ) ;
-         return ;
-      }
-   #endif
+   E4PARMLOW( block, E92508 ) ;
 
    list = &block->optList->list ;
    l4link = &block->lruLink ;
@@ -1339,11 +1299,7 @@ static void opt4fileReadSpBuffer( FILE4 *file, const unsigned long posIn, int nu
    #endif
 
    #ifdef E4PARM_LOW
-      if ( file == 0 )
-      {
-         error4( 0, e4parm_null, E92508 ) ;
-         return ;
-      }
+     E4PARMLOW( file, E92508 ) ;
       if ( ( direction == -1 && numBlocks != -1 ) || ( direction != -1 && numBlocks == -1 ) )
       {
          error4( file->codeBase, e4parm, E92508 ) ;

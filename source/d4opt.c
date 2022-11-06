@@ -571,13 +571,7 @@ static void opt4freeAlloc( OPT4 *opt )
       FILE4 *f4 ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( opt == 0 )
-      {
-         error4( 0, e4parm_null, E92508 ) ;
-         return ;
-      }
-   #endif
+   E4PARMLOW( opt, E92508 ) ;
 
    #ifdef S4WRITE_DELAY
       if ( opt->delayWriteBuffer != 0 )

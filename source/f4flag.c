@@ -4,10 +4,7 @@
 
 int S4FUNCTION f4flagInit( F4FLAG *f4, CODE4 *c4, const unsigned long nFlags )
 {
-   #ifdef E4PARM_LOW
-      if ( f4 == 0 || c4 == 0 )
-         return error4( c4, e4parm, E90812 ) ;
-   #endif
+   E4PARMLOW( f4 && c4 , E90812 ) ;
 
    memset( (void *)f4, 0, sizeof(F4FLAG) ) ;
 
@@ -31,10 +28,7 @@ int S4FUNCTION f4flagReset( F4FLAG *f4, const unsigned long flagNum )
    unsigned char lowVal, setVal ;
    unsigned long highVal ;
 
-   #ifdef E4PARM_LOW
-      if ( f4 == 0 )
-         return error4( f4->codeBase, e4parm, E90812 ) ;
-   #endif
+   E4PARMLOW( f4, E90812 ) ;
 
    if ( error4code( f4->codeBase ) < 0 )
    {
@@ -63,10 +57,7 @@ int S4FUNCTION f4flagSet( F4FLAG *f4, const unsigned long flagNum )
    unsigned char lowVal, setVal ;
    unsigned long highVal ;
 
-   #ifdef E4PARM_LOW
-      if ( f4 == 0 )
-         return error4( f4->codeBase, e4parm, E90812 ) ;
-   #endif
+   E4PARMLOW( f4, E90812 ) ;
 
    if ( error4code( f4->codeBase ) < 0 )
    {
@@ -94,10 +85,7 @@ int S4FUNCTION f4flagSetRange( F4FLAG *f4, const unsigned long flagNum, const un
    unsigned long iFlag ;
    int rc ;
 
-   #ifdef E4PARM_LOW
-      if ( f4 == 0 )
-         return error4( 0, e4parm, E90812 ) ;
-   #endif
+   E4PARMLOW( f4, E90812 ) ;
 
    for ( iFlag = 0; iFlag < numFlags; iFlag++ )
    {
@@ -113,10 +101,7 @@ int S4FUNCTION f4flagIsSet( F4FLAG *f4, const unsigned long flagNum )
    unsigned char lowVal, retVal ;
    unsigned long highVal ;
 
-   #ifdef E4PARM_LOW
-      if ( f4 == 0 )
-         return error4( 0, e4parm, E90812 ) ;
-   #endif
+   E4PARMLOW( f4, E90812 ) ;
 
    if ( error4code( f4->codeBase ) < 0 )
    {
@@ -142,10 +127,8 @@ int S4FUNCTION f4flagIsAllSet( F4FLAG *f4, const unsigned long flagNum, const un
    int rc ;
    unsigned long iFlag, numFlags ;
 
-   #ifdef E4PARM_LOW
-      if ( f4 == 0 )
-         return error4( 0, e4parm, E90812 ) ;
-   #endif
+   E4PARMLOW( f4, E90812 ) ;
+
 
    if ( error4code( f4->codeBase ) < 0 )
       numFlags = 1 ;
@@ -168,10 +151,7 @@ int S4FUNCTION f4flagIsAnySet( F4FLAG *f4, const unsigned long flagNum, const un
    int rc ;
    unsigned long iFlag, numFlags ;
 
-   #ifdef E4PARM_LOW
-      if ( f4 == 0 )
-         return error4( 0, e4parm, E90812 ) ;
-   #endif
+   E4PARMLOW( f4, E90812 ) ;
 
    if ( error4code( f4->codeBase ) < 0 )
       numFlags = 1 ;
@@ -188,10 +168,7 @@ int S4FUNCTION f4flagAnd( F4FLAG *flagPtr, const F4FLAG *andPtr )
 {
    unsigned numBytes ;
 
-   #ifdef E4PARM_LOW
-      if ( flagPtr == 0 || andPtr == 0 )
-         return error4( 0, e4parm_null, E90812 ) ;
-   #endif
+   E4PARMLOW( flagPtr && andPtr, E90812 ) ;
 
    if ( andPtr->numFlags == 0 )
    {
@@ -258,10 +235,7 @@ int S4FUNCTION f4flagOr( F4FLAG *flagPtr, const F4FLAG *orPtr )
 {
    unsigned numBytes ;
 
-   #ifdef E4PARM_LOW
-      if ( flagPtr == 0 || orPtr == 0 )
-         return error4( 0, e4parm_null, E90812 ) ;
-   #endif
+   E4PARMLOW( flagPtr && orPtr, E90812 ) ;
 
    if ( orPtr->numFlags == 0 )
       return 0 ;
@@ -311,26 +285,14 @@ int S4FUNCTION f4flagOr( F4FLAG *flagPtr, const F4FLAG *orPtr )
 
 void S4FUNCTION f4flagFlipReturns( F4FLAG *flagPtr )
 {
-   #ifdef E4PARM_LOW
-      if ( flagPtr == 0 )
-      {
-         error4( 0, e4parm_null, E90812 ) ;
-         return ;
-      }
-   #endif
+   E4PARMLOW( flagPtr, E90812 ) ;
 
    flagPtr->isFlip = !flagPtr->isFlip ;
 }
 
 void S4FUNCTION f4flagSetAll( F4FLAG *flagPtr )
 {
-   #ifdef E4PARM_LOW
-      if ( flagPtr == 0 )
-      {
-         error4( 0, e4parm_null, E90812 ) ;
-         return ;
-      }
-   #endif
+   E4PARMLOW( flagPtr, E90812 ) ;
 
    memset( (void *)flagPtr->flags, 0xFF, (unsigned)((flagPtr->numFlags+7)/8) ) ;
 }

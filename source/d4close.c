@@ -37,10 +37,7 @@ int dfile4closeLow( DATA4FILE *data )
       #endif
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
-   #endif
+   E4PARMLOW( data, E91102 ) ;
 
    c4 = data->c4 ;
 
@@ -123,10 +120,7 @@ int code4dataFileCloseAll( CODE4 *c4 )
    DATA4FILE *data ;
    int rc ;
 
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E91304 ) ;
-   #endif
+   E4PARMLOW( c4, E91304 ) ;
 
    for( ;; )
    {
@@ -152,10 +146,7 @@ int code4dataFileCloseAll( CODE4 *c4 )
 int dfile4close( DATA4FILE *data )
 {
 
-   #ifdef E4PARM_LOW
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
-   #endif
+   E4PARMLOW( data, E91102 ) ;
 
    #ifdef E4ANALYZE
       if ( data->userCount <= 0 )

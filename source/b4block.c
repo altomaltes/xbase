@@ -26,13 +26,7 @@ short S4FUNCTION x4reverseShort( const void *val )
 
    atVal = (const unsigned char *)val ;
 
-   #ifdef E4PARM_LOW
-      if ( val == 0 )
-      {
-         error4( 0, e4parm, E90439 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARMLOW( val, E90439 ) ;
 
    out[0] = atVal[1] ;
    out[1] = atVal[0] ;
@@ -47,13 +41,7 @@ S4LONG S4FUNCTION x4reverseLong( const void *val )
    unsigned const char *atVal ;
    atVal = (const unsigned char *)val ;
 
-   #ifdef E4PARM_LOW
-      if ( val == 0 )
-      {
-         error4( 0, e4parm, E90439 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARMLOW( val, E90439 ) ;
 
    #ifdef S4BYTEORDER_2301
       out[0] = atVal[2] ;
@@ -114,13 +102,7 @@ B4BLOCK *b4alloc( TAG4FILE *t4, const long fb )
       int i ;
    #endif  /* S4CLIPPER */
 
-   #ifdef E4PARM_LOW
-      if ( t4 == 0 )
-      {
-         error4( 0, e4parm, E90438 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARMLOW( t4, E90438 ) ;
 
    #ifdef S4CLIPPER
       b4 = (B4BLOCK *)mem4alloc2( t4->blockMemory, t4->codeBase ) ;
@@ -156,10 +138,7 @@ B4BLOCK *b4alloc( TAG4FILE *t4, const long fb )
 
 int b4free( B4BLOCK *b4 )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    #ifdef S4FOX
       #ifdef E4ANALYZE
@@ -267,12 +246,7 @@ int b4flush( B4BLOCK *b4 )
 #ifndef S4INLINE
 void b4goEof( B4BLOCK *b4 )
 {
-   E4PARMLOW( b4 == 0 )
-      {
-         error4( 0, e4parm_null, E90438 ) ;
-         return ;
-      }
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    b4->keyOn = b4numKeys( b4 ) ;
 }
@@ -325,10 +299,7 @@ int b4dataLeaf( void *data, TAG4FILE *tag )
    short nKeys ;
    char *info ;
 
-   #ifdef E4PARM_LOW
-      if ( data == 0 || tag == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( data && tag, E90438 ) ;
 
    nKeys = * ((short *)data) ;
    info = (char *)data + ( sizeof( short ) + 6 ) ;
@@ -340,13 +311,7 @@ int b4dataLeaf( void *data, TAG4FILE *tag )
 #ifndef S4INLINE
 B4KEY_DATA *b4key( const B4BLOCK *b4, const int iKey )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || iKey < 0 )
-      {
-         error4( 0, e4parm, E90438 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARMLOW( b4 && iKey, E90438 ) ;
 
    return (B4KEY_DATA *)((char *)&b4->info.num + b4->tag->header.groupLen * iKey) ;
 }
@@ -354,13 +319,7 @@ B4KEY_DATA *b4key( const B4BLOCK *b4, const int iKey )
 /* S4MDX */
 unsigned char *b4keyKey( B4BLOCK *b4, const int iKey )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || iKey < 0 )
-      {
-         error4( 0, e4parm, E90438 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARMLOW( b4 && iKey, E90438 ) ;
 
    return (unsigned char *)(((B4KEY_DATA *)((char *)&b4->info.num + b4->tag->header.groupLen * iKey ))->value ) ;
 }
@@ -368,10 +327,7 @@ unsigned char *b4keyKey( B4BLOCK *b4, const int iKey )
 /* S4MDX */
 int b4lastpos( const B4BLOCK *b4 )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    return ( ( b4leaf( b4 ) ) ? ( b4numKeys( b4 ) - 1 ) : ( b4numKeys( b4 ) ) ) ;
 }
@@ -379,10 +335,8 @@ int b4lastpos( const B4BLOCK *b4 )
 /* S4MDX */
 int b4leaf( const B4BLOCK *b4 )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
+
 
    return( b4key( b4, b4numKeys( b4 ) )->num == 0L ) ;
 }
@@ -406,10 +360,8 @@ int b4remove( B4BLOCK *b4 )
    B4KEY_DATA *keyCur, *keyNext ;
    int leftLen ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
+
 
    keyCur = b4key( b4, b4->keyOn ) ;
    keyNext = b4key( b4, b4->keyOn + 1 ) ;
@@ -493,13 +445,7 @@ int b4skip( B4BLOCK *b4, const long n )
 {
    int numLeft ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-      {
-         error4( 0, e4parm_null, E90438 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    if ( n > 0 )
    {
@@ -534,13 +480,7 @@ void b4leafInit( B4BLOCK *b4 )
    unsigned int cLen, keyLen ;
    unsigned S4LONG ff, rLen ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-      {
-         error4( 0, e4parm_null, E90438 ) ;
-         return ;
-      }
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    t4 = b4->tag ;
    keyLen = (unsigned int)t4->header.keyLen ;
@@ -1201,10 +1141,7 @@ int b4reindex( B4BLOCK *b4 )
    S4LONG rec ;
    int spaceReqd ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    spaceReqd = b4numKeys( b4 ) ;   /* 1 byte extra for each record */
    if ( spaceReqd > b4->nodeHdr.freeSpace )  /* not enough room */
@@ -1250,10 +1187,7 @@ int b4flush( B4BLOCK *b4 )
       short shortVal ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    if ( b4->changed )
    {
@@ -1351,10 +1285,7 @@ int b4go( B4BLOCK *b4, const int iKey )
 /* S4FOX */
 int b4top( B4BLOCK *b4 )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    b4->keyOn = 0 ;
    if ( b4leaf( b4 ) )
@@ -1369,13 +1300,7 @@ int b4top( B4BLOCK *b4 )
 /* S4FOX */
 void b4goEof( B4BLOCK *b4 )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-      {
-         error4( 0, e4parm_null, E90438 ) ;
-         return ;
-      }
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    b4->keyOn = b4numKeys( b4 ) ;
    b4->curPos = ((char *)&b4->header) + sizeof( B4STD_HEADER ) + sizeof( B4NODE_HEADER )
@@ -1447,10 +1372,7 @@ B4KEY_DATA *b4key( B4BLOCK *b4, const int iKey )
 int b4dataLeaf( void *data, TAG4FILE *tag )
 {
    B4STD_HEADER *header ;
-   #ifdef E4PARM_LOW
-      if ( data == 0 || tag == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( data && tag, E90438 ) ;
 
    header = (B4STD_HEADER *)data ;
 
@@ -1461,13 +1383,7 @@ int b4dataLeaf( void *data, TAG4FILE *tag )
 /* S4FOX */
 unsigned char *b4keyKey( B4BLOCK *b4, const int iKey )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-      {
-         error4( 0, e4parm_null, E90438 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    return (unsigned char *)b4key( b4, iKey )->value ;
 }
@@ -1475,10 +1391,7 @@ unsigned char *b4keyKey( B4BLOCK *b4, const int iKey )
 /* S4FOX */
 int b4lastpos( const B4BLOCK *b4 )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    return b4numKeys( b4 ) - 1 ;
 }
@@ -1486,10 +1399,7 @@ int b4lastpos( const B4BLOCK *b4 )
 /* S4FOX */
 int b4leaf( const B4BLOCK *b4 )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    return( b4->header.nodeAttribute >= 2 ) ;
 }
@@ -1833,10 +1743,7 @@ int b4removeLeaf( B4BLOCK *b4 )
    unsigned char buffer[6], iLen ;
    char *oldPos, *infoPos ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    b4->builtOn = -1 ;
 
@@ -1923,10 +1830,7 @@ int b4remove( B4BLOCK *b4 )
    char *keyCur ;
    int len, iLen ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    if( b4->header.nodeAttribute >= 2 ) /* leaf */
       b4removeLeaf( b4 ) ;
@@ -1962,10 +1866,7 @@ int b4skip( B4BLOCK *b4, const long num )
 
    n = num ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    nKeys = b4numKeys( b4 ) ;
 
@@ -2044,10 +1945,7 @@ int b4flush( B4BLOCK *b4 )
       FILE4LONG pos ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    if ( b4->changed )
    {
@@ -2195,13 +2093,7 @@ int b4insert( B4BLOCK *b4, const void *k, const long r, const long pointer )
 /* goes to one past the end of the block */
 void b4goEof( B4BLOCK *b4 )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-      {
-         error4( 0, e4parm_null, E90438 ) ;
-         return ;
-      }
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    b4->keyOn = b4numKeys( b4 ) ;
 
@@ -2248,20 +2140,14 @@ unsigned char *b4keyKey( B4BLOCK *b4, const int iKey )
 
 int b4lastpos( const B4BLOCK *b4 )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARM_LOW( b4, E90438 ) ;
 
    return ( ( b4leaf( b4 ) ) ? ( b4numKeys( b4 ) - 1 ) : ( b4numKeys( b4 ) ) ) ;
 }
 
 int b4leaf( const B4BLOCK *b4 )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    return( b4key( b4, 0 )->pointer == 0L ) ;
 }
@@ -2284,10 +2170,7 @@ int b4dataLeaf( void *data, TAG4FILE *tag )
 {
    B4KEY_DATA *keyData ;
 
-   #ifdef E4PARM_LOW
-      if ( data == 0 || tag == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( data && tag, E90438 ) ;
 
    keyData = (B4KEY_DATA *)( (char *)data + *((short *)((char *)data + sizeof(short))) ) ;
 
@@ -2299,10 +2182,7 @@ int b4remove( B4BLOCK *b4 )
 {
    short temp ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
 
    /* just delete this entry */
    temp = b4->pointers[b4->keyOn] ;
@@ -2329,10 +2209,8 @@ int b4remove( B4BLOCK *b4 )
 
 int b4room( const B4BLOCK *b4 )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
+
 
    if ( b4leaf( b4 ) )
       return ( b4numKeys( b4 ) < b4->tag->header.keysMax ) ;
@@ -2390,10 +2268,8 @@ int b4skip( B4BLOCK *b4, const long n )
 {
    int numLeft ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
+
 
    if ( n > 0 )
    {
@@ -2432,10 +2308,8 @@ int b4verify( B4BLOCK *b4 )
       int iType ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
-   #endif
+   E4PARMLOW( b4, E90438 ) ;
+
 
    #ifdef S4FOX
       holdDup = b4->curDupCnt ;

@@ -621,10 +621,7 @@ ERROR4DATA e4errorData[] =
 #ifndef S4INLINE
 int S4FUNCTION error4code( CODE4 *c4 )
 {
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E96602 ) ;
-   #endif
+   E4PARMLOW( c4, E96602 ) ;
       return c4->errorCode ;
 }
 #endif
@@ -633,10 +630,7 @@ int S4FUNCTION error4set( CODE4 *c4, const int newErrCode )
 {
    int oldErrCode ;
 
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E96601 ) ;
-   #endif
+   E4PARMLOW( c4, E96601 ) ;
 
    oldErrCode = error4code( c4 ) ;
       c4->errorCode = newErrCode ;
@@ -647,10 +641,8 @@ int S4FUNCTION error4set2( CODE4 *c4, const long newErrCode2 )
 {
    int oldErrCode2 ;
 
-   #ifdef E4PARM_LOW
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E96601 ) ;
-   #endif
+   E4PARMLOW( c4, E96601 ) ;
+
 
    oldErrCode2 = error4code2( c4 ) ;
       c4->errorCode2 = newErrCode2 ;

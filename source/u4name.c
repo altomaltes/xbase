@@ -163,10 +163,7 @@ int S4FUNCTION u4nameCurrent( char *buf, const int bufLen, const char *name )
 {
    int namePos, len, len2 ;
 
-   #ifdef E4PARM_LOW
-      if ( buf == 0 || name == 0 )
-         return error4( 0, e4parm_null, E94509 ) ;
-   #endif
+   E4PARMLOW( buf && name, E94509 ) ;
 
    if ( name[0] == S4DIR )  /* full path */
    {
@@ -283,10 +280,7 @@ int S4FUNCTION u4nameCurrent( char *buf, const int bufLen, const char *name )
       unsigned origDrive, curDrive, dummy;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( buf == 0 || name == 0 )
-         return error4( 0, e4parm_null, E94509 ) ;
-   #endif
+   E4PARMLOW( buf && name, E94509 ) ;
 
    /* also must consider machine name accesses (eg. "\\BARNEY\TEST...") */
 

@@ -442,10 +442,7 @@ long S4FUNCTION tfile4skip( TAG4FILE *t4, long numSkip )
 
    long j ;
 
-   #ifdef E4PARM_LOW
-      if ( t4 == 0 )
-         return (long)error4( 0, e4parm_null, E91642 ) ;
-   #endif
+   E4PARMLOW( t4, E91642 ) ;
 
    if ( error4code( t4->codeBase ) < 0 )
       return e4codeBase ;
@@ -642,10 +639,7 @@ int tfile4rlTop( TAG4FILE *t4 )
 {
    int rc ;
 
-   #ifdef E4PARM_LOW
-      if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
-   #endif
+   E4PARMLOW( t4, E91642 ) ;
 
    if ( error4code( t4->codeBase ) < 0 )
       return e4codeBase ;
@@ -676,10 +670,7 @@ int tfile4rlTop( TAG4FILE *t4 )
 
 int S4FUNCTION tfile4top( TAG4FILE *t4 )
 {
-   #ifdef E4PARM_LOW
-      if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
-   #endif
+   E4PARMLOW( t4, E91642 ) ;
 
    if ( error4code( t4->codeBase ) < 0 )
       return e4codeBase ;
@@ -692,10 +683,7 @@ int S4FUNCTION tfile4top( TAG4FILE *t4 )
 
 int tfile4up( TAG4FILE *t4 )
 {
-   #ifdef E4PARM_LOW
-      if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
-   #endif
+   E4PARMLOW( t4 == 0, E91642 ) ;
 
    if ( t4->blocks.lastNode == 0 )
       return 1 ;

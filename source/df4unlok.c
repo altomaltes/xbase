@@ -8,10 +8,7 @@
 #ifndef S4MEMO_OFF
 int dfile4memoUnlock( DATA4FILE *data )
 {
-   #ifdef E4PARM_LOW
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
-   #endif
+   E4PARMLOW( data, E91102 ) ;
 
    if ( code4unlockAuto( data->c4 ) == LOCK4OFF )
       return 0 ;
@@ -305,10 +302,8 @@ int dfile4unlockRecords( DATA4FILE *data, const long clientId, const long server
 int dfile4unlockData( DATA4FILE *data, const long clientId, const long serverId )
 {
    #ifndef S4OFF_MULTI
-      #ifdef E4PARM_LOW
-         if ( data == 0 )
-            return error4( 0, e4parm_null, E91102 ) ;
-      #endif
+      E4PARMLOW( data, E91102 ) ;
+
       if ( code4unlockAuto( data->c4 ) == LOCK4OFF )
          return 0 ;
 
