@@ -1,27 +1,28 @@
-lib_LTLIBRARIES= libnomad.la nomad-gsm.la nomad-cip.la nomad-mbus.la nomad-rfid.la nomad-vnc.la nomad-udev.la nomad-rs232.la nomad-thread.la
+lib_LTLIBRARIES= libxbase.la # xbase-thread.la
 
-library_includedir=$(includedir)/altomaltes
+#library_includedir=$(includedir)/altomaltes
 library_include_HEADERS= nomad2.h
 
-libnomad_la_SOURCES= inet.c net.c slot.c mux.c rs232.c pid.c
+libxbase_la_SOURCES=  b4block.c b4node.c o4opt.c m4create.c m4file.c m4map.c m4memo.c m4memory.c
+libxbase_la_SOURCES+= c4.c c4baspas.c c4bcd.c c4blast.c c4buffer.c c4code.c c4com.c c4com2.c  c4const.c 
+libxbase_la_SOURCES+= c4hook.c c4send.c c4set.c c4thread.c c4trans.c c4util.c 
+libxbase_la_SOURCES+= d4append.c d4bottom.c d4close.c d4create.c d4data.c d4date.c d4extra.c d4field.c 
+libxbase_la_SOURCES+= d4file.c d4flush.c d4fresh.c d4go.c d4index.c d4info.c d4inline.c d4lock.c d4modify.c 
+libxbase_la_SOURCES+= d4open.c d4opt.c d4pack.c d4positi.c d4remove.c d4seek.c d4skip.c d4tag.c d4top.c 
+libxbase_la_SOURCES+= d4unlock.c d4write.c d4zap.c df4lock.c df4unlok.c 
+libxbase_la_SOURCES+= e4calc.c e4calc_2.c e4error.c e4expr.c e4event.c e4functi.c e4not_s.c e4parse.c e4string.c 
+libxbase_la_SOURCES+= f4ass_f.c f4char.c f4close.c f4create.c f4double.c f4field.c f4file.c f4filese.c 
+libxbase_la_SOURCES+= f4flag.c f4flush.c f4info.c f4int.c f4lock.c f4long.c f4memo.c f4open.c f4opt.c f4ptr.c f4str.c f4temp.c 
+libxbase_la_SOURCES+= f4true.c f4write.c f4wstr.c  
+libxbase_la_SOURCES+= i4add.c i4addtag.c i4check.c i4conv.c i4create.c i4dump.c i4index.c i4info.c i4init.c i4key.c i4lock.c 
+libxbase_la_SOURCES+= i4ntag.c i4positi.c i4remove.c i4tag.c i4thread.c 
+libxbase_la_SOURCES+= l4link.c l4lock_c.c l4mutex.c m4check.c 
+libxbase_la_SOURCES+= r4area.c r4bit.c r4drive2.c r4driver.c r4group.c r4log.c r4obj.c r4regs.c r4reinde.c r4reindx.c 
+libxbase_la_SOURCES+= r4relate.c r4report.c r4save.c r4save_2.c r4style.c r4total.c 
+libxbase_la_SOURCES+= s4init.c s4initfr.c s4next.c s4quick.c s4sort.c s4signal.c sema4.c u4name.c u4util.c 
 
-nomad_udev_la_CFLAGS=  -DBUILDING_SO_MODULE $(AM_CFLAGS)
-nomad_cip_la_CFLAGS=   -DBUILDING_SO_MODULE $(AM_CFLAGS)
-nomad_gsm_la_CFLAGS=   -DBUILDING_SO_MODULE $(AM_CFLAGS)
-nomad_vnc_la_CFLAGS=   -DBUILDING_SO_MODULE $(AM_CFLAGS)
-nomad_mbus_la_CFLAGS=  -DBUILDING_SO_MODULE $(AM_CFLAGS)
-nomad_rfid_la_CFLAGS=  -DBUILDING_SO_MODULE $(AM_CFLAGS)
-nomad_rs232_la_CFLAGS= -DBUILDING_SO_MODULE $(AM_CFLAGS)
-nomad_async_la_CFLAGS= -DBUILDING_SO_MODULE $(AM_CFLAGS)
-nomad_thread_la_CFLAGS=  -DBUILDING_SO_MODULE $(AM_CFLAGS)
-
-nomad_cip_la_SOURCES=   drivers/cip/ethip.c        drivers/cip/lgx.c  drivers/cip/pcl5.c
-nomad_gsm_la_SOURCES=   drivers/gsm/hilink.c       drivers/gsm/html.c  drivers/gsm/sha256.c
-nomad_mbus_la_SOURCES=  drivers/mbus/mbus.c        
-nomad_vnc_la_SOURCES=   drivers/vnc/vnc.c
-nomad_rfid_la_SOURCES=  drivers/rfid/rfid-rd232.c  drivers/rfid/rfid-usb.c  drivers/rfid/rfid.c  drivers/rfid/rfid-pn532.c drivers/rfid/rfid-guiliam.c
-nomad_rs232_la_SOURCES= drivers/rs232/rain-RG15.c
-nomad_thread_la_SOURCES= drivers/threads.c
+#nomad_cip_la_CFLAGS=   -DBUILDING_SO_MODULE $(AM_CFLAGS)
+#nomad_cip_la_SOURCES=   drivers/cip/ethip.c        drivers/cip/lgx.c  drivers/cip/pcl5.c
 
 LDFLAGS+= -release $(VERSION) -shared -L$(top_builddir)/src/.libs
 
@@ -47,13 +48,5 @@ else
   lib_LTLIBRARIES+= nomad-async.la
 endif
 
-nomad_cip_la_LDFLAGS   = $(MODULE_FLAGS)
-nomad_gsm_la_LDFLAGS   = $(MODULE_FLAGS) -lexpat
-nomad_vnc_la_LDFLAGS   = $(MODULE_FLAGS) -lvncasync
-nomad_mbus_la_LDFLAGS  = $(MODULE_FLAGS)
-nomad_rfid_la_LDFLAGS  = $(MODULE_FLAGS)
-nomad_rs232_la_LDFLAGS = $(MODULE_FLAGS)
-nomad_thread_la_LDFLAGS= $(MODULE_FLAGS) -lpthread
-
-nomad_udev_la_LDFLAGS+= $(MODULE_FLAGS)
+# nomad_vnc_la_LDFLAGS   = $(MODULE_FLAGS) -lvncasync
 
