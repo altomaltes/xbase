@@ -1,7 +1,7 @@
 lib_LTLIBRARIES= libxbase.la # xbase-thread.la
 
-#library_includedir=$(includedir)/altomaltes
-library_include_HEADERS= nomad2.h
+library_includedir=$(includedir)
+library_include_HEADERS= d4all.h
 
 libxbase_la_SOURCES=  b4block.c b4node.c o4opt.c m4create.c m4file.c m4map.c m4memo.c m4memory.c
 libxbase_la_SOURCES+= c4.c c4baspas.c c4bcd.c c4blast.c c4buffer.c c4code.c c4com.c c4com2.c  c4const.c 
@@ -21,32 +21,30 @@ libxbase_la_SOURCES+= r4area.c r4bit.c r4drive2.c r4driver.c r4group.c r4log.c r
 libxbase_la_SOURCES+= r4relate.c r4report.c r4save.c r4save_2.c r4style.c r4total.c 
 libxbase_la_SOURCES+= s4init.c s4initfr.c s4next.c s4quick.c s4sort.c s4signal.c sema4.c u4name.c u4util.c 
 
-#nomad_cip_la_CFLAGS=   -DBUILDING_SO_MODULE $(AM_CFLAGS)
-#nomad_cip_la_SOURCES=   drivers/cip/ethip.c        drivers/cip/lgx.c  drivers/cip/pcl5.c
+#omad_cip_la_CFLAGS=   -DBUILDING_SO_MODULE $(AM_CFLAGS)
+#omad_cip_la_SOURCES=   drivers/cip/ethip.c        drivers/cip/lgx.c  drivers/cip/pcl5.c
 
 LDFLAGS+= -release $(VERSION) -shared -L$(top_builddir)/src/.libs
 
-MODULE_FLAGS= -module -lnomad-$(VERSION) -no-undefined
+MODULE_FLAGS= -module -lxbase-$(VERSION) -no-undefined
 
 if WINDOWS
   AM_CFLAGS=-DBUILDING_DLL
-  libnomad_la_SOURCES+= win32/winsock.c win32/file.c win32/gpio.c win32/os.c win32/piped.c win32/rs232.c win32/waitfor.c
-  libnomad_la_LDFLAGS= -LC:\windows\system32 ws2_32.dll -no-undefined
+  libxbase_la_SOURCES+= win32/winsock.c win32/file.c win32/gpio.c win32/os.c win32/piped.c win32/rs232.c win32/waitfor.c
+  libxbase_la_LDFLAGS= -LC:\windows\system32 ws2_32.dll -no-undefined
 
-  nomad_udev_la_SOURCES= drivers/udev/udev-win.c
-  nomad_udev_la_LDFLAGS= -uuid -lSetupAPI -lHid
+# xbase_udev_la_SOURCES= drivers/udev/udev-win.c
+# xbase_udev_la_LDFLAGS= -uuid -lSetupAPI -lHid
 else
-  libnomad_la_SOURCES+= unx/ioctl.c unx/os.c unx/select.c unx/signals.c unx/socks.c unx/gpio.c unx/rs232.c unx/piped.c unx/spi.c
-  libnomad_la_LDFLAGS= -ldl
+#  libxbase_la_SOURCES+= unx/ioctl.c unx/os.c unx/select.c unx/signals.c unx/socks.c unx/gpio.c unx/rs232.c unx/piped.c unx/spi.c
+# libbasela_LDFLAGS= -ldl
 
-  nomad_udev_la_SOURCES= drivers/udev/udev-unx.c # unx/hid.c hidbnd.c
-  nomad_udev_la_LDFLAGS= -ludev
+#  omad_udev_la_SOURCES= drivers/udev/udev-unx.c # unx/hid.c hidbnd.c
+#  omad_udev_la_LDFLAGS= -ludev
 
-  nomad_async_la_SOURCES= unx/async.c
-  nomad_async_la_LDFLAGS= $(MODULE_FLAGS) -lrt
 
-  lib_LTLIBRARIES+= nomad-async.la
+#  lib_LTLIBRARIES+= omad-async.la
 endif
 
-# nomad_vnc_la_LDFLAGS   = $(MODULE_FLAGS) -lvncasync
+# omad_vnc_la_LDFLAGS   = $(MODULE_FLAGS) -lvncasync
 
