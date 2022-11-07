@@ -1,0 +1,20 @@
+BUILD=34
+
+HEAD=$( head -n1 ${0} )
+BUILD=$( echo ${HEAD} | cut -d = -f 2 )
+
+
+case ${1} in
+  inc)
+    BUILD=$((BUILD+=1))
+    echo $BUILD
+    sed  "1s/.*/BUILD=${BUILD}/" -i ${0}
+    exit
+  ;;
+
+  *)
+    echo $BUILD
+esac
+
+
+
