@@ -5,7 +5,7 @@
 #
 
 AC_INIT([nomad],[2.0.0])
-AC_CONFIG_SRCDIR([src/slot.c])
+AC_CONFIG_SRCDIR([source/d4all.h])
 AM_INIT_AUTOMAKE( [subdir-objects] )
 AC_CONFIG_HEADERS( config.h )
 
@@ -224,7 +224,7 @@ AC_SUBST(AUTHORS)
 AC_SUBST(DATE)
 AC_SUBST(SVN_BUILD)
 
-AC_CONFIG_FILES([Makefile src/Makefile arena/Makefile])
+AC_CONFIG_FILES([Makefile source/Makefile ])
 AC_OUTPUT
 
 echo "

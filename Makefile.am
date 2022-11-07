@@ -3,7 +3,7 @@
 AUTOMAKE_OPTIONS = foreign
 ACLOCAL_AMFLAGS = -I m4
 CCOPTS= -DNO_FORK
-SUBDIRS= src arena
+SUBDIRS= source 
 EXTRA_DIST = configure.ac
 
 noinst_PROGRAMS = hid async
