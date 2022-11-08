@@ -47,4 +47,3 @@ void main( void )
    d4close( data ) ;      /* The top record is not flushed.*/
    code4initUndo( &cb ) ;
  }
-
