@@ -19,6 +19,7 @@
 \***********************************************************************/
 /* See User's Manual, chapter 5 */
 
+
 #include "../../../source/d4all.h"
 
 #ifdef __TURBOC__
@@ -95,13 +96,13 @@ void printRecord(int rc)
 
    seekStatus(rc,status);
 
-   printf("Seek status : %s\n",status);
-   printf("---------------------------------\n");
-   printf("Name     : %10s %10s\n",fNameStr,lNameStr);
-   printf("Address  : %15s\n",addressStr);
-   printf("Age:%3d BirthDate:%8s Married : %1s\n",ageValue,dateStr,marriedStr);
-   printf("Comment: %s\n",commentStr);
-   printf("Amount purchased : $%5.2lf \n",amountValue);
+   printf( "Seek status : %s\n",status);
+   printf( "---------------------------------\n");
+   printf( "Name     : %10s %10s\n",fNameStr,lNameStr);
+   printf( "Address  : %15s\n",addressStr);
+   printf( "Age:%3d BirthDate:%8s Married : %1s\n",ageValue,dateStr,marriedStr);
+   printf( "Comment: %s\n",commentStr);
+   printf( "Amount purchased : $%5.2lf \n",amountValue);
 
    printf("\n");
 }

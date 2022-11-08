@@ -43,9 +43,6 @@ void main()
 
    cb.errOpen = 0 ;
 
-   #ifdef S4CLIENT
-      printf("\nAttempting implicit connection..." ) ;
-   #endif
 
    if( d4open( &cb, "TEST.DBF" ) != 0 )
       printf( "\nTEST.DBF Opened\n" ) ;
@@ -81,13 +78,12 @@ void verifySwitches( void )
    if( d4switch & 0x100L )
       printf( "S4OS2 - OS/2\n" ) ;
    if( d4switch & 0x200L )
-      printf( "S4UNIX - UNIX\n" ) ;
+      printf( "__unix__ - UNIX\n" ) ;
    if( d4switch & 0x400L )
       printf( "S4MACINTOSH - MACINTOSH\n" ) ;
    if( d4switch & 0x800L )
       printf( "S4PACAL_WIN - PASCAL Windows\n" ) ;
-   if( d4switch & 0x1000L )
-      printf( "S4CB51 - CodeBase 5.1 compatibility\n" ) ;
+
    if( d4switch & 0x2000L )
       printf( "\nS4SAFE  - Immediate File Length Updates\n" ) ;
    if( d4switch & 0x4000L )
@@ -110,6 +106,7 @@ void verifySwitches( void )
       printf( "E4OFF - No CodeBase Error Display\n" ) ;
    if( d4switch & 0x800000L )
       printf( "E4OFF_STRING - No Extended String CodeBase Error Display\n" ) ;
+
    if( d4switch & 0x1000000L )
       printf( "E4PARM_HIGH - High-level Functional Parameter CodeBase Error Display\n" ) ;
    if( d4switch & 0x2000000L )
@@ -140,21 +137,11 @@ void verifySwitches( void )
       printf( "S4OFF_WRITE - CodeBase File Write Source Code Removed\n" ) ;
 */
 
-   #ifdef S4STAND_ALONE
       if( ( d4switch & 0x80L ) == 0 )
          error4describe( &cb, e4result, E87001, "S4STAND_ALONE must be used in Library Build too.", 0, 0 ) ;
-   #else
-      if( d4switch & 0x80L )
-         error4describe( &cb, e4result, E87001, "S4STAND_ALONE must be off in Library Build too.", 0, 0 ) ;
-   #endif
 
-   #ifdef S4CLIENT
-      if( ( d4switch & 0x8L ) == 0 )
-         error4describe( &cb, e4result, E87001, "S4CLIENT must be used in Library Build too.", 0, 0 ) ;
-   #else
       if( d4switch & 0x8L )
          error4describe( &cb, e4result, E87001, "S4CLIENT must be off in Library Build too.", 0, 0 ) ;
-   #endif
 
    #ifdef S4OFF_OPTIMIZE
       if( (d4switch & 0x80000000L )  ==  0 )

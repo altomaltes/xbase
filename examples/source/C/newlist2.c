@@ -19,7 +19,7 @@
 \***********************************************************************/
 /* See User's Manual, chapter 5 */
 
-#include "d4all.h"
+#include "../../../source/d4all.h"
 
 #ifdef __TURBOC__
    extern unsigned _stklen = 10000;

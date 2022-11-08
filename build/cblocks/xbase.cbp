@@ -16,9 +16,6 @@
 					<Add option="-fPIC" />
 					<Add option="-g" />
 				</Compiler>
-				<Linker>
-					<Add library="gdi32" />
-				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/xbase" prefix_auto="1" extension_auto="1" />
@@ -49,6 +46,10 @@
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="../../examples/source/C/newlist2.c">
+			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
 		<Unit filename="../../examples/source/C/relate1.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
@@ -76,31 +77,11 @@
 		<Unit filename="../../source/c4bcd.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../source/c4blast.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../source/c4buffer.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../source/c4code.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../source/c4com.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../source/c4com.h" />
 		<Unit filename="../../source/c4com.pdb" />
-		<Unit filename="../../source/c4com2.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../source/c4comlow.h" />
 		<Unit filename="../../source/c4comws.h" />
-		<Unit filename="../../source/c4conect.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../source/c4conlow.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../source/c4const.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -116,25 +97,15 @@
 		<Unit filename="../../source/c4long.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../source/c4send.c">
-			<Option compilerVar="CC" />
-			<Option target="&lt;{~None~}&gt;" />
-		</Unit>
 		<Unit filename="../../source/c4set.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../../source/c4source.lst" />
-		<Unit filename="../../source/c4thread.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../source/c4trans.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../source/c4trans.h" />
-		<Unit filename="../../source/c4util.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../source/coll4arr.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
@@ -149,6 +120,7 @@
 		<Unit filename="../../source/d4bottom.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="../../source/d4cb51.h" />
 		<Unit filename="../../source/d4close.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -159,7 +131,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../source/d4data.h" />
-		<Unit filename="../../source/d4data.hpp" />
 		<Unit filename="../../source/d4date.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -185,9 +156,6 @@
 		</Unit>
 		<Unit filename="../../source/d4inc.h" />
 		<Unit filename="../../source/d4index.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../source/d4info.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../source/d4inline.c">
@@ -255,9 +223,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../source/e4error.h" />
-		<Unit filename="../../source/e4event.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../source/e4expr.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -334,9 +299,6 @@
 		<Unit filename="../../source/f4memo.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../source/f4null.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../source/f4open.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -345,10 +307,6 @@
 		</Unit>
 		<Unit filename="../../source/f4ptr.c">
 			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../source/f4seq.cpp">
-			<Option compile="0" />
-			<Option link="0" />
 		</Unit>
 		<Unit filename="../../source/f4str.c">
 			<Option compilerVar="CC" />
@@ -412,16 +370,10 @@
 		<Unit filename="../../source/i4tag.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../source/i4thread.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../source/l4link.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../source/l4lock_c.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../source/l4mutex.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../source/log5.cpp">
@@ -438,10 +390,6 @@
 		</Unit>
 		<Unit filename="../../source/m4map.c">
 			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../source/m4mem2.c">
-			<Option compilerVar="CC" />
-			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../../source/m4mem2.h" />
 		<Unit filename="../../source/m4memo.c">
@@ -467,27 +415,29 @@
 		<Unit filename="../../source/r4area,c" />
 		<Unit filename="../../source/r4area.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../source/r4bit.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../source/r4drive2.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../source/r4driver.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../source/r4group.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../source/r4log.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../source/r4obj.c">
 			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../source/r4regs.c">
-			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../source/r4reinde.c">
 			<Option compilerVar="CC" />
@@ -502,19 +452,24 @@
 		<Unit filename="../../source/r4relate.h" />
 		<Unit filename="../../source/r4report.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../source/r4report.h" />
 		<Unit filename="../../source/r4save.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../source/r4save_2.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../source/r4style.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../source/r4total.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../source/rijndael.h" />
 		<Unit filename="../../source/s4init.c">
@@ -527,9 +482,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../source/s4quick.c">
-			<Option compilerVar="CC" />
-		</Unit>
-		<Unit filename="../../source/s4signal.c">
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../source/s4sort.c">
