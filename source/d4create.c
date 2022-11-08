@@ -35,7 +35,7 @@ DATA4 *S4FUNCTION d4createTemp( CODE4 *c4, const FIELD4INFO *fieldData, const TA
    #ifdef E4PARM_HIGH
       if ( c4 == 0 || fieldData == 0 )
       {
-         error4( c4, e4parm_null, E91401 ) ;
+         error4( c4, e4parmNull, E91401 ) ;
          return 0 ;
       }
    #endif
@@ -235,14 +235,14 @@ DATA4 *S4FUNCTION d4create( CODE4 *c4, const char *name, const FIELD4INFO *field
    #ifdef E4PARM_HIGH
       if ( c4 == 0 || fieldData == 0 )
       {
-         error4( c4, e4parm_null, E91401 ) ;
+         error4( c4, e4parmNull, E91401 ) ;
          return 0 ;
       }
       /* #ifndef OLEDB5BUILD */ /* commented out for compatablity with OLEDB and library users */
          /* AS 06/04/97 ole-db allows creation of permanent files without fixed file names */
          if ( name == 0 && c4->createTemp != 1 )
          {
-            error4( c4, e4parm_null, E91401 ) ;
+            error4( c4, e4parmNull, E91401 ) ;
             return 0 ;
          }
       /* #endif */
@@ -316,7 +316,7 @@ int dfile4create( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, cons
 
    E4PARMLOW( c4 && fieldData, E91102 ) ;
 /*    if ( name == 0 && c4->createTemp != 1 )
-         return error4( c4, e4parm_null, E91102 ) ; */
+         return error4( c4, e4parmNull, E91102 ) ; */
 
    if ( error4code( c4 ) < 0 )
       return e4codeBase ;

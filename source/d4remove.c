@@ -9,7 +9,7 @@ int S4FUNCTION d4remove( DATA4 *data )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E96401 ) ;
+         return error4( 0, e4parmNull, E96401 ) ;
    #endif
 
    /* for c/s, server takes care of determining this info... */
@@ -40,11 +40,11 @@ int S4FUNCTION dfile4remove( DATA4FILE *data )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E96401 ) ;
+         return error4( 0, e4parmNull, E96401 ) ;
    #endif
 
    if ( data->userCount != 0 )
-      return error4( 0, e4parm_null, E86402 ) ;
+      return error4( 0, e4parmNull, E86402 ) ;
 
    #ifndef S4INDEX_OFF
       #ifdef N4OTHER

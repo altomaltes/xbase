@@ -52,7 +52,7 @@ static int code4freeBlocks( CODE4 *c4 )
 
    #ifdef E4PARM_HIGH
       if ( c4 == 0 )
-         return error4( 0, e4parm_null, E92510 ) ;
+         return error4( 0, e4parmNull, E92510 ) ;
    #endif
 
       for ( data = 0 ;; )
@@ -76,7 +76,7 @@ int S4FUNCTION code4optAll( CODE4 *c4 )
 
    #ifdef E4PARM_HIGH
       if ( c4 == 0 )
-         return error4( 0, e4parm_null, E92531 ) ;
+         return error4( 0, e4parmNull, E92531 ) ;
    #endif
 
    list = tran4dataList( code4trans( c4 ) ) ;
@@ -145,7 +145,7 @@ int S4FUNCTION code4optStart( CODE4 *c4 )
 
       #ifdef E4PARM_HIGH
          if ( c4 == 0 )
-            return error4( 0, e4parm_null, E92501 ) ;
+            return error4( 0, e4parmNull, E92501 ) ;
       #endif
 
       rc = code4optRestart( c4 ) ;
@@ -170,6 +170,7 @@ int code4optRestart( CODE4 *c4 )
       FILE4 *fileOn ;
       FILE4LONG len ;
       double hitCountAdd ;
+
       #ifdef __WIN32
          DWORD sectorsPerCluster, bytesPerSector, numberFreeClusters, totalNumberClusters ;
       #endif
@@ -181,7 +182,7 @@ int code4optRestart( CODE4 *c4 )
 
       #ifdef E4PARM_HIGH
          if ( c4 == 0 )
-            return error4( 0, e4parm_null, E92502 ) ;
+            return error4( 0, e4parmNull, E92502 ) ;
       #endif
 
       #ifdef E4ANALYZE
@@ -202,7 +203,10 @@ int code4optRestart( CODE4 *c4 )
          /* if used, final version must address different drives for different
             files */
          /* use current directory for now */
-         if ( GetDiskFreeSpace( 0, &sectorsPerCluster, &bytesPerSector, &numberFreeClusters, &totalNumberClusters ) == TRUE )
+         if ( GetDiskFreeSpace( 0, &sectorsPerCluster
+                              , &bytesPerSector
+                              , &numberFreeClusters
+                              , &totalNumberClusters ) == TRUE )
          {
             if ( c4->memSizeBlock < bytesPerSector )  /* ok if larger than sector size */
                c4->memSizeBlock = bytesPerSector ;
@@ -369,7 +373,7 @@ int S4FUNCTION code4optSuspend( CODE4 *c4 )
 
       #ifdef E4PARM_HIGH
          if ( c4 == 0 )
-            return error4( 0, e4parm_null, E92503 ) ;
+            return error4( 0, e4parmNull, E92503 ) ;
       #endif
 
       opt = &c4->opt ;

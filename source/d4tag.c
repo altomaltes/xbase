@@ -19,7 +19,7 @@ TAG4 *S4FUNCTION d4tag( DATA4 *d4, const char* const tagName )
       #ifdef E4PARM_HIGH
          if ( d4 == 0 || tagName == 0 )
          {
-            error4( 0, e4parm_null, E92401 ) ;
+            error4( 0, e4parmNull, E92401 ) ;
             return 0 ;
          }
       #endif
@@ -113,7 +113,7 @@ TAG4 *S4FUNCTION d4tagDefault( DATA4 *d4 )
       #ifdef E4PARM_HIGH
          if ( d4 == 0 )
          {
-            error4( 0, e4parm_null, E92403 ) ;
+            error4( 0, e4parmNull, E92403 ) ;
             return 0 ;
          }
       #endif
@@ -175,7 +175,7 @@ TAG4 *S4FUNCTION d4tagNext( DATA4 *d4, TAG4 * tag )
       #ifdef E4PARM_HIGH
          if ( d4 == 0 )
          {
-            error4( 0, e4parm_null, E92405 ) ;
+            error4( 0, e4parmNull, E92405 ) ;
             return 0 ;
          }
       #endif
@@ -270,7 +270,7 @@ TAG4 *S4FUNCTION d4tagPrev( DATA4 *d4, TAG4 *tag )
       #ifdef E4PARM_HIGH
          if ( d4 == 0 )
          {
-            error4( 0, e4parm_null, E92407 ) ;
+            error4( 0, e4parmNull, E92407 ) ;
             return 0 ;
          }
       #endif
@@ -357,7 +357,7 @@ void S4FUNCTION d4tagSelect( DATA4 *d4, TAG4 *t4 )
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
       {
-         error4( 0, e4parm_null, E92409 ) ;
+         error4( 0, e4parmNull, E92409 ) ;
          return ;
       }
    #endif
@@ -414,7 +414,7 @@ TAG4 *S4FUNCTION d4tagSelected( DATA4 *d4 )
       #ifdef E4PARM_HIGH
          if ( d4 == 0 )
          {
-            error4( 0, e4parm_null, E92411 ) ;
+            error4( 0, e4parmNull, E92411 ) ;
             return 0 ;
          }
       #endif

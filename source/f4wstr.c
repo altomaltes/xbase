@@ -34,13 +34,13 @@ void S4FUNCTION f4assignUnicode( FIELD4 *field, const WSTR5 *wideString )
       #ifdef E4PARM_HIGH
          if ( field == 0 )
          {
-            error4( 0, e4parm_null, E90533 ) ;
+            error4( 0, e4parmNull, E90533 ) ;
             return ;
          }
 
          if ( wideString == 0 )
          {
-            error4( field->data->codeBase, e4parm_null, E90533 ) ;
+            error4( field->data->codeBase, e4parmNull, E90533 ) ;
             return ;
          }
       #endif
@@ -118,10 +118,10 @@ void S4FUNCTION f4assignUnicode( FIELD4 *field, const WSTR5 *wideString )
    {
       #ifdef E4PARM_HIGH
          if ( field == 0 )
-            return error4( 0, e4parm_null, E90518 ) ;
+            return error4( 0, e4parmNull, E90518 ) ;
 
          if ( wideString == 0 )
-            return error4( field->data->codeBase, e4parm_null, E90518 ) ;
+            return error4( field->data->codeBase, e4parmNull, E90518 ) ;
       #endif
 
       #if  !defined(S4OFF_ENFORCE_LOCK)

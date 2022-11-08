@@ -47,9 +47,9 @@ int memo4fileCreate( MEMO4FILE *m4file, CODE4 *c4, DATA4FILE *d4, const char *na
 
    #ifdef E4PARM_LOW
       if ( c4 == 0 )
-         return error4( c4, e4parm_null, E95207 ) ;
+         return error4( c4, e4parmNull, E95207 ) ;
       if ( d4 == 0 && name == 0 )
-         return error4( c4, e4parm_null, E95207 ) ;
+         return error4( c4, e4parmNull, E95207 ) ;
    #endif
 
    m4file->data = d4 ;

@@ -52,7 +52,7 @@ int S4FUNCTION i4reindex( INDEX4 *i4 )
 
    #ifdef E4PARM_HIGH
       if ( i4 == 0  )
-         return error4( 0, e4parm_null, E92101 ) ;
+         return error4( 0, e4parmNull, E92101 ) ;
    #endif
 
    if ( error4code( i4->codeBase ) < 0 )

@@ -404,7 +404,7 @@ void *S4FUNCTION mem4allocDefault( MEM4 *memoryType )
    #ifdef E4PARM_HIGH
       if ( memoryType == 0 )
       {
-         error4( 0, e4parm_null, E95905 ) ;
+         error4( 0, e4parmNull, E95905 ) ;
          return 0 ;
       }
    #endif
@@ -794,7 +794,7 @@ int S4FUNCTION mem4freeDefault( MEM4 *memoryType, void *freePtr )
       return 0 ;
 
    if ( memoryType == 0 )
-      return error4( 0, e4parm_null, E95907 ) ;
+      return error4( 0, e4parmNull, E95907 ) ;
 
    if ( code4numCodeBase() == 0 && resetInProgress == 0 )
       return 0 ;
@@ -1125,7 +1125,7 @@ FIXED4MEM S4FUNCTION u4allocFixedDefault( CODE4 *c4, long n )
       #ifdef E4PARM_LOW
          if ( c4 == 0 )
          {
-            error4( 0, e4parm_null, E95908 ) ;
+            error4( 0, e4parmNull, E95908 ) ;
             return fixedMem ;
          }
 

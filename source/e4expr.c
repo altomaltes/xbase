@@ -13,7 +13,7 @@ int S4FUNCTION expr4context( EXPR4 *expr, DATA4 *data )
    short int i ;
    #ifdef E4PARM_LOW
       if ( expr == 0 || data == 0 )
-         return error4( 0, e4parm_null, E90918 ) ;
+         return error4( 0, e4parmNull, E90918 ) ;
    #endif
 
    if ( expr->data != data )
@@ -219,7 +219,7 @@ int S4FUNCTION expr4execute( EXPR4 *expr, const int pos, void **resultPtrPtr )
 
    #ifdef E4PARM_LOW
       if ( expr == 0 )
-         return error4( 0, e4parm_null, E90912 ) ;
+         return error4( 0, e4parmNull, E90912 ) ;
       if ( pos < 0 || resultPtrPtr == 0 )
          return error4( expr->codeBase, e4parm, E90912 ) ;
    #endif
@@ -258,11 +258,13 @@ int S4FUNCTION expr4key( EXPR4 *e4expr, char **ptrPtr, TAG4FILE *t4file )
 {
    int resultLen ;
 
+  // E4PARHIGH( expr && resultPtrPtr, E90916 ) ;
    #ifdef E4PARM_HIGH
       if ( e4expr == 0 || ptrPtr == 0 )
-         return error4( 0, e4parm_null, E90913 ) ;
+         return error4( 0, e4parmNull, E90913 ) ;
+
       if ( e4expr == 0 || ptrPtr == 0 )
-         return error4( e4expr->codeBase, e4parm_null, E90913 ) ;
+         return error4( e4expr->codeBase, e4parmNull, E90913 ) ;
    #endif
 
    if ( error4code( e4expr->codeBase ) < 0 )
@@ -643,7 +645,7 @@ int S4FUNCTION expr4keyLen( EXPR4 *e4expr )
 
    #ifdef E4PARM_LOW
       if ( e4expr == 0 )
-         return error4( 0, e4parm_null, E90915 ) ;
+         return error4( 0, e4parmNull, E90915 ) ;
    #endif
 
    len = expr4nullLow( e4expr, 0 ) ;   /* extra byte for nulls if required */
@@ -709,13 +711,7 @@ const char *S4FUNCTION expr4str( EXPR4 *expr )
 {
    char *str ;
 
-   #ifdef E4PARM_HIGH
-      if ( expr == 0 )
-      {
-         error4( 0, e4parm_null, E90919 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARM_HRET( expr, E90919, NULL ) ;
 
    switch( expr4type( expr ) )
    {
@@ -752,12 +748,7 @@ int S4FUNCTION expr4vary( EXPR4 *expr, char **resultPtrPtr )
    char *pointers[E4MAX_STACK_ENTRIES] ;
    int infoPos, rc ;
 
-   #ifdef E4PARM_HIGH
-      if ( expr == 0 )
-         return error4( 0, e4parm_null, E90916 ) ;
-      if ( resultPtrPtr == 0 )
-         return error4( expr->codeBase, e4parm_null, E90916 ) ;
-   #endif
+   E4PARHIGH( expr && resultPtrPtr, E90916 ) ;
 
    if ( error4code( expr->codeBase ) < 0 )
       return e4codeBase ;

@@ -12,7 +12,7 @@ char *S4FUNCTION f4ptr( const FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90532 ) ;
+         error4( 0, e4parmNull, E90532 ) ;
          return 0 ;
       }
    #endif

@@ -353,7 +353,7 @@ int memo4fileWritePart( MEMO4FILE *f4memo, long *memoIdPtr, const char *ptr, con
 
    #ifdef E4PARM_LOW
       if ( memoIdPtr == 0 )
-         return error4( 0, e4parm_null, E95208 ) ;
+         return error4( 0, e4parmNull, E95208 ) ;
       if ( f4memo->file.hand == INVALID4HANDLE ) /* file closed! */
          return error4( 0, e4parm, E95208 ) ;
    #endif
@@ -487,7 +487,7 @@ int memo4fileWrite( MEMO4FILE *f4memo, long *memoIdPtr, const char *ptr, const u
 
       #ifdef E4PARM_LOW
          if ( memoIdPtr == 0 )
-            return error4( 0, e4parm_null, E95209 ) ;
+            return error4( 0, e4parmNull, E95209 ) ;
       #endif
 
       #ifdef S4MNDX

@@ -6,7 +6,7 @@ int S4FUNCTION d4refresh( DATA4 *data )
 {
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E94201 ) ;
+         return error4( 0, e4parmNull, E94201 ) ;
    #endif
 
       if ( dfile4refresh( data->dataFile ) < 0 )
@@ -31,7 +31,7 @@ int dfile4refresh( DATA4FILE *data )
 
          #ifdef E4PARM_LOW
             if ( data == 0 )
-               return error4( 0, e4parm_null, E91102 ) ;
+               return error4( 0, e4parmNull, E91102 ) ;
          #endif
 
          file4refresh( &data->file ) ;

@@ -544,7 +544,7 @@ int S4FUNCTION dfile4lockTestAppend( DATA4FILE *data, const long clientId, const
          int rc ;
 
          if ( data == 0 )
-            return error4( 0, e4parm_null, E91102 ) ;
+            return error4( 0, e4parmNull, E91102 ) ;
 
          rc = dfile4lockTestFile( data, clientId, serverId ) ;
          if ( rc )
@@ -569,7 +569,7 @@ int S4FUNCTION dfile4lockTestFile( DATA4FILE *data, const long clientId, const l
       return 1 ;
    #else
          if ( data == 0 )
-            return error4( 0, e4parm_null, E91102 ) ;
+            return error4( 0, e4parmNull, E91102 ) ;
 
          #ifdef S4LOCK_MATCH
             if ( data->file.accessMode != OPEN4DENY_NONE )

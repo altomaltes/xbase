@@ -86,7 +86,7 @@ int S4FUNCTION i4reindex( INDEX4 *i4 )
 
    #ifdef E4PARM_HIGH
       if ( i4 == 0  )
-         return error4( 0, e4parm_null, E92101 ) ;
+         return error4( 0, e4parmNull, E92101 ) ;
    #endif
 
    c4 = i4->codeBase ;
@@ -346,7 +346,7 @@ int r4reindexInit( R4REINDEX *r4, INDEX4 *i4, INDEX4FILE *indexFile )
 {
    #ifdef E4PARM_LOW
       if ( r4 == 0 || i4 == 0 || indexFile == 0 )
-         return error4( 0, e4parm_null, E92102 ) ;
+         return error4( 0, e4parmNull, E92102 ) ;
    #endif
 
    memset( (void *)r4, 0, sizeof( R4REINDEX ) ) ;
@@ -392,7 +392,7 @@ int r4reindexBlocksAlloc( R4REINDEX *r4 )
 
    #ifdef E4PARM_LOW
       if ( r4 == 0 )
-         return error4( 0, e4parm_null, E92102 ) ;
+         return error4( 0, e4parmNull, E92102 ) ;
    #endif
 
    #ifdef E4MISC
@@ -439,7 +439,7 @@ int r4reindexSupplyKeys( R4REINDEX *r4 )
 
    #ifdef E4PARM_LOW
       if ( r4 == 0 )
-         return error4( 0, e4parm_null, E92102 ) ;
+         return error4( 0, e4parmNull, E92102 ) ;
    #endif
 
    dataFile = r4->dataFile ;
@@ -550,7 +550,7 @@ int r4reindexTagHeadersCalc( R4REINDEX *r4 )
 
    #ifdef E4PARM_LOW
       if ( r4 == 0 )
-         return error4( 0, e4parm_null, E92102 ) ;
+         return error4( 0, e4parmNull, E92102 ) ;
    #endif
 
    c4 = r4->codeBase ;
@@ -698,7 +698,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
 
    #ifdef E4PARM_LOW
       if ( r4 == 0 )
-         return error4( 0, e4parm_null, E92102 ) ;
+         return error4( 0, e4parmNull, E92102 ) ;
    #endif
 
    memset( (void *)higher, 0, sizeof( higher ) ) ;
@@ -935,7 +935,7 @@ int r4reindexWriteKeys( R4REINDEX *r4, short int errUnique )
 
    #ifdef E4PARM_LOW
       if ( r4 == 0 )
-         return error4( 0, e4parm_null, E92102 ) ;
+         return error4( 0, e4parmNull, E92102 ) ;
    #endif
 
    t4 = r4->tag ;
@@ -1039,7 +1039,7 @@ static int r4reindexToDisk( R4REINDEX *r4 )
 
    #ifdef E4PARM_LOW
       if ( r4 == 0 )
-         return error4( 0, e4parm_null, E92102 ) ;
+         return error4( 0, e4parmNull, E92102 ) ;
    #endif
 
    /* Writes out the current block and adds references to higher blocks */
@@ -1167,7 +1167,7 @@ int r4reindexFinish( R4REINDEX *r4 )
 
    #ifdef E4PARM_LOW
       if ( r4 == 0 )
-         return error4( 0, e4parm_null, E92102 ) ;
+         return error4( 0, e4parmNull, E92102 ) ;
    #endif
 
    #ifdef S4BYTE_SWAP
@@ -1290,7 +1290,7 @@ static int r4reindexToDisk( R4REINDEX *r4, const char *keyValue )
 
    #ifdef E4PARM_LOW
       if ( r4 == 0 )
-         return error4( 0, e4parm_null, E92102 ) ;
+         return error4( 0, e4parmNull, E92102 ) ;
    #endif
 
    block = r4->startBlock ;
@@ -1433,7 +1433,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
 
    #ifdef E4PARM_LOW
       if ( r4 == 0 )
-         return error4( 0, e4parm_null, E92102 ) ;
+         return error4( 0, e4parmNull, E92102 ) ;
    #endif
 
    iTag = 2 ;
@@ -1584,7 +1584,7 @@ int r4reindexWriteKeys( R4REINDEX *r4, short int errUnique )
 
    #ifdef E4PARM_LOW
       if ( r4 == 0 )
-         return error4( 0, e4parm_null, E92102 ) ;
+         return error4( 0, e4parmNull, E92102 ) ;
    #endif
 
    t4 = r4->tag ;
@@ -1816,7 +1816,7 @@ int r4reindexFinish( R4REINDEX *r4, char *keyValue )
 
    #ifdef E4PARM_LOW
       if ( r4 == 0 )
-         return error4( 0, e4parm_null, E92102 ) ;
+         return error4( 0, e4parmNull, E92102 ) ;
    #endif
 
    block = r4->startBlock ;

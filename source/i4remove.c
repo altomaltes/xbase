@@ -11,7 +11,7 @@ int tfile4remove( TAG4FILE *t4, const unsigned char *ptr, const long rec )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E95404 ) ;
+         return error4( 0, e4parmNull, E95404 ) ;
    #endif
 
    rc = tfile4go( t4, ptr, rec, 0 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
@@ -29,7 +29,7 @@ int tfile4removeCalc( TAG4FILE *t4, long rec )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E95405 ) ;
+         return error4( 0, e4parmNull, E95405 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )

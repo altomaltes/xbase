@@ -12,7 +12,7 @@ char *S4FUNCTION t4alias( TAG4 *t4 )
    #ifdef E4PARM_HIGH
       if ( t4 == 0 )
       {
-         error4( 0, e4parm_null, E91640 ) ;
+         error4( 0, e4parmNull, E91640 ) ;
          return 0 ;
       }
       if ( t4->tagFile == 0 )
@@ -59,7 +59,7 @@ TAG4INFO *S4FUNCTION i4tagInfo( INDEX4 *i4 )
    #ifdef E4PARM_HIGH
       if ( i4 == 0 )
       {
-         error4( 0, e4parm_null, E95501 ) ;
+         error4( 0, e4parmNull, E95501 ) ;
          return 0 ;
       }
    #endif

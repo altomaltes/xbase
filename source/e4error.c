@@ -290,7 +290,7 @@ ERROR4DATA e4errorData[] =
    { e4info,           "Unexpected Information"} ,
    { e4memory,         "Out of Memory"} ,
    { e4parm,           "Unexpected Parameter"} ,
-   { e4parm_null,      "Null Input Parameter unexpected"} ,
+   { e4parmNull,      "Null Input Parameter unexpected"} ,
    { e4demo,           "Exceeded Maximum Record Number for Demonstration"} ,
    { e4result,         "Unexpected Result"} ,
    { e4verify,         "Structure Verification Failure"} ,
@@ -409,7 +409,7 @@ ERROR4DATA e4errorData[] =
    { e4memory,         "Kein Speicher mehr verfÅgbar"} ,
    { e4info,           "Unerwartete Information" },
    { e4parm,           "Unerwarteter Parameter"},
-   { e4parm_null,      "Null Input Parameter unexpected"} ,
+   { e4parmNull,      "Null Input Parameter unexpected"} ,
    { e4demo,           "Exceeded Maximum Record Number for Demonstration"} , /*!!!GERMAN*/
    { e4result,         "Unerwartetes Ergebnis"},
    { 0, 0 },
@@ -472,7 +472,7 @@ ERROR4DATA e4errorData[] =
    { e4memory,         "Plus de mÇmoire disponible" } ,
    { e4info,           "Information inexpectÇe"} ,
    { e4parm,           "Paramätre inexpectÇ"} ,
-   { e4parm_null,      "Null Input Parameter unexpected"} ,
+   { e4parmNull,      "Null Input Parameter unexpected"} ,
    { e4demo,           "Au maximum d'articles dans la version de dÇmonstration" } ,
    { e4result,         "RÇsultat inexpectÇ"} ,
    { 0, 0 },
@@ -541,7 +541,7 @@ ERROR4DATA e4errorData[] =
    { e4memory,         "Out of Memory"} ,
    { e4info,           "Unexpected Information"} ,
    { e4parm,           "Unexpected Parameter"} ,
-   { e4parm_null,      "Null Input Parameter unexpected"} ,
+   { e4parmNull,      "Null Input Parameter unexpected"} ,
    { e4demo,           "Exceeded Maximum Record Number for Demonstration"} ,
    { e4result,         "Unexpected Result"} ,
    { 0, 0 },
@@ -607,7 +607,7 @@ ERROR4DATA e4errorData[] =
    { e4memory,         "Out of Memory"} ,
    { e4info,           "Unexpected Information"} ,
    { e4parm,           "Unexpected Parameter"} ,
-   { e4parm_null,      "Null Input Parameter unexpected"} ,
+   { e4parmNull,      "Null Input Parameter unexpected"} ,
    { e4demo,           "Exceeded Maximum Record Number for Demonstration"} ,
    { e4result,         "Unexpected Result"} ,
    { 0, 0 },
@@ -1206,7 +1206,9 @@ int S4FUNCTION error4describeDefault( CODE4 *c4, const int errCode1, const long 
    return error4describeExecute( c4, errCode1, errCode2, s1, s2, s3 ) ;
 }
 
-int S4FUNCTION error4describeExecute( CODE4 *c4, const int errCode1, const long errCode2, const char *s1, const char *s2, const char *s3 )
+int S4FUNCTION error4describeExecute( CODE4 *c4
+                                    , const int errCode1, const long errCode2
+                                    , const char *s1, const char *s2, const char *s3 )
 {
    #ifdef E4HOOK
          if ( c4 != 0 )
@@ -1234,7 +1236,7 @@ int S4FUNCTION error4describeExecute( CODE4 *c4, const int errCode1, const long 
                #endif
             #endif
          #endif
-         error4set( c4, errCode1 ) ;
+         error4set(  c4, errCode1 ) ;
          error4set2( c4, errCode2 ) ;
       }
 
@@ -1250,7 +1252,7 @@ int S4FUNCTION error4describeExecute( CODE4 *c4, const int errCode1, const long 
             case e4info:
             case e4memory:
             case e4parm:
-            case e4parm_null:
+            case e4parmNull:
             case e4result:
             case e4struct:
                code4exit( c4 ) ;

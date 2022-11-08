@@ -55,10 +55,7 @@ static unsigned long f4flagGetNextFlip( F4FLAG *f4, const unsigned long r, const
    unsigned long lowVal, onVal, highVal ;
    char i ;
 
-   #ifdef E4PARM_LOW
-      if ( direction != -1 && direction != 1 )
-         return error4( 0, e4parm, E90812 ) ;
-   #endif
+   E4PARM_TEST( direction != -1 && direction != 1, E90812 ) ;
 
    onVal = r ;
    if ( f4->flags == 0 || r > f4->numFlags )
@@ -312,10 +309,7 @@ static int relate4blankSet( RELATE4 *relate, const char direction )
    CODE4 *c4 ;
    int rc ;
 
-   #ifdef E4PARM_LOW
-      if ( direction < -1 || direction > 1 )
-         return error4( 0, e4parm, E94417 ) ;
-   #endif
+   E4PARM_TEST( direction < -1 || direction > 1, E94417 ) ;
 
    c4 = relate->codeBase ;
 
@@ -374,10 +368,7 @@ int S4FUNCTION relate4bottom( RELATE4 *relate )
          return -1 ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( relate == 0 )
-         return error4( 0, e4parm_null, E94401 ) ;
-   #endif
+   E4PARMLOW( relate, E94401 ) ;
 
    c4 = relate->codeBase ;
    if ( error4code( c4 ) < 0 )
@@ -566,10 +557,7 @@ int S4FUNCTION relate4changed( RELATE4 *relate )
    CODE4 *c4 ;
       int j ;
 
-   #ifdef E4PARM_HIGH
-      if ( relate == 0 )
-         return error4( 0, e4parm_null, E94402 ) ;
-   #endif
+   E4PARHIGH( relate, E94402) ;
 
    c4 = relate->codeBase ;
    if ( error4code( c4 ) < 0 )
@@ -636,13 +624,7 @@ RELATE4 *S4FUNCTION relate4createSlave( RELATE4 *master, DATA4 *slaveData, const
    if ( error4code( c4 ) < 0 )
       return 0 ;
 
-   #ifdef E4PARM_LOW
-      if ( slaveData == 0 || masterExpr == 0 )
-      {
-         error4( c4, e4parm_null, E94403 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARMLOW( slaveData && masterExpr, E94403 ) ;
 
    relation = master->relation ;
 
@@ -716,10 +698,7 @@ int S4FUNCTION relate4doAll( RELATE4 *relate )
          return -1 ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( relate == 0 )
-         return error4( 0, e4parm_null, E94405 ) ;
-   #endif
+   E4PARHIGH( relate, E94405 ) ;
 
    c4 = relate->codeBase ;
 
@@ -768,17 +747,11 @@ int S4FUNCTION relate4doOne( RELATE4 *relate )
          return -1 ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( relate == 0 )
-         return error4( 0, e4parm_null, E94405 ) ;
-   #endif
+   E4PARHIGH( relate, E94405) ;
 
    c4 = relate->codeBase ;
 
-   #ifdef E4PARM_HIGH
-      if ( relate->master == 0 )
-         return error4( c4, e4parm, E84405 ) ;
-   #endif
+   E4PARHIGH( relate->master, E94405) ;
 
    if ( error4code( c4 ) < 0 )
       return e4codeBase ;
@@ -812,10 +785,7 @@ int S4FUNCTION relate4doOne( RELATE4 *relate )
 
 int S4FUNCTION relate4eof( RELATE4 *relate )
 {
-   #ifdef E4PARM_HIGH
-      if ( relate == 0 )
-         return error4( 0, e4parm_null, E94406 ) ;
-   #endif
+   E4PARHIGH( relate, E94406) ;
 
    #ifdef E4MISC
       if ( relate->relation->isInitialized == 0 )
@@ -837,7 +807,7 @@ int S4FUNCTION relate4errorAction( RELATE4 *relate, const int code )
 
    #ifdef E4PARM_HIGH
       if ( relate == 0 )
-         return error4( 0, e4parm_null, E94407 ) ;
+         return error4( 0, e4parmNull, E94407 ) ;
       if ( code != relate4blank && code != relate4skipRec && code != relate4terminate )
          return error4( relate->codeBase, e4parm, E84407 ) ;
    #endif
@@ -956,7 +926,7 @@ RELATE4 *S4FUNCTION relate4init( DATA4 *master )
    #ifdef E4PARM_HIGH
       if ( master == 0 )
       {
-         error4( 0, e4parm_null, E94410 ) ;
+         error4( 0, e4parmNull, E94410 ) ;
          return 0 ;
       }
    #endif
@@ -1026,10 +996,7 @@ int S4FUNCTION relate4lockAdd( RELATE4 *relate )
       int rc ;
       RELATE4 *relateOn ;
 
-      #ifdef E4PARM_HIGH
-         if ( relate == 0 )
-            return error4( 0, e4parm_null, E94411 ) ;
-      #endif
+   E4PARHIGH( relate, E94411) ;
 
       #ifdef S4VBASIC
          if ( c4parm_check( relate, 5, E94411 ) )
@@ -1072,7 +1039,7 @@ static int relate4lookup( RELATE4 *relate, const char direction )
 
    #ifdef E4PARM_LOW
       if ( relate == 0 )
-         return error4( 0, e4parm_null, E94412 ) ;
+         return error4( 0, e4parmNull, E94412 ) ;
       if ( direction < -1 || direction > 1 )
          return error4( 0, e4parm, E94417 ) ;
    #endif
@@ -1263,7 +1230,7 @@ int S4FUNCTION relate4matchLen( RELATE4 *relate, const int matchLenIn )
 
    #ifdef E4PARM_HIGH
       if ( relate == 0 )
-         return error4( 0, e4parm_null, E94413 ) ;
+         return error4( 0, e4parmNull, E94413 ) ;
       if ( relate->master == NULL )
          return error4( 0, e4parm, E84405 ) ;
    #endif
@@ -1331,18 +1298,8 @@ int S4FUNCTION relate4next( RELATE4 **ptrPtr )
    void *nextLink ;
    int rc ;
 
-   #ifdef E4PARM_HIGH
-      if ( ptrPtr == 0 )
-      {
-         error4( 0, e4parm_null, E94414 ) ;
-         return r4complete ;
-      }
-      if ( *ptrPtr == 0 )
-      {
-         error4( 0, e4parm_null, E94414 ) ;
-         return r4complete ;
-      }
-   #endif
+   E4PARM_HRET(  ptrPtr, E94414, r4complete ) ;
+   E4PARM_HRET( *ptrPtr, E94414, r4complete ) ;
 
    cur = *ptrPtr ;
    rc = r4down ;
@@ -1389,7 +1346,7 @@ static int relate4nextRecordInScan( RELATE4 *relate )
 
    #ifdef E4PARM_LOW
       if ( relate == 0 )
-         return error4( 0, e4parm_null, E94415 ) ;
+         return error4( 0, e4parmNull, E94415 ) ;
    #endif
 
    if ( error4code( relate->codeBase ) < 0 )
@@ -1797,7 +1754,7 @@ static int relate4prevRecordInScan( RELATE4 *relate )
 
    #ifdef E4PARM_LOW
       if ( relate == 0 )
-         return error4( 0, e4parm_null, E94416 ) ;
+         return error4( 0, e4parmNull, E94416 ) ;
    #endif
 
    #ifdef E4MISC
@@ -2083,7 +2040,7 @@ static int relate4readRest( RELATE4 *relate, char direction )
 
    #ifdef E4PARM_LOW
       if ( relate == 0 )
-         return error4( 0, e4parm_null, E94417 ) ;
+         return error4( 0, e4parmNull, E94417 ) ;
       if ( direction < -1 || direction > 1 )
          return error4( 0, e4parm, E94417 ) ;
    #endif
@@ -2223,10 +2180,7 @@ int S4FUNCTION relate4skip( RELATE4 *relate, const long numSkip )
          return -1 ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( relate == 0 )
-         return error4( 0, e4parm_null, E94418 ) ;
-   #endif
+   E4PARHIGH(  relate, E94418 ) ;
 
    c4 = relate->codeBase ;
 
@@ -2422,7 +2376,7 @@ static int relate4sort( RELATE4 *relate )
 
    #ifdef E4PARM_LOW
       if ( relate == 0 )
-         return error4( 0, e4parm_null, E94419 ) ;
+         return error4( 0, e4parmNull, E94419 ) ;
    #endif
 
    c4 = relate->codeBase ;
@@ -2736,10 +2690,7 @@ static int relate4topInit( RELATE4 *relate )
          return -1 ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if( relate == 0 )
-         return error4( 0, e4parm_null, E94422 ) ;
-   #endif
+   E4PARHIGH( relate, E94422 ) ;
 
    c4 = relate->codeBase ;
    if ( error4code( c4 ) < 0 )
@@ -2813,10 +2764,7 @@ int S4FUNCTION relate4top( RELATE4 *relate )
          return -1 ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if( relate == 0 )
-         return error4( 0, e4parm_null, E94422 ) ;
-   #endif
+   E4PARHIGH( relate, E94422 ) ;
 
    c4 = relate->codeBase ;
    if ( error4code( c4 ) < 0 )
@@ -2948,7 +2896,8 @@ int S4FUNCTION relate4type( RELATE4 *relate, int relateType )
 
    #ifdef E4PARM_HIGH
       if ( relate == 0 )
-         return error4( 0, e4parm_null, E94423 ) ;
+         return error4( 0, e4parmNull, E94423 ) ;
+
       if ( relateType != relate4exact && relateType != relate4scan && relateType != relate4approx )
          return error4( relate->codeBase, e4parm, E84416 ) ;
    #endif

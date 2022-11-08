@@ -177,7 +177,7 @@ int S4FUNCTION file4flush( FILE4 *file )
 
    #ifdef E4PARM_HIGH
       if ( file == 0 )
-         return error4( 0, e4parm_null, E90611 ) ;
+         return error4( 0, e4parmNull, E90611 ) ;
    #endif
 
    if ( file->isReadOnly == 1 )
@@ -210,7 +210,7 @@ int S4FUNCTION file4refresh( FILE4 *file )
          int rc ;
          #ifdef E4PARM_HIGH
             if ( file == 0 )
-               return error4( 0, e4parm_null, E90612 ) ;
+               return error4( 0, e4parmNull, E90612 ) ;
          #endif
 
          if ( file->doBuffer == 0 || file->lowAccessMode != OPEN4DENY_NONE )

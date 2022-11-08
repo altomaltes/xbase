@@ -227,7 +227,7 @@ FILE4LONG S4FUNCTION file4lenLow( FILE4 *f4 )
    #ifdef E4PARM_HIGH
       if ( f4 == 0 )
       {
-         error4( 0, e4parm_null, E90605 ) ;
+         error4( 0, e4parmNull, E90605 ) ;
          file4longAssignError( lrc ) ;
          return lrc ;
       }
@@ -291,7 +291,7 @@ int S4FUNCTION file4lenSetLow( FILE4 *f4, FILE4LONG newLen )
 
    #ifdef E4PARM_HIGH
       if ( f4 == 0 || file4longError( newLen ) == (unsigned long)-1L )
-         return error4( 0, e4parm_null, E90606 ) ;
+         return error4( 0, e4parmNull, E90606 ) ;
    #endif
 
    c4 = f4->codeBase ;
@@ -730,7 +730,7 @@ unsigned S4FUNCTION file4read( FILE4 *f4, const long posIn, void *ptr, const uns
    #ifdef E4PARM_HIGH
       if ( f4 == 0 || posIn < 0 || ptr == 0  )
       {
-         error4( 0, e4parm_null, E90607 ) ;
+         error4( 0, e4parmNull, E90607 ) ;
          return 0 ;
       }
    #endif
@@ -815,7 +815,7 @@ int S4FUNCTION file4readAll( FILE4 *f4, const long posIn, void *ptr, const unsig
 
    #ifdef E4PARM_HIGH
       if ( f4 == 0 || posIn < 0 || ptr == 0  )
-         return error4( 0, e4parm_null, E90608 ) ;
+         return error4( 0, e4parmNull, E90608 ) ;
    #endif
 
    file4longAssign( pos, posIn, 0 ) ;
@@ -954,7 +954,7 @@ int S4FUNCTION file4replace( FILE4 *keep, FILE4 *from )
 
    #ifdef E4PARM_LOW
       if ( keep == 0 || from == 0  )
-         return error4( 0, e4parm_null, E90609 ) ;
+         return error4( 0, e4parmNull, E90609 ) ;
    #endif
 
    rc = 0 ;

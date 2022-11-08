@@ -13,7 +13,7 @@ void S4FUNCTION f4assignChar( FIELD4 *field, const int chr )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90502 ) ;
+         error4( 0, e4parmNull, E90502 ) ;
          return ;
       }
       switch( field->type )
@@ -65,7 +65,7 @@ int S4FUNCTION f4char( const FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90503 ) ;
+         error4( 0, e4parmNull, E90503 ) ;
          return -1 ;
       }
       #ifdef S4FOX

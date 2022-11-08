@@ -24,7 +24,7 @@ int S4FUNCTION sort4getMemInit( SORT4 *s4 )
 {
    #ifdef E4PARM_LOW
       if ( s4 == 0 )
-         return error4( 0, e4parm_null, E91901 ) ;
+         return error4( 0, e4parmNull, E91901 ) ;
    #endif
 
    s4quick( (void **)s4->pointers, s4->pointersUsed, s4->cmp, s4->sortLen) ;
@@ -44,7 +44,7 @@ int S4FUNCTION sort4getInit( SORT4 *s4 )
 
    #ifdef E4PARM_HIGH
       if ( s4 == 0 )
-         return error4( 0, e4parm_null, E91902 ) ;
+         return error4( 0, e4parmNull, E91902 ) ;
    #endif
 
    if ( error4code( s4->codeBase ) < 0 )
@@ -76,10 +76,7 @@ int S4FUNCTION sort4spoolsInit( SORT4 *s4, const int prevCall )
    char *poolEntry, *poolEntryIterate ;
    S4LONG spoolDiskI ;
 
-   #ifdef E4PARM_LOW
-      if ( s4 == 0 || prevCall < 0 || prevCall > 1 )
-         return error4( 0, e4parm, E91903 ) ;
-   #endif
+   E4PARM_TEST( s4 == 0 || prevCall < 0 || prevCall > 1, E91903 ) ;
 
    poolEntry = (char *) 0 ;
    if ( !prevCall )
@@ -186,7 +183,7 @@ int S4FUNCTION sort4init( SORT4 *s4, CODE4 *c4, const int sortL, const int infoL
 {
    #ifdef E4PARM_HIGH
       if ( s4 == 0 || c4 == 0 )
-         return error4( c4, e4parm_null, E91904 ) ;
+         return error4( c4, e4parmNull, E91904 ) ;
    #endif
 
    if ( error4code( c4 ) < 0 )
@@ -230,7 +227,7 @@ int S4FUNCTION sort4initAlloc( SORT4 *s4 )
 
    #ifdef E4PARM_LOW
       if ( s4 == 0 )
-         return error4( 0, e4parm_null, E91906 ) ;
+         return error4( 0, e4parmNull, E91906 ) ;
    #endif
 
    if ( s4->seqwriteBuffer == 0 )
@@ -274,7 +271,7 @@ void sort4initPointers( SORT4 *s4, char *availMem, unsigned int len )
    #ifdef E4PARM_LOW
       if ( s4 == 0 || availMem == 0 )
       {
-         error4( 0, e4parm_null, E91907 ) ;
+         error4( 0, e4parmNull, E91907 ) ;
          return ;
       }
    #endif

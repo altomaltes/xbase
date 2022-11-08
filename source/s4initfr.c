@@ -25,7 +25,7 @@ void relate4freeBitmaps( RELATE4 *relate )
 
    #ifdef E4PARM_LOW
       if ( relate == 0 )
-         error4( 0, e4parm_null, E91909 ) ;
+         error4( 0, e4parmNull, E91909 ) ;
    #endif
 
    for( relateOn = 0 ;; )
@@ -46,7 +46,7 @@ static int sort4freeExtra( RELATE4 *relate, CODE4 *codeBase )
 {
    #ifdef E4PARM_LOW
       if ( codeBase == 0 )
-         error4( 0, e4parm_null, E91910 ) ;
+         error4( 0, e4parmNull, E91910 ) ;
    #endif
 
    #ifndef S4OPTIMIZE_OFF
@@ -78,7 +78,7 @@ int S4FUNCTION sort4getInitFree( SORT4 *s4, RELATE4 *relate )
 
    #ifdef E4PARM_LOW
       if ( s4 == 0 )
-         error4( 0, e4parm_null, E91911 ) ;
+         error4( 0, e4parmNull, E91911 ) ;
    #endif
 
    codeBase = s4->codeBase ;
@@ -128,7 +128,7 @@ int S4FUNCTION sort4initFree( SORT4 *s4, CODE4 *c4, const int sortL, const int i
 
    #ifdef E4PARM_LOW
       if ( s4 == 0 || c4 == 0 || sortL < 0 || infoL < 0 )
-         error4( 0, e4parm_null, E91912 ) ;
+         error4( 0, e4parmNull, E91912 ) ;
    #endif
 
    sort4initSet( s4, c4, sortL, infoL ) ;

@@ -132,6 +132,11 @@ PUBLIC int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) ;
    #define u4filelength( a )          ( filelength( a ) )
 #endif
 
-#define E4PARMLOW( param, errno ) if (!( param ))  {  error4( 0, e4parm, errno ) ; return 0 ; }
+#define E4PARHIGH(   param, errno  ) if (!( param )) {  return( error4( 0, e4parmNull, errno )); }
+#define E4PARMLOW(   param, errno  ) if (!( param )) {  error4( 0, e4parmNull, errno ) ; return 0 ; }
+#define E4PARM_TEST( param, errno  ) if (   param  ) {  return( error4( 0, e4parm, errno )); }
+#define E4PARM_TRET( prm, err, ret ) if (   prm    ) {  error4( 0, e4parm    , err ) ; return ret ; }
+#define E4PARM_HRET( prm, err, ret ) if (!( prm   )) {  error4( 0, e4parmNull, err ) ; return ret ; }
+
 
 

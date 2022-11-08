@@ -1,4 +1,4 @@
-/*If E4PARM_LOW is defined, the functions in this module will ensure that
+/*If E4PARMLOW is defined, the functions in this module will ensure that
   their paramaters are not invalid.  This error will be generated even
   for those functions which otherwise say that no error is generated.*/
 
@@ -34,10 +34,7 @@ int semaphore4init(SEMAPHORE4 *semaphore )
    < 0 error
 */
 
-   #ifdef E4PARM_LOW
-      if (semaphore == NULL)
-         return (error4(NULL, e4parmNull, E96934 ) ) ;
-   #endif
+   E4PARMLOW( semaphore, E96934 ) ;
 
    semaphore->handle = CreateSemaphore(NULL, 0, INT_MAX, NULL ) ;
    if (semaphore->handle == NULL )
@@ -71,10 +68,7 @@ int semaphore4initUndo(SEMAPHORE4 *semaphore )
 
    int rc ;
 
-   #ifdef E4PARM_LOW
-      if (semaphore == NULL)
-         return (error4(NULL, e4parmNull, E96935 ) ) ;
-   #endif
+   E4PARMLOW( semaphore, E96935 ) ;
 
    rc = CloseHandle(semaphore->handle ) ;
    if (rc ==FALSE)
@@ -104,13 +98,7 @@ void semaphore4release(SEMAPHORE4 *semaphore )
 
    int rc ;
 
-   #ifdef E4PARM_LOW
-      if (semaphore == NULL)
-      {
-         error4(NULL, e4parmNull, E96936 )  ;
-         return ;
-      }
-   #endif
+   E4PARMLOW( semaphore, E96936 )  ;
 
    rc = ReleaseSemaphore(semaphore->handle, 1, NULL ) ;
    if (rc == FALSE )
@@ -127,7 +115,7 @@ int semaphore4wait (SEMAPHORE4 *semaphore, int waitSecs )
 
    ERRORS
 
-   In case of E4PARM_LOW error, call error4() with a NULL CODE4 (since one is
+   In case of E4PARMLOW error, call error4() with a NULL CODE4 (since one is
      not available), and an error code of e4result.  This severe error
      indicates an unrecoverable failure, and indicates a major failure.
 
@@ -151,10 +139,7 @@ int semaphore4wait (SEMAPHORE4 *semaphore, int waitSecs )
 
    int rc ;
 
-   #ifdef E4PARM_LOW
-      if ( semaphore == NULL )
-         return( error4(NULL, e4parm, E96937 )) ;
-   #endif
+   E4PARMLOW( semaphore, E96937 )  ;
 
    if (waitSecs<0)
       rc = WaitForSingleObject(semaphore->handle, INFINITE) ;

@@ -20,7 +20,7 @@ int S4FUNCTION d4top( DATA4 *data )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E92301 ) ;
+         return error4( 0, e4parmNull, E92301 ) ;
    #endif
 
    c4 = data->codeBase ;
@@ -87,7 +87,7 @@ int S4FUNCTION d4goBof( DATA4 *data )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E93104 ) ;
+         return error4( 0, e4parmNull, E93104 ) ;
    #endif
 
    if ( error4code( data->codeBase ) < 0 )

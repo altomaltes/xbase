@@ -144,7 +144,7 @@ int dfile4registerLocked( DATA4FILE *d4, const long lockId, int doExtra )
       #ifdef E4PARM_HIGH
          if ( c4 == 0 )
          {
-            error4( 0, e4parm_null, E91009 ) ;
+            error4( 0, e4parmNull, E91009 ) ;
             return 0 ;
          }
       #endif
@@ -156,7 +156,7 @@ int dfile4registerLocked( DATA4FILE *d4, const long lockId, int doExtra )
       #ifdef E4PARM_HIGH
          if ( c4 == 0 )
          {
-            error4( 0, e4parm_null, E91010 ) ;
+            error4( 0, e4parmNull, E91010 ) ;
             return 0 ;
          }
       #endif
@@ -168,7 +168,7 @@ int dfile4registerLocked( DATA4FILE *d4, const long lockId, int doExtra )
       #ifdef E4PARM_HIGH
          if ( c4 == 0 )
          {
-            error4( 0, e4parm_null, E91011 ) ;
+            error4( 0, e4parmNull, E91011 ) ;
             return 0 ;
          }
       #endif
@@ -180,7 +180,7 @@ int dfile4registerLocked( DATA4FILE *d4, const long lockId, int doExtra )
       #ifdef E4PARM_HIGH
          if ( c4 == 0 )
          {
-            error4( 0, e4parm_null, E91012 ) ;
+            error4( 0, e4parmNull, E91012 ) ;
             return 0 ;
          }
       #endif
@@ -218,7 +218,7 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
 
       #ifdef E4PARM_HIGH
          if ( file == 0 )
-            return error4( 0, e4parm_null, E90613 ) ;
+            return error4( 0, e4parmNull, E90613 ) ;
          #ifndef S4MDX
             if ( numBytes < 0 || posStart < 0 )
                return error4( 0, e4parm, E90613 ) ;
@@ -497,7 +497,7 @@ int S4FUNCTION file4unlockInternal( FILE4 *file, unsigned long posStart, long po
 
       #ifdef E4PARM_HIGH
          if ( file == 0 )
-            return error4( 0, e4parm_null, E90614 ) ;
+            return error4( 0, e4parmNull, E90614 ) ;
          #ifndef S4MDX
             if ( numBytes < 0 || posStart < 0 )
                return error4( file->codeBase, e4parm, E90614 ) ;

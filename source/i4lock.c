@@ -133,9 +133,9 @@ int S4FUNCTION tfile4lock( TAG4FILE *t4, const long serverId )
 
          #ifdef E4PARM_LOW
             if ( t4 == 0 )
-               return error4( 0, e4parm_null, E95607 ) ;
+               return error4( 0, e4parmNull, E95607 ) ;
             if ( serverId == 0 )
-               return error4( t4->codeBase, e4parm_null, E95607 ) ;
+               return error4( t4->codeBase, e4parmNull, E95607 ) ;
          #endif
 
          if ( error4code( t4->codeBase ) < 0 )
@@ -211,7 +211,7 @@ static INDEX4 *code4index( CODE4 *cb, const long id, const char *name )
 
    if ( cb == 0 || id == 0 )
    {
-      error4( cb, e4parm_null, E95601 ) ;
+      error4( cb, e4parmNull, E95601 ) ;
       return 0 ;
    }
 
@@ -278,9 +278,9 @@ int index4lock( INDEX4FILE *i4, const long serverId )
 
       #ifdef E4PARM_LOW
          if ( i4 == 0 )
-            return error4( 0, e4parm_null, E95602 ) ;
+            return error4( 0, e4parmNull, E95602 ) ;
          if ( serverId == 0 )
-            return error4( i4->codeBase, e4parm_null, E95602 ) ;
+            return error4( i4->codeBase, e4parmNull, E95602 ) ;
       #endif
 
       if ( error4code( i4->codeBase ) < 0 )

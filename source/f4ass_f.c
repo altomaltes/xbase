@@ -8,7 +8,7 @@ void S4FUNCTION f4assignField( FIELD4 *fieldTo, const FIELD4 *fieldFrom )
    #ifdef E4PARM_HIGH
       if ( fieldTo == 0 || fieldFrom == 0 )
       {
-         error4( 0, e4parm_null, E90501 ) ;
+         error4( 0, e4parmNull, E90501 ) ;
          return ;
       }
    #endif

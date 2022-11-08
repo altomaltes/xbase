@@ -72,10 +72,7 @@ int S4FUNCTION d4lockAddAppend( DATA4 *d4 )
       CODE4 *c4 ;
       int rc ;
 
-      #ifdef E4PARM_HIGH
-         if ( d4 == 0 )
-            return error4( 0, e4parm, E92719 ) ;
-      #endif
+     E4PARHIGH( d4, E92719 ) ;
 
       if ( ( rc = d4verify( d4, 1 ) ) < 0 )
          return rc ;
@@ -113,10 +110,7 @@ int S4FUNCTION d4lockAddAll( DATA4 *d4 )
       CODE4 *c4 ;
       int rc ;
 
-      #ifdef E4PARM_HIGH
-         if ( d4 == 0 )
-            return error4( 0, e4parm, E92725 ) ;
-      #endif
+     E4PARHIGH( d4, E92725 ) ;
 
       if ( ( rc = d4verify( d4, 1 ) ) < 0 )
          return rc ;
@@ -154,10 +148,7 @@ int S4FUNCTION d4lockAddFile( DATA4 *d4 )
       CODE4 *c4 ;
       int rc ;
 
-      #ifdef E4PARM_HIGH
-         if ( d4 == 0 )
-            return error4( 0, e4parm, E92720 ) ;
-      #endif
+     E4PARHIGH( d4, E92720 ) ;
 
       if ( ( rc = d4verify( d4, 1 ) ) < 0 )
          return rc ;
@@ -237,10 +228,7 @@ int S4FUNCTION d4lockAll( DATA4 *data )
    #ifndef S4SINGLE
       int rc, rc2 ;
 
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parm, E92702 ) ;
-      #endif
+     E4PARHIGH( data, E92702 ) ;
 
       if ( error4code( data->codeBase ) < 0 )
          return e4codeBase ;
@@ -300,10 +288,7 @@ int S4FUNCTION d4lockAppend( DATA4 *data )
             return -1 ;
       #endif
 
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parm, E92708 ) ;
-      #endif
+     E4PARHIGH( data, E92708 ) ;
 
       c4 = data->codeBase ;
       if ( error4code( c4 ) < 0 )
@@ -353,10 +338,7 @@ int S4FUNCTION d4lockFile( DATA4 *data )
             return -1 ;
       #endif
 
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parm, E92709 ) ;
-      #endif
+     E4PARHIGH( data, E92709 ) ;
 
       c4 = data->codeBase ;
       if ( error4code( c4 ) < 0 )
@@ -397,10 +379,7 @@ int S4FUNCTION d4lockTest( DATA4 *data, const long rec )
    #ifndef S4SINGLE
       int rc ;
 
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parm, E92703 ) ;
-      #endif
+     E4PARHIGH( data, E92703 ) ;
 
       rc = dfile4lockTest( data->dataFile, data4clientId( data ), data4serverId( data ), rec ) ;
 

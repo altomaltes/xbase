@@ -108,7 +108,7 @@ int S4FUNCTION d4unlock( DATA4 *data )
    #ifndef S4SINGLE
       #ifdef E4PARM_HIGH
          if ( data == 0 )
-            return error4( 0, e4parm_null, E92801 ) ;
+            return error4( 0, e4parmNull, E92801 ) ;
       #endif
 
       return d4unlockLow( data, data4clientId( data ), 1 ) ;
@@ -127,7 +127,7 @@ int d4unlockAppend( DATA4 *data )
    #ifndef S4SINGLE
       #ifdef E4PARM_HIGH
          if ( data == 0 )
-            return error4( 0, e4parm_null, E92802 ) ;
+            return error4( 0, e4parmNull, E92802 ) ;
       #endif
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
          return 0 ;
@@ -147,7 +147,7 @@ int d4unlockData( DATA4 *data )
    #ifndef S4SINGLE
       #ifdef E4PARM_HIGH
          if ( data == 0 )
-            return error4( 0, e4parm_null, E92803 ) ;
+            return error4( 0, e4parmNull, E92803 ) ;
       #endif
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
          return 0 ;
@@ -175,7 +175,7 @@ int d4unlockFile( DATA4 *data )
 
       #ifdef E4PARM_HIGH
          if ( data == 0 )
-            return error4( 0, e4parm_null, E92804 ) ;
+            return error4( 0, e4parmNull, E92804 ) ;
       #endif
 
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
@@ -201,7 +201,7 @@ int S4FUNCTION d4unlockRecord( DATA4 *data, long rec )
    #ifndef S4SINGLE
       #ifdef E4PARM_HIGH
          if ( data == 0 )
-            return error4( 0, e4parm_null, E92805 ) ;
+            return error4( 0, e4parmNull, E92805 ) ;
       #endif
 
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
@@ -230,7 +230,7 @@ int d4unlockRecords( DATA4 *data )
    #ifndef S4SINGLE
       #ifdef E4PARM_HIGH
          if ( data == 0 )
-            return error4( 0, e4parm_null, E92806 ) ;
+            return error4( 0, e4parmNull, E92806 ) ;
       #endif
 
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
@@ -258,7 +258,7 @@ int code4unlockDo( LIST4 *dataList )
 
    #ifdef E4PARM_HIGH
       if ( dataList == 0 )
-         return error4( 0, e4parm_null, E92807 ) ;
+         return error4( 0, e4parmNull, E92807 ) ;
    #endif
 
       for ( dataOn = 0 ;; )

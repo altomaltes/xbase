@@ -277,7 +277,7 @@ char *u4environ( char *find, const int doErr )
    #ifdef E4PARM_HIGH
       if ( find == 0 )
       {
-         error4( 0, e4parm_null, E94503 ) ;
+         error4( 0, e4parmNull, E94503 ) ;
          return 0 ;
       }
    #endif
@@ -816,7 +816,7 @@ int S4FUNCTION u4remove( const char *ptr )
 
    #ifdef E4PARM_LOW
       if ( ptr == 0 )
-         return error4( 0, e4parm_null, E94504 ) ;
+         return error4( 0, e4parmNull, E94504 ) ;
    #endif
 
    #ifdef S4UNICODE
@@ -842,10 +842,7 @@ int u4rename( const char *oldName, const char *newName )
       memset( (void *)buf, 0, sizeof(buf) ) ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( oldName == 0 || newName == 0 )
-         return error4( 0, e4parm_null, E94505 ) ;
-   #endif
+   E4PARMLOW( oldName && newName, E94505 ) ;
 
    #ifdef S4UNICODE
       c4atou(oldName, from, 256) ;
@@ -1702,10 +1699,7 @@ int S4FUNCTION u4ncpy_v2( char *to, char *from, int len )
          compressedChars *v4compressedChar = vfp->compPtr ;
          unsigned char *v4codePage = vfp->cpPtr ;
 
-         #ifdef E4PARM_LOW
-            if ( max_l < 1 || src_l > max_l )
-               return error4( 0, e4parm, E91643 ) ;
-         #endif
+         E4PARM_TEST( max_l < 1 || src_l > max_l, E91643 ) ;
 
          if ( src_l*2 < max_l )   /* partial key: don't need to worry about tail characters */
          {

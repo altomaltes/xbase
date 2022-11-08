@@ -25,20 +25,14 @@
 
    short S4FUNCTION code4getErrorCode( const CODE4 *cb )
    {
-      #ifdef E4PARM_HIGH
-         if ( cb == 0 )
-            return error4( 0, e4parm_null, E96702 ) ;
-      #endif
+      E4PARHIGH( cb, E96702 ) ;
+
       return (short)cb->errorCode ;
    }
 
    long S4FUNCTION code4getErrorCode2( const CODE4 *cb )
    {
-      #ifdef E4PARM_HIGH
-         if ( cb == 0 )
-            return error4( 0, e4parm_null, E96702 ) ;
-      #endif
-      return cb->errorCode2 ;
+      E4PARHIGH( cb, E96702 ) ;
    }
 
 
@@ -816,16 +810,11 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
 
 
    // AS Feb 12/03 - Added new switch odbc for internal use.
-   void S4FUNCTION c4setOdbc( CODE4 *c4, Bool5 val )
+   int S4FUNCTION c4setOdbc( CODE4 *c4, Bool5 val )
    {
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-         {
-            error4( 0, e4parm_null, E96702 ) ;
-            return ;
-         }
-      #endif
+      E4PARHIGH( cb, E96702 ) ;
       c4->odbc = val ;
+      return( 0 );
    }
 
 
@@ -835,13 +824,7 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
 #if  (defined( E4ANALYZE ) || defined( S4TESTING ))
    void S4FUNCTION code4countPosReset( CODE4 *c4 )
    {
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-         {
-            error4( 0, e4parm_null, E96702 ) ;
-            return ;
-         }
-      #endif
+      E4PARHIGH( cb, E96702 ) ;
       // reset count to 0
          c4->testCount = 0 ;
    }
@@ -850,13 +833,7 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
 
    unsigned long S4FUNCTION code4countPosGet( CODE4 *c4 )
    {
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-         {
-            error4( 0, e4parm_null, E96702 ) ;
-            return 0 ;
-         }
-      #endif
+      E4PARHIGH( cb, E96702 ) ;
       // return current count
          return c4->testCount ;
    }
@@ -865,15 +842,10 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
 
 
 // AS Jan 24/03 - isolate encryption to a dll
+
 void *S4FUNCTION c4getPreprocess( CODE4 *c4 )
 {
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-      {
-         error4( 0, e4parm_null, E96702 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARM_HRET( c4, E96702, 0 ) ;
 
    #if defined( S4ENCRYPT_FILE )  )
        #ifdef S4ENCRYPT_DLL   // LY Jul 16/04
@@ -889,13 +861,7 @@ void *S4FUNCTION c4getPreprocess( CODE4 *c4 )
 
 Bool5 S4FUNCTION c4getFileAccessed( CODE4 *c4 )
 {
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-      {
-         error4( 0, e4parm_null, E96702 ) ;
-         return -1 ;
-      }
-   #endif
+   E4PARM_HRET( c4, E96702, -1 ) ;
 
    #if defined( S4PREPROCESS_FILE  )
       return c4->fileAccessed ;
@@ -909,10 +875,7 @@ Bool5 S4FUNCTION c4getFileAccessed( CODE4 *c4 )
 #if defined( S4ENCRYPT_DLL ) && defined( S4PREPROCESS_FILE )
    int S4FUNCTION code4setPreprocessFile( CODE4 *c4, short val )  // LY Dec 11/03 : added S4FUNCTION
    {
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-            return error4( 0, e4parm_null, E96702 ) ;
-      #endif
+      E4PARHIGH( cb, E96702 ) ;
       // AS May 20/03 - avoid server compile error
       // AS Jul 16/03 - this was wrnong, just don't load
       if ( c4->encrypt == 0 )
@@ -930,26 +893,18 @@ Bool5 S4FUNCTION c4getFileAccessed( CODE4 *c4 )
 
 
 // AS Apr 11/03 - New feature allows unlock appending as well as locking of clones
-   void S4FUNCTION c4setShareCloneLocks( CODE4 *c4, short val )
+   int S4FUNCTION c4setShareCloneLocks( CODE4 *c4, short val )
    {
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-         {
-            error4( 0, e4parm_null, E96702 ) ;
-            return ;
-         }
-      #endif
+      E4PARHIGH( cb, E96702 ) ;
       c4->shareCloneLocks = val ;
+      return( 0 );
    }
 
 
 
 long S4FUNCTION c4getTimeout( CODE4 *c4 )
 {
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E96702 ) ;
-   #endif
+      E4PARHIGH( cb, E96702 ) ;
 
       return e4notSupported ;
 }
@@ -966,13 +921,7 @@ int S4FUNCTION c4getDecimals( CODE4 *c4 )
 
 void S4FUNCTION c4setDecimals( CODE4 *c4, int numDec )
 {
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-      {
-         error4( 0, e4parm_null, E96702 ) ;
-         return ;
-      }
-   #endif
+   E4PARHIGH( cb, E96702 ) ;
    c4->decimals = numDec ;
 }
 
@@ -980,12 +929,7 @@ void S4FUNCTION c4setDecimals( CODE4 *c4, int numDec )
 // AS Jan 26/06 - Support for limiting the key size
 void S4FUNCTION code4limitKeySizeSet( CODE4 *c4, short val )
 {
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-      {
-         error4( 0, e4parm_null, E96702 ) ;
-         return ;
-      }
-   #endif
+   E4PARM_HRET( cb, E96702, ) ;
+
    c4->limitKeySize = (char)val ;  // CS 2007/04/27 Cast to char to avoid warning.
 }

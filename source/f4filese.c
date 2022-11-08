@@ -38,7 +38,7 @@ unsigned S4FUNCTION file4seqReadAdvance( FILE4SEQ_READ *seqRead, void *ptr, cons
    #ifdef E4PARM_LOW
       if ( seqRead->avail != 0 )
       {
-         error4( c4, e4parm_null, E90701 ) ;
+         error4( c4, e4parmNull, E90701 ) ;
          return 0 ;
       }
       #ifdef S4FILE_EXTENDED
@@ -188,7 +188,7 @@ unsigned S4FUNCTION file4seqRead( FILE4SEQ_READ *seqRead, void *ptr, unsigned le
    #ifdef E4PARM_HIGH
       if ( seqRead == 0 || ( ptr == 0 && len ) )
       {
-         error4( 0, e4parm_null, E90701 ) ;
+         error4( 0, e4parmNull, E90701 ) ;
          return 0 ;
       }
    #endif
@@ -291,7 +291,7 @@ int S4FUNCTION file4seqReadAll( FILE4SEQ_READ *seqRead, void *ptr, const unsigne
 
    #ifdef E4PARM_HIGH
       if ( seqRead == 0 || ( ptr == 0 && len ) )
-         return error4( 0, e4parm_null, E90702 ) ;
+         return error4( 0, e4parmNull, E90702 ) ;
    #endif
    #ifdef E4ANALYZE
       if ( seqRead->file == 0 )
@@ -390,7 +390,7 @@ int S4FUNCTION file4seqWriteDelay( FILE4SEQ_WRITE *seqWrite )   /* not static du
 
    #ifdef E4PARM_HIGH
       if ( seqWrite == 0 )
-         return error4( 0, e4parm_null, E90705 ) ;
+         return error4( 0, e4parmNull, E90705 ) ;
    #endif
 
    if ( seqWrite->file == 0 )  /* nothing to flush, just return */
@@ -496,7 +496,7 @@ int S4FUNCTION file4seqWriteFlush( FILE4SEQ_WRITE *seqWrite )
 
    #ifdef E4PARM_HIGH
       if ( seqWrite == 0 )
-         return error4( 0, e4parm_null, E90705 ) ;
+         return error4( 0, e4parmNull, E90705 ) ;
    #endif
 
    if ( seqWrite->file == 0 )  /* nothing to flush, just return */
@@ -556,7 +556,7 @@ int S4FUNCTION file4seqWrite( FILE4SEQ_WRITE *seqWrite, const void *buffer, cons
 
    #ifdef E4PARM_HIGH
       if ( seqWrite == 0 || ( ptrLen && buffer == 0 ) )
-         return error4( 0, e4parm_null, E90704 ) ;
+         return error4( 0, e4parmNull, E90704 ) ;
    #endif
 
    c4 = seqWrite->file->codeBase ;

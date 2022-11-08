@@ -1437,16 +1437,16 @@
 #define e4rep_ret          e4repRet
 #define e4rep_data         e4repData
 
-/* Critical Errors */
-#define e4info      -910  /* Unexpected information in internal variable */
-#define e4memory    -920  /* Out of memory */
-#define e4parm      -930  /* Unexpected parameter */
-#define e4parmNull  e4parm_null
-#define e4parm_null -935  /* Unexpected parameter - null input */
-#define e4demo      -940  /* Exceeded maximum record number for demo */
-#define e4result    -950  /* Unexpected result */
-#define e4verify    -960
-#define e4struct    -970
+/* Critical Errors
+*/
+#define e4info     -910  /* Unexpected information in internal variable */
+#define e4memory   -920  /* Out of memory */
+#define e4parm     -930  /* Unexpected parameter */
+#define e4parmNull -935  /* Unexpected parameter - null input */
+#define e4demo     -940  /* Exceeded maximum record number for demo */
+#define e4result   -950  /* Unexpected result */
+#define e4verify   -960
+#define e4struct   -970
 
 /* Library Errors */
 /* call to library function calls not supported */

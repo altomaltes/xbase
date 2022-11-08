@@ -506,7 +506,7 @@ int S4FUNCTION file4create( FILE4 *file, CODE4 *c4, S4CONST char *name, const in
 
    #ifdef E4PARM_HIGH
       if ( file == 0 || c4 == 0 )
-         return error4( c4, e4parm_null, E90602 ) ;
+         return error4( c4, e4parmNull, E90602 ) ;
    #endif
 
    #ifndef S4OPTIMIZE_OFF

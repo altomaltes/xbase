@@ -13,7 +13,7 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
 
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
-         return error4( 0, e4parm_null, E94604 ) ;
+         return error4( 0, e4parmNull, E94604 ) ;
       if ( r1 < 1 || r2 < 1 )
          return error4( d4->codeBase, e4parm, E94604 ) ;
    #endif
@@ -69,7 +69,7 @@ int d4zapData( DATA4 *data, const long startRec, const long endRec )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E94605 ) ;
+         return error4( 0, e4parmNull, E94605 ) ;
       if ( startRec < 1 || endRec < 1 )
          return error4( data->codeBase, e4parm, E94605 ) ;
    #endif
@@ -130,7 +130,7 @@ int dfile4zapData( DATA4FILE *d4, long startRec, long endRec )
 
    #ifdef E4PARM_LOW
       if ( d4 == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
+         return error4( 0, e4parmNull, E91102 ) ;
       if ( startRec < 0 || endRec < 0 )
          return error4( d4->c4, e4parm, E91102 ) ;
    #endif

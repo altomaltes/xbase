@@ -71,7 +71,7 @@ int S4FUNCTION file4close( FILE4 *file )
 
    #ifdef E4PARM_HIGH
       if ( file == 0 )
-         return error4( 0, e4parm_null, E90601 ) ;
+         return error4( 0, e4parmNull, E90601 ) ;
    #endif
 
    if ( file->hand == INVALID4HANDLE )

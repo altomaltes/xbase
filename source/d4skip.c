@@ -23,7 +23,7 @@ int S4FUNCTION d4tagSync( DATA4 *data, TAG4 * const tag )
 
       #ifdef E4PARM_HIGH
          if ( data == 0 )
-            return error4( 0, e4parm_null, E94803 ) ;
+            return error4( 0, e4parmNull, E94803 ) ;
       #endif
 
       if ( tag == 0 )
@@ -249,7 +249,7 @@ int S4FUNCTION d4skip( DATA4 *data, const long nSkip )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E94802 ) ;
+         return error4( 0, e4parmNull, E94802 ) ;
    #endif
 
    c4 = data->codeBase ;

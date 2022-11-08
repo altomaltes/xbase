@@ -15,7 +15,7 @@ int S4FUNCTION d4freeBlocks( DATA4 *data )
 
       #ifdef E4PARM_HIGH
          if ( data == 0 )
-            return error4( 0, e4parm_null, E93001 ) ;
+            return error4( 0, e4parmNull, E93001 ) ;
       #endif
 
 
@@ -55,7 +55,7 @@ INDEX4 *S4FUNCTION d4index( DATA4 *data, const char *indexName )
       #ifdef E4PARM_HIGH
          if ( data == 0 )
          {
-            error4( 0, e4parm_null, E93002 ) ;
+            error4( 0, e4parmNull, E93002 ) ;
             return 0 ;
          }
       #endif
@@ -167,7 +167,7 @@ INDEX4FILE *dfile4index( DATA4FILE *data, const char *indexName )
       #ifdef E4PARM_LOW
          if ( data == 0 || indexName == 0 )
          {
-            error4( 0, e4parm_null, E91102 ) ;
+            error4( 0, e4parmNull, E91102 ) ;
             return 0 ;
          }
       #endif
@@ -211,7 +211,7 @@ int S4FUNCTION d4reindex( DATA4 *data )
 
       #ifdef E4PARM_HIGH
          if ( data == 0 )
-            return error4( 0, e4parm_null, E93004 ) ;
+            return error4( 0, e4parmNull, E93004 ) ;
       #endif
 
       c4 = data->codeBase ;

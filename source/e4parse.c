@@ -642,7 +642,7 @@ EXPR4 *S4FUNCTION expr4parseLow( DATA4 *d4, const char *exprPtr, TAG4FILE *tagPt
    #ifdef E4PARM_HIGH
       if ( d4 == 0 || exprPtr == 0 )
       {
-         error4( 0, e4parm_null, E90904 ) ;
+         error4( 0, e4parmNull, E90904 ) ;
          return 0 ;
       }
    #endif
@@ -744,7 +744,7 @@ int e4getOperator( E4PARSE *p4, int *opReturn)
 
    #ifdef E4PARM_LOW
       if ( p4 == 0 || opReturn == 0 )
-         return error4( 0, e4parm_null, E90505 ) ;
+         return error4( 0, e4parmNull, E90505 ) ;
    #endif
 
    s4scanRange( &p4->scan, 1, ' ' ) ;

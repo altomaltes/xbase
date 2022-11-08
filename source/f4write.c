@@ -353,7 +353,7 @@ int file4writeInternal( FILE4 *f4, FILE4LONG pos, const void *ptr, unsigned len 
 
    #ifdef E4PARM_HIGH
       if ( f4 == 0 )
-         return error4( 0, e4parm_null, E90619 ) ;
+         return error4( 0, e4parmNull, E90619 ) ;
       if ( file4longError( pos ) < 0 || ( ptr == 0 && len > 0 ) )
          return error4( f4->codeBase, e4parm, E90619 ) ;
       if ( f4->hand == INVALID4HANDLE )

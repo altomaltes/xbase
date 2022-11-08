@@ -38,7 +38,7 @@ int S4FUNCTION d4writeLow( DATA4 *d4, const long recIn, const int unlock )
 
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
-         return error4( 0, e4parm_null, E92601 ) ;
+         return error4( 0, e4parmNull, E92601 ) ;
       if ( recIn < -1 || recIn == 0 || d4->codeBase == 0 )
          return error4( d4->codeBase, e4parm, E92601 ) ;
    #endif
@@ -367,7 +367,7 @@ int d4writeData( DATA4 *data, const long rec )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E92602 ) ;
+         return error4( 0, e4parmNull, E92602 ) ;
       if ( rec < 1 || data->codeBase == 0 )
          return error4( data->codeBase, e4parm, E92602 ) ;
    #endif
@@ -389,7 +389,7 @@ int dfile4writeData( DATA4FILE *d4, const long rec, const char *record )
 {
    #ifdef E4PARM_LOW
       if ( d4 == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
+         return error4( 0, e4parmNull, E91102 ) ;
       if ( rec < 1 || d4->c4 == 0 )
          return error4( d4->c4, e4parm, E91102 ) ;
    #endif
@@ -453,7 +453,7 @@ int d4writeKeys( DATA4 *d4, const long rec )
 
       #ifdef E4PARM_HIGH
          if ( d4 == 0 )
-            return error4( 0, e4parm_null, E92604 ) ;
+            return error4( 0, e4parmNull, E92604 ) ;
          if ( rec < 1 || d4->codeBase == 0 )
             return error4( d4->codeBase, e4parm, E92604 ) ;
       #endif
@@ -838,7 +838,7 @@ static int d4unwriteKeys( DATA4 *d4, const long rec )
 
       #ifdef E4PARM_HIGH
          if ( d4 == 0 )
-            return error4( 0, e4parm_null, E92605 ) ;
+            return error4( 0, e4parmNull, E92605 ) ;
          if ( rec < 1 || d4->codeBase == 0 )
             return error4( d4->codeBase, e4parm, E92605 ) ;
       #endif

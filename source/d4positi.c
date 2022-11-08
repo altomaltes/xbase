@@ -21,7 +21,7 @@ double S4FUNCTION d4position( DATA4 *data )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return (double)error4( 0, e4parm_null, E94701 ) ;
+         return (double)error4( 0, e4parmNull, E94701 ) ;
    #endif
 
    if( error4code( data->codeBase ) < 0 )
@@ -84,7 +84,7 @@ int S4FUNCTION d4positionSet( DATA4 *data, const double per )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E94702 ) ;
+         return error4( 0, e4parmNull, E94702 ) ;
    #endif
 
    c4 = data->codeBase ;

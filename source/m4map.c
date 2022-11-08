@@ -49,7 +49,7 @@ int bitmap4destroy( BITMAP4 *map )
 
    #ifdef E4PARM_HIGH
       if ( map == 0 )
-         return error4( 0, e4parm_null, E93701 ) ;
+         return error4( 0, e4parmNull, E93701 ) ;
    #endif
 
    c_on = (CONST4 *)l4first( &map->ne ) ;
@@ -1201,7 +1201,7 @@ BITMAP4 * bitmap4combineLeafs( BITMAP4 *parent, BITMAP4 *map1, BITMAP4 *map2 )
    #ifdef E4PARM_LOW
       if ( parent == 0 || map1 == 0 || map2 == 0 )
       {
-         error4( 0, e4parm_null, E93701 ) ;
+         error4( 0, e4parmNull, E93701 ) ;
          return 0 ;
       }
       if ( map1->type != map2->type )

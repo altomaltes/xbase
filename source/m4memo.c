@@ -56,7 +56,7 @@ int S4FUNCTION d4memoCompress( DATA4 *data )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E95201 ) ;
+         return error4( 0, e4parmNull, E95201 ) ;
    #endif
 
    c4 = data->codeBase ;
@@ -111,7 +111,7 @@ int dfile4memoCompress( DATA4FILE *data, DATA4 *d4 )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E95201 ) ;
+         return error4( 0, e4parmNull, E95201 ) ;
    #endif
 
    c4 = data->c4 ;
@@ -358,7 +358,7 @@ int d4validateMemoIds( DATA4 *data )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E95203 ) ;
+         return error4( 0, e4parmNull, E95203 ) ;
    #endif
 
    if ( data->memoValidated )

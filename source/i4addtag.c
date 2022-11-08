@@ -27,9 +27,9 @@ int tfile4add( TAG4FILE *t4, unsigned char *keyInfo, const long recNum, short in
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E95402 ) ;
+         return error4( 0, e4parmNull, E95402 ) ;
       if ( keyInfo == 0 || recNum < 1 )
-         return error4( t4->codeBase, e4parm_null, E95402 ) ;
+         return error4( t4->codeBase, e4parmNull, E95402 ) ;
    #endif
 
    rec = recNum ;
@@ -436,9 +436,9 @@ int tfile4addDo( TAG4FILE *t4, const unsigned char *keyInfo, const long recIn, s
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E95402 ) ;
+         return error4( 0, e4parmNull, E95402 ) ;
       if ( keyInfo == 0 || rec < 1 )
-         return error4( t4->codeBase, e4parm_null, E95402 ) ;
+         return error4( t4->codeBase, e4parmNull, E95402 ) ;
    #endif
 
    c4 = t4->codeBase ;

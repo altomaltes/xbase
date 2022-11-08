@@ -40,7 +40,7 @@ int s4flush( SORT4 *s4 )
 
    #ifdef E4PARM_LOW
       if ( s4 == 0 )
-         return error4( 0, e4parm_null, E91801 ) ;
+         return error4( 0, e4parmNull, E91801 ) ;
    #endif
 
    rc = s4quick( (void **) s4->pointers, s4->pointersUsed, s4->cmp, s4->sortLen ) ;
@@ -74,7 +74,7 @@ int S4FUNCTION sort4free( SORT4 *s4 )
 
    #ifdef E4PARM_LOW
       if ( s4 == 0 )
-         return error4( 0, e4parm_null, E91804 ) ;
+         return error4( 0, e4parmNull, E91804 ) ;
    #endif
 
    u4free( s4->spoolPointer ) ;
@@ -109,7 +109,7 @@ int S4FUNCTION sort4get( SORT4 *s4, S4LONG *recPtr, void **sortData, void **info
 
    #ifdef E4PARM_HIGH
       if ( s4 == 0 )
-         return error4( 0, e4parm_null, E91802 ) ;
+         return error4( 0, e4parmNull, E91802 ) ;
    #endif
 
    if ( error4code( s4->codeBase ) < 0 )

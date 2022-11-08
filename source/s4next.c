@@ -30,10 +30,7 @@ int s4nextSpoolEntry( SORT4 *s4 )
    char *newData ;
    S4SPOOL saveSpool ;
 
-   #ifdef E4PARM_LOW
-      if ( s4 == 0 )
-         return error4( 0, e4parm_null, E91908 ) ;
-   #endif
+   E4PARMLOW( s4, E91908 ) ;
 
    s4->spoolPointer->pos += s4->totLen ;
    if ( s4->spoolPointer->pos >= s4->spoolPointer->len )

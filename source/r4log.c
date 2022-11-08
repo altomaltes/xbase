@@ -257,7 +257,7 @@ static int dataList4remove( DATA4LIST *thisList, DATA4LIST *removeList )
 
    #ifdef E4PARM_LOW
       if ( thisList == 0 || removeList == 0 )
-         return error4( 0, e4parm_null, E96001 ) ;
+         return error4( 0, e4parmNull, E96001 ) ;
    #endif
 
    for( i = 0; i < thisList->pointersUsed; i++ )

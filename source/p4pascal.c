@@ -939,7 +939,7 @@ int S4FUNCTION code4initUndoP( CODE4 *c4 )
 
 int S4FUNCTION d4tagSelectP( DATA4 S4PTR * d4, TAG4 S4PTR * tag )
 {
-   #ifdef E4PARM_NULL
+   #ifdef e4parmNull
       if ( d4 == 0 || tag == 0 )
          return error4( 0, e4parmNull, E92409 ) ;
    #endif

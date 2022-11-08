@@ -12,7 +12,7 @@ int S4FUNCTION t4uniqueModify( TAG4 *tag, int newUnique )
 
    #ifdef E4PARM_HIGH
       if ( tag == 0 )
-         return error4( 0, e4parm_null, E91716 ) ;
+         return error4( 0, e4parmNull, E91716 ) ;
       if ( newUnique != e4unique && newUnique != r4unique && newUnique !=
            r4uniqueContinue && newUnique != 0 )
          #ifdef S4FOX
@@ -242,7 +242,7 @@ static int i4addOneTag( INDEX4 *i4, const TAG4INFO *tagData )
 
    #ifdef E4PARM_LOW
       if ( i4 == 0 || tagData == 0 )
-         return error4( 0, e4parm_null, E91716 ) ;
+         return error4( 0, e4parmNull, E91716 ) ;
    #endif
 
    if ( error4code( i4->codeBase ) < 0 )
@@ -811,7 +811,7 @@ static int i4tagAssociate( INDEX4 *i4 )
 
    #ifdef E4PARM_LOW
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91718 ) ;
+         return error4( 0, e4parmNull, E91718 ) ;
    #endif
 
    c4 = i4->codeBase ;
@@ -879,7 +879,7 @@ int S4FUNCTION i4tagAdd( INDEX4 *i4, const TAG4INFO *tagData )
 
    #ifdef E4PARM_HIGH
       if ( i4 == 0 || tagData == 0 )
-         return error4( 0, e4parm_null, E91717 ) ;
+         return error4( 0, e4parmNull, E91717 ) ;
    #endif
 
    c4 = i4->codeBase ;

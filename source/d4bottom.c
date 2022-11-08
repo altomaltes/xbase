@@ -42,7 +42,7 @@ int S4FUNCTION d4bottom( DATA4 *data )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E91201 ) ;
+         return error4( 0, e4parmNull, E91201 ) ;
    #endif
 
    c4 = data->codeBase ;

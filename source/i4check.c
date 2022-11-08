@@ -227,7 +227,7 @@ int t4check( TAG4 *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E95703 ) ;
+         return error4( 0, e4parmNull, E95703 ) ;
    #endif
 
    d4 = t4->index->data ;
@@ -756,7 +756,7 @@ int i4check( INDEX4 *i4 )
 
    #ifdef E4PARM_HIGH
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E95705 ) ;
+         return error4( 0, e4parmNull, E95705 ) ;
    #endif
 
    if ( error4code( i4->codeBase ) < 0 )
@@ -812,7 +812,7 @@ int S4FUNCTION d4check( DATA4 *d4 )
 
       #ifdef E4PARM_HIGH
          if ( d4 == 0 )
-            return error4( 0, e4parm_null, E95702 ) ;
+            return error4( 0, e4parmNull, E95702 ) ;
       #endif
 
       oldTag = d4tagSelected( d4 ) ;

@@ -9,7 +9,7 @@ void S4FUNCTION l4addLow( LIST4 *list, void *item )
 {
    #ifdef E4LINK
       if ( list == 0 || item == 0 )
-         error4( 0, e4parm_null, E96201 ) ;
+         error4( 0, e4parmNull, E96201 ) ;
       else
    #endif
    l4addAfter( list, list->lastNode, item ) ;
@@ -25,7 +25,7 @@ void S4FUNCTION l4addAfter( LIST4 *list, void *anchor, void *item )
    #ifdef E4LINK
       if ( list == 0 || item == 0 )
       {
-         error4( 0, e4parm_null, E96202 ) ;
+         error4( 0, e4parmNull, E96202 ) ;
          return ;
       }
       if ( l4seek( list, item ) == 1 )
@@ -37,7 +37,7 @@ void S4FUNCTION l4addAfter( LIST4 *list, void *anchor, void *item )
       {
          if ( anchor == 0 )
          {
-            error4( 0, e4parm_null, E96202 ) ;
+            error4( 0, e4parmNull, E96202 ) ;
             return ;
          }
          if ( l4seek( list, anchor ) == 0 )
@@ -83,7 +83,7 @@ void S4FUNCTION l4addBefore( LIST4 *list, void *anchor, void *item )
    #ifdef E4LINK
       if ( list == 0 || item == 0 )
       {
-         error4( 0, e4parm_null, E96203 ) ;
+         error4( 0, e4parmNull, E96203 ) ;
          return ;
       }
       if ( l4seek( list, item ) == 1 )
@@ -95,7 +95,7 @@ void S4FUNCTION l4addBefore( LIST4 *list, void *anchor, void *item )
       {
          if ( anchor == 0 )
          {
-            error4( 0, e4parm_null, E96202 ) ;
+            error4( 0, e4parmNull, E96202 ) ;
             return ;
          }
          if ( l4seek( list, anchor ) == 0 )
@@ -142,7 +142,7 @@ int S4FUNCTION l4check( LIST4 *list )
    unsigned int i ;
 
    if ( list == 0 )
-      return error4( 0, e4parm_null, E96204 ) ;
+      return error4( 0, e4parmNull, E96204 ) ;
 
    onLink = list->lastNode ;
    if ( onLink == 0 )
@@ -179,7 +179,7 @@ void *S4FUNCTION l4firstLow( const LIST4 *list )
    #ifdef E4LINK
       if ( list == 0 )
       {
-         error4( 0, e4parm_null, E96205 ) ;
+         error4( 0, e4parmNull, E96205 ) ;
          return 0 ;
       }
    #endif
@@ -194,7 +194,7 @@ void *S4FUNCTION l4lastLow( const LIST4 *list )
    #ifdef E4LINK
       if ( list == 0 )
       {
-         error4( 0, e4parm_null, E96206 ) ;
+         error4( 0, e4parmNull, E96206 ) ;
          return 0 ;
       }
    #endif
@@ -207,7 +207,7 @@ void *S4FUNCTION l4nextLow( const LIST4 *list, const void *link )
    #ifdef E4LINK
       if ( list == 0 )
       {
-         error4( 0, e4parm_null, E96207 ) ;
+         error4( 0, e4parmNull, E96207 ) ;
          return 0 ;
       }
    #endif
@@ -228,7 +228,7 @@ void *S4FUNCTION l4pop( LIST4 *list )
    #ifdef E4LINK
       if ( list == 0 )
       {
-         error4( 0, e4parm_null, E96208 ) ;
+         error4( 0, e4parmNull, E96208 ) ;
          return 0 ;
       }
    #endif
@@ -243,7 +243,7 @@ void *S4FUNCTION l4prev( const LIST4 *list, const void *link )
    #ifdef E4LINK
       if ( list == 0 )
       {
-         error4( 0, e4parm_null, E96209 ) ;
+         error4( 0, e4parmNull, E96209 ) ;
          return 0 ;
       }
    #endif
@@ -268,13 +268,13 @@ void S4FUNCTION l4remove( LIST4 *list, void *item )
    #ifdef E4LINK
       if ( list == 0 )
       {
-         error4( 0, e4parm_null, E86202 ) ;
+         error4( 0, e4parmNull, E86202 ) ;
          return ;
       }
       /* Make sure the link being removed is on the linked list ! */
       if ( l4seek( list, item ) == 0 )
       {
-         error4( 0, e4parm_null, E86202 ) ;
+         error4( 0, e4parmNull, E86202 ) ;
          return ;
       }
    #endif
@@ -330,7 +330,7 @@ int l4seek( const LIST4 *list, const void *item )
 
    #ifdef E4PARM_LOW
       if ( list == 0 || item == 0 )
-         error4( 0, e4parm_null, E96211 ) ;
+         error4( 0, e4parmNull, E96211 ) ;
    #endif
 
    #ifdef E4LINK

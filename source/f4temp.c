@@ -49,7 +49,7 @@ int file4tempLow( FILE4 *file, CODE4 *c4, const int autoRemove, int useTempDirec
 
    #ifdef E4PARM_HIGH
       if ( file == 0 || c4 == 0  )
-         return error4( c4, e4parm_null, E90618 ) ;
+         return error4( c4, e4parmNull, E90618 ) ;
    #endif
 
    #ifndef S4OPTIMIZE_OFF

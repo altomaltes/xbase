@@ -206,7 +206,7 @@ const char *S4FUNCTION code4dateFormat( CODE4 *c4 )
    #ifdef E4PARM_HIGH
       if ( c4 == 0 )
       {
-         error4( c4, e4parm_null, E96303 ) ;
+         error4( c4, e4parmNull, E96303 ) ;
          return 0 ;
       }
    #endif
@@ -219,7 +219,7 @@ int S4FUNCTION code4dateFormatSet( CODE4 *c4, const char *str )
 
    #ifdef E4PARM_HIGH
       if ( c4 == 0 || str == 0 )
-         return error4( c4, e4parm_null, E96302 ) ;
+         return error4( c4, e4parmNull, E96302 ) ;
       if ( strlen( str ) >= sizeof( c4->c4trans.trans.dateFormat ) )
          return error4( c4, e4parm, E96302 ) ;
    #endif

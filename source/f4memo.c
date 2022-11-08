@@ -30,7 +30,7 @@ int S4FUNCTION f4memoAssign( FIELD4 *field, const char *ptr )
 {
    #ifdef E4PARM_HIGH
       if ( field == 0 )
-         return error4( 0, e4parm_null, E90518 ) ;
+         return error4( 0, e4parmNull, E90518 ) ;
    #endif
 
    if ( error4code( field->data->codeBase ) < 0 )
@@ -65,7 +65,7 @@ int S4FUNCTION f4memoAssignN( FIELD4 *field, const char *ptr, const unsigned int
 
    #ifdef E4PARM_HIGH
       if ( field == 0 )
-         return error4( 0, e4parm_null, E90519 ) ;
+         return error4( 0, e4parmNull, E90519 ) ;
    #endif
 
    #ifdef S4OFF_MEMO
@@ -114,7 +114,7 @@ int S4FUNCTION f4memoFree( FIELD4 *field )
 
       #ifdef E4PARM_HIGH
          if ( field == 0 )
-            return error4( 0, e4parm_null, E90521 ) ;
+            return error4( 0, e4parmNull, E90521 ) ;
       #endif
 
       mfield = field->memo ;
@@ -145,7 +145,7 @@ unsigned S4FUNCTION f4memoLen( FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90522 ) ;
+         error4( 0, e4parmNull, E90522 ) ;
          return 0 ;
       }
    #endif
@@ -176,7 +176,7 @@ unsigned S4FUNCTION f4memoNcpy( FIELD4 *field, char *memPtr, const unsigned len 
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90523 ) ;
+         error4( 0, e4parmNull, E90523 ) ;
          return 0 ;
       }
    #endif
@@ -217,7 +217,7 @@ char *S4FUNCTION f4memoPtr( FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90524 ) ;
+         error4( 0, e4parmNull, E90524 ) ;
          return 0 ;
       }
    #endif
@@ -246,7 +246,7 @@ int f4memoRead( FIELD4 *field )
 
    #ifdef E4PARM_HIGH
       if ( field == 0 )
-         return error4( 0, e4parm_null, E90525 ) ;
+         return error4( 0, e4parmNull, E90525 ) ;
    #endif
 
    c4 = field->data->codeBase ;
@@ -415,7 +415,7 @@ S4CONST char *S4FUNCTION f4memoStr( FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90529 ) ;
+         error4( 0, e4parmNull, E90529 ) ;
          return 0 ;
       }
    #endif

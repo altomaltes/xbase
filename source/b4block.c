@@ -1410,7 +1410,7 @@ long b4recNo( const B4BLOCK *b4, const int i )
 {
    #ifdef E4PARM_LOW
       if ( b4 == 0 || i < 0 )
-         return error4( 0, e4parm_null, E90438 ) ;
+         return error4( 0, e4parmNull, E90438 ) ;
    #endif
 
    if ( b4->header.nodeAttribute >= 2 ) /* leaf */

@@ -22,26 +22,28 @@
 
 
 #ifdef S4VBASIC
-int c4parm_check( const void *ptr, int doCheck, const long message )
-{
-   char errMsg[512] ;
+int c4parm_check( const void *ptr
+                , int doCheck
+                , const long message )
+{ char errMsg[512] ;
 
-   if (!ptr)
+  if (!ptr)
       doCheck = - 1 ;
 
-   else
-   {
-      switch (doCheck)
-      {
-         case 0:
-            if ( ((INDEX4 *)ptr)->codeBase->debugInt != E4DEBUG_INT)
-               doCheck = -1 ;
-            break ;
+  else
+  {
+     switch (doCheck)
+     {
+        case 0:
+           if ( ((INDEX4 *)ptr)->codeBase->debugInt != E4DEBUG_INT)
+              doCheck = -1 ;
+         break ;
 
          case 1:
             if ( ((CODE4 *)ptr)->debugInt != E4DEBUG_INT)
                doCheck = -1 ;
             break ;
+
          case 2:
             if ( ((DATA4 *)ptr)->debugInt != E4DEBUG_INT)
                doCheck = -1 ;
@@ -67,10 +69,9 @@ int c4parm_check( const void *ptr, int doCheck, const long message )
       }
    }
 
-   if (doCheck < 0 )
-   {
-      strcpy( errMsg, "Function was Passed an Invalid Structure Pointer" ) ;
-      return error4describe( 0, e4info, message, errMsg, 0, 0 ) ;
+   if ( doCheck < 0 )
+   { strcpy( errMsg, "Function was Passed an Invalid Structure Pointer" ) ;
+     return error4describe( 0, e4info, message, errMsg, 0, 0 ) ;
    }
    else return 0 ;
 }

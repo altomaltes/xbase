@@ -15,7 +15,7 @@ void S4FUNCTION f4assignLong( FIELD4 *field, const long lValue )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90516 ) ;
+         error4( 0, e4parmNull, E90516 ) ;
          return ;
       }
       switch( field->type )
@@ -94,7 +94,7 @@ long S4FUNCTION f4long( const FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90517 ) ;
+         error4( 0, e4parmNull, E90517 ) ;
          return -1L ;
       }
       switch( field->type )

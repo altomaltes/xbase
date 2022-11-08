@@ -18,7 +18,7 @@ char *S4FUNCTION f4assignPtr( FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90507 ) ;
+         error4( 0, e4parmNull, E90507 ) ;
          return 0 ;
       }
    #endif
@@ -43,7 +43,7 @@ void S4FUNCTION f4blank( FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90508 ) ;
+         error4( 0, e4parmNull, E90508 ) ;
          return ;
       }
    #endif
@@ -76,7 +76,7 @@ DATA4 *S4FUNCTION f4data( const FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90509 ) ;
+         error4( 0, e4parmNull, E90509 ) ;
          return 0 ;
       }
    #endif
@@ -93,7 +93,7 @@ int S4FUNCTION f4decimals( const FIELD4 *field )
 
    #ifdef E4PARM_HIGH
       if ( field == 0 )
-         return error4( 0, e4parm_null, E90510 ) ;
+         return error4( 0, e4parmNull, E90510 ) ;
    #endif
 
    return field->dec ;
@@ -109,7 +109,7 @@ unsigned S4FUNCTION f4len( const FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90511 ) ;
+         error4( 0, e4parmNull, E90511 ) ;
          return 0 ;
       }
    #endif
@@ -127,7 +127,7 @@ S4CONST char *S4FUNCTION f4name( S4CONST FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90512 ) ;
+         error4( 0, e4parmNull, E90512 ) ;
          return 0 ;
       }
    #endif
@@ -142,7 +142,7 @@ int S4FUNCTION f4number( const FIELD4 *field )
 
    #ifdef E4PARM_HIGH
       if ( field == 0 )
-         return error4( 0, e4parm_null, E90538 ) ;
+         return error4( 0, e4parmNull, E90538 ) ;
    #endif
 
    fieldOn = field->data->fields ;
@@ -164,7 +164,7 @@ int S4FUNCTION f4type( const FIELD4 *field )
 
    #ifdef E4PARM_HIGH
       if ( field == 0 )
-         return error4( 0, e4parm_null, E90513 ) ;
+         return error4( 0, e4parmNull, E90513 ) ;
    #endif
 
    #ifdef CLIENT_OR_FOX
@@ -958,7 +958,7 @@ void S4FUNCTION f4assignCurrency( FIELD4 *field, char *str )
    #ifdef E4PARM_HIGH
       if ( field == 0 || str == 0 )
       {
-         error4( 0, e4parm_null, E90541 ) ;
+         error4( 0, e4parmNull, E90541 ) ;
          return ;
       }
    #endif
@@ -1018,23 +1018,11 @@ char *S4FUNCTION f4currency( const FIELD4 *field, int numDec )
          return 0 ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( field == 0 || numDec < 0 || numDec > 4 )
-      {
-         error4( 0, e4parm, E90542 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARM_TRET( field == 0 || numDec < 0 || numDec > 4, E90542, NULL ) ;
 
    codeBase = field->data->codeBase ;
 
-   #ifdef E4PARM_HIGH
-      if ( field->type != r4currency )
-      {
-         error4( codeBase, e4parm, E81409 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARM_TRET( field->type != r4currency, E90542, NULL ) ;
 
    if ( error4code( codeBase ) < 0 )
       return 0 ;
@@ -1113,7 +1101,7 @@ void S4FUNCTION f4assignNull( FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90539 ) ;
+         error4( 0, e4parmNull, E90539 ) ;
          return ;
       }
    #endif
@@ -1179,7 +1167,7 @@ int S4FUNCTION f4null( const FIELD4 *field )
 
    #ifdef E4PARM_HIGH
       if ( field == 0 )
-         return error4( 0, e4parm_null, E90540 ) ;
+         return error4( 0, e4parmNull, E90540 ) ;
    #endif
 
    if ( d4version( field->data ) != 0x30 )

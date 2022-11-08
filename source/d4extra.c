@@ -10,7 +10,7 @@
 int code4verify( CODE4 *c4, int subs )
 {
    if ( c4 == 0 )
-      return error4( 0, e4parm_null, E93901 ) ;
+      return error4( 0, e4parmNull, E93901 ) ;
 
    if ( error4code( c4 ) < 0 )
       return error4code( c4 ) ;
@@ -23,7 +23,7 @@ int dfile4verify( DATA4FILE *d4, int subs )
    int rc ;
 
    if ( d4 == 0 )
-      return error4( 0, e4parm_null, E91102 ) ;
+      return error4( 0, e4parmNull, E91102 ) ;
 
    if ( d4->c4 == 0 )
       return error4( 0, e4struct, E91102 ) ;
@@ -41,7 +41,7 @@ int lock4verify( LOCK4 *lock, const int subs )
    int rc ;
 
    if ( lock->data == 0 )
-      return error4( 0, e4parm_null, E93903 ) ;
+      return error4( 0, e4parmNull, E93903 ) ;
 
    if ( subs == 1 )
       if ( ( rc = dfile4verify( lock->data, 1 ) ) < 0 )

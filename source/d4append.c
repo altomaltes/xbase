@@ -162,10 +162,7 @@ static int d4doAppend( DATA4 *data )
          return -1 ;
    #endif  /* S4VBASIC */
 
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parm_null, E91103 ) ;
-      #endif
+   E4PARHIGH( data, E91103 ) ;
 
    #ifdef E4MISC
       if ( data->record[0] != ' ' && data->record[0] != '*' )
@@ -340,10 +337,7 @@ int S4FUNCTION d4append( DATA4 *data )
    #endif
    int rc ;
 
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E91103 ) ;
-   #endif
+   E4PARHIGH( data, E91103 ) ;
 
    #ifndef S4OFF_TRAN
       c4 = data->codeBase ;
@@ -526,10 +520,7 @@ int S4FUNCTION d4appendBlank( DATA4 *data )
          return -1 ;
    #endif  /* S4VBASIC */
 
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E91104 ) ;
-   #endif
+   E4PARHIGH( data, E91104 ) ;
 
    #ifdef S4DEMO
       if ( d4recCount( data ) >= 200L)
@@ -564,10 +555,7 @@ int S4FUNCTION d4appendStart( DATA4 *data, int useMemoEntries )
          return -1 ;
    #endif  /* S4VBASIC */
 
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parm_null, E91107 ) ;
-   #endif
+   E4PARHIGH( data, E91107 ) ;
 
    c4 = data->codeBase ;
 

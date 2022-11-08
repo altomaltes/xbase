@@ -21,13 +21,7 @@ EXPR4CALC *S4FUNCTION code4calcCreate( CODE4 *c4, EXPR4 *exp4, const char *name 
 {
    EXPR4CALC *calcPtr ;
 
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 || exp4 == 0 || name == 0 )
-      {
-         error4( 0, e4parm_null, E90920 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARHIGH( c4 && exp4 && name, E90920 ) ;
 
    calcPtr = (EXPR4CALC *)mem4createAlloc( c4, &c4->calcMemory, 5, sizeof(EXPR4CALC), 5, 0 ) ;
    if ( calcPtr == 0 )

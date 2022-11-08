@@ -32,7 +32,7 @@ short int S4FUNCTION t4unique( const TAG4 *tag )
 
    #ifdef E4PARM_HIGH
       if ( tag == 0 )
-         return error4( 0, e4parm_null, E91639 ) ;
+         return error4( 0, e4parmNull, E91639 ) ;
       if ( tag->tagFile == 0 )
          return error4( 0, e4parm, E91639 ) ;
    #endif
@@ -50,7 +50,7 @@ int S4FUNCTION t4uniqueSet( TAG4 *t4, const short uniqueCode )
 
    #ifdef E4PARM_HIGH
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91601 ) ;
+         return error4( 0, e4parmNull, E91601 ) ;
    #endif
 
    if ( uniqueCode == t4unique( t4 ) )  /* possibly both zero ok */
@@ -85,7 +85,7 @@ int S4FUNCTION t4uniqueSetLow( TAG4 *t4, const short uniqueCode, const char doZe
 {
    #ifdef E4PARM_HIGH
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91601 ) ;
+         return error4( 0, e4parmNull, E91601 ) ;
       #ifdef CLIENT_OR_FOX
          if ( t4unique( t4 ) == r4candidate )  /* can't change a candidate setting */
          {
@@ -119,7 +119,7 @@ long S4FUNCTION tfile4dskip( TAG4FILE *t4, long numSkip )
    #ifdef S4HAS_DESCENDING
       #ifdef E4PARM_LOW
          if ( t4 == 0 )
-            return error4( 0, e4parm_null, E91642 ) ;
+            return error4( 0, e4parmNull, E91642 ) ;
       #endif
 
       if ( t4->header.descending )
@@ -137,7 +137,7 @@ int tfile4outOfDate( TAG4FILE *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    #ifdef S4SINGLE
@@ -410,7 +410,7 @@ int S4FUNCTION tfile4exprKey( TAG4FILE *tag, unsigned char **ptrPtr )
 
    #ifdef E4PARM_LOW
       if ( tag == 0 || ptrPtr == 0)
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    #ifdef S4CLIPPER
@@ -461,7 +461,7 @@ int tfile4empty( TAG4FILE *tag )
 
    #ifdef E4PARM_LOW
       if ( tag == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    b4 = tfile4block( tag ) ;
@@ -486,7 +486,7 @@ void S4FUNCTION tfile4descending( TAG4FILE *tag, const unsigned short int settin
    #ifdef E4PARM_LOW
       if ( tag == 0 )
       {
-         error4( 0, e4parm_null, E91642 ) ;
+         error4( 0, e4parmNull, E91642 ) ;
          return ;
       }
    #endif
@@ -515,7 +515,7 @@ int tfile4setCollatingSeq( TAG4FILE *t4, const int type )
 {
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -547,7 +547,7 @@ int tfile4setCodePage( TAG4FILE *t4, const int type )
 {
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -605,7 +605,7 @@ int tfile4rlBottom( TAG4FILE *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -664,7 +664,7 @@ int S4FUNCTION tfile4bottom( TAG4FILE *t4 )
 {
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -683,10 +683,7 @@ int S4FUNCTION tfile4bottom( TAG4FILE *t4 )
    int rc, rc2 ;
    B4BLOCK *blockOn ;
 
-   #ifdef E4PARM_LOW
-      if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
-   #endif
+   E4PARMLOW( t4, E91642 ) ;
 
    if ( error4code( t4->codeBase ) < 0 )
       return e4codeBase ;
@@ -738,7 +735,7 @@ B4BLOCK *tfile4block( TAG4FILE *t4 )
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
       {
-         error4( 0, e4parm_null, E91642 ) ;
+         error4( 0, e4parmNull, E91642 ) ;
          return 0 ;
       }
    #endif
@@ -766,7 +763,7 @@ int tfile4down( TAG4FILE *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -915,7 +912,7 @@ int S4FUNCTION tfile4eof( TAG4FILE *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    b4 = tfile4block( t4 ) ;
@@ -938,7 +935,7 @@ int tfile4update( TAG4FILE *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -990,7 +987,7 @@ int tfile4freeAll( TAG4FILE *t4 )
 {
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    while ( tfile4up( t4 ) == 0 ) ;
@@ -1004,7 +1001,7 @@ int tfile4freeSaved( TAG4FILE *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    #ifndef S4OFF_WRITE
@@ -1247,7 +1244,7 @@ B4KEY_DATA *tfile4keyData( TAG4FILE *t4 )
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
       {
-         error4( 0, e4parm_null, E91642 ) ;
+         error4( 0, e4parmNull, E91642 ) ;
          return 0 ;
       }
    #endif
@@ -1279,7 +1276,7 @@ PUBLIC long S4FUNCTION tfile4recNo( TAG4FILE *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    blockOn = (B4BLOCK *)t4->blocks.lastNode ;
@@ -1321,7 +1318,7 @@ int S4FUNCTION tfile4seek( TAG4FILE *t4, const void *ptr, const int lenIn )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 || ptr == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
       if ( lenPtr != t4->header.keyLen && tfile4type( t4 ) != r4str && tfile4type( t4 ) != r5wstr )
          return error4( t4->codeBase, e4parm, E91642 ) ;
    #endif
@@ -1472,7 +1469,7 @@ long S4FUNCTION tfile4skip( TAG4FILE *t4, long numSkip )
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
       {
-         error4( 0, e4parm_null, E91642 ) ;
+         error4( 0, e4parmNull, E91642 ) ;
          return -numSkip ;
       }
    #endif
@@ -1675,7 +1672,7 @@ B4BLOCK *tfile4split( TAG4FILE *t4, B4BLOCK *oldBlock )
    #ifdef E4PARM_LOW
       if ( t4 == 0 || oldBlock == 0 )
       {
-         error4( 0, e4parm_null, E91642 ) ;
+         error4( 0, e4parmNull, E91642 ) ;
          return 0 ;
       }
    #endif
@@ -1751,7 +1748,7 @@ int tfile4branchSplit( TAG4FILE *t4, B4BLOCK *oldBlock, B4BLOCK *newBlock )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 || oldBlock == 0 || newBlock == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    /* NNNNOOOO  N - New, O - Old */
@@ -1783,7 +1780,7 @@ int tfile4leafSplit( TAG4FILE *t4, B4BLOCK *oldBlock, B4BLOCK *newBlock )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 || oldBlock == 0 || newBlock == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    kLen = t4->header.keyLen ;
@@ -1878,7 +1875,7 @@ int tfile4rlTop( TAG4FILE *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -1913,7 +1910,7 @@ int S4FUNCTION tfile4top( TAG4FILE *t4 )
 {
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -1931,7 +1928,7 @@ int S4FUNCTION tfile4top( TAG4FILE *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -1969,7 +1966,7 @@ int tfile4up( TAG4FILE *t4 )
 {
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( t4->blocks.lastNode == 0 )
@@ -1985,7 +1982,7 @@ int tfile4upToRoot( TAG4FILE *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    for ( ;; )
@@ -2003,7 +2000,7 @@ int tfile4goEof( TAG4FILE *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    rc = tfile4bottom( t4 ) ;

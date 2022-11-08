@@ -27,7 +27,7 @@ int dfile4unlockAppend( DATA4FILE *data, const long clientId, const long serverI
 
       #ifdef E4PARM_LOW
          if ( data == 0 || serverId == 0 )
-            return error4( 0, e4parm_null, E91102 ) ;
+            return error4( 0, e4parmNull, E91102 ) ;
       #endif
       if ( code4unlockAuto( data->c4 ) == LOCK4OFF )
          return 0 ;

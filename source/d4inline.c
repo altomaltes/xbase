@@ -74,7 +74,7 @@ int tran4dataListSet( TRAN4 *t4, LIST4 *list )
 {
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E93839 ) ;
+         return error4( 0, e4parmNull, E93839 ) ;
    #endif
    t4->dataList = list ;
    return 0 ;
@@ -85,7 +85,7 @@ LIST4 *S4FUNCTION tran4dataList( TRAN4 *t4 )
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
       {
-         error4( 0, e4parm_null, E93838 ) ;
+         error4( 0, e4parmNull, E93838 ) ;
          return 0 ;
       }
    #endif

@@ -9,7 +9,7 @@ int tfile4position2( TAG4FILE *t4, double *result )
 {
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -29,7 +29,7 @@ double tfile4positionDbl( TAG4FILE *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -82,7 +82,7 @@ double tfile4position( TAG4FILE *t4 )
 {
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return (double)error4( 0, e4parm_null, E91642 ) ;
+         return (double)error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -99,7 +99,7 @@ int tfile4positionSet( TAG4FILE *t4, const double ipos )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -176,7 +176,7 @@ double tfile4position( TAG4FILE *t4 )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return (double)error4( 0, e4parm_null, E91642 ) ;
+         return (double)error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -249,7 +249,7 @@ int tfile4positionSet( TAG4FILE *t4, const double posIn )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91642 ) ;
+         return error4( 0, e4parmNull, E91642 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )
@@ -270,7 +270,7 @@ int tfile4positionSet( TAG4FILE *t4, const double posIn )
    {
       #ifdef E4PARM_LOW
          if ( pos < 0.0 || pos > 1.0 )  /* Could be caused by rounding error ? */
-            return error4( 0, e4parm_null, E81604 ) ;
+            return error4( 0, e4parmNull, E81604 ) ;
       #endif
 
       blockOn = tfile4block( t4 ) ;

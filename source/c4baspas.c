@@ -898,7 +898,7 @@
 
    int S4FUNCTION d4tagSelectP( DATA4 S4PTR * d4, TAG4 S4PTR * tag )
    {
-      #ifdef E4PARM_NULL
+      #ifdef e4parmNull
          if ( d4 == 0 || tag == 0 )
             return error4( 0, e4parmNull, E92409 ) ;
       #endif
@@ -1417,10 +1417,7 @@
 
       short S4FUNCTION report4doCB( REPORT4 *r4 )
       {
-         #ifdef E4PARM_HIGH
-            if( r4 == 0 )
-               return error4( 0, e4parm_null, E95702 ) ;
-         #endif
+         E4PARHIGH( r4, E95702 ) ;
 
          #if defined(S4OFF_REPORT) || !defined(S4WINDOWS)
             return error4( 0, e4notSupported, 0 ) ;   /* LY 2003/12/09 : changed first param from r4->codeBase */

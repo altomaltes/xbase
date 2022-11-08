@@ -1641,7 +1641,7 @@ const char *S4FUNCTION code4serverName( CODE4 *c4 )
          {
             #ifdef E4PARM_HIGH
                if ( c4 == 0 )
-                  return error4( 0, e4parm_null, E90620 ) ;
+                  return error4( 0, e4parmNull, E90620 ) ;
             #endif
 
             return error4( c4, e4notLock, E90620 ) ;
@@ -1656,7 +1656,7 @@ const char *S4FUNCTION code4serverName( CODE4 *c4 )
       {
          #ifdef E4PARM_HIGH
             if ( c4 == 0 )
-               error4( 0, e4parm_null, E95001 ) ;
+               error4( 0, e4parmNull, E95001 ) ;
          #endif
       }
    #endif
@@ -1670,7 +1670,7 @@ int S4FUNCTION i4tagAdd( INDEX4 *i4, const TAG4INFO *tagData )
 {
    #ifdef E4PARM_HIGH
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91717 ) ;
+         return error4( 0, e4parmNull, E91717 ) ;
    #endif
 
    return error4( i4->codeBase, e4notSupported, E91717 ) ;
@@ -1690,7 +1690,7 @@ int S4FUNCTION d4memoCompress( DATA4 *data )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E95201 ) ;
+         return error4( 0, e4parmNull, E95201 ) ;
    #endif
    return error4( data->codeBase, e4notSupported, E95201 ) ;
 }
@@ -1713,7 +1713,7 @@ int S4FUNCTION d4changed( DATA4 *data, int flag )
 {
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E94101 ) ;
+         return error4( 0, e4parmNull, E94101 ) ;
    #endif
    return error4( data->codeBase, e4notWrite, E94101 ) ;
 }
@@ -1727,7 +1727,7 @@ int S4FUNCTION d4append( DATA4 *data )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E91103 ) ;
+         return error4( 0, e4parmNull, E91103 ) ;
    #endif
 
    return error4( data->codeBase, e4notWrite, E91103 ) ;
@@ -1742,7 +1742,7 @@ int S4FUNCTION d4appendBlank( DATA4 *data )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E91104 ) ;
+         return error4( 0, e4parmNull, E91104 ) ;
    #endif
 
    return error4( data->codeBase, e4notWrite, E91104 ) ;
@@ -1759,7 +1759,7 @@ int S4FUNCTION d4appendStart( DATA4 *data, int useMemoEntries )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E91107 ) ;
+         return error4( 0, e4parmNull, E91107 ) ;
    #endif
 
    return error4( data->codeBase, e4notWrite, E91107 ) ;
@@ -1778,7 +1778,7 @@ DATA4 *S4FUNCTION d4create( CODE4 *c4, const char *name, const FIELD4INFO *field
    #ifdef E4PARM_HIGH
       if ( c4 == 0 )
       {
-         error4( 0, e4parm_null, E91401 ) ;
+         error4( 0, e4parmNull, E91401 ) ;
          return 0 ;
       }
    #endif
@@ -1797,7 +1797,7 @@ void S4FUNCTION d4delete( DATA4 *data )
    #ifdef E4PARM_HIGH
       if ( data == 0 )
       {
-         error4( 0, e4parm_null, E93305 ) ;
+         error4( 0, e4parmNull, E93305 ) ;
          return ;
       }
    #endif
@@ -1814,7 +1814,7 @@ int S4FUNCTION d4pack( DATA4 *d4 )
 
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
-         return error4( 0, e4parm_null, E94601 ) ;
+         return error4( 0, e4parmNull, E94601 ) ;
    #endif
 
    return error4( d4->codeBase, e4notWrite, E94601 ) ;
@@ -1825,7 +1825,7 @@ void S4FUNCTION d4recall( DATA4 *data )
    #ifdef E4PARM_HIGH
       if ( data == 0 )
       {
-         error4( 0, e4parm_null, E93311 ) ;
+         error4( 0, e4parmNull, E93311 ) ;
          return ;
       }
    #endif
@@ -1842,7 +1842,7 @@ int S4FUNCTION d4reindex( DATA4 *data )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E93004 ) ;
+         return error4( 0, e4parmNull, E93004 ) ;
    #endif
 
    return error4( data->codeBase, e4notWrite, E93004 ) ;
@@ -1860,7 +1860,7 @@ int S4FUNCTION d4writeLow( DATA4 *d4, const long rec, const int unlock )
 
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
-         return error4( 0, e4parm_null, E92601 ) ;
+         return error4( 0, e4parmNull, E92601 ) ;
    #endif
 
    return error4( d4->codeBase, e4notWrite, E92601 ) ;
@@ -1878,7 +1878,7 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
 
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
-         return error4( 0, e4parm_null, E94604 ) ;
+         return error4( 0, e4parmNull, E94604 ) ;
    #endif
 
    return error4( d4->codeBase, e4notWrite, E94604 ) ;
@@ -1897,7 +1897,7 @@ void S4FUNCTION f4assign( FIELD4 *field, const char *str )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90533 ) ;
+         error4( 0, e4parmNull, E90533 ) ;
          return ;
       }
    #endif
@@ -1918,7 +1918,7 @@ void S4FUNCTION f4assignChar( FIELD4 *field, const int chr )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90502 ) ;
+         error4( 0, e4parmNull, E90502 ) ;
          return ;
       }
    #endif
@@ -1939,7 +1939,7 @@ void S4FUNCTION f4assignDouble( FIELD4 *field, const double dValue )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90504 ) ;
+         error4( 0, e4parmNull, E90504 ) ;
          return ;
       }
    #endif
@@ -1955,7 +1955,7 @@ void S4FUNCTION f4assignField( FIELD4 *fieldTo, const FIELD4 *fieldFrom )
    #ifdef E4PARM_HIGH
       if ( fieldTo == 0 )
       {
-         error4( 0, e4parm_null, E90501 ) ;
+         error4( 0, e4parmNull, E90501 ) ;
          return ;
       }
    #endif
@@ -1976,7 +1976,7 @@ void S4FUNCTION f4assignInt( FIELD4 *field, const int iValue )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90514 ) ;
+         error4( 0, e4parmNull, E90514 ) ;
          return ;
       }
    #endif
@@ -2013,7 +2013,7 @@ void S4FUNCTION f4assignN( FIELD4 *field, const char *ptr, const unsigned ptrLen
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90534 ) ;
+         error4( 0, e4parmNull, E90534 ) ;
          return ;
       }
    #endif
@@ -2026,7 +2026,7 @@ char *S4FUNCTION f4assignPtr( FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90507 ) ;
+         error4( 0, e4parmNull, E90507 ) ;
          return 0 ;
       }
    #endif
@@ -2045,7 +2045,7 @@ void S4FUNCTION f4blank( FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90508 ) ;
+         error4( 0, e4parmNull, E90508 ) ;
          return ;
       }
    #endif
@@ -2060,7 +2060,7 @@ int S4FUNCTION f4memoAssign( FIELD4 *field, const char *ptr )
 {
    #ifdef E4PARM_HIGH
       if ( field == 0 )
-         return error4( 0, e4parm_null, E90518 ) ;
+         return error4( 0, e4parmNull, E90518 ) ;
    #endif
 
    return error4( field->data->codeBase, e4notWrite, E90518 ) ;
@@ -2078,7 +2078,7 @@ int S4FUNCTION f4memoAssignN( FIELD4 *field, const char *ptr, const unsigned ptr
 
    #ifdef E4PARM_HIGH
       if ( field == 0 )
-         return error4( 0, e4parm_null, E90519 ) ;
+         return error4( 0, e4parmNull, E90519 ) ;
    #endif
 
    return error4( field->data->codeBase, e4notWrite, E90519 ) ;
@@ -2099,7 +2099,7 @@ INDEX4 *S4FUNCTION i4create( DATA4 *d4, const char *fileName, const TAG4INFO *ta
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
       {
-         error4( 0, e4parm_null, E95301 ) ;
+         error4( 0, e4parmNull, E95301 ) ;
          return 0 ;
       }
    #endif
@@ -2128,7 +2128,7 @@ const char *S4FUNCTION i4fileName( INDEX4 *i4 )
    #ifdef E4PARM_HIGH
       if ( i4 == 0 )
       {
-         error4( 0, e4parm_null, E91720 ) ;
+         error4( 0, e4parmNull, E91720 ) ;
          return 0 ;
       }
    #endif
@@ -2146,7 +2146,7 @@ char *S4FUNCTION t4alias( TAG4 *t4 )
    #ifdef E4PARM_HIGH
       if ( t4 == 0 )
       {
-         error4( 0, e4parm_null, E91640 ) ;
+         error4( 0, e4parmNull, E91640 ) ;
          return 0 ;
       }
    #endif
@@ -2163,7 +2163,7 @@ short int S4FUNCTION t4unique( const TAG4 *tag )
 
    #ifdef E4PARM_HIGH
       if ( tag == 0 )
-         return error4( 0, e4parm_null, E91639 ) ;
+         return error4( 0, e4parmNull, E91639 ) ;
       if ( tag->tagFile == 0 )
          return error4( 0, e4parm, E91639 ) ;
    #endif
@@ -2183,7 +2183,7 @@ int S4FUNCTION t4uniqueSet( TAG4 S4PTR *t4, const short uniqueCode )
 
    #ifdef E4PARM_HIGH
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E91601 ) ;
+         return error4( 0, e4parmNull, E91601 ) ;
    #endif
 
    return error4( t4->index->codeBase, e4notIndex, E91601 ) ;
@@ -2201,7 +2201,7 @@ int S4FUNCTION d4seek( DATA4 *d4, const char *str )
 
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
-         return error4( 0, e4parm_null, E92907 ) ;
+         return error4( 0, e4parmNull, E92907 ) ;
    #endif
 
    return error4( d4->codeBase, e4notIndex, E92907 ) ;
@@ -2219,7 +2219,7 @@ int S4FUNCTION d4seekN( DATA4 S4PTR *d4, const char *str, const short len )
 
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
-         return error4( 0, e4parm_null, E92903 ) ;
+         return error4( 0, e4parmNull, E92903 ) ;
    #endif
 
    return error4( d4->codeBase, e4notIndex, E92903 ) ;
@@ -2237,7 +2237,7 @@ int S4FUNCTION d4seekDouble( DATA4 *d4, const double dkey )
 
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
-         return error4( 0, e4parm_null, E92904 ) ;
+         return error4( 0, e4parmNull, E92904 ) ;
    #endif
 
    return error4( d4->codeBase, e4notIndex, E92904 ) ;
@@ -2252,7 +2252,7 @@ int S4FUNCTION i4close( INDEX4 *i4 )
 
    #ifdef E4PARM_HIGH
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91701 ) ;
+         return error4( 0, e4parmNull, E91701 ) ;
    #endif
 
    return error4( i4->codeBase, e4notIndex, E91701 ) ;
@@ -2266,7 +2266,7 @@ INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
       {
-         error4( 0, e4parm_null, E91706 ) ;
+         error4( 0, e4parmNull, E91706 ) ;
          return 0 ;
       }
    #endif

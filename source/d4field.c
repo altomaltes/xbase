@@ -14,7 +14,7 @@ FIELD4 *S4FUNCTION d4field( DATA4 *data, const char *fieldName )
    #ifdef E4PARM_HIGH
       if ( data == 0 )
       {
-         error4( 0, e4parm_null, E94001 ) ;
+         error4( 0, e4parmNull, E94001 ) ;
          return 0 ;
       }
    #endif
@@ -36,7 +36,7 @@ FIELD4 *S4FUNCTION d4fieldJ( DATA4 *data, const int jField )
    #ifdef E4PARM_HIGH
       if ( data == 0 )
       {
-         error4( 0, e4parm_null, E94002 ) ;
+         error4( 0, e4parmNull, E94002 ) ;
          return (FIELD4 *)0 ;
       }
       if ( jField <= 0 || data->fields == 0 || jField > data->dataFile->nFields )
@@ -56,7 +56,7 @@ int S4FUNCTION d4fieldNumber( DATA4 *data, const char *fieldName )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E94003 ) ;
+         return error4( 0, e4parmNull, E94003 ) ;
    #endif
 
    if ( fieldName )

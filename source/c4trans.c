@@ -66,7 +66,7 @@ static int tran4fileVerify( TRAN4FILE *t4, int subs )
    int rc ;
 
    if ( t4 == 0 )
-      return error4( 0, e4parm_null, E93801 ) ;
+      return error4( 0, e4parmNull, E93801 ) ;
 
    if ( t4->c4trans == 0 )
       return error4( 0, e4parm, E93801 ) ;
@@ -101,7 +101,7 @@ int S4FUNCTION tran4fileAppend( TRAN4FILE *t4, LOG4HEADER *header, void *dta, in
 
    #ifdef E4PARM_LOW
       if ( header == 0 )
-         return error4( t4->c4trans->c4, e4parm_null, E93801 ) ;
+         return error4( t4->c4trans->c4, e4parmNull, E93801 ) ;
    #endif
 
    #ifdef E4ANALYZE
@@ -126,7 +126,7 @@ int S4FUNCTION tran4fileAppend( TRAN4FILE *t4, LOG4HEADER *header, void *dta, in
    {
       #ifdef E4PARM_LOW
          if ( dta == 0 )
-            return error4( t4->c4trans->c4, e4parm_null, E93801 ) ;
+            return error4( t4->c4trans->c4, e4parmNull, E93801 ) ;
       #endif
       rc = file4writeInternal( &t4->file, filePos, dta, (unsigned int)header->dataLen ) ;
       if ( rc < 0 )
@@ -213,7 +213,7 @@ int tran4fileCreate( TRAN4FILE *t4, const char *name )
 
    #ifdef E4PARM_LOW
       if ( name == 0 )
-         return error4( c4, e4parm_null, E93801 ) ;
+         return error4( c4, e4parmNull, E93801 ) ;
    #endif
 
    memcpy( buf, name, strlen( name ) + 1 ) ;
@@ -365,7 +365,7 @@ static int tran4fileOpen( TRAN4FILE *t4, char *name )
 
    #ifdef E4PARM_LOW
       if ( name == 0 )
-         return error4( t4->c4trans->c4, e4parm_null, E93801 ) ;
+         return error4( t4->c4trans->c4, e4parmNull, E93801 ) ;
    #endif
 
    c4 = t4->c4trans->c4 ;
@@ -1031,10 +1031,7 @@ int S4FUNCTION tran4lowStart( TRAN4 *trans, long clientId, int doUnlock )
    #endif
    CODE4 *c4 ;
 
-   #ifdef E4PARM_HIGH
-      if ( trans == 0 )
-         return error4( 0, e4parm_null, E93801 ) ;
-   #endif
+   E4PARHIGH( trans, E93801 ) ;
 
    c4 = trans->c4trans->c4 ;
 
@@ -1100,10 +1097,7 @@ int S4FUNCTION tran4lowRollback( TRAN4 *trans, long id, const int doInvalidate )
    long transId ;
    CODE4 *c4 ;
 
-   #ifdef E4PARM_HIGH
-      if ( trans == 0 )
-         return error4( 0, e4parm, E93801 ) ;
-   #endif
+   E4PARHIGH( trans, E93801 ) ;
 
    c4 = trans->c4trans->c4 ;
    saveErr = error4set( c4, 0 ) ;
@@ -1429,10 +1423,7 @@ int S4FUNCTION tran4lowCommitPhaseTwo( TRAN4 *trans, long id, int doUnlock )
 
 int S4FUNCTION code4tranCommit( CODE4 *c4 )
 {
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93828 ) ;
-   #endif
+   E4PARHIGH( c4, E93828 ) ;
 
    if ( code4trans(c4)->currentTranStatus != r4partial )   /* do full commit */
       if ( code4tranCommitPhaseOne( c4 ) != 0 )
@@ -1443,10 +1434,7 @@ int S4FUNCTION code4tranCommit( CODE4 *c4 )
 
 int S4FUNCTION code4tranCommitSingle( CODE4 *c4 )
 {
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93828 ) ;
-   #endif
+   E4PARHIGH( c4, E93828 ) ;
 
    if ( code4tranCommitPhaseOne( c4 ) != 0 )
       return -1 ;
@@ -1481,10 +1469,7 @@ int S4FUNCTION code4tranCommitPhaseOne( CODE4 *c4 )
 {
    int saveErr, rc ;
 
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93828 ) ;
-   #endif
+   E4PARHIGH( c4, E93828 ) ;
 
    saveErr = error4code( c4 ) ;
    if ( saveErr < 0 )
@@ -1511,10 +1496,7 @@ int S4FUNCTION code4tranCommitPhaseTwo( CODE4 *c4, int doUnlock )
 {
    int saveErr, rc ;
 
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93828 ) ;
-   #endif
+   E4PARHIGH( c4, E93828 ) ;
 
    if ( c4->c4trans.trans.currentTranStatus != r4partial )
       return error4( c4, e4transStatus, E83812 ) ;
@@ -1536,10 +1518,7 @@ int S4FUNCTION code4tranCommitPhaseTwo( CODE4 *c4, int doUnlock )
 
 int S4FUNCTION code4tranStart( CODE4 *c4 )
 {
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93829 ) ;
-   #endif
+   E4PARHIGH( c4, E93829 ) ;
 
    return tran4lowStart( &c4->c4trans.trans, 0, 0 ) ;
 }
@@ -1547,10 +1526,7 @@ int S4FUNCTION code4tranStart( CODE4 *c4 )
 
 int S4FUNCTION code4tranStartSingle( CODE4 *c4 )
 {
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93829 ) ;
-   #endif
+   E4PARHIGH( c4, E93829 ) ;
 
    return tran4lowStart( &c4->c4trans.trans, 0, 0 ) ;
 }
@@ -1560,10 +1536,7 @@ int S4FUNCTION code4tranRollback( CODE4 *c4 )
 {
    int rc ;
 
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93830 ) ;
-   #endif
+   E4PARHIGH( c4, E93830 ) ;
 
    if ( code4transEnabled( c4 ) != 1 )
       return error4( c4, e4trans, E83807 ) ;
@@ -1732,13 +1705,7 @@ void S4FUNCTION tran4freeLocks( CODE4 *c4, SINGLE4DISTANT *toFree )
 {
    LOCK4 *lock ;
 
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-      {
-         error4( 0, e4parm_null, E91018 ) ;
-         return ;
-      }
-   #endif
+   E4PARM_HRET( c4, E93828, ) ;
 
    for ( ;; )
    {
@@ -1862,7 +1829,7 @@ static int code4transVerify( CODE4TRANS *c4trans, int subs )
    int rc ;
 
    if ( c4trans == 0 )
-      return error4( 0, e4parm_null, E93832 ) ;
+      return error4( 0, e4parmNull, E93832 ) ;
 
    if ( subs == 1 )
    {
@@ -1892,7 +1859,7 @@ int tran4verify( TRAN4 *t4, int subs )
    #endif
 
    if ( t4 == 0 )
-      return error4( 0, e4parm_null, E93801 ) ;
+      return error4( 0, e4parmNull, E93801 ) ;
 
    if ( t4->c4trans == 0 )
       return error4( 0, e4struct, E93801 ) ;
@@ -1919,7 +1886,7 @@ int code4tranInitLow( TRAN4 *t4, CODE4TRANS *c4trans )
 {
    #ifdef E4PARM_LOW
       if ( t4 == 0 || c4trans == 0 )
-         return error4( 0, e4parm_null, E93834 ) ;
+         return error4( 0, e4parmNull, E93834 ) ;
    #endif
 
    t4->c4trans = c4trans ;
@@ -2141,13 +2108,7 @@ int tran4active( CODE4 *c4, DATA4 *data )
 void S4FUNCTION code4lockClear( CODE4 *c4 )
 {
    #ifndef S4OFF_MULTI
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-         {
-            error4( 0, e4parm_null, E91018 ) ;
-            return ;
-         }
-      #endif
+   E4PARM_HRET( c4, E91018, ) ;
          single4distantInitIterate( &(c4->c4trans.trans.toLock), &(c4->c4trans.trans.locks ) ) ;
          tran4freeLocks( c4, &(c4->c4trans.trans.toLock) ) ;
    #endif

@@ -52,7 +52,7 @@ int S4FUNCTION i4close( INDEX4 *i4 )
 
    #ifdef E4PARM_HIGH
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91701 ) ;
+         return error4( 0, e4parmNull, E91701 ) ;
       if ( i4->codeBase == 0 )
          return error4( 0, e4parm, E91701 ) ;
       #ifndef S4CLIPPER
@@ -70,7 +70,7 @@ const char *S4FUNCTION t4fileName( TAG4 *t4 )
    #ifdef E4PARM_HIGH
       if ( t4 == 0 )
       {
-         error4( 0, e4parm_null, E91720 ) ;
+         error4( 0, e4parmNull, E91720 ) ;
          return 0 ;
       }
    #endif
@@ -91,7 +91,7 @@ const char *S4FUNCTION i4fileName( INDEX4 *i4 )
    #ifdef E4PARM_HIGH
       if ( i4 == 0 )
       {
-         error4( 0, e4parm_null, E91720 ) ;
+         error4( 0, e4parmNull, E91720 ) ;
          return 0 ;
       }
    #endif
@@ -192,7 +192,7 @@ int index4close( INDEX4FILE *i4 )
 
    #ifdef E4PARM_LOW
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91702 ) ;
+         return error4( 0, e4parmNull, E91702 ) ;
    #endif
    #ifdef E4ANALYZE
       if ( i4->userCount < 0 )
@@ -303,7 +303,7 @@ long index4extend( INDEX4FILE *i4 )
 
    #ifdef E4PARM_LOW
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91703 ) ;
+         return error4( 0, e4parmNull, E91703 ) ;
    #endif
 
    c4 = i4->codeBase ;
@@ -401,7 +401,7 @@ int index4flush( INDEX4FILE *i4 )
 
    #ifdef E4PARM_LOW
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91704 ) ;
+         return error4( 0, e4parmNull, E91704 ) ;
    #endif
 
    rc = index4update( i4 ) ;
@@ -418,7 +418,7 @@ int index4update( INDEX4FILE *i4 )
 
    #ifdef E4PARM_LOW
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91705 ) ;
+         return error4( 0, e4parmNull, E91705 ) ;
    #endif
 
    if ( error4code( i4->codeBase ) < 0 )
@@ -468,7 +468,7 @@ INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
       {
-         error4( 0, e4parm_null, E91706 ) ;
+         error4( 0, e4parmNull, E91706 ) ;
          return 0 ;
       }
    #endif
@@ -598,12 +598,12 @@ INDEX4FILE *index4open( DATA4 *d4, const char *fileName, INDEX4 *index )
    #ifdef E4PARM_LOW
       if ( d4 == 0 )
       {
-         error4( 0, e4parm_null, E91707 ) ;
+         error4( 0, e4parmNull, E91707 ) ;
          return 0 ;
       }
          if ( index == 0 )
          {
-            error4( 0, e4parm_null, E91707 ) ;
+            error4( 0, e4parmNull, E91707 ) ;
             return 0 ;
          }
    #endif
@@ -994,12 +994,12 @@ TAG4 *S4FUNCTION i4tag( INDEX4 *i4, const char *tagName )
    #ifdef E4PARM_HIGH
       if ( i4 == 0 )
       {
-         error4( 0, e4parm_null, E91709 ) ;
+         error4( 0, e4parmNull, E91709 ) ;
          return 0 ;
       }
       if ( tagName == 0 )
       {
-         error4( i4->codeBase, e4parm_null, E91709 ) ;
+         error4( i4->codeBase, e4parmNull, E91709 ) ;
          return 0 ;
       }
    #endif
@@ -1029,7 +1029,7 @@ int index4shrink( INDEX4FILE *i4, long blockNo )
 
    #ifdef E4PARM_LOW
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91708 ) ;
+         return error4( 0, e4parmNull, E91708 ) ;
       if ( blockNo < 0 )
          return error4( i4->codeBase, e4parm, E91708 ) ;
    #endif
@@ -1082,7 +1082,7 @@ int index4updateHeader( INDEX4FILE *i4 )
 
    #ifdef E4PARM_LOW
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91710 ) ;
+         return error4( 0, e4parmNull, E91710 ) ;
    #endif
 
    if ( error4code( i4->codeBase ) < 0 )
@@ -1196,7 +1196,7 @@ int S4FUNCTION i4versionCheck( INDEX4 *i4, const int doSeek, const int updateVer
 
       #ifdef E4PARM_LOW
          if ( i4 == 0 )
-            return error4( 0, e4parm_null, E91711 ) ;
+            return error4( 0, e4parmNull, E91711 ) ;
       #endif
 
       if ( error4code( i4->codeBase ) < 0 )
@@ -1281,7 +1281,7 @@ int index4versionCheck( INDEX4FILE *i4, const int updateVersion )
 
       #ifdef E4PARM_LOW
          if ( i4 == 0 )
-            return error4( 0, e4parm_null, E91712 ) ;
+            return error4( 0, e4parmNull, E91712 ) ;
       #endif
 
       if ( error4code( i4->codeBase ) < 0 )
@@ -1509,7 +1509,7 @@ int i4flush( INDEX4 *i4 )
 
    #ifdef E4PARM_LOW
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91713 ) ;
+         return error4( 0, e4parmNull, E91713 ) ;
    #endif
 
    #ifndef S4SINGLE
@@ -1535,7 +1535,7 @@ int i4update( INDEX4 *i4 )
 
    #ifdef E4PARM_LOW
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91705 ) ;
+         return error4( 0, e4parmNull, E91705 ) ;
    #endif
 
    if ( error4code( i4->codeBase ) < 0 )
@@ -1579,7 +1579,7 @@ INDEX4 *S4FUNCTION i4open( DATA4 *d4, const char *fileName )
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
       {
-         error4( 0, e4parm_null, E91706 ) ;
+         error4( 0, e4parmNull, E91706 ) ;
          return 0 ;
       }
    #endif
@@ -1829,7 +1829,7 @@ TAG4 *S4FUNCTION i4tag( INDEX4 *i4, const char *tagName )
    #ifdef E4PARM_HIGH
       if ( i4 == 0 || tagName == 0 )
       {
-         error4( 0, e4parm_null, E91709 ) ;
+         error4( 0, e4parmNull, E91709 ) ;
          return 0 ;
       }
    #endif
@@ -1861,7 +1861,7 @@ int index4isProduction( INDEX4FILE *i4 )
    #endif
    #ifdef E4PARM_LOW
       if ( i4 == 0 )
-         return error4( 0, e4parm_null, E91714 ) ;
+         return error4( 0, e4parmNull, E91714 ) ;
    #endif
 
    #ifdef S4MDX

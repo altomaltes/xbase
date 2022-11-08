@@ -12,7 +12,7 @@ int dfile4read( DATA4FILE *data, long recNum, char *ptr, int fromDisk )
 
       #ifdef E4PARM_LOW
          if ( data == 0 || recNum <= 0 || ptr == 0 )
-            return error4( 0, e4parm_null, E91102 ) ;
+            return error4( 0, e4parmNull, E91102 ) ;
       #endif
 
       if ( error4code( data->c4 ) < 0 )
@@ -55,7 +55,7 @@ long S4FUNCTION dfile4recCount( DATA4FILE *data, const long serverId )
    #ifdef E4PARM_HIGH
       /* PARM_HIGH because called directly in S4OFF_MULTI case */
       if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
+         return error4( 0, e4parmNull, E91102 ) ;
    #endif
 
    if ( error4code( data->c4 ) < 0 )
@@ -113,7 +113,7 @@ unsigned int dfile4recWidth( DATA4FILE *data )
 {
    #ifdef E4PARM_LOW
       if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
+         return error4( 0, e4parmNull, E91102 ) ;
    #endif
 
    return (unsigned int)data->recWidth ;
@@ -125,7 +125,7 @@ S4CONST char *dfile4name( S4CONST DATA4FILE *data )
    #ifdef E4PARM_LOW
       if ( data == 0 )
       {
-         error4( 0, e4parm_null, E93205 ) ;
+         error4( 0, e4parmNull, E93205 ) ;
          return 0 ;
       }
    #endif
@@ -154,7 +154,7 @@ int dfile4updateHeader( DATA4FILE *data, int doTimeStamp, int doCount )
 
    #ifdef E4PARM_LOW
       if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
+         return error4( 0, e4parmNull, E91102 ) ;
    #endif
 
    #ifdef E4ANALYZE

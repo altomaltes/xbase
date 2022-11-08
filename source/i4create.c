@@ -26,7 +26,7 @@ INDEX4 *S4FUNCTION i4create( DATA4 *d4, const char *fileName, const TAG4INFO *ta
    #ifdef E4PARM_HIGH
       if ( d4 == 0 || tagData == 0 )
       {
-         error4( 0, e4parm_null, E95301 ) ;
+         error4( 0, e4parmNull, E95301 ) ;
          return 0 ;
       }
    #endif

@@ -440,13 +440,8 @@ DATA4 *S4FUNCTION d4open( CODE4 *c4, const char *name )
    char *info ;
    DATA4 *d4 ;
 
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 || name == 0 )
-      {
-         error4( 0, e4parm_null, E94301 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARM_HRET( c4 && name, E94301, NULL ) ;
+
 
    d4 = d4openInit( c4 ) ;
    if ( d4 != 0 )
@@ -493,13 +488,7 @@ DATA4 *S4FUNCTION d4openClone( DATA4 *dataOld )
    #endif
       int oldSingleOpen ;
 
-   #ifdef E4PARM_HIGH
-      if ( dataOld == 0 )
-      {
-         error4( 0, e4parm_null, E94301 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARM_HRET( dataOld, E94301, NULL ) ;
 
    c4 = dataOld->codeBase ;
    d4 = d4openInit( c4 ) ;
@@ -798,12 +787,12 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
    #ifdef E4PARM_LOW
       if ( c4 == 0 || name == 0 )
       {
-         error4( c4, e4parm_null, E91102 ) ;
+         error4( c4, e4parmNull, E91102 ) ;
          return 0 ;
       }
          if ( data == 0 )
          {
-            error4( c4, e4parm_null, E91102 ) ;
+            error4( c4, e4parmNull, E91102 ) ;
             return 0 ;
          }
    #endif

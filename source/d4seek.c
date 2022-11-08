@@ -174,7 +174,7 @@ int S4FUNCTION d4seek( DATA4 *data, const char *str )
 {
    #ifdef E4PARM_HIGH
       if ( data == 0 || str == 0 )
-         return error4( 0, e4parm_null, E92907 ) ;
+         return error4( 0, e4parmNull, E92907 ) ;
    #endif
 
       return d4seekN( data, str, (short)strlen( str ) ) ;
@@ -184,7 +184,7 @@ int S4FUNCTION d4seekNext( DATA4 *data, const char *str )
 {
    #ifdef E4PARM_HIGH
       if ( data == 0 || str == 0 )
-         return error4( 0, e4parm_null, E92908 ) ;
+         return error4( 0, e4parmNull, E92908 ) ;
    #endif
 
       return d4seekNextN( data, str, (const short)strlen( str ) ) ;
@@ -210,7 +210,7 @@ int S4FUNCTION d4seekNextN( DATA4 *data, const char *str, const short l )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 || str == 0 )
-         return error4( 0, e4parm_null, E92905 ) ;
+         return error4( 0, e4parmNull, E92905 ) ;
    #endif
 
       len = l ;
@@ -408,7 +408,7 @@ int S4FUNCTION d4seekN( DATA4 *data, const char *str, const short l )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 || str == 0 )
-         return error4( 0, e4parm_null, E92903 ) ;
+         return error4( 0, e4parmNull, E92903 ) ;
    #endif
 
       len = l ;
@@ -556,7 +556,7 @@ int S4FUNCTION d4seekDouble( DATA4 *data, const double dkey )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E92904 ) ;
+         return error4( 0, e4parmNull, E92904 ) ;
    #endif
 
       c4 = data->codeBase ;
@@ -679,7 +679,7 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E92909 ) ;
+         return error4( 0, e4parmNull, E92909 ) ;
    #endif
 
       c4 = data->codeBase ;

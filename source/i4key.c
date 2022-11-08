@@ -17,7 +17,7 @@ char *S4FUNCTION tfile4key( TAG4FILE *t4 )
    #ifdef E4PARM_HIGH
       if ( t4 == 0 )
       {
-         error4( 0, e4parm_null, E91630 ) ;
+         error4( 0, e4parmNull, E91630 ) ;
          return 0 ;
       }
    #endif

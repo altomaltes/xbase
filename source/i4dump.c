@@ -98,7 +98,7 @@ int tfile4dump( TAG4FILE *t4, int outHandle, const int displayAll )
 
    #ifdef E4PARM_LOW
       if ( t4 == 0 )
-         return error4( 0, e4parm_null, E94902 ) ;
+         return error4( 0, e4parmNull, E94902 ) ;
    #endif
 
    if ( error4code( t4->codeBase ) < 0 )

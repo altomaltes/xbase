@@ -251,10 +251,7 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
       #endif
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-         return error4( 0, e4parm, E91001 ) ;
-   #endif
+   E4PARHIGH( c4, E91001 ) ;
 
    /***********************************************************************
 
@@ -674,13 +671,7 @@ void S4FUNCTION code4calcReset( CODE4 *c4 )
 {
    LIST4 *list ;
 
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-      {
-         error4( 0, e4parm_null, E90921 ) ;
-         return ;
-      }
-   #endif
+   E4PARHIGH( c4, E90921 ) ;
 
       list = &c4->calcList ;
 
@@ -703,7 +694,7 @@ static int code4initUndo2( CODE4 *c4, int doClose )
 
    #ifdef E4PARM_HIGH
       if ( c4 == 0 )
-         return e4parm_null ;
+         return e4parmNull ;
    #endif
 
    if ( c4->initialized == 0 )  /* already uninitialized */
@@ -999,10 +990,7 @@ int S4FUNCTION code4close( CODE4 *c4 )
          return -1 ;
    #endif  /* S4VBASIC */
 
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-         return error4( 0, e4parm_null, E91003 ) ;
-   #endif
+   E4PARHIGH( c4, E91003 ) ;
 
    list = tran4dataList( (&(c4->c4trans.trans)) ) ;
    for ( dataNext = (DATA4 *)l4first( list ) ; ; )
@@ -1043,7 +1031,7 @@ DATA4FILE *dfile4data( CODE4 *c4, const char *aliasName )
    #ifdef E4PARM_LOW
       if ( c4 == 0 || aliasName == 0 )
       {
-         error4( c4, e4parm_null, E91102 ) ;
+         error4( c4, e4parmNull, E91102 ) ;
          return 0 ;
       }
    #endif
@@ -1225,13 +1213,7 @@ DATA4 *S4FUNCTION code4data( CODE4 *c4, const char *aliasName )
          return 0 ;
    #endif  /* S4VBASIC */
 
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 || aliasName == 0 )
-      {
-         error4( c4, e4parm_null, E91102 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARHIGH( c4 && aliasName, E91102 ) ;
 
    u4ncpy( buf, aliasName, sizeof( buf ) ) ;
    #ifndef S4CASE_SEN
@@ -1259,10 +1241,7 @@ int S4FUNCTION code4indexFormat( CODE4 *c4 )
    #ifdef S4OFF_INDEX
       return 0 ;
    #else
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-            return error4( 0, e4parm_null, E91110 ) ;
-      #endif
+   E4PARHIGH( c4, E91110 ) ;
 
       #ifdef S4MDX
          return r4mdx ;
@@ -1315,10 +1294,7 @@ int S4FUNCTION code4logCreate( CODE4 *c4, const char *fileName, const char *user
    int rc ;
    static char defaultUser[] = "PUBLIC" ;
 
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-         return error4( c4, e4parm_null, E91013 ) ;
-   #endif
+   E4PARHIGH( c4, E91014 ) ;
 
    if ( userId == 0 )
       userId = defaultUser ;
@@ -1354,13 +1330,7 @@ int S4FUNCTION code4logCreate( CODE4 *c4, const char *fileName, const char *user
 
 const char *S4FUNCTION code4logFileName( CODE4 *c4 )
 {
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-      {
-         error4( c4, e4parm_null, E91014 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARHIGH( c4, E91014 ) ;
 
    if ( c4->c4trans.transFile == 0 )
       return 0 ;
@@ -1372,10 +1342,7 @@ int S4FUNCTION code4logOpen( CODE4 *c4, const char *fileName, const char *userId
    int rc ;
    static char defaultUser[] = "PUBLIC" ;
 
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-         return error4( c4, e4parm_null, E91015 ) ;
-   #endif
+   E4PARHIGH( c4, E91015 ) ;
 
    if ( userId == 0 )
       userId = defaultUser ;
@@ -1410,13 +1377,7 @@ int S4FUNCTION code4logOpen( CODE4 *c4, const char *fileName, const char *userId
 
 void S4FUNCTION code4logOpenOff( CODE4 *c4 )
 {
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-      {
-         error4( c4, e4parm_null, E91016 ) ;
-         return ;
-      }
-   #endif
+   E4PARHIGH( c4, E91016 ) ;
 
    c4->logOpen = 0 ;
 }
@@ -2174,7 +2135,7 @@ void code4tranInitUndo( CODE4 *c4 )
    #ifdef E4PARM_LOW
       if ( c4 == 0 )
       {
-         error4( 0, e4parm_null, E93804 ) ;
+         error4( 0, e4parmNull, E93804 ) ;
          return ;
       }
    #endif
@@ -2189,7 +2150,7 @@ int S4FUNCTION code4tranInit2( CODE4 *c4, const char *fileName, const char *char
 
    #ifdef E4PARM_LOW
       if ( c4 == 0 || fileName == 0 )
-         return error4( 0, e4parm_null, E93801 ) ;
+         return error4( 0, e4parmNull, E93801 ) ;
    #endif
 
    c4->c4trans.c4 = c4 ;
@@ -2211,7 +2172,7 @@ int S4FUNCTION code4tranInit( CODE4 *c4 )
 {
    #ifdef E4PARM_LOW
       if ( c4 == 0 )
-         return error4( 0, e4parm_null, E93802 ) ;
+         return error4( 0, e4parmNull, E93802 ) ;
    #endif
 
    c4->c4trans.c4 = c4 ;

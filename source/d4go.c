@@ -21,7 +21,7 @@ int S4FUNCTION d4go( DATA4 *data, const long recNo )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E93101 ) ;
+         return error4( 0, e4parmNull, E93101 ) ;
    #endif
 
    c4 = data->codeBase ;
@@ -127,7 +127,7 @@ int dfile4goData( DATA4FILE *data, long rec, void *record, int fromDisk )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
+         return error4( 0, e4parmNull, E91102 ) ;
    #endif
 
    cb = data->c4 ;
@@ -190,7 +190,7 @@ int  S4FUNCTION d4goEof( DATA4 *data )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E93103 ) ;
+         return error4( 0, e4parmNull, E93103 ) ;
    #endif
 
    if ( error4code( data->codeBase ) < 0 )

@@ -14,7 +14,7 @@ int S4FUNCTION d4changed( DATA4 *data, int flag )
 
    #ifdef E4PARM_HIGH
       if ( data == 0 )
-         return error4( 0, e4parm_null, E94101 ) ;
+         return error4( 0, e4parmNull, E94101 ) ;
    #endif
 
    #ifndef S4OFF_ENFORCE_LOCK
@@ -41,7 +41,7 @@ int S4FUNCTION d4flush( DATA4 *data )
 
       #ifdef E4PARM_HIGH
          if ( data == 0 )
-            return error4( 0, e4parm_null, E94102 ) ;
+            return error4( 0, e4parmNull, E94102 ) ;
       #endif
 
          saveRc = d4flushData( data ) ;
@@ -82,7 +82,7 @@ int dfile4flush( DATA4FILE *data )
 
    #ifdef E4PARM_LOW
       if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
+         return error4( 0, e4parmNull, E91102 ) ;
    #endif
 
    saveRc = dfile4flushData( data ) ;
@@ -222,7 +222,7 @@ int dfile4updateIndexes( DATA4FILE *data )
 
    #ifdef E4PARM_LOW
       if ( data == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
+         return error4( 0, e4parmNull, E91102 ) ;
    #endif
 
    rc = 0 ;

@@ -15,7 +15,7 @@ int S4FUNCTION d4pack( DATA4 *d4 )
 
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
-         return error4( 0, e4parm_null, E94601 ) ;
+         return error4( 0, e4parmNull, E94601 ) ;
    #endif
 
    c4 = d4->codeBase ;
@@ -64,7 +64,7 @@ int d4packData( DATA4 *d4 )
 
    #ifdef E4PARM_HIGH
       if ( d4 == 0 )
-         return error4( 0, e4parm_null, E94602 ) ;
+         return error4( 0, e4parmNull, E94602 ) ;
    #endif
 
    rc = d4update( d4 ) ;   /* returns -1 if error4code( codeBase ) < 0 */
@@ -110,7 +110,7 @@ int dfile4packData( DATA4FILE *d4 )
 
    #ifdef E4PARM_LOW
       if ( d4 == 0 )
-         return error4( 0, e4parm_null, E91102 ) ;
+         return error4( 0, e4parmNull, E91102 ) ;
    #endif
 
    c4 = d4->c4 ;

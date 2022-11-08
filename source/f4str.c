@@ -14,13 +14,7 @@ void S4FUNCTION f4assign( FIELD4 *field, const char *str )
          return ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( field == 0 || str == 0 )
-      {
-         error4( 0, e4parm_null, E90533 ) ;
-         return ;
-      }
-   #endif
+   E4PARM_HRET( field && str, E90533,  ) ;
 
    #ifdef E4ANALYZE
       if ( field->data == 0 )
@@ -63,7 +57,7 @@ void S4FUNCTION f4assignN( FIELD4 *field, const char *ptr, const unsigned ptrLen
    #ifdef E4PARM_HIGH
       if ( field == 0 || ( ptr == 0 && ptrLen ) )
       {
-         error4( 0, e4parm_null, E90534 ) ;
+         error4( 0, e4parmNull, E90534 ) ;
          return ;
       }
    #endif
@@ -110,13 +104,7 @@ unsigned int S4FUNCTION f4ncpy( FIELD4 *field, char *memPtr, const unsigned int 
          return 0 ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( field == 0 || memPtr == 0 )
-      {
-         error4( 0, e4parm_null, E90535 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARM_HRET( field && memPtr, E90535, 0  ) ;
 
    numCpy = field->len ;
    if ( memLen <= numCpy )
@@ -139,13 +127,7 @@ char *S4FUNCTION f4str( FIELD4 *field )
          return 0 ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parm_null, E90536 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARM_HRET( field, E90536, NULL ) ;
 
    codeBase = field->data->codeBase ;
 

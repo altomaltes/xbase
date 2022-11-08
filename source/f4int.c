@@ -15,7 +15,7 @@ void S4FUNCTION f4assignInt( FIELD4 *field, const int iValue )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90514 ) ;
+         error4( 0, e4parmNull, E90514 ) ;
          return ;
       }
       switch( field->type )

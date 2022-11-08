@@ -21,7 +21,7 @@ void S4FUNCTION f4assignDouble( FIELD4 *field, const double dValue )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90504 ) ;
+         error4( 0, e4parmNull, E90504 ) ;
          return ;
       }
       switch( field->type )
@@ -89,7 +89,7 @@ double S4FUNCTION f4double( const FIELD4 *field )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90505 ) ;
+         error4( 0, e4parmNull, E90505 ) ;
          return -1.0 ;
       }
       switch( field->type )
@@ -130,7 +130,7 @@ int S4FUNCTION f4double2( const FIELD4 *field, double *result )
    #ifdef E4PARM_HIGH
       if ( field == 0 )
       {
-         error4( 0, e4parm_null, E90506 ) ;
+         error4( 0, e4parmNull, E90506 ) ;
          return -1 ;
       }
    #endif
