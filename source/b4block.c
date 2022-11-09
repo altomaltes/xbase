@@ -81,10 +81,7 @@ int b4calcBlanks( const unsigned char *keyVal, const int len, const unsigned cha
 {
    int a ;
 
-   #ifdef E4PARM_LOW
-      if ( keyVal == 0 || len < 0 )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( keyVal == 0 || len < 0, E90438 );
 
    for ( a = len ; a > 0; a-- )
       if ( keyVal[a-1] != pChar )
@@ -344,10 +341,7 @@ int b4leaf( const B4BLOCK *b4 )
 /* S4MDX */
 long b4recNo( const B4BLOCK *b4, const int i )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || i < 0 )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST(  b4 == 0 || i < 0, E90438 );
 
    return b4key( b4, i )->num ;
 }
@@ -398,10 +392,7 @@ int b4seek( B4BLOCK *b4, const char *searchValue, const int len )
    int rc, keyLower, keyUpper, saveRc, keyCur ;
    S4CMP_FUNCTION *cmp;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || searchValue == 0 || len < 0 )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST(  b4 == 0 || searchValue == 0 || len < 0, E90438 );
 
    /* keyCur must be between  keyLower and  keyUpper */
    keyLower = -1 ;
@@ -516,10 +507,7 @@ int b4calcDups( const unsigned char *ptr1, const unsigned char *ptr2, const int 
 {
    int a ;
 
-   #ifdef E4PARM_LOW
-      if ( ptr1 == 0 || ptr2 == 0 || len < 0 )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST(  ptr1 == 0 || ptr2 == 0 || len < 0, E90438 );
 
    for ( a = 0 ; a < len; a++ )
       if ( ptr1[a] != ptr2[a] )
@@ -541,10 +529,7 @@ S4LONG x4recNo( const B4BLOCK *b4, const int numInBlock )
       #endif
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || numInBlock < 0 )
-         return error4( 0, e4parm, E90439 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || numInBlock < 0, E90439 ) ;
 
    #ifdef S4DATA_ALIGN
       memcpy( (void *)&longPtr , b4->data + numInBlock * b4->nodeHdr.infoLen , sizeof(S4LONG) ) ;
@@ -578,10 +563,7 @@ int x4dupCnt( const B4BLOCK *b4, const int numInBlock )
       #endif
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || numInBlock < 0 )
-         return error4( 0, e4parm, E90439 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || numInBlock < 0, E90439 ) ;
 
    if ( b4->nodeHdr.infoLen > 4 )  /* > size of long, so must do careful shifting and copying */
    {
@@ -635,10 +617,7 @@ int x4trailCnt( const B4BLOCK *b4, const int numInBlock )
       #endif
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || numInBlock < 0 )
-         return error4( 0, e4parm, E90439 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || numInBlock < 0, E90439 ) ;
 
    if ( b4->nodeHdr.infoLen > 4 )  /* > size of long, so must do careful shifting and copying */
    {
@@ -699,10 +678,7 @@ int x4putInfo( const B4NODE_HEADER *b4nodeHdr, void *buffer, const S4LONG rec, c
       unsigned long *lPtr ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( b4nodeHdr == 0 || buffer == 0 || rec < 0 || trail < 0 || dupCnt < 0 )
-         return error4( 0, e4parm, E90439 ) ;
-   #endif
+   E4PARM_TEST(  b4nodeHdr == 0 || buffer == 0 || rec < 0 || trail < 0 || dupCnt < 0, E90439 ) ;
 
    #ifdef S4DATA_ALIGN
       memset( unixBuf, 0, 6 ) ;
@@ -793,10 +769,7 @@ int b4insertLeaf( B4BLOCK *b4, const void *vkeyData, const S4LONG rec )
       S4LONG *mask2;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || vkeyData == 0 || rec < 0L )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || vkeyData == 0 || rec < 0L, E90438 ) ;
 
    iLen = b4->nodeHdr.infoLen ;
    keyData = (unsigned char *)vkeyData ;
@@ -1076,10 +1049,7 @@ int b4insertBranch( B4BLOCK *b4, const void *k, const S4LONG r1, const S4LONG ri
 
    gLen = b4->tag->header.keyLen + 2 * sizeof(S4LONG) ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || k == 0 || r1 <= 0L || rin2 < 0 )
-         return error4( b4->tag->codeBase, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || k == 0 || r1 <= 0L || rin2 < 0, E90438 ) ;
 
    leftLen = B4BLOCK_SIZE - sizeof( b4->header ) - gLen * b4numKeys( b4 ) ;
    if ( leftLen < gLen )  /* not enough room */
@@ -1123,10 +1093,7 @@ int b4insertBranch( B4BLOCK *b4, const void *k, const S4LONG r1, const S4LONG ri
 #ifndef S4INLINE
 int b4insert( B4BLOCK *b4, const void *keyData, const long rec, const long rec2, const char newFlag )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || keyData == 0 || rec <= 0L || rec2 < 0 )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || keyData == 0 || rec <= 0L || rec2 < 0, E90438 ) ;
 
    return ( b4leaf( b4 ) ? b4insertLeaf( b4, keyData, rec ) : b4insertBranch( b4, keyData, rec, rec2, newFlag ) ) ;
 }
@@ -1273,10 +1240,7 @@ int b4flush( B4BLOCK *b4 )
 /* S4FOX */
 int b4go( B4BLOCK *b4, const int iKey )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || iKey < 0 )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || iKey < 0, E90438 ) ;
 
    return b4skip( b4, iKey - b4->keyOn ) ;
 }
@@ -1313,13 +1277,7 @@ B4KEY_DATA *b4key( B4BLOCK *b4, const int iKey )
    int len, kLen ;
    char *val ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || iKey > b4numKeys( b4 ) || iKey < 0 )
-      {
-         error4( 0, e4parm, E90438 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARM_TRET( b4 == 0 || iKey > b4numKeys( b4 ) || iKey < 0, E90438, NULL ) ;
 
    if ( iKey == b4->builtOn )   /* already there! */
       return b4->builtKey ;
@@ -1408,10 +1366,7 @@ int b4leaf( const B4BLOCK *b4 )
 /* S4FOX */
 long b4recNo( const B4BLOCK *b4, const int i )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || i < 0 )
-         return error4( 0, e4parmNull, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || i < 0, E90438 ) ;
 
    if ( b4->header.nodeAttribute >= 2 ) /* leaf */
       return x4recNo( b4, i ) ;
@@ -1428,10 +1383,7 @@ int b4brReplace( B4BLOCK *b4, const unsigned char *str, const long r )
    char *putPl ;
    long rec ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || str == 0 || r < 0 )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || str == 0 || r < 0, E90438 ) ;
 
    keyLen = b4->tag->header.keyLen ;
    putPl = ( (char *)&b4->nodeHdr ) + b4->keyOn * ( 2 * sizeof(S4LONG ) + keyLen ) ;
@@ -1458,10 +1410,7 @@ int b4rBrseek( B4BLOCK *b4, const char *searchValue, const int len, const long r
       long swapped ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || searchValue == 0 || len < 0 )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || searchValue == 0 || len < 0, E90438 ) ;
 
    #ifdef E4ANALYZE_ALL
       /* incoming rec is swapped, so unswap it to see if it is valid */
@@ -1502,10 +1451,7 @@ int b4seek( B4BLOCK *b4, const char *searchValue, const int len )
 {
    int rc, keyLower, keyUpper, saveRc, keyCur, groupVal ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || searchValue == 0 || len < 0 )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || searchValue == 0 || len < 0, E90438 ) ;
 
    if ( b4numKeys( b4 ) == 0 )
    {
@@ -1570,10 +1516,7 @@ int b4leafSeek( B4BLOCK *b4, const char *searchValue, const int l )
    #endif
    char allBlank ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || searchValue == 0 || l < 0 )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || searchValue == 0 || l < 0, E90438 ) ;
 
    originalLen = len = l ;
    keyLen = b4->tag->header.keyLen ;
@@ -1992,10 +1935,7 @@ int b4append( B4BLOCK *b4, const long pointer )
       int leftLen ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || pointer < 1L )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || pointer < 1L, E90438 ) ;
 
    #ifdef E4ANALYZE
       if ( b4leaf( b4 ) )
@@ -2030,10 +1970,7 @@ int b4append2( B4BLOCK *b4, const void *k, const long r, const long pointer )
    B4KEY_DATA *dataPtr ;
    long adjPointer ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || k == 0 || r < 0L || pointer < 0L )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || k == 0 || r < 0L || pointer < 0L, E90438 ) ;
 
    b4goEof( b4 ) ;
 
@@ -2067,10 +2004,7 @@ int b4insert( B4BLOCK *b4, const void *k, const long r, const long pointer )
 {
    short temp, insertPos ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || k == 0 || r < 0L || pointer < 0L )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || k == 0 || r < 0L || pointer < 0L, E90438 ) ;
 
    insertPos = b4->keyOn ;
 
@@ -2102,13 +2036,7 @@ void b4goEof( B4BLOCK *b4 )
 
 B4KEY_DATA *b4key( const B4BLOCK *b4, const int iKey )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || iKey < 0 )
-      {
-         error4( 0, e4parm, E90438 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARM_TRET( b4 == 0 || i < 0, E90438, NULL ) ;
 
    #ifdef E4ANALYZE
       if ( iKey > 2 + b4->tag->header.keysMax )
@@ -2128,19 +2056,14 @@ B4KEY_DATA *b4key( const B4BLOCK *b4, const int iKey )
 
 unsigned char *b4keyKey( B4BLOCK *b4, const int iKey )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || iKey < 0 )
-      {
-         error4( 0, e4parm, E90438 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARM_TRET( b4 == 0 || iKey < 0, E90438, NULL ) ;
+
    return (unsigned char *) b4key( b4, iKey )->value ;
 }
 
 int b4lastpos( const B4BLOCK *b4 )
 {
-   E4PARM_LOW( b4, E90438 ) ;
+   E4PARMLOW( b4, E90438 ) ;
 
    return ( ( b4leaf( b4 ) ) ? ( b4numKeys( b4 ) - 1 ) : ( b4numKeys( b4 ) ) ) ;
 }
@@ -2154,10 +2077,7 @@ int b4leaf( const B4BLOCK *b4 )
 
 long b4recNo( const B4BLOCK *b4, const int i )
 {
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || i < 0 )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || i < 0, E90438 );
 
    return b4key( b4, i )->num ;
 }
@@ -2224,10 +2144,7 @@ int b4seek( B4BLOCK *b4, const char *searchValue, const int len )
    int rc, saveRc, keyCur, keyLower, keyUpper ;
    S4CMP_FUNCTION *cmp = b4->tag->cmp ;
 
-   #ifdef E4PARM_LOW
-      if ( b4 == 0 || searchValue == 0 || len < 0 )
-         return error4( 0, e4parm, E90438 ) ;
-   #endif
+   E4PARM_TEST( b4 == 0 || searchValue == 0 || len < 0, E90438 );
 
    /* keyOn must be between  keyLower and  keyUpper */
    keyLower = -1 ;

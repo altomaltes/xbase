@@ -58,7 +58,7 @@ int S4FUNCTION t4uniqueSet( TAG4 *t4, const short uniqueCode )
 
    /* if not zero matches, then neither should be zero */
    #ifdef E4PARM_HIGH
-      #ifdef CLIENT_OR_FOX
+      #ifdef S4CFOX
          if ( t4unique( t4 ) == r4candidate )
          {
             if ( uniqueCode != e4candidate )
@@ -86,7 +86,7 @@ int S4FUNCTION t4uniqueSetLow( TAG4 *t4, const short uniqueCode, const char doZe
    #ifdef E4PARM_HIGH
       if ( t4 == 0 )
          return error4( 0, e4parmNull, E91601 ) ;
-      #ifdef CLIENT_OR_FOX
+      #ifdef S4CFOX
          if ( t4unique( t4 ) == r4candidate )  /* can't change a candidate setting */
          {
             if ( uniqueCode != e4candidate )

@@ -153,7 +153,7 @@
          if ( c4parm_check( cb, 1, 0 ) ) return -1 ;
       #endif
 
-      #if defined( CLIENT_OR_FOX ) && defined( S4COMPRESS )
+      #if defined( S4CFOX ) && defined( S4COMPRESS )
          if ( value == (Bool5)r4check ) return( cb->compressedMemos ) ;
          temp = cb->compressedMemos ;
          cb->compressedMemos = value ;

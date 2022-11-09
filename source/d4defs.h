@@ -202,7 +202,7 @@
 #endif
 
 #ifdef S4FOX
-      #define CLIENT_OR_FOX
+      #define S4CFOX
 #endif
 
    #ifndef S4MDX

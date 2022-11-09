@@ -23,7 +23,7 @@ char *S4FUNCTION f4assignPtr( FIELD4 *field )
       }
    #endif
 
-   #ifdef CLIENT_OR_FOX
+   #ifdef S4CFOX
       if ( d4version( field->data ) == 0x30 )
          f4assignNotNull( field ) ;
    #endif
@@ -60,7 +60,7 @@ void S4FUNCTION f4blank( FIELD4 *field )
             }
       #endif
 
-   #ifdef CLIENT_OR_FOX
+   #ifdef S4CFOX
       if ( field->binary )
    #else
       if ( field->type == r5wstr || field->type == r4int )
@@ -167,7 +167,7 @@ int S4FUNCTION f4type( const FIELD4 *field )
          return error4( 0, e4parmNull, E90513 ) ;
    #endif
 
-   #ifdef CLIENT_OR_FOX
+   #ifdef S4CFOX
       switch( field->type )
       {
          case 'F':
@@ -1044,7 +1044,7 @@ char *S4FUNCTION f4currency( const FIELD4 *field, int numDec )
    return codeBase->fieldBuffer ;
 }
 
-#ifdef CLIENT_OR_FOX
+#ifdef S4CFOX
 
 #ifndef S4OFF_WRITE
 void S4FUNCTION f4assignNotNull( FIELD4 *field )
@@ -1192,7 +1192,7 @@ int S4FUNCTION f4null( const FIELD4 *field )
    }
    return 0 ;
 }
-#endif /* CLIENT_OR_FOX */
+#endif /* S4CFOX */
 
 static void time4assign( char *ptr, unsigned long inVal )
 {

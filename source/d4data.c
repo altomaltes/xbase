@@ -233,7 +233,7 @@ short int S4FUNCTION d4numFields( DATA4 *data )
 
    E4PARHIGH( data, E93308 ) ;
 
-   #ifdef CLIENT_OR_FOX
+   #ifdef S4CFOX
       if ( data->fields[data->dataFile->nFields-1].type == '0' )   /* null flags field */
          return data->dataFile->nFields - 1 ;
    #endif

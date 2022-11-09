@@ -814,10 +814,7 @@ int S4FUNCTION u4remove( const char *ptr )
       unsigned short name[256] ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( ptr == 0 )
-         return error4( 0, e4parmNull, E94504 ) ;
-   #endif
+   E4PARMLOW( ptr, E94504 ) ;
 
    #ifdef S4UNICODE
       c4atou(ptr, name, 256) ;

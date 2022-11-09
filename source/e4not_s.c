@@ -36,18 +36,12 @@
    #ifndef S4OFF_WRITE_REPORT
       #define S4OFF_WRITE_REPORT
    #endif
-   #ifndef S4OFF_CLIENT_OR_FOX_OR_WRITE
-      #define S4OFF_CLIENT_OR_FOX_OR_WRITE
-   #endif
    #ifndef S4OFF_INDEX_WRITE_OR_CLIENT
       #define S4OFF_INDEX_WRITE_OR_CLIENT
    #endif
 #endif
 
-#ifndef CLIENT_OR_FOX
-   #ifndef S4OFF_CLIENT_OR_FOX_OR_WRITE
-      #define S4OFF_CLIENT_OR_FOX_OR_WRITE
-   #endif
+#ifndef S4CFOX
 #endif
 
 #ifdef S4OFF_REPORT
@@ -223,7 +217,7 @@ int S4FUNCTION code4tranStart( CODE4 *c4 )
 }
 #endif /* S4OFF_TRAN */
 
-#ifdef S4OFF_CLIENT_OR_FOX_OR_WRITE
+#ifdef S4OFF_S4CFOX_OR_WRITE
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -239,9 +233,9 @@ void S4FUNCTION f4assignNull( FIELD4 *field )
 {
    error4( field->data->codeBase, e4notSupported, E90539 ) ;
 }
-#endif /* S4OFF_CLIENT_OR_FOX_OR_WRITE */
+#endif /* S4OFF_S4CFOX_OR_WRITE */
 
-#ifndef CLIENT_OR_FOX
+#ifndef S4CFOX
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
@@ -249,7 +243,7 @@ int S4FUNCTION f4null( const FIELD4 *field )
 {
    return error4( field->data->codeBase, e4notSupported, E90540 ) ;
 }
-#endif /* CLIENT_OR_FOX */
+#endif /* S4CFOX */
 
 #ifdef S4WINDOWS
 #ifdef S4OFF_REPORT
@@ -2451,10 +2445,6 @@ int S4FUNCTION file4seqWriteDelay( FILE4SEQ_WRITE *seqWrite )
 
 #ifdef S4OFF_WRITE_REPORT
    #undef S4OFF_WRITE_REPORT
-#endif
-
-#ifdef S4OFF_CLIENT_OR_FOX_OR_WRITE
-   #undef S4OFF_CLIENT_OR_FOX_OR_WRITE
 #endif
 
 #ifdef S4OFF_INDEX_WRITE_OR_CLIENT

@@ -390,10 +390,7 @@ int r4reindexBlocksAlloc( R4REINDEX *r4 )
 {
    S4LONG onCount ;
 
-   #ifdef E4PARM_LOW
-      if ( r4 == 0 )
-         return error4( 0, e4parmNull, E92102 ) ;
-   #endif
+   E4PARMLOW( r4, E92102 ) ;
 
    #ifdef E4MISC
       if ( (unsigned)r4->minKeysmax > INT_MAX )
@@ -437,10 +434,7 @@ int r4reindexSupplyKeys( R4REINDEX *r4 )
       int i ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( r4 == 0 )
-         return error4( 0, e4parmNull, E92102 ) ;
-   #endif
+   E4PARMLOW( r4, E92102 ) ;
 
    dataFile = r4->dataFile ;
    t4 = r4->tag ;
@@ -548,10 +542,7 @@ int r4reindexTagHeadersCalc( R4REINDEX *r4 )
       int keysmax, exprType ;
    #endif  /* S4FOX */
 
-   #ifdef E4PARM_LOW
-      if ( r4 == 0 )
-         return error4( 0, e4parmNull, E92102 ) ;
-   #endif
+   E4PARMLOW( r4, E92102 ) ;
 
    c4 = r4->codeBase ;
    r4->nTags = 0 ;
@@ -696,10 +687,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
       T4HEADER swapTagHeader ;
    #endif  /* S4BYTE_SWAP */
 
-   #ifdef E4PARM_LOW
-      if ( r4 == 0 )
-         return error4( 0, e4parmNull, E92102 ) ;
-   #endif
+   E4PARMLOW( r4, E92102 ) ;
 
    memset( (void *)higher, 0, sizeof( higher ) ) ;
    memset( (void *)lower,  0, sizeof( lower ) ) ;
@@ -933,10 +921,7 @@ int r4reindexWriteKeys( R4REINDEX *r4, short int errUnique )
    S4LONG  keyRec ;
    FILE4LONG pos ;
 
-   #ifdef E4PARM_LOW
-      if ( r4 == 0 )
-         return error4( 0, e4parmNull, E92102 ) ;
-   #endif
+   E4PARMLOW( r4, E92102 ) ;
 
    t4 = r4->tag ;
 
@@ -1037,10 +1022,7 @@ static int r4reindexToDisk( R4REINDEX *r4 )
       short shortVal ;
    #endif  /* S4BYTE_SWAP */
 
-   #ifdef E4PARM_LOW
-      if ( r4 == 0 )
-         return error4( 0, e4parmNull, E92102 ) ;
-   #endif
+   E4PARMLOW( r4, E92102 ) ;
 
    /* Writes out the current block and adds references to higher blocks */
    block = r4->startBlock ;
@@ -1165,10 +1147,7 @@ int r4reindexFinish( R4REINDEX *r4 )
       S4LONG dif ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( r4 == 0 )
-         return error4( 0, e4parmNull, E92102 ) ;
-   #endif
+   E4PARMLOW( r4, E92102 ) ;
 
    #ifdef S4BYTE_SWAP
       char *swap, *swapPtr ;
@@ -1288,10 +1267,7 @@ static int r4reindexToDisk( R4REINDEX *r4, const char *keyValue )
       iBlock = 0 ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( r4 == 0 )
-         return error4( 0, e4parmNull, E92102 ) ;
-   #endif
+   E4PARMLOW( r4, E92102 ) ;
 
    block = r4->startBlock ;
    tnUsed = 1 ;
@@ -1431,10 +1407,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
       T4HEADER swapTagHeader ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( r4 == 0 )
-         return error4( 0, e4parmNull, E92102 ) ;
-   #endif
+   E4PARMLOW( r4, E92102 ) ;
 
    iTag = 2 ;
    i4file = r4->indexFile ;
@@ -1582,10 +1555,7 @@ int r4reindexWriteKeys( R4REINDEX *r4, short int errUnique )
    R4BLOCK_DATA *r4block ;
    FILE4LONG pos ;
 
-   #ifdef E4PARM_LOW
-      if ( r4 == 0 )
-         return error4( 0, e4parmNull, E92102 ) ;
-   #endif
+   E4PARMLOW( r4, E92102 ) ;
 
    t4 = r4->tag ;
    kLen = (unsigned short int)t4->header.keyLen ;
@@ -1814,10 +1784,7 @@ int r4reindexFinish( R4REINDEX *r4, char *keyValue )
       short shortVal ;
    #endif
 
-   #ifdef E4PARM_LOW
-      if ( r4 == 0 )
-         return error4( 0, e4parmNull, E92102 ) ;
-   #endif
+   E4PARMLOW( r4, E92102 ) ;
 
    block = r4->startBlock ;
 

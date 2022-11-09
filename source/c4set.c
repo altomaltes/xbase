@@ -89,7 +89,7 @@
 
    short S4FUNCTION code4indexBlockSize( CODE4 *c4 )
    {
-      #if !defined( CLIENT_OR_FOX ) || defined( S4OFF_INDEX ) || defined( S4PALM )
+      #if !defined( S4CFOX ) || defined( S4OFF_INDEX ) || defined( S4PALM )
          return error4( c4, e4notSupported, E96701 ) ;
       #else
          if ( !s5fox )
@@ -125,7 +125,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
       // CS 2007/01/30
       return e4notSupported;
    #else
-         #ifdef CLIENT_OR_FOX
+         #ifdef S4CFOX
             if ( code4indexFormat( c4 ) == r4cdx )
                return c4->foxCreateIndexMultiplier ;
             else
@@ -139,7 +139,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
    // CS 1999/08/26 return short for VB
    short S4FUNCTION code4indexBlockSizeSet( CODE4 *c4, short val )
    {
-      #if defined( CLIENT_OR_FOX ) && !defined( S4OFF_INDEX ) && !defined( S4PALM )
+      #if defined( S4CFOX ) && !defined( S4OFF_INDEX ) && !defined( S4PALM )
          // AS Jul 5/06 - it is ok to set this if we are not connected yet...
          // if ( s5fox )
          if ( s5clipper == 0 && s5mdx == 0 )
@@ -203,7 +203,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
    Bool5 S4FUNCTION c4getCompressedMemos( const CODE4 *c4 )
    {
-      #if defined( CLIENT_OR_FOX ) && defined( S4COMPRESS )
+      #if defined( S4CFOX ) && defined( S4COMPRESS )
          return c4->compressedMemos ;
       #else
          return 0;
@@ -481,7 +481,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
    void S4FUNCTION c4setCompressedMemos( CODE4 *c4, Bool5 val )
    {
-      #if defined( CLIENT_OR_FOX ) && defined( S4COMPRESS )
+      #if defined( S4CFOX ) && defined( S4COMPRESS )
          c4->compressedMemos = val ;
       #else
          error4describe(c4, e4notSupported, 0, "c4setCompressedMemos", 0, 0);
@@ -771,7 +771,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
    void S4FUNCTION code4collateNameSet( CODE4 *c4, enum Collate4name val )
    {
-      #ifdef CLIENT_OR_FOX
+      #ifdef S4CFOX
          c4->collateName = val ;
       #endif
    }
@@ -779,7 +779,7 @@ short c4indexMultiplierGet( CODE4 *c4 )
 
 enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
    {
-      #ifdef CLIENT_OR_FOX
+      #ifdef S4CFOX
          return c4->collateName ;
       #else
          return collate4none ;
@@ -789,7 +789,7 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
 
    void S4FUNCTION code4collateNameUnicodeSet( CODE4 *c4, enum Collate4name val )
    {
-      #ifdef CLIENT_OR_FOX
+      #ifdef S4CFOX
          c4->collateNameUnicode = val ;
       #endif
    }
@@ -797,7 +797,7 @@ enum Collate4name S4FUNCTION code4collateName ( CODE4 *c4 )
 
    enum Collate4name S4FUNCTION code4collateNameUnicode ( CODE4 *c4 )
    {
-      #ifdef CLIENT_OR_FOX
+      #ifdef S4CFOX
          return c4->collateNameUnicode ;
       #else
          return collate4none ;

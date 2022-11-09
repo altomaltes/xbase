@@ -31,40 +31,16 @@ int c4parm_check( const void *ptr
       doCheck = - 1 ;
 
   else
-  {
-     switch (doCheck)
-     {
-        case 0:
-           if ( ((INDEX4 *)ptr)->codeBase->debugInt != E4DEBUG_INT)
-              doCheck = -1 ;
-         break ;
+  {  switch (doCheck)
+     {  case 0: if ( ((INDEX4  *)ptr)->codeBase->debugInt != E4DEBUG_INT)  doCheck = -1 ;  break ;
+        case 1: if ( ((CODE4   *)ptr)->debugInt != E4DEBUG_INT)             doCheck = -1 ;  break ;              1
+        case 2: if ( ((DATA4   *)ptr)->debugInt != E4DEBUG_INT)               doCheck = -1 ;            break ;
+        case 3: if ( ((FIELD4  *)ptr)->debugInt != E4DEBUG_INT)               doCheck = -1 ;            break ;
+        case 4: if ( ((TAG4    *)ptr)->index->codeBase->debugInt != E4DEBUG_INT)               doCheck = -1 ;            break ;
+        case 5: if ( ((RELATE4 *)ptr)->codeBase->debugInt != E4DEBUG_INT)               doCheck = -1 ;            break ;
 
-         case 1:
-            if ( ((CODE4 *)ptr)->debugInt != E4DEBUG_INT)
-               doCheck = -1 ;
-            break ;
-
-         case 2:
-            if ( ((DATA4 *)ptr)->debugInt != E4DEBUG_INT)
-               doCheck = -1 ;
-            break ;
-         case 3:
-            if ( ((FIELD4 *)ptr)->debugInt != E4DEBUG_INT)
-               doCheck = -1 ;
-            break ;
-         case 4:
-            if ( ((TAG4 *)ptr)->index->codeBase->debugInt != E4DEBUG_INT)
-               doCheck = -1 ;
-            break ;
-         case 5:
-            if ( ((RELATE4 *)ptr)->codeBase->debugInt != E4DEBUG_INT)
-               doCheck = -1 ;
-            break ;
          #ifndef S4OFF_REPORT
-         case 6:
-            if ( ((REPORT4 *)ptr)->codeBase->debugInt != E4DEBUG_INT)
-               doCheck = -1 ;
-            break ;
+         case 6:            if ( ((REPORT4 *)ptr)->codeBase->debugInt != E4DEBUG_INT)               doCheck = -1 ;            break ;
          #endif
       }
    }
@@ -80,8 +56,7 @@ int c4parm_check( const void *ptr
 
 #ifdef S4NO_ATOF
 double c4atof( const char *bufIn )
-{
-   double decLen = 1.0 ;
+{  double decLen = 1.0 ;
    int i = 0, baseLen, decLenHold, offset, max, sign ;
    const char *cPtr, *tptr ;
    char *ptr, buf[40] ;

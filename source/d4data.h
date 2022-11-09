@@ -1108,7 +1108,7 @@ typedef struct  /* Data File Format */
    S4LONG offset ;    /* field's offset into record buffer (for vfp 3.0) */
    unsigned char len ;
    unsigned char dec ;
-   #ifdef CLIENT_OR_FOX
+   #ifdef S4CFOX
       char nullBinary ;    /* for FOX 3.0 0x02 == allows null fields, 0x04 == binary field */
       char filler2[12] ;
    #else
@@ -1132,7 +1132,7 @@ typedef struct FIELD4St /* Internal Structure and Field Routines. */
    unsigned long offset ;   /* codebase allows long */
    struct DATA4St S4PTR *data ;
 
-   /* #ifdef CLIENT_OR_FOX  */  /*These members are used in OLEDB*/
+   /* #ifdef S4CFOX  */  /*These members are used in OLEDB*/
       char null ;
       unsigned short int nullBit ;   /* bit which indicates whether field contents currently are null */
       char binary ;

@@ -22,10 +22,7 @@
 /* no spools */
 int S4FUNCTION sort4getMemInit( SORT4 *s4 )
 {
-   #ifdef E4PARM_LOW
-      if ( s4 == 0 )
-         return error4( 0, e4parmNull, E91901 ) ;
-   #endif
+   E4PARMLOW( s4, E91901 ) ;
 
    s4quick( (void **)s4->pointers, s4->pointersUsed, s4->cmp, s4->sortLen) ;
    #ifdef  E4ANALYZE
@@ -225,10 +222,7 @@ int S4FUNCTION sort4initAlloc( SORT4 *s4 )
 {
    FILE4LONG start ;
 
-   #ifdef E4PARM_LOW
-      if ( s4 == 0 )
-         return error4( 0, e4parmNull, E91906 ) ;
-   #endif
+   E4PARMLOW( s4, E91906 ) ;
 
    if ( s4->seqwriteBuffer == 0 )
    {
@@ -268,13 +262,7 @@ void sort4initPointers( SORT4 *s4, char *availMem, unsigned int len )
    /* Assign 'pointers' */
    unsigned int n, i ;
 
-   #ifdef E4PARM_LOW
-      if ( s4 == 0 || availMem == 0 )
-      {
-         error4( 0, e4parmNull, E91907 ) ;
-         return ;
-      }
-   #endif
+   E4PARM_TRET( s4 == 0 || availMem == 0, E91907, NULL ) ;
 
    n = len / s4->totLen ;
    i = s4->pointersInit ;

@@ -298,7 +298,8 @@ PUBLIC char S4PTR * S4FUNCTION f4ptr( const FIELD4 S4PTR * ) ;
 PUBLIC char S4PTR * S4FUNCTION f4str( FIELD4 S4PTR * ) ;
 PUBLIC int S4FUNCTION f4true( const FIELD4 S4PTR * ) ;
 PUBLIC int S4FUNCTION f4type( const FIELD4 S4PTR * ) ;
-#ifdef CLIENT_OR_FOX  /*Internal function */
+
+#ifdef S4CFOX  /*Internal function */
    void S4FUNCTION f4assignNotNull( FIELD4 *field );
 #endif
 
@@ -594,22 +595,23 @@ long time4long( const char *, int ) ;
       #endif
 
       #ifdef S4FOX
-         int  b4brReplace( B4BLOCK *, const unsigned char *, const long ) ;
+         int  b4brReplace(    B4BLOCK *, const unsigned char *, const long ) ;
          int  b4calcDups( const unsigned char *, const unsigned char *, const int ) ;
-         int  b4go( B4BLOCK *, const int ) ;
-         int  b4insert( B4BLOCK *, const void *, const long, const long, const char ) ;
-         int  b4insertLeaf( B4BLOCK *, const void *, const long ) ;
+         int  b4go(           B4BLOCK *, const int ) ;
+         int  b4insert(       B4BLOCK *, const void *, const long, const long, const char ) ;
+         int  b4insertLeaf(   B4BLOCK *, const void *, const long ) ;
          int  b4insertBranch( B4BLOCK *, const void *, const long, const long, const char ) ;
-         void b4leafInit( B4BLOCK * ) ;
-         int  b4leafSeek( B4BLOCK *, const char *, const int ) ;
-         int  b4reindex( B4BLOCK * ) ;
-         int  b4removeLeaf( B4BLOCK * ) ;
-         int  b4rBrseek( B4BLOCK *, const char *, const int, const long ) ;
-         int  b4top( B4BLOCK * ) ;
+         void b4leafInit(     B4BLOCK * ) ;
+         int  b4leafSeek(     B4BLOCK *, const char *, const int ) ;
+         int  b4reindex(      B4BLOCK * ) ;
+         int  b4removeLeaf(   B4BLOCK * ) ;
+         int  b4rBrseek(      B4BLOCK *, const char *, const int, const long ) ;
+         int  b4top(          B4BLOCK * ) ;
          int  tfile4branchSplit( TAG4FILE *, B4BLOCK *, B4BLOCK * ) ;
          int  tfile4init( TAG4FILE *, INDEX4 *, long, unsigned char * ) ;
          int  tfile4leafSplit( TAG4FILE *, B4BLOCK *, B4BLOCK * ) ;
          int  tfile4rSeek( TAG4FILE *, void *, int, long ) ;
+
          #ifndef S4FOX
             int  S4CALL t4descMemcmp( S4CMP_PARM, S4CMP_PARM, size_t ) ;
          #endif
@@ -1118,7 +1120,7 @@ double S4FUNCTION x4reverseDouble( const void S4PTR * ) ;
 
 #ifndef S4FOX
    #ifndef S4CLIPPER
-      int S4CALL c4bcdCmp( S4CMP_PARM, S4CMP_PARM, size_t ) ;
+      int S4CALL c4bcdCmp(  S4CMP_PARM, S4CMP_PARM, size_t ) ;
       int S4CALL t4cmpDoub( S4CMP_PARM, S4CMP_PARM, size_t ) ;
    #endif
 #endif
@@ -1168,13 +1170,12 @@ double S4FUNCTION x4reverseDouble( const void S4PTR * ) ;
    void t4noChangeDouble( char *, const double ) ;
 #endif
 
-void t4dblToFox( char *, const double ) ;
-
-void t4curToFox( char *, const CURRENCY4 * ) ;
-void t4intToFox( char *, const long * ) ;
+void t4dblToFox(      char *, const double ) ;
+void t4curToFox(      char *, const CURRENCY4 * ) ;
+void t4intToFox(      char *, const long * ) ;
 void t4dateTimeToFox( char *, const long * ) ;
-void t4dblToCurFox( char *, const double ) ;
-void t4dblToCur( char *, const double ) ;
+void t4dblToCurFox(   char *, const double ) ;
+void t4dblToCur(      char *, const double ) ;
 
 #ifdef S4FOX
       int S4CALL u4keycmp( S4CMP_PARM, S4CMP_PARM, size_t, size_t, size_t, T4VFP * ) ;

@@ -93,7 +93,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
    char *savePtr ;
    char fieldBuf[2] ;
    FIELD4IMAGE *image ;
-   #ifdef CLIENT_OR_FOX
+   #ifdef S4CFOX
       int nullCount ;
    #endif
 
@@ -185,7 +185,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
 
    recOffset = 1 ;
 
-   #ifdef CLIENT_OR_FOX
+   #ifdef S4CFOX
       nullCount = 0 ;
    #endif
 
@@ -199,7 +199,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
          c4upper( fieldBuf ) ;
          d4->fields[iFields].type = *fieldBuf ;
          fieldType = d4->fields[iFields].type ;
-         #ifdef CLIENT_OR_FOX
+         #ifdef S4CFOX
             if ( d4version( d4 ) == 0x30 )  /* FOX 3.0 */
             {
                d4->fields[iFields].null = ( image->nullBinary & 0x02 ) ? 1 : 0 ;
@@ -222,7 +222,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
 
          switch( fieldType )
          {
-            #ifdef CLIENT_OR_FOX
+            #ifdef S4CFOX
                case r4int:
             #endif
             case r4log:
@@ -240,7 +240,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
                break ;
             case r4num:
             case r4float:
-            #ifdef CLIENT_OR_FOX
+            #ifdef S4CFOX
                case r4currency:
                case r4dateTime:
             #endif
@@ -1056,7 +1056,7 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
                #endif
             }
             break ;
-         #ifdef CLIENT_OR_FOX
+         #ifdef S4CFOX
             case r4currency:
             case r4int:
             case r4dateTime:

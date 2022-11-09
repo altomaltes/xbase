@@ -10,7 +10,7 @@
 #ifndef S4OFF_WRITE
 void S4FUNCTION f4assignDouble( FIELD4 *field, const double dValue )
 {
-   #ifdef CLIENT_OR_FOX
+   #ifdef S4CFOX
       char currencyBuffer[21] ;
    #endif
    #ifdef S4VBASIC
@@ -27,7 +27,7 @@ void S4FUNCTION f4assignDouble( FIELD4 *field, const double dValue )
       switch( field->type )
       {
          case r4log:
-         #ifdef CLIENT_OR_FOX
+         #ifdef S4CFOX
             case r4system:
             case r4dateTime:
          #endif
@@ -55,7 +55,7 @@ void S4FUNCTION f4assignDouble( FIELD4 *field, const double dValue )
       case r4date:
          date4assign( f4assignPtr( field ), (long)dValue ) ;
          break ;
-      #ifdef CLIENT_OR_FOX
+      #ifdef S4CFOX
          case r4double:
             *((double *)f4assignPtr( field )) = dValue ;
             break ;
@@ -77,7 +77,7 @@ void S4FUNCTION f4assignDouble( FIELD4 *field, const double dValue )
 
 double S4FUNCTION f4double( const FIELD4 *field )
 {
-   #ifdef CLIENT_OR_FOX
+   #ifdef S4CFOX
       const char *ptr ;
    #endif
 
@@ -95,7 +95,7 @@ double S4FUNCTION f4double( const FIELD4 *field )
       switch( field->type )
       {
          case r4log:
-         #ifdef CLIENT_OR_FOX
+         #ifdef S4CFOX
             case r4system:
             case r4dateTime:
          #endif
@@ -110,7 +110,7 @@ double S4FUNCTION f4double( const FIELD4 *field )
    {
       case r4date:
          return (double)date4long( f4ptr( field ) ) ;
-      #ifdef CLIENT_OR_FOX
+      #ifdef S4CFOX
          case r4double:
             return *((double *)f4ptr( field )) ;
          case r4int:

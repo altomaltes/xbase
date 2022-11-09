@@ -565,7 +565,7 @@ int expr4keyConvert( EXPR4 *e4expr, char **ptrPtr, const int rLen, const int exp
    the expression and the result type is otherwise r4numDoub */
 int S4FUNCTION expr4currency( const EXPR4 *e4expr )
 {
-   #ifndef CLIENT_OR_FOX
+   #ifndef S4CFOX
       FIELD4 *field ;
       int parms ;
 
@@ -584,7 +584,7 @@ int S4FUNCTION expr4currency( const EXPR4 *e4expr )
    return 0 ;
 }
 
-#ifdef CLIENT_OR_FOX
+#ifdef S4CFOX
 /* if forAdd is 0, then returns whether or not the expression has the
    possibility of a null return.  If one, it evaluates the current
    expression to see if the current result is null */

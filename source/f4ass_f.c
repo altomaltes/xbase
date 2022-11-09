@@ -25,7 +25,7 @@ void S4FUNCTION f4assignField( FIELD4 *fieldTo, const FIELD4 *fieldFrom )
             }
       #endif
 
-   #ifdef CLIENT_OR_FOX
+   #ifdef S4CFOX
       /* first check if null, if so then assign null */
       if ( f4null( fieldFrom ) )
          f4assignNull( fieldTo ) ;
@@ -50,7 +50,7 @@ void S4FUNCTION f4assignField( FIELD4 *fieldTo, const FIELD4 *fieldFrom )
                *f4assignPtr( fieldTo ) = *f4ptr( fieldFrom ) ;
             break ;
          case r4date:
-         #ifdef CLIENT_OR_FOX
+         #ifdef S4CFOX
             case r4currency:
             case r4dateTime:
             case r4int:

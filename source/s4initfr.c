@@ -23,10 +23,7 @@ void relate4freeBitmaps( RELATE4 *relate )
 {
    RELATE4 *relateOn ;
 
-   #ifdef E4PARM_LOW
-      if ( relate == 0 )
-         error4( 0, e4parmNull, E91909 ) ;
-   #endif
+   E4PARM_HRET( relate, E91909,  ) ;
 
    for( relateOn = 0 ;; )
    {
@@ -44,10 +41,7 @@ void relate4freeBitmaps( RELATE4 *relate )
 /* returns 0 if successfully freed info, else 0 */
 static int sort4freeExtra( RELATE4 *relate, CODE4 *codeBase )
 {
-   #ifdef E4PARM_LOW
-      if ( codeBase == 0 )
-         error4( 0, e4parmNull, E91910 ) ;
-   #endif
+   E4PARMLOW( codeBase, E91910 ) ;
 
    #ifndef S4OPTIMIZE_OFF
       if ( codeBase->hasOpt && codeBase->opt.numBuffers )
@@ -76,10 +70,7 @@ int S4FUNCTION sort4getInitFree( SORT4 *s4, RELATE4 *relate )
    int rc, oldPoolN, prev ;
    unsigned int oldPoolEntries, oldTotLen ;
 
-   #ifdef E4PARM_LOW
-      if ( s4 == 0 )
-         error4( 0, e4parmNull, E91911 ) ;
-   #endif
+   E4PARMLOW( s4, E91911 ) ;
 
    codeBase = s4->codeBase ;
    if ( error4code( codeBase ) < 0 )
@@ -126,10 +117,7 @@ int S4FUNCTION sort4initFree( SORT4 *s4, CODE4 *c4, const int sortL, const int i
 {
    int rc ;
 
-   #ifdef E4PARM_LOW
-      if ( s4 == 0 || c4 == 0 || sortL < 0 || infoL < 0 )
-         error4( 0, e4parmNull, E91912 ) ;
-   #endif
+   E4PARM_TEST( s4 == 0 || c4 == 0 || sortL < 0 || infoL < 0, E91912 ) ;
 
    sort4initSet( s4, c4, sortL, infoL ) ;
    rc = sort4initAlloc( s4 ) ;
