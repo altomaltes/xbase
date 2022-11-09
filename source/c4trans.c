@@ -762,8 +762,11 @@ void *S4FUNCTION tran4getData( TRAN4 *t4, const long pos )
    return c4->tranData + pos ;
 }
 
-int S4FUNCTION tran4set( TRAN4 *t4, const int status, const long id1, const long id2, const int typ,
-                         const unsigned int dLen, const long clientId, const long serverId )
+int S4FUNCTION tran4set( TRAN4 *t4
+                       , const int status
+                       , const long id1, const long id2
+                       , const int typ,  const unsigned int dLen
+                       , const long clientId, const long serverId )
 {
    DATA4 *data ;
    #ifdef E4ANALYZE
@@ -792,11 +795,12 @@ int S4FUNCTION tran4set( TRAN4 *t4, const int status, const long id1, const long
       return error4( t4->c4trans->c4, e4trans, E93801 ) ;
 
       /* AS 5/14/98 always just use the userIdNo for s/a */
-      t4->header.clientId = t4->c4trans->trans.userIdNo ;
+   t4->header.clientId = t4->c4trans->trans.userIdNo ;
    t4->header.type = typ ;
    t4->header.dataLen = dLen ;
    t4->header.clientDataId = clientId ;
    t4->header.serverDataId = serverId ;
+
    time( &t4->header.time ) ;
    #ifdef __WIN32                /* CJ - This change was needed as 32-bit and 16-bit apps report different values from time().*/
       t4->header.time += 3600;   /* Upon such a time that the CodeUtil is change to 32-bit app the ifdef should be S4WIN16 and */

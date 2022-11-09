@@ -28,10 +28,7 @@ void f4memoAssignField( FIELD4 *fieldTo, FIELD4 *fieldFrom )
 #ifndef S4OFF_WRITE
 int S4FUNCTION f4memoAssign( FIELD4 *field, const char *ptr )
 {
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-         return error4( 0, e4parmNull, E90518 ) ;
-   #endif
+   E4PARHIGH( field, E90518 ) ;
 
    if ( error4code( field->data->codeBase ) < 0 )
       return e4codeBase ;
@@ -63,10 +60,7 @@ int S4FUNCTION f4memoAssignN( FIELD4 *field, const char *ptr, const unsigned int
          return -1 ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-         return error4( 0, e4parmNull, E90519 ) ;
-   #endif
+   E4PARHIGH( field, E90519 ) ;
 
    #ifdef S4OFF_MEMO
       f4assignN( field, ptr, ptrLen ) ;
@@ -112,10 +106,7 @@ int S4FUNCTION f4memoFree( FIELD4 *field )
    #ifndef S4OFF_MEMO
       F4MEMO *mfield ;
 
-      #ifdef E4PARM_HIGH
-         if ( field == 0 )
-            return error4( 0, e4parmNull, E90521 ) ;
-      #endif
+   E4PARHIGH( field, E90521 ) ;
 
       mfield = field->memo ;
 
@@ -244,10 +235,7 @@ int f4memoRead( FIELD4 *field )
    F4MEMO *mfield ;
    CODE4 *c4 ;
 
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-         return error4( 0, e4parmNull, E90525 ) ;
-   #endif
+   E4PARHIGH( field, E90518 ) ;
 
    c4 = field->data->codeBase ;
    if ( error4code( c4 ) < 0 )

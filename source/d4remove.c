@@ -7,10 +7,7 @@ int S4FUNCTION d4remove( DATA4 *data )
    int rc ;
    CODE4 *c4 ;
 
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parmNull, E96401 ) ;
-   #endif
+      E4PARHIGH( data, E96401 ) ;
 
    /* for c/s, server takes care of determining this info... */
       #ifndef S4OFF_TRAN
@@ -38,10 +35,7 @@ int S4FUNCTION dfile4remove( DATA4FILE *data )
       #endif
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parmNull, E96401 ) ;
-   #endif
+      E4PARHIGH( data, E96401 ) ;
 
    if ( data->userCount != 0 )
       return error4( 0, e4parmNull, E86402 ) ;

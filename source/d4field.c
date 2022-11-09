@@ -54,10 +54,7 @@ int S4FUNCTION d4fieldNumber( DATA4 *data, const char *fieldName )
    char buf[256] ;
    int i ;
 
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parmNull, E94003 ) ;
-   #endif
+   E4PARHIGH( data, E94003 ) ;
 
    if ( fieldName )
    {

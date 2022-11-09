@@ -135,7 +135,7 @@
      #define t4dump( a, b, c )      ( tfile4dump( (a)->tagFile, b, c ) )
      #define t4eof( a )             ( tfile4eof( (a)->tagFile ) )
      #ifdef N4OTHER
-     #define t4flush( a )           ( tfile4flush( (a)->tagFile ) )
+       #define t4flush( a )           ( tfile4flush( (a)->tagFile ) )
      #endif
      #define t4free_all( a )        ( tfile4freeAll( (a)->tagFile ) )
      #define t4go( a, b, c )        ( tfile4go( (a)->tagFile, b, c, 0 ) )

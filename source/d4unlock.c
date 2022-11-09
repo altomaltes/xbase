@@ -106,10 +106,7 @@ int S4FUNCTION d4unlockLow( DATA4 *data, long clientId, char doReqdUpdate )
 int S4FUNCTION d4unlock( DATA4 *data )
 {
    #ifndef S4SINGLE
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parmNull, E92801 ) ;
-      #endif
+      E4PARHIGH( data, E92801 ) ;
 
       return d4unlockLow( data, data4clientId( data ), 1 ) ;
    #else
@@ -122,13 +119,12 @@ int S4FUNCTION d4unlock( DATA4 *data )
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
+
 int d4unlockAppend( DATA4 *data )
 {
    #ifndef S4SINGLE
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parmNull, E92802 ) ;
-      #endif
+      E4PARHIGH( data, E92802 ) ;
+
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
          return 0 ;
 
@@ -145,10 +141,8 @@ int d4unlockAppend( DATA4 *data )
 int d4unlockData( DATA4 *data )
 {
    #ifndef S4SINGLE
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parmNull, E92803 ) ;
-      #endif
+      E4PARHIGH( data, E92803 ) ;
+
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
          return 0 ;
 
@@ -173,10 +167,7 @@ int d4unlockFile( DATA4 *data )
             return -1 ;
       #endif
 
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parmNull, E92804 ) ;
-      #endif
+      E4PARHIGH( data, E92804 ) ;
 
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
          return 0 ;
@@ -199,10 +190,7 @@ int d4unlockFile( DATA4 *data )
 int S4FUNCTION d4unlockRecord( DATA4 *data, long rec )
 {
    #ifndef S4SINGLE
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parmNull, E92805 ) ;
-      #endif
+      E4PARHIGH( data, E92805 ) ;
 
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
          return 0 ;
@@ -228,10 +216,7 @@ int S4FUNCTION d4unlockRecord( DATA4 *data, long rec )
 int d4unlockRecords( DATA4 *data )
 {
    #ifndef S4SINGLE
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parmNull, E92806 ) ;
-      #endif
+      E4PARHIGH( data, E92806 ) ;
 
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
          return 0 ;
@@ -256,10 +241,7 @@ int code4unlockDo( LIST4 *dataList )
 
    c4 = 0 ;
 
-   #ifdef E4PARM_HIGH
-      if ( dataList == 0 )
-         return error4( 0, e4parmNull, E92807 ) ;
-   #endif
+      E4PARHIGH( dataList, E92807 ) ;
 
       for ( dataOn = 0 ;; )
       {

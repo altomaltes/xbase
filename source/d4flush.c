@@ -39,10 +39,7 @@ int S4FUNCTION d4flush( DATA4 *data )
    #else
          int rc, saveRc ;
 
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parmNull, E94102 ) ;
-      #endif
+   E4PARHIGH( data, E94102 ) ;
 
          saveRc = d4flushData( data ) ;
          rc = dfile4flushIndex( data->dataFile ) ;
@@ -63,10 +60,7 @@ int d4flushData( DATA4 *data )
    #else
          int rc, saveRc ;
 
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parm, E94105 ) ;
-      #endif
+   E4PARHIGH( data, E94105 ) ;
 
          saveRc = d4update( data ) ;   /* returns -1 if error4code( codeBase ) < 0 */
          rc = dfile4flushData( data->dataFile ) ;
@@ -187,10 +181,7 @@ int S4FUNCTION code4flush( CODE4 *c4 )
             return -1;
       #endif  /* S4VBASIC */
 
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-            return error4( 0, e4parm, E94107 ) ;
-      #endif
+   E4PARHIGH( c4, E94107 ) ;
 
       rcReturn = 0 ;
 
@@ -297,10 +288,7 @@ int d4updateRecord( DATA4 *data, const int doUnlock )
          return -1 ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parm, E94110 ) ;
-   #endif
+   E4PARHIGH( data, E94110 ) ;
 
    #ifdef E4ANALYZE
       if ( data->codeBase == 0 )

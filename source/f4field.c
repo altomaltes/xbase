@@ -91,10 +91,7 @@ int S4FUNCTION f4decimals( const FIELD4 *field )
          return -1 ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-         return error4( 0, e4parmNull, E90510 ) ;
-   #endif
+   E4PARHIGH( field, E90510 ) ;
 
    return field->dec ;
 }
@@ -140,10 +137,7 @@ int S4FUNCTION f4number( const FIELD4 *field )
    FIELD4 *fieldOn ;
    int fNum ;
 
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-         return error4( 0, e4parmNull, E90538 ) ;
-   #endif
+   E4PARHIGH( field, E90538 ) ;
 
    fieldOn = field->data->fields ;
 
@@ -162,10 +156,7 @@ int S4FUNCTION f4type( const FIELD4 *field )
          return -1 ;
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-         return error4( 0, e4parmNull, E90513 ) ;
-   #endif
+   E4PARHIGH( field, E90513 ) ;
 
    #ifdef S4CFOX
       switch( field->type )

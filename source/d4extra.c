@@ -9,8 +9,7 @@
 #endif
 int code4verify( CODE4 *c4, int subs )
 {
-   if ( c4 == 0 )
-      return error4( 0, e4parmNull, E93901 ) ;
+   if ( !c4 )   return error4( 0, e4parmNull, E93901 ) ;
 
    if ( error4code( c4 ) < 0 )
       return error4code( c4 ) ;
@@ -22,11 +21,8 @@ int dfile4verify( DATA4FILE *d4, int subs )
 {
    int rc ;
 
-   if ( d4 == 0 )
-      return error4( 0, e4parmNull, E91102 ) ;
-
-   if ( d4->c4 == 0 )
-      return error4( 0, e4struct, E91102 ) ;
+   if ( !d4     )  return error4( 0, e4parmNull, E91102 ) ;
+   if ( !d4->c4 )  return error4( 0, e4struct, E91102 ) ;
 
    if ( subs == 1 )
       if ( ( rc = code4verify( d4->c4, 1 ) ) < 0 )
@@ -69,21 +65,11 @@ int lock4lock( LOCK4 *lock )
 
    switch( lock->id.type )
    {
-      case LOCK4ALL:
-         rc = dfile4lockAll( lock->data, lock->id.clientId, lock->id.serverId ) ;
-         break ;
-      case LOCK4APPEND:
-         rc = dfile4lockAppend( lock->data, lock->id.clientId, lock->id.serverId ) ;
-         break ;
-      case LOCK4FILE:
-         rc = dfile4lockFile( lock->data, lock->id.clientId, lock->id.serverId ) ;
-         break ;
-      case LOCK4RECORD:
-         rc = dfile4lock( lock->data, lock->id.clientId, lock->id.serverId, lock->id.recNum ) ;
-         break ;
-      default:
-         rc = error4( lock->data->c4, e4lock, E83901 ) ;
-         break ;
+      case LOCK4ALL:    rc = dfile4lockAll(    lock->data, lock->id.clientId, lock->id.serverId ) ;      break ;
+      case LOCK4APPEND: rc = dfile4lockAppend( lock->data, lock->id.clientId, lock->id.serverId ) ;         break ;
+      case LOCK4FILE:   rc = dfile4lockFile(   lock->data, lock->id.clientId, lock->id.serverId ) ;         break ;
+      case LOCK4RECORD: rc = dfile4lock(       lock->data, lock->id.clientId, lock->id.serverId, lock->id.recNum ) ;         break ;
+      default:          rc = error4( lock->data->c4, e4lock, E83901 ) ;         break ;
    }
 
    return rc ;
@@ -113,16 +99,20 @@ int lock4unlock( LOCK4 *lock )
             dfile4unlockIndex( lock->data, lock->id.serverId ) ;
          #endif
          rc = dfile4unlockFile( lock->data, lock->id.clientId, lock->id.serverId ) ;
-         break ;
+      break ;
+
       case LOCK4APPEND:
          rc = dfile4unlockAppend( lock->data, lock->id.clientId, lock->id.serverId ) ;
-         break ;
+      break ;
+
       case LOCK4FILE:
          rc = dfile4unlockFile( lock->data, lock->id.clientId, lock->id.serverId ) ;
-         break ;
+      break ;
+
       case LOCK4RECORD:
          rc = dfile4unlockRecord( lock->data, lock->id.clientId, lock->id.serverId, lock->id.recNum ) ;
-         break ;
+      break ;
+
       default:
          rc = error4( lock->data->c4, e4info, E93801 ) ;
          break ;

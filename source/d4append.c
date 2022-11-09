@@ -145,6 +145,7 @@ static int d4doAppend( DATA4 *data )
       F4MEMO *mfield ;
       short i ;
    #endif /* S4OFF_MEMO */
+
    #ifndef S4OFF_MULTI
          long serverId ;
    #endif

@@ -40,10 +40,7 @@ int S4FUNCTION d4bottom( DATA4 *data )
          return -1;
    #endif  /* S4VBASIC */
 
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parmNull, E91201 ) ;
-   #endif
+      E4PARHIGH( data, E91201 ) ;
 
    c4 = data->codeBase ;
    if ( error4code( c4 ) < 0 )

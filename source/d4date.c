@@ -203,13 +203,7 @@ static MONTH monthOfYear[] =
 
 const char *S4FUNCTION code4dateFormat( CODE4 *c4 )
 {
-   #ifdef E4PARM_HIGH
-      if ( c4 == 0 )
-      {
-         error4( c4, e4parmNull, E96303 ) ;
-         return 0 ;
-      }
-   #endif
+   E4PARHIGH( c4, E96303 ) ;
 
       return c4->c4trans.trans.dateFormat ;
 }

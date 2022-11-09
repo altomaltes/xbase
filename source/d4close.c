@@ -221,10 +221,7 @@ int S4FUNCTION d4close( DATA4 *data )
       /* int saveAttempts ; */
    #endif
 
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parmNull, E91302 ) ;
-   #endif
+      E4PARHIGH( data, E91302 ) ;
 
    c4 = data->codeBase ;
    saveRc = 0 ;
