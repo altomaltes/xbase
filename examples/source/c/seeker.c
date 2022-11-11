@@ -33,40 +33,31 @@ TAG4     *nameTag,*ageTag,*amountTag,*addressTag,*birthdateTag;
 
 void OpenDataFile(void)
 {
-   dataFile = d4open(&codeBase,"data1.dbf");
+   dataFile = d4open(&codeBase,"DATA1.DBF");
 
-   fName = d4field(dataFile,"F_NAME");
-   lName = d4field(dataFile,"L_NAME");
-   address = d4field(dataFile,"ADDRESS");
-   age = d4field(dataFile,"AGE");
-   birthDate = d4field(dataFile,"BIRTH_DATE");
-   married = d4field(dataFile,"MARRIED");
-   amount = d4field(dataFile,"AMOUNT");
-   comment = d4field(dataFile,"COMMENT");
+   fName=     d4field( dataFile, "F_NAME"     );
+   lName=     d4field( dataFile, "L_NAME"     );
+   address=   d4field( dataFile, "ADDRESS"    );
+   age =      d4field( dataFile, "AGE"        );
+   birthDate= d4field( dataFile, "BIRTH_DATE" );
+   married =  d4field( dataFile, "MARRIED"    );
+   amount =   d4field( dataFile, "AMOUNT"     );
+   comment =  d4field( dataFile, "COMMENT"    );
 
-   nameTag = d4tag(dataFile,"NAME_TAG");
-   addressTag = d4tag(dataFile,"ADDR_TAG");
-   ageTag = d4tag(dataFile,"AGE_TAG");
-   birthdateTag = d4tag(dataFile,"DATE_TAG");
-   amountTag = d4tag(dataFile,"AMNT_TAG");
+   nameTag     = d4tag( dataFile, "NAME_TAG" );
+   addressTag  = d4tag( dataFile, "ADDR_TAG" );
+   ageTag      = d4tag( dataFile, "AGE_TAG"  );
+   birthdateTag= d4tag( dataFile, "DATE_TAG" );
+   amountTag   = d4tag( dataFile, "AMNT_TAG" );
 }
 
 void seekStatus(int rc,char *status)
-{
-   switch(rc)
-   {
-      case r4success:
-         strcpy(status,"r4success");
-         break;
-      case r4eof:
-         strcpy(status,"r4eof");
-         break;
-      case r4after:
-         strcpy(status,"r4after");
-         break;
-      default:
-         strcpy(status,"other");
-         break;
+{  switch(rc)
+   {  case r4success: strcpy(status,"r4success");  break;
+      case r4eof:     strcpy(status,"r4eof");      break;
+      case r4after:   strcpy(status,"r4after");    break;
+
+      default:        strcpy(status,"other");      break;
    }
 }
 
@@ -115,7 +106,7 @@ int main(void)
 
    OpenDataFile();
 
-   d4tagSelect(dataFile,addressTag);
+   d4tagSelect( dataFile,addressTag );
 
    rc = d4seek(dataFile,"123 - 45 Ave   ");
    printRecord(rc);
@@ -152,8 +143,8 @@ int main(void)
       printRecord(rc);
    }
 
-   code4close(&codeBase);
-   code4initUndo(&codeBase);
+   code4close(    &codeBase );
+   code4initUndo( &codeBase );
 
    return 0;
 }

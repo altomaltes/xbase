@@ -1618,6 +1618,8 @@
    #define S4CONV( a, b )  a
 #endif
 
+#define S464BIT
+
 #ifdef S464BIT
    #define S4LONG int
    #define S4UNSIGNED_LONG unsigned int

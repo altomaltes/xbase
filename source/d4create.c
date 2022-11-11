@@ -136,7 +136,7 @@ DATA4 *S4FUNCTION d4createLow( CODE4 *c4, const char *name, const FIELD4INFO *fi
    else
    {
          u4nameCurrent( nameBuf, sizeof( nameBuf ), name ) ;
-         u4nameExt( nameBuf, sizeof( nameBuf ), "dbf", 0 ) ;
+         u4nameExt(     nameBuf, sizeof( nameBuf ), "dbf", 0 ) ;
          #ifndef S4CASE_SEN
             c4upper(nameBuf);
          #endif

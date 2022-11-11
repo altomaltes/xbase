@@ -56,8 +56,8 @@
 /* Error Configuration Options
  */
 
-/* #define E4ANALYZE    */
-/* #define E4DEBUG      */
+ #define E4ANALYZE    
+ #define E4DEBUG      
 /* #define E4HOOK       */
 /* #define E4LINK       */
 /* #define E4MISC       */

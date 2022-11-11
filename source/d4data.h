@@ -1,8 +1,22 @@
 /* d4data.h   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
-typedef int S4CALL S4CMP_FUNCTION( S4CMP_PARM, S4CMP_PARM, size_t) ;
 
-/* typedef required to work around VC++ 1.50 bug in definition of Sort4.assignCmp() */
+#ifdef __unix__
+
+  #include <sys/types.h>
+  #define HANDLE int
+  #define S4CMP_PARM const void *
+
+//
+//  typedef int (* S4CMP_FUNCTION )(const void *, const void *, void *);
+  #define S4CALL
+  #define  S4CMP_PARM void *
+#endif
+
+typedef int S4CALL S4CMP_FUNCTION( const void *, const void *, size_t ) ;
+//
+///* typedef required to work around VC++ 1.50 bug in definition of Sort4.assignCmp() 
+// */
 typedef int (S4CALL *S4CMP_FUNCTION_PTR)( S4CMP_PARM, S4CMP_PARM, size_t ) ;
 typedef short BOOL4  ;
 
@@ -1394,6 +1408,7 @@ typedef struct
    unsigned char    dupCntLen ;       /* # bits used for duplicate count */
    unsigned char    trailCntLen ;     /* # bits used for trail count */
    unsigned char    infoLen ;          /* # bytes for holding record number, */
+
 } B4NODE_HEADER ;
 
 typedef struct
