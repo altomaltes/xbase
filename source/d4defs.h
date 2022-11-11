@@ -565,6 +565,16 @@
    #endif
 #endif
 
+#ifdef __unix__             // altomaltes@gmail.com , nov, 2022
+   #define S4NO_STRUPR
+   #define S4NO_STRLWR
+   #define S4NO_STRNICMP
+   #define S4NO_POW
+   #define S4NO_CHSIZE
+   #define S4NO_FILELENGTH
+#endif
+
+
 #ifdef S4MACINTOSH
    #define S4BYTEORDER_3210
    #define S4BYTE_SWAP

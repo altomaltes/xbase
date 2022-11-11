@@ -19,7 +19,8 @@
 \***********************************************************************/
 /* See User's Manual, chapter 5 */
 
-#include "d4all.h"
+#include "../../../source/d4all.h"
+
 #ifdef S4MACINTOSH
    #include <console.h>
 #endif

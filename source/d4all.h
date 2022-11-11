@@ -112,11 +112,8 @@
    #include <time.h>
 #endif
 
-#ifdef __unix__
-   #include "p4port.h"
-#else
+#ifndef __unix__
    #ifdef S4MACINTOSH
-      #include "p4port.h"
    #else
       #include <stdarg.h>
       #ifndef S4WINCE

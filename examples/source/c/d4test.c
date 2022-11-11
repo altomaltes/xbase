@@ -18,7 +18,7 @@
 *                                                                       *
 \***********************************************************************/
 
-#include "d4all.h"
+#include "../../../source/d4all.h"
 
 void AddNewRecord(char *, char *, char *, int, int, double, char * ) ;
 void ConnectToServer( char *, char * ) ;
@@ -79,7 +79,7 @@ void AddNewRecord(char *fNameStr
    d4append(dataFile);
 }
 
-
+/*
 void ConnectToServer( char *serverName, char *processId ) 
 {
    int rc ;
@@ -103,21 +103,22 @@ void ConnectToServer( char *serverName, char *processId )
    else
       printf( "\nSuccessful connection.\n\n" ) ;
 }
+*/
 
 int OpenDataFile( )
 {
-   dataFile = d4create(&codeBase,"C4TEST.DBF",field_info,0);
+   dataFile = d4create(&codeBase,"c4test.dbf",field_info,0);
    
    if( dataFile )
    {    
-	fName = d4field(dataFile,"F_NAME");
-	lName = d4field(dataFile,"L_NAME");
-	address = d4field(dataFile,"ADDRESS");
-	age = d4field(dataFile,"AGE");
-	birthDate = d4field(dataFile,"BIRTH_DATE");
-	married = d4field(dataFile,"MARRIED");
-	amount = d4field(dataFile,"AMOUNT");
-	comment = d4field(dataFile,"COMMENT");
+	fName =     d4field(dataFile,"F_NAME");
+	lName =     d4field(dataFile,"L_NAME");
+	address =   d4field(dataFile,"ADDRESS");
+	age =       d4field(dataFile,"AGE");
+	birthDate= d4field(dataFile,"BIRTH_DATE");
+	married  = d4field(dataFile,"MARRIED");
+	amount   = d4field(dataFile,"AMOUNT");
+	comment  = d4field(dataFile,"COMMENT");
 		
 		return 1 ;
 	}
@@ -188,7 +189,7 @@ int main( int argc, char **argv )
 
    code4init(&codeBase);
 
-   ConnectToServer( argv[1], argv[2] );
+  // ConnectToServer( argv[1], argv[2] );
 
    codeBase.safety = 0;
 

@@ -20,7 +20,7 @@
 /* See User's Manual, chapter 4 */
 
 
-#include "d4all.h"
+#include "../../../source/d4all.h"
 
 
 #ifdef __TURBOC__
@@ -30,16 +30,16 @@
 
 int main( )
 {
-   CODE4    codeBase;
-   DATA4    *dataFile = 0;
-   FIELD4   *fName = 0
-            ,*lName = 0
-            ,*address = 0
-            ,*age = 0
-            ,*birthDate = 0
-            ,*married = 0
-            ,*amount = 0
-            ,*comment = 0;
+   CODE4   codeBase;
+   DATA4  *dataFile = 0;
+   FIELD4 *fName = 0
+        , *lName = 0
+        , *address = 0
+        , *age = 0
+        , *birthDate = 0
+        , *married = 0
+        , *amount = 0
+        , *comment = 0;
 
    int      rc,ageValue;
    double   amountValue;

@@ -20,7 +20,7 @@
 /* See User's Manual, chapter 4 */
 
 
-#include "d4all.h"
+#include "../../../source/d4all.h"
 
 
 #ifdef __TURBOC__
@@ -79,12 +79,12 @@ void main(void)
 
    printRecords(dataFile);
 
-   d4go(dataFile,3L);
-   d4delete(dataFile);
-   d4go(dataFile,1L);
-   d4delete(dataFile);
-   d4go(dataFile,4L);
-   d4delete(dataFile);
+   d4go(      dataFile,3L);
+   d4delete(  dataFile);
+   d4go(      dataFile,1L);
+   d4delete(  dataFile);
+   d4go(      dataFile,4L);
+   d4delete(  dataFile);
    printRecords(dataFile);
 
    d4go(dataFile,3L);

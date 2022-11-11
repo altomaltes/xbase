@@ -68,7 +68,6 @@
    #endif
 
    #if defined( __unix__ ) || defined( S4MACINTOSH ) || defined( S4PALM )
-      #include "p4port.h"
    #else
       #include <stdarg.h>
       #ifndef S4WINCE

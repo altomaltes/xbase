@@ -6,10 +6,30 @@ CCOPTS= -DNO_FORK
 SUBDIRS= source 
 EXTRA_DIST = configure.ac
 
-noinst_PROGRAMS = ex1 seeker
+check_PROGRAMS = ex1 ex2 ex3 ex4 ex5 ex6 ex7 ex8 seeker append bank capieg copydat2 copydata custlist d4test d4verify datainfo date1 deletion
 
 ex1_SOURCES=examples/source/c/ex1.c 
+ex2_SOURCES=examples/source/c/ex2.c 
+ex3_SOURCES=examples/source/c/ex3.c 
+ex4_SOURCES=examples/source/c/ex4.c 
+ex5_SOURCES=examples/source/c/ex5.c 
+ex6_SOURCES=examples/source/c/ex6.c 
+ex7_SOURCES=examples/source/c/ex7.c 
+ex8_SOURCES=examples/source/c/ex8.c 
 seeker_SOURCES=examples/source/c/seeker.c 
+
+append_SOURCES=examples/source/c/seeker.c 
+bank_SOURCES=examples/source/c/bank.c 
+capieg_SOURCES=examples/source/c/capieg.c 
+copydat2_SOURCES=examples/source/c/copydat2.c 
+copydata_SOURCES=examples/source/c/copydata.c 
+
+custlist_SOURCES=examples/source/c/custlist.c 
+d4test_SOURCES=examples/source/c/d4test.c 
+d4verify_SOURCES=examples/source/c/d4verify.c 
+datainfo_SOURCES=examples/source/c/datainfo.c 
+date1_SOURCES=examples/source/c/date1.c 
+deletion_SOURCES=examples/source/c/deletion.c 
 
 LDADD= $(top_builddir)/source/libxbase.la
 

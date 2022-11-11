@@ -15,7 +15,7 @@
 // BANK.C
 // Creates new data file for TRANSFER.C program
 
-#include "d4all.h"
+#include "../../../source/d4all.h"
 
 
 #ifdef __TURBOC__

@@ -8,7 +8,7 @@
 		<Build>
 			<Target title="Debug">
 				<Option output="../../examples/xbase" prefix_auto="1" extension_auto="1" />
-				<Option working_dir="../../examples/DATA" />
+				<Option working_dir="../../examples/data" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
 				<Option compiler="gcc" />
@@ -38,29 +38,96 @@
 		<Linker>
 			<Add library="z" />
 		</Linker>
-		<Unit filename="../../examples/source/C/d4verify.c">
+		<Unit filename="../../examples/source/c/append.c">
 			<Option compilerVar="CC" />
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Release" />
 		</Unit>
-		<Unit filename="../../examples/source/C/relate1.c">
+		<Unit filename="../../examples/source/c/bank.c">
 			<Option compilerVar="CC" />
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Release" />
 		</Unit>
-		<Unit filename="../../examples/source/C/relate4.c">
+		<Unit filename="../../examples/source/c/capieg.c">
 			<Option compilerVar="CC" />
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Release" />
 		</Unit>
-		<Unit filename="../../examples/source/C/seeker.c">
+		<Unit filename="../../examples/source/c/copydat2.c">
 			<Option compilerVar="CC" />
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/copydata.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/custlist.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/d4test.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/d4verify.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/datainfo.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/date1.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/deletion.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex1.c">
 			<Option compilerVar="CC" />
-			<Option target="&lt;{~None~}&gt;" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/ex2.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/ex2a.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/ex3.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/ex4.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/ex5.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/ex6.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/ex7.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/ex8.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
+		</Unit>
+		<Unit filename="../../examples/source/c/relate4.c">
+			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/seeker.c">
 			<Option compilerVar="CC" />
 			<Option target="Debug" />
+		</Unit>
+		<Unit filename="../../examples/source/cc/ex1.cc">
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../source/b4block.c">
 			<Option compilerVar="CC" />
@@ -72,10 +139,6 @@
 		<Unit filename="../../source/c4.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../source/c4baspas.c">
-			<Option compilerVar="CC" />
-			<Option target="Release" />
-		</Unit>
 		<Unit filename="../../source/c4bcd.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -86,9 +149,6 @@
 		<Unit filename="../../source/c4com.pdb" />
 		<Unit filename="../../source/c4comlow.h" />
 		<Unit filename="../../source/c4comws.h" />
-		<Unit filename="../../source/c4conect.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="../../source/c4const.c">
 			<Option compilerVar="CC" />
 		</Unit>
