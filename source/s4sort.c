@@ -97,9 +97,6 @@ int S4FUNCTION sort4get( SORT4 *s4, S4LONG *recPtr, void **sortData, void **info
 {
    char *ptr ;
    int rc ;
-   #ifdef S464BIT
-      S4LONG recl ;
-   #endif
 
    #ifdef E4PARM_HIGH
       if ( s4 == 0 )
@@ -115,9 +112,11 @@ int S4FUNCTION sort4get( SORT4 *s4, S4LONG *recPtr, void **sortData, void **info
    if ( rc )
       return rc ;
 
-   #ifdef S464BIT
+   #if ( __WORDSIZE == 64 )
+   {  S4LONG recl ;
       memcpy( (void *)&recl, ptr + s4->sortLen, sizeof(S4LONG) ) ;
       *recPtr = recl ;
+   }
    #else
       memcpy( (void *)recPtr, ptr + s4->sortLen, sizeof(S4LONG) ) ;
    #endif

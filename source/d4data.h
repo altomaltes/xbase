@@ -9,8 +9,7 @@
 
 //
 //  typedef int (* S4CMP_FUNCTION )(const void *, const void *, void *);
-  #define S4CALL
-  #define  S4CMP_PARM void *
+//  #define S4CALL
 #endif
 
 typedef int S4CALL S4CMP_FUNCTION( const void *, const void *, size_t ) ;
@@ -318,7 +317,7 @@ typedef struct
 
 /* temporarily allow everything to work if S4FILE_EXTENDED not defined (for development purposes only) */
 #ifdef S4FILE_EXTENDED
-   #ifndef S464BIT
+    #if ( __WORDSIZE != 64 )
    typedef struct
    {
       unsigned long longLo ;  /* must be unsigned, can be up to 4 gig */
@@ -331,10 +330,10 @@ typedef struct
    typedef union
    {
       FILE4LONGPIECE piece ;
-      DWORDLONG dLong ;
+      DWORDLONG      dLong ;
    } FILE4LONG ;
 
-      #define file4longAssign( f2, longLoIn, longHiIn ) ( ((f2).piece.longLo) = (longLoIn), ((f2).piece.longHi) = (longHiIn) )
+      #define file4longAssign(     f2, longLoIn, longHiIn ) ( ((f2).piece.longLo) = (longLoIn), ((f2).piece.longHi) = (longHiIn) )
       #define file4longAssignLong( f1, f2 ) ( (f1) = (f2))    // JACS
       #define file4longCmp( f1, f2 ) ( ( (f1).piece.longLo == (f2).piece.longLo && (f1).piece.longHi == (f2).piece.longHi ) ? 0 : 1 )
       #define file4longGetLo( f1 ) ( (f1).piece.longLo )
@@ -343,14 +342,14 @@ typedef struct
       #define file4longGreaterEqZero( f1 ) ( (f1).piece.longLo >= 0 && (f1).piece.longHi >= 0 )
       #define file4longGreaterLong( f1, f2 ) ( ((f1).piece.longHi > (f2).piece.longHi ) || ( (f1).piece.longHi == (f2).piece.longHi && (f1).piece.longLo > (f2).piece.longLo ) )
       #define file4longGreaterZero( f1 ) ( ((f1).piece.longLo > 0 && (f1).piece.longHi >= 0 ) ||((f1).piece.longHi > 0))
-      #define file4longLess( f1, val ) ( (f1).piece.longLo < (val) && (f1).piece.longHi == 0 )
-      #define file4longLessEq( f1, val ) ( (f1).piece.longLo <= (val) && (f1).piece.longHi == 0 )
-      #define file4longLessEqLong( f1, f2 ) ( ((f1).piece.longHi < (f2).piece.longHi)|| ( ((f1).piece.longHi == (f2).piece.longHi) && ((f1).piece.longHi <= (f2).piece.longHi)) )
-      #define file4longSetLo( f1, val ) ( (f1).piece.longLo = val )
-      #define file4longMultiply( f1, f2 ) ( (f1).dLong *= (f2))
-      #define file4longDivide( f1, f2 ) ( (f1).dLong /= (f2))
-      #define file4longSubtract( f1, val ) ( (*(f1)).dLong -= (val) )
-      #define file4longSubtractLong( f1, f2 ) ( (*(f1)).dLong - (*(f2)).dLong )
+      #define file4longLess( f1, val )            ( (f1).piece.longLo < (val) && (f1).piece.longHi == 0 )
+      #define file4longLessEq( f1, val )          ( (f1).piece.longLo <= (val) && (f1).piece.longHi == 0 )
+      #define file4longLessEqLong( f1, f2 )       ( ((f1).piece.longHi < (f2).piece.longHi)|| ( ((f1).piece.longHi == (f2).piece.longHi) && ((f1).piece.longHi <= (f2).piece.longHi)) )
+      #define file4longSetLo( f1, val )           ( (f1).piece.longLo = val )
+      #define file4longMultiply( f1, f2 )         ( (f1).dLong *= (f2))
+      #define file4longDivide( f1, f2 )           ( (f1).dLong /= (f2))
+      #define file4longSubtract( f1, val )        ( (*(f1)).dLong -= (val) )
+      #define file4longSubtractLong(     f1, f2 ) ( (*(f1)).dLong - (*(f2)).dLong )
       #define file4longSubtractLongLong( f1, f2 ) ( (*(f1)).dLong - (*(f2)).dLong )
    /*   #define file4longSubtractLongLong( FILE4LONG *f1, FILE4LONG f2 ) */
 
@@ -363,8 +362,8 @@ typedef struct
    #else
       #define FILE4LONG long
 
-      #define file4longAdd( f1, val ) ( *(f1) += (val) )
-      #define file4longAddLong( f1, f2 ) ( (*(f1)) += (*(f2)) )
+      #define file4longAdd(     f1, val ) ( *(f1) += (val) )
+      #define file4longAddLong( f1, f2  ) ( (*(f1)) += (*(f2)) )
       #define file4longAssign( f2, longLoIn, longHiIn ) ((f2) = (longLoIn) + (longHiIn<<32))
       #define file4longAssignError( f2 ) ( (f2) = (unsigned long)-1L )
       #define file4longAssignLong( f1, f2 ) ( (f1) = (f2) )
@@ -409,6 +408,7 @@ typedef struct
    #define file4longSubtract( f1, val ) ( *(f1) -= (val) )
    #define file4longSubtractLong( f1, f2 ) ( (f1) - (f2) )
    #define file4longDivide( f1, f2 ) ( f1 /= (f2))
+
 #endif /* S4FILE_EXTENDED */
 
    /* structure whose size, when added to a FILE4LONG, will be 10 */

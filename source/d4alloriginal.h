@@ -61,7 +61,6 @@
 /* #define S4ENCRYPT_AES */
 /* #define S4ENCRYPT_PUBLIC */
 /* #define S4TEST_KEEP_FILES */
-/* #define S4INTUIT */
 
 /* Error Configuration Options */
 /* #define E4ANALYZE    */

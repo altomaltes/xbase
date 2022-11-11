@@ -458,11 +458,12 @@ static long tran4fileGetNextTransId( TRAN4FILE *t4, TRAN4 *trans )
          if ( trans->header.transId < 0 )
             return e4trans ;
 
-         #ifdef S464BIT
-            if ( trans->header.transId == INT_MAX || ( trans->header.transId % TRAN4MAX_USERS != t4->c4trans->trans.userIdNo ) )
+         #if ( __WORDSIZE == 64 )
+            if ( trans->header.transId == INT_MAX  || ( trans->header.transId % TRAN4MAX_USERS != t4->c4trans->trans.userIdNo ) )
          #else
             if ( trans->header.transId == LONG_MAX || ( trans->header.transId % TRAN4MAX_USERS != t4->c4trans->trans.userIdNo ) )
          #endif
+
             t4->transId = t4->c4trans->trans.userIdNo ;
          else
             t4->transId = trans->header.transId + TRAN4MAX_USERS ;

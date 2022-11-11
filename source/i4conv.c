@@ -14,10 +14,10 @@
 
 /* i4conv.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
-#include "d4all.h"
-
+#include "d4all.h"  
+ 
 #ifdef P4ARGS_USED
-   #pragma argsused
+   #pragma argsused 
 #endif
 
 #if defined( __WIN32 ) || defined( S4MACINTOSH )    /* LY 00/01/24: for 32-bit only */

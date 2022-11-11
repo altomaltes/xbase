@@ -253,9 +253,6 @@ void b4goEof( B4BLOCK *b4 )
 #ifndef S4OFF_WRITE
 int b4insert( B4BLOCK *b4, const void *k, const long r )
 {
-   #ifdef S464BIT
-      S4LONG tempR ;
-   #endif
    int leftLen ;
    B4KEY_DATA *dataPtr, *nextPtr ;
 
@@ -276,12 +273,14 @@ int b4insert( B4BLOCK *b4, const void *k, const long r )
    c4memmove( nextPtr, dataPtr, leftLen ) ;
    b4->nKeys++ ;
    memcpy( dataPtr->value, k, b4->tag->header.keyLen ) ;
-   #ifdef S464BIT
-      tempR = (S4LONG) r ;
+
+    #if ( __WORDSIZE == 64 )
+      S4LONG tempR = (S4LONG) r ;
       memcpy( (void *)&dataPtr->num, (void *)&tempR, sizeof(tempR) ) ;
    #else
       memcpy( (void *)&dataPtr->num, (void *)&r, sizeof(r) ) ;
    #endif
+
    b4->changed = 1 ;
 
    return 0 ;

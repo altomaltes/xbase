@@ -877,62 +877,6 @@ int S4FUNCTION file4readError( FILE4 *f4, FILE4LONG pos, unsigned len, const cha
    return error4describe( f4->codeBase, e4read, E90621, f4->name, posBuf, location ) ;
 }
 
-#ifdef S4FILE_EXTENDED
-/*
-   void file4longSubtractLongLong( FILE4LONG *f1, FILE4LONG f2 )
-   {
-      file4longSubtract( f1, file4longGetLo( f2 ) ) ;
-      f1->piece.longHi -= f2.piece.longHi ;
-   }
-*/
-/* this function requires that the result be contained within a long */
-/*
-   unsigned file4longSubtractLong( FILE4LONG f1, FILE4LONG f2 )
-   {
-      file4longSubtract( &f1, file4longGetLo( f2 ) ) ;
-      f1.piece.longHi -= f2.piece.longHi ;
-      assert5( f1.piece.longHi == 0 ) ;
-      return f1.piece.longLo ;
-   }
-*/
-/*
-   void file4longSubtract( FILE4LONG *f1, unsigned long val )
-   {
-      if ( (unsigned long)val < f1->piece.longLo )
-         f1->piece.longLo -= val ;
-      else
-      {
-         if ( f1->piece.longHi == 0 ) */  /* nothing to subtract from... */
-/*
-            f1->piece.longLo = 0 ;
-         else
-         {
-            f1->piece.longHi-- ;
-            f1->piece.longLo += (ULONG_MAX-val) ;
-         }
-      }
-   }
-*/
-
-/*
-   void file4longAddLong( FILE4LONG *f1, FILE4LONG *f2 )
-   {
-      file4longAdd( f1, file4longGetLo( *f2 ) ) ;
-      f1->piece.longHi += f2->piece.longHi ;
-   }
-*/
-
-/*
-   void file4longAdd( FILE4LONG *f1, unsigned long val )
-   {
-      unsigned long tVal = f1->piece.longLo + val ;
-      if ( tVal < f1->piece.longLo ) */ /* means carry over to hiPos */
-/*
-         f1->piece.longHi++ ;
-      f1->piece.longLo = tVal ;
-   }
-*/
-#endif
 
 int S4FUNCTION file4replace( FILE4 *keep, FILE4 *from )
 {

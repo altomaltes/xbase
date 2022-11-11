@@ -6,12 +6,12 @@ CCOPTS= -DNO_FORK
 SUBDIRS= source 
 EXTRA_DIST = configure.ac
 
-noinst_PROGRAMS = hid async
+noinst_PROGRAMS = ex1 seeker
 
-hid_SOURCES= arena/hid.c
-async_SOURCES= arena/async.c
+ex1_SOURCES=examples/source/c/ex1.c 
+seeker_SOURCES=examples/source/c/seeker.c 
 
-LDADD= $(top_builddir)/src/libnomad.la
+LDADD= $(top_builddir)/source/libxbase.la
 
 if BUILDING_SLACK
 

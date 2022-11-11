@@ -134,13 +134,13 @@ S4CONST char *dfile4name( S4CONST DATA4FILE *data )
 
 FILE4LONG dfile4recordPosition( DATA4FILE *d4, long rec )
 {
-   FILE4LONG val ;
+  FILE4LONG val ;
 
-   file4longAssign( val, (unsigned long)(d4)->recWidth, 0 ) ;
-   file4longMultiply( val, ( (rec) - 1 ) ) ;
-   file4longAdd( &val, (d4)->headerLen ) ;
+  file4longAssign( val, (unsigned long)(d4)->recWidth, 0 ) ;
+  file4longMultiply( val, ( (rec) - 1 ) ) ;
+  file4longAdd( &val, (d4)->headerLen ) ;
 
-   return val ;
+  return val ;
 }
 
 #ifndef S4OFF_WRITE

@@ -33,7 +33,7 @@ TAG4     *nameTag,*ageTag,*amountTag,*addressTag,*birthdateTag;
 
 void OpenDataFile(void)
 {
-   dataFile = d4open(&codeBase,"DATA1.DBF");
+   dataFile = d4open(&codeBase,"data1.dbf");
 
    fName=     d4field( dataFile, "F_NAME"     );
    lName=     d4field( dataFile, "L_NAME"     );

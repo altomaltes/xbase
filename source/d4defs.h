@@ -1618,9 +1618,7 @@
    #define S4CONV( a, b )  a
 #endif
 
-#define S464BIT
-
-#ifdef S464BIT
+#if ( __WORDSIZE == 64 )
    #define S4LONG int
    #define S4UNSIGNED_LONG unsigned int
 #else
@@ -1664,7 +1662,7 @@
       #endif
    #endif
 #else   /* we only support extended length files with WIN 32 and 64-bit UNIX machines*/
-   #ifndef S464BIT
+  #if ( __WORDSIZE != 64 )
       #ifdef S4FILE_EXTENDED
          #undef S4FILE_EXTENDED
       #endif
