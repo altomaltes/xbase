@@ -12,7 +12,8 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-#include "d4all.h"
+#include "../../../source/d4all.h"
+
 
 
 #ifdef __TURBOC__

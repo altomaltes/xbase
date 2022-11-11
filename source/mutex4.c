@@ -17,6 +17,7 @@
 
 #include "d4all.h"
 
+
 // AS Nov 11/02 - Used now in Windows CE for shared locking
 
 #ifdef S4MUTEX4LOCK

@@ -20,6 +20,7 @@
 
 #include "d4all.h"
 
+
 #ifndef S4MEMO_OFF
    extern char f4memoNullChar ;
 #endif  /* not S4MEMO_OFF */

@@ -13,7 +13,8 @@
 /* *********************************************************************************************** */
 
 /* 'f4int()' uses 'c4atoi' because database field data is not null terminated */
-#include "d4all.h"
+#include "../../../source/d4all.h"
+
 
 
 #ifdef __TURBOC__
