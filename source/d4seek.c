@@ -545,6 +545,7 @@ int S4FUNCTION d4seekDouble( DATA4 *data, const double dkey )
       CODE4 *c4 ;
       int rc ;
       char buf[I4MAX_KEY_SIZE] ;
+
       #ifdef S4CLIPPER
          int len ;
       #endif
@@ -579,7 +580,7 @@ int S4FUNCTION d4seekDouble( DATA4 *data, const double dkey )
       tfile = tag->tagFile ;
 
       #ifdef S4CLIPPER
-         if ( tfile->dtok == 0 )
+         if ( ! tfile->dtok  )
          {
             len = tfile->header.keyLen ;
             c4dtoa45( dkey, buf, len, tfile->header.keyDec ) ;
@@ -597,16 +598,10 @@ int S4FUNCTION d4seekDouble( DATA4 *data, const double dkey )
          #ifdef S4MDX
             switch ( tfile->keyType )
             {
-               case r4num:
-                  c4bcdFromD( buf, dkey ) ;
-                  break ;
-               case r4date:
-                  t4noChangeDouble( buf, dkey ) ;
-                  break ;
-               case r4str:
-                  break ;
-               default:
-                  return error4( data->codeBase, e4index, E82901 ) ;
+               case r4num:  c4bcdFromD(       buf, dkey );  break ;
+               case r4date: t4noChangeDouble( buf, dkey );  break ;
+               case r4str:        break ;
+               default:      return error4( data->codeBase, e4index, E82901 ) ;
             }
          #endif
          #ifdef S4FOX
@@ -617,10 +612,11 @@ int S4FUNCTION d4seekDouble( DATA4 *data, const double dkey )
                case r4date:
                case r4dateDoub:
                   t4dblToFox( buf, dkey ) ;
-                  break ;
+               break ;
+
                case r4str:
                case r4log:
-                  break ;
+               break ;
                default:
                   return error4( data->codeBase, e4index, E82901 ) ;
             }
@@ -663,11 +659,11 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
       #ifndef S4OFF_MULTI
          int oldErrGo ;
       #endif
-      int rc2, saveGo ;
-      TAG4 *tag ;
-      TAG4FILE *tfile ;
-      char buf[I4MAX_KEY_SIZE] ;
-      unsigned char *dbfKey ;
+    int rc2, saveGo ;
+    TAG4 *tag ;
+    TAG4FILE *tfile ;
+    char buf[I4MAX_KEY_SIZE] ;
+    unsigned char *dbfKey ;
       #ifdef S4CLIPPER
          int len ;
       #endif
@@ -683,8 +679,10 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
    #endif
 
       c4 = data->codeBase ;
+
       if ( c4 == 0 )
          return e4info ;
+
       if ( error4code( c4 ) < 0 )
          return -1 ;
 
@@ -719,16 +717,10 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
          #ifdef S4MDX
             switch ( tfile->keyType )
             {
-               case r4num:
-                  c4bcdFromD( buf, dkey ) ;
-                  break ;
-               case r4date:
-                  t4noChangeDouble( buf, dkey ) ;
-                  break ;
-               case r4str:
-                  break ;
-               default:
-                  return error4( data->codeBase, e4index, E82901 ) ;
+               case r4num:                  c4bcdFromD( buf, dkey ) ;                  break ;
+               case r4date:                  t4noChangeDouble( buf, dkey ) ;                  break ;
+               case r4str:                  break ;
+               default:                  return error4( data->codeBase, e4index, E82901 ) ;
             }
          #endif
          #ifdef S4FOX
@@ -737,14 +729,12 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
                case r4num:
                case r4numDoub:
                case r4date:
-               case r4dateDoub:
-                  t4dblToFox( buf, dkey ) ;
-                  break ;
+               case r4dateDoub:                  t4dblToFox( buf, dkey ) ;                  break ;
+
                case r4str:
-               case r4log:
-                  break ;
-               default:
-                  return error4( data->codeBase, e4index, E82901 ) ;
+               case r4log:                  break ;
+
+               default:                  return error4( data->codeBase, e4index, E82901 ) ;
             }
          #endif
          #ifdef S4CLIPPER
@@ -752,14 +742,12 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
             {
                case r4num:
                case r4numDoub:
-               case r4str:
-                  break ;
+               case r4str:                  break ;
+
                case r4date:
-               case r4dateDoub:
-                  t4dateDoubToStr( buf, dkey ) ;
-                  break ;
-               default:
-                  return error4( data->codeBase, e4index, E82901 ) ;
+               case r4dateDoub:                  t4dateDoubToStr( buf, dkey ) ;                  break ;
+
+               default:                  return error4( data->codeBase, e4index, E82901 ) ;
             }
          #endif
       #else
@@ -781,13 +769,17 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
             {
                   oldErrGo = data->codeBase->errGo ;
                   data->codeBase->errGo = 0 ;
+
                #ifndef S4OFF_OPTIMIZE
                   data->dataFile->hiPrio = 1 ;
                #endif
+
                saveGo = d4go( data, data->recNum ) ;
+
                #ifndef S4OFF_OPTIMIZE
                   data->dataFile->hiPrio = 0 ;
                #endif
+
                   data->codeBase->errGo = oldErrGo ;
                if ( saveGo < 0 )
                   return saveGo ;

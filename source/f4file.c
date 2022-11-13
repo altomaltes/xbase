@@ -362,8 +362,8 @@ int S4FUNCTION file4lenSetLow( FILE4 *f4, FILE4LONG newLen )
                   return error4( c4, e4opt, E80602 ) ;
       #endif
 
-      #ifdef S4SAFE
-         if ( f4->fileCreated != 0 )   /* don't need to safeguard temporary files */
+      #ifdef S4SAFE  // !!!!
+         if ( f4->fileCreated  )   /* don't need to safeguard temporary files */
       #else
          /* E4ANALYZE must explicitly set file length for later verifications */
          #ifndef E4ANALYZE

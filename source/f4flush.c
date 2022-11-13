@@ -123,14 +123,16 @@ int opt4fileFlush( FILE4 *file, const int doFree )
          case OPT4DBF:
             rc = opt4fileFlushList( &file->codeBase->opt, file, &file->codeBase->opt.dbfLo.list, doFree ) ;
             rc = opt4fileFlushList( &file->codeBase->opt, file, &file->codeBase->opt.dbfHi.list, doFree ) ;
-            break ;
+         break ;
+
          case OPT4INDEX:
             rc = opt4fileFlushList( &file->codeBase->opt, file, &file->codeBase->opt.indexLo.list, doFree ) ;
             rc = opt4fileFlushList( &file->codeBase->opt, file, &file->codeBase->opt.indexHi.list, doFree ) ;
-            break ;
+         break ;
+
          default:
             rc = opt4fileFlushList( &file->codeBase->opt, file, &file->codeBase->opt.other.list, doFree ) ;
-            break ;
+         break ;
       }
       if ( file->codeBase->opt.writeFile == file )  /* flush out the final file changes */
       {

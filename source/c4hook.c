@@ -20,13 +20,6 @@
 #include "d4all.h"
 
 
-#ifdef S4TIMEOUT_HOOK
-int code4timeoutHook( CODE4 *c4, int numAttempts, long elapsedTime )
-{
-   return 0 ;
-}
-#endif
-
 #ifdef S4LOCK_HOOK
 int code4lockHook( CODE4 *c4, const char *fileName, const char *userId, const char *networkId, long item, int numAttempts )
 {

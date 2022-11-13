@@ -18,6 +18,7 @@ typedef struct
       char dummy[6] ;
       char info[2] ;
    #endif
+
 } R4BLOCK_DATA ;
 
 typedef struct  /* R4REINDEX  For 'i4reindex' */

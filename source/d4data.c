@@ -64,7 +64,7 @@ void S4FUNCTION d4aliasSet( DATA4 *data, const char * newAlias )
 
 void d4blankLow( DATA4 *data, char *record )
 {
-   if ( data->recordBlank != 0 )
+   if ( data->recordBlank )
       memcpy( record, data->recordBlank, (unsigned int)dfile4recWidth( data->dataFile ) ) ;
    else
       memset( record, ' ', (unsigned int)dfile4recWidth( data->dataFile ) ) ;

@@ -753,8 +753,11 @@ int x4putInfo( const B4NODE_HEADER *b4nodeHdr, void *buffer, const S4LONG rec, c
    return 0 ;
 }
 
-/* S4FOX */
-int b4insertLeaf( B4BLOCK *b4, const void *vkeyData, const S4LONG rec )
+/* S4FOX
+ */
+int b4insertLeaf( B4BLOCK *b4
+                , const void *vkeyData
+                , const S4LONG rec )
 {
    int leftBlanks, rightBlanks, leftDups, rightDups, leftLen, rightLen, reqdLen, movLen, oldRec, rc, oldRightDups, extraDups, saveDups ;
    unsigned char buffer[6], iLen ;

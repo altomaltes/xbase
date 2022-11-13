@@ -673,10 +673,6 @@ PUBLIC long S4FUNCTION code4version( CODE4 S4PTR * ) ;
    int code4lockHook( CODE4 *, const char *, const char *, const char *, long, int ) ;
 #endif
 
-#ifdef S4TIMEOUT_HOOK
-   int code4timeoutHook( CODE4 *, int, long ) ;
-#endif
-
 /* used for internal testing only */
 PUBLIC int S4FUNCTION file4seqWriteDelay( FILE4SEQ_WRITE * ) ;
 PUBLIC int S4FUNCTION code4catalogSet( CODE4 S4PTR *, int, int ) ;
@@ -1163,10 +1159,11 @@ double S4FUNCTION x4reverseDouble( const void S4PTR * ) ;
 #endif
 
    void c4bcdFromA( char *, const char *, const int ) ; /*Removed from S4MDX to facilitate index independent OLEDB*/
+
 #ifdef S4MDX
-   void t4strToDateMdx( char *, const char *, const int ) ;
-   void t4noChangeStr( char *, const char *, const int ) ;
-   void c4bcdFromD( char *, const double ) ;
+   void t4strToDateMdx(   char *, const char *, const int ) ;
+   void t4noChangeStr(    char *, const char *, const int ) ;
+   void c4bcdFromD(       char *, const double ) ;
    void t4noChangeDouble( char *, const double ) ;
 #endif
 

@@ -40,8 +40,8 @@
    #ifdef __TURBOC__
       #ifndef __DLL__
          #ifndef S4OS2PM
-            #ifndef __WIN32
-               #ifndef S4WINDOWS
+            #ifndef S4WINDOWS
+               #ifndef __WIN32
                   extern unsigned _stklen ;
                #endif
             #endif
@@ -433,14 +433,6 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
       #endif
    #endif
 
-   #ifndef S4OFF_COMMUNICATIONS
-      #ifdef S4TIMEOUT_HOOK
-         c4->timeout = 100 ;
-      #else
-         c4->timeout = -1 ;
-      #endif
-   #endif
-
    #ifndef S4OPTIMIZE_OFF
       c4->doOpt = 1 ;   /* by default do optimization */
          c4->optimize = OPT4EXCLUSIVE ;   /* by default optimize non-shared files */
@@ -453,10 +445,6 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
          numCode4--;
          return error4( 0, rc, E91001 ) ;
       }
-
-      #ifndef S4OFF_COMMUNICATIONS
-         c4->clientDataCount = 1 ;
-      #endif
 
       #ifndef S4LANGUAGE
          code4dateFormatSet( c4, "MM/DD/YY" ) ;
@@ -733,14 +721,6 @@ static int code4initUndo2( CODE4 *c4, int doClose )
          code4close( c4 ) ;
 
       code4calcReset( c4 ) ;
-      #ifndef S4OFF_COMMUNICATIONS
-            /* if ( c4->defaultServer != 0 ) */
-            /* { */
-               connection4initUndo( &c4->defaultServer ) ;
-            /*    connection4free( c4->defaultServer ) ;*/
-            /* } */
-         c4->defaultServer.connected = 0 ;
-      #endif
 
       #ifndef S4OFF_TRAN
          code4tranInitUndo( c4 ) ;
@@ -892,13 +872,6 @@ static int code4initUndo2( CODE4 *c4, int doClose )
          c4->tranData = 0 ;
          c4->tranDataLen = 0 ;
       }
-   #endif
-
-   #ifndef S4OFF_COMMUNICATIONS
-      mem4release( c4->connectLowMemory ) ;
-      c4->connectLowMemory = 0 ;
-      mem4release( c4->writeMemory ) ;
-      c4->writeMemory = 0 ;
    #endif
 
    #ifdef S4TESTING
@@ -1498,12 +1471,6 @@ const char *S4FUNCTION code4indexExtension( CODE4 *c4 )
    #error Must choose one of CodeBase switches S4DOS, S4WIN16, __WIN32, S4OS2, __unix__, S4MACINTOSH or S4PASCAL_WIN
 #endif
 
-#ifdef S4SAFE
-   #define S4SAFE_VAL  0x2000
-#else
-   #define S4SAFE_VAL  0
-#endif
-
 #ifdef S4LOCK_HOOK
    #define S4LOCK_HOOK_VAL 0x4000
 #else
@@ -1514,12 +1481,6 @@ const char *S4FUNCTION code4indexExtension( CODE4 *c4 )
    #define S4MAX_VAL 0x8000
 #else
    #define S4MAX_VAL 0
-#endif
-
-#ifdef S4TIMEOUT_HOOK
-   #define S4TIMEOUT_HOOK_VAL 0x10000L
-#else
-   #define S4TIMEOUT_HOOK_VAL 0
 #endif
 
 #ifdef E4ANALYZE
@@ -1637,8 +1598,8 @@ const char *S4FUNCTION code4indexExtension( CODE4 *c4 )
 long S4FUNCTION u4switch()
 {
    return (long)
-          ( S4FORMAT + S4OPERATING + S4SAFE_VAL
-          + S4LOCK_HOOK_VAL + S4MAX_VAL + S4TIMEOUT_HOOK_VAL + E4ANALYZE_VAL
+          ( S4FORMAT + S4OPERATING + /* S4SAFE _VAL */
+          + S4LOCK_HOOK_VAL + S4MAX_VAL /*+ S4TIMEOUT _HOOK_VAL*/ + E4ANALYZE_VAL
           + E4DEBUG_VAL + E4HOOK_VAL + E4LINK_VAL + E4MISC_VAL + E4OFF_VAL
           + E4OFF_STRING_VAL + E4PARM_HIGH_VAL + E4PAUSE_VAL + E4STOP_VAL +
           E4STOP_CRITICAL_VAL + S4OFF_INDEX_VAL + S4OFF_MEMO_VAL +

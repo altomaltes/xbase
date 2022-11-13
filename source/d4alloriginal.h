@@ -53,8 +53,6 @@
 /* General Configuration Options */
 /* #define S4LOCK_HOOK    */
 /* #define S4MAX          */
-/* #define S4SAFE         */
-/* #define S4TIMEOUT_HOOK */
 
 /* #define S4ENCRYPT_COM */
 /* #define S4ENCRYPT_HOOK */

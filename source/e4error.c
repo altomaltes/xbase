@@ -162,7 +162,7 @@ void error4logAppend( CODE4 *c4, int errCode1, long errCode2, const char *desc1,
 #ifdef E4PAUSE
 static void error4pause( void )
 {
-   #ifndef S4WINTEL
+  #ifndef S4WINTEL
       getchar() ;
    #else
       getch() ;
@@ -209,7 +209,7 @@ S4CONST char *bad4data = "Invalid or Unknown Error Code" ;
 #ifndef S4LANGUAGE
 ERROR4DATA e4errorData[] =
 {
- /* General Disk Access Errors 
+ /* General Disk Access Errors
  */
   { e4close,          "Closing File" }
  ,{ e4create,         "Creating File" }
@@ -229,7 +229,7 @@ ERROR4DATA e4errorData[] =
  ,{ e4unlock,         "Unlocking File" }
  ,{ e4write,          "Writing to File" }
 
- /* Database Specific Errors 
+ /* Database Specific Errors
   */
  ,{ e4data,          "File is not a Data File" }
  ,{ e4fieldName,     "Unrecognized Field Name" }
@@ -238,7 +238,7 @@ ERROR4DATA e4errorData[] =
  ,{ e4append,        "Record Append Attempt Past End of File" }
  ,{ e4seek,          "Attempt to perform a d4seekDouble() on non-numeric tag" }
 
-/* Index File Specific Errors 
+/* Index File Specific Errors
  */
  ,{ e4entry,          "Tag Entry Missing" }
  ,{ e4index,          "Not a Correct Index File" }
@@ -247,7 +247,7 @@ ERROR4DATA e4errorData[] =
  ,{ e4tagInfo,        "Tag Information Invalid" }
  ,{ e4candidate,      "Candidate Key Error" }
 
- /* Expression Evaluation Errors 
+ /* Expression Evaluation Errors
  */
  ,{ e4commaExpected, "Comma or Bracket Expected" }
  ,{ e4complete,      "Expression not Complete" }
@@ -260,23 +260,23 @@ ERROR4DATA e4errorData[] =
  ,{ e4typeSub,       "Sub-expression Type is Wrong" }
  ,{ e4unrecFunction, "Unrecognized Function" }
  ,{ e4unrecOperator, "Unrecognized Operator" }
- ,{ e4unrecValue,    "Unrecognized Value"        } 
- ,{ e4unterminated,  "Unterminated String"       } 
- ,{ e4tagExpr,       "Expression Invalid for Tag"} 
+ ,{ e4unrecValue,    "Unrecognized Value"        }
+ ,{ e4unterminated,  "Unterminated String"       }
+ ,{ e4tagExpr,       "Expression Invalid for Tag"}
 
-/* Optimization Errors 
+/* Optimization Errors
  */
  ,{ e4opt,            "Optimization Error"               }
  ,{ e4optSuspend,     "Optimization Removal Failure"     }
  ,{ e4optFlush,      "Optimization File Flushing Failure"}
 
-/* Relation Errors 
+/* Relation Errors
  */
  ,{ e4lookupErr,      "Matching Slave Record Not Located"}
  ,{ e4relate,         "Relation Error"}
  ,{ e4relateRefer,    "Relation Referred to Does Not Exist or is Not Initialized"}
 
- /* Report Errors 
+ /* Report Errors
  */
  ,{ e4report,         "Report Error"}
  ,{ e4styleCreate,   "Error Creating Style"}
@@ -293,7 +293,7 @@ ERROR4DATA e4errorData[] =
  ,{ e4repRet,        "Error Retrieving Report"}
  ,{ e4repData,       "Error In Sending Report to Data File"}
 
- /* Critical Errors 
+ /* Critical Errors
   */
  ,{ e4info,           "Unexpected Information"}
  ,{ e4memory,         "Out of Memory"}
@@ -304,7 +304,7 @@ ERROR4DATA e4errorData[] =
  ,{ e4verify,         "Structure Verification Failure"}
  ,{ e4struct,         "Data Structure Corrupt or not Initialized" }
 
-/* Not Supported Errors 
+/* Not Supported Errors
  */
  ,{ e4notIndex,       "Function unsupported: library compiled with S4OFF_INDEX" }
  ,{ e4notMemo,        "Function unsupported: library compiled with S4OFF_MEMO" }
@@ -316,12 +316,12 @@ ERROR4DATA e4errorData[] =
  ,{ e4notSupported,   "Function unsupported" }
  ,{ e4version,        "Application/Library version mismatch" }
 
- /* MEMO errors 
+ /* MEMO errors
   */
  ,{ e4memoCorrupt,    "Memo File Corrupt" }
  ,{ e4memoCreate,     "Error Creating Memo File" }
 
- /* transaction errors 
+ /* transaction errors
   */
  ,{ e4transViolation, "Transaction Violation Error" }
  ,{ e4trans,          "Transaction Error" }
@@ -330,7 +330,7 @@ ERROR4DATA e4errorData[] =
  ,{ e4transAppend,    "Error Appending Information to Log File" }
  ,{ e4transStatus,    "Transaction state confliction" }  /* eg. attempt to commit when no active transaction */
 
- /* communications errors 
+ /* communications errors
   */
  ,{ e4corrupt,        "Communication Information Corrupt" }
  ,{ e4connection,     "Connection Failure" }
@@ -343,7 +343,7 @@ ERROR4DATA e4errorData[] =
  ,{ e4packet,         "Communication Packet Corrupt" }
  ,{ e4connect,        "system-level communication failure" }
 
- /* miscellaneous errors 
+ /* miscellaneous errors
   */
  ,{ e4max,            "CodeBase Capabilities Exceeded (system maxed out)" }
  ,{ e4codeBase,       "CodeBase in an Unacknowledged Error State" }
@@ -355,7 +355,7 @@ ERROR4DATA e4errorData[] =
  ,{ e4connectDenied,  "Server is not accepting any new connections at this time - contact System Administrator for details" }
  ,{ e4invalidLicence, "LICENCE NOTICE: " }
 
-/* all server-specific error >2100, not only e4server returned to client 
+/* all server-specific error >2100, not only e4server returned to client
  */
  ,{ e4server,         "Server Failure" }
  ,{ e4config,         "Server Configuration Failure" }
@@ -1227,8 +1227,8 @@ int S4FUNCTION error4describeExecute( CODE4 *c4
    #ifdef E4HOOK
          if ( c4 != 0 )
          {
-            error4set( c4, errCode1 ) ;
-            error4set2( c4, errCode2 ) ;
+            error4set(  c4, errCode1 );
+            error4set2( c4, errCode2 );
          }
 
       error4hook( c4, errCode1, errCode2, s1, s2, s3 ) ;

@@ -1234,7 +1234,9 @@ int S4FUNCTION u4ncpy_v2( char *to, char *from, int len )
             {
                int i ;
 
-               for ( i = 0 ; i < len ; i++ )
+               for ( i = 0
+                   ; i < len
+                   ; i++ )
                   if ( ((unsigned char *)s1)[i] != ((unsigned char *)s2)[i] )
                   {
                      if ( v4map[((unsigned char *)s1)[i]] < v4map[((unsigned char *)s2)[i]] )

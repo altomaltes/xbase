@@ -581,6 +581,7 @@ PREPORT4 report ;
          report->tdone = 0 ;
          report4swap_old_rec( report ) ;
       }
+
 GOODRET:
       if( report->output_flag )
       {
@@ -811,7 +812,8 @@ PAGE4 *hDC ;
                0, 0, (int)pbmi->bmiHeader.biWidth, (int)pbmi->bmiHeader.biHeight,
                (LPSTR)bmp4FindDIBBits((LPSTR)pbmi), pbmi, DIB_RGB_COLORS, SRCCOPY ) ;
             GlobalUnlock((HANDLE)obj->data) ;
-            break ;
+         break ;
+
          case obj4type_hline:
          case obj4type_vline:
          case obj4type_frame:
@@ -887,7 +889,8 @@ PAGE4 *hDC ;
             if( hpen )
                DeleteObject( hpen ) ;
             len = 0 ;
-            break ;
+         break ;
+
          case obj4type_text:
             if( report->for_dbf )
             {

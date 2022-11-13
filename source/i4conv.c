@@ -14,10 +14,10 @@
 
 /* i4conv.c   (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
-#include "d4all.h"  
- 
+#include "d4all.h"
+
 #ifdef P4ARGS_USED
-   #pragma argsused 
+   #pragma argsused
 #endif
 
 #if defined( __WIN32 ) || defined( S4MACINTOSH )    /* LY 00/01/24: for 32-bit only */
@@ -2484,6 +2484,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
       #ifdef S4BYTEORDER_3210
          throw Err5internal( 0 ) ;  // not coded
       #endif
+
       #ifdef S4BYTEORDER_2301
          throw Err5internal( 0 ) ;  // not coded
       #endif

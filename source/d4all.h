@@ -10,6 +10,7 @@
    #define S4STAND_ALONE
 
 /* Index File compatibility options */
+
 /* #define S4CLIPPER */
    #define S4FOX
 /* #define S4MDX     */
@@ -41,24 +42,18 @@
 /* #define S4MACINTOSH  */   /* requires CodeBase Mac version */
 /* #define S4PASCAL_WIN */   /* requires CodePascal version */
 
-/* Alterable CodeBase Global Defines */
-#define DEF4SERVER_ID "localhost"
-#define DEF4PROCESS_ID "23165"
-
 /* General Configuration Options
  */
-
 /* #define S4LOCK_HOOK    */
 /* #define S4MAX          */
-/* #define S4SAFE         */
-/* #define S4TIMEOUT_HOOK */
 
 /* Error Configuration Options
  */
 
- #define E4ANALYZE    
- #define E4DEBUG      
+ #define E4ANALYZE
+ #define E4DEBUG
 /* #define E4HOOK       */
+
 /* #define E4LINK       */
 /* #define E4MISC       */
 /* #define E4OFF        */
@@ -69,7 +64,8 @@
    #define E4STOP_CRITICAL
 /* #define E4MAC_ALERT 4444 */
 
-/* Library Reducing Switches */
+/* Library Reducing Switches
+ */
 /* #define S4OFF_INDEX    */
 /* #define S4OFF_MEMO     */
 /* #define S4OFF_MULTI    */
@@ -94,19 +90,20 @@
 
 #ifdef _MSC_VER
    #if _MSC_VER >= 900
-      #pragma pack(push,1)
+      #pragma pack( push,1)
    #else
-      #pragma pack(1)
+      #pragma pack( 1 )
    #endif
 #else
    #ifdef __BORLANDC__
-      #pragma pack(1)
+      #pragma pack( 1 )
    #endif
 #endif
 
 #include <stdlib.h>
 #include <string.h>
 #include <limits.h>
+
 #ifndef S4WINCE
    #include <stdio.h>
    #include <time.h>
@@ -154,7 +151,6 @@
 #include "e4error.h"
 
 #include "o4opt.h"
-
 #include "c4trans.h"
 
 #ifdef OLEDB5BUILD
@@ -162,17 +158,6 @@
 #endif
 
 #include "r4relate.h"
-
-#ifdef S4VBX
-   #ifndef S4CONTROLS
-   #endif
-   #include "ctrl4vbx.h"
-#else
-   #ifdef S4CONTROLS
-      #include "ctrl4.h"
-   #endif
-#endif
-
 #include "r4report.h"
 
 #ifdef S4CODE_SCREENS

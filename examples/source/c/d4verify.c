@@ -73,10 +73,10 @@ void verifySwitches( void )
    if( d4switch & 0x00000200L ) printf( "__unix__ - UNIX\n" ) ;
    if( d4switch & 0x00000400L ) printf( "S4MACINTOSH - MACINTOSH\n" ) ;
    if( d4switch & 0x00000800L ) printf( "S4PACAL_WIN - PASCAL Windows\n" ) ;
-   if( d4switch & 0x00002000L ) printf( "\nS4SAFE  - Immediate File Length Updates\n" ) ;
-   if( d4switch & 0x00004000L ) printf( "\nS4LOCK_HOOK - Custom Lock Failure Function\n" ) ;
+//   if( d4switch & 0x00002000L ) printf( "\nS4SAFE  - Immediate File Length Updates\n" ) ;
+//   if( d4switch & 0x00004000L ) printf( "\nS4LOCK _HOOK - Custom Lock Failure Function\n" ) ;
    if( d4switch & 0x00008000L ) printf( "\nS4MAX - Maximum Memory Allocation Testing\n" ) ;
-   if( d4switch & 0x00010000L ) printf( "\nS4TIMEOUT_HOOK - Custom Timeout Hook Function\n" ) ;
+ //  if( d4switch & 0x00010000L ) printf( "\nS4TIMEOUT _HOOK - Custom Timeout Hook Function\n" ) ;
    if( d4switch & 0x00020000L ) printf( "E4ANALYZE - Structure Analysis CodeBase Error Checking\n" ) ;
    if( d4switch & 0x00040000L ) printf( "E4DEBUG - Extended CodeBase Error Checking\n" ) ;
    if( d4switch & 0x00080000L ) printf( "E4HOOK - Custom Error Function\n" ) ;
@@ -92,7 +92,7 @@ void verifySwitches( void )
    if( d4switch & 0x20000000L ) printf( "S4OFF_MEMO - CodeBase Memo Support Source Code Removed\n" ) ;
    if( d4switch & 0x40000000L ) printf( "S4OFF_MULTI - CodeBase Multi-user Support Source Code Removed\n" ) ;
    if( d4switch & 0x80000000L ) printf( "S4OFF_OPTIMIZE - CodeBase Optimization Source Code Removed\n" ) ;
-   if( d4switch & 0x00000008L ) printf( "S4CLIENT - CodeBase In Client/Server Mode\n" ) ;
+ //  if( d4switch & 0x00000008L ) printf( "S4 CLIENT - CodeBase In Client/Server Mode\n" ) ;
    if( d4switch & 0x00000080L ) printf( "S4STAND_ALONE - CodeBase In Stand Alone Mode\n" ) ;
 
 /* no room for these switches
@@ -106,7 +106,7 @@ void verifySwitches( void )
 
       if( ( d4switch & 0x80L ) == 0 )  error4describe( &cb, e4result, E87001, "S4STAND_ALONE must be used in Library Build too.", 0, 0 ) ;
 
-      if( d4switch & 0x8L )            error4describe( &cb, e4result, E87001, "S4CLIENT must be off in Library Build too.", 0, 0 ) ;
+   //   if( d4switch & 0x8L )            error4describe( &cb, e4result, E87001, "S4 CLIENT must be off in Library Build too.", 0, 0 ) ;
 
    #ifdef S4OFF_OPTIMIZE
       if( (d4switch & 0x80000000L )  ==  0 )   error4describe( &cb, e4result, E87001, "S4OFF_OPTIMIZE must be used in Library Build too.", 0, 0 ) ;

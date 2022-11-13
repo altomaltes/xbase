@@ -4,7 +4,7 @@
 #  Jul 2004
 #
 
-AC_INIT([nomad],[2.0.0])
+AC_INIT([xbase],[6.4.1])
 AC_CONFIG_SRCDIR([source/d4all.h])
 AM_INIT_AUTOMAKE( [subdir-objects] )
 AC_CONFIG_HEADERS( config.h )
@@ -39,7 +39,7 @@ if test -z "${CFLAGS}"; then
     CFLAGS="$CCOPTS"
 fi
 
-AC_ARG_WITH(cc, [  --with-cc=compiler  force libnomad to build with a particular compiler (like pgcc, egcs, etc.)],
+AC_ARG_WITH(cc, [  --with-cc=compiler  force libxbase to build with a particular compiler (like pgcc, egcs, etc.)],
             CC=$withval,
   if test -z "$CC"; then
     CC=check
@@ -144,9 +144,9 @@ dnl# Checks for library functions.
 AC_CHECK_FUNCS( atexit unsetenv setutent seteuid putenv setresuid setresgid usleep fork vsnprintf )
 
 dnl# Portability checks for various functions
-AC_SEARCH_LIBS( getpwuid, sun )
-AC_SEARCH_LIBS( connect, socket )
-AC_SEARCH_LIBS( gethostbyname, nsl )
+#AC_SEARCH_LIBS( getpwuid, sun )
+#AC_SEARCH_LIBS( connect, socket )
+#AC_SEARCH_LIBS( gethostbyname, nsl )
 
 dnl#
 dnl# Utility stuff
@@ -169,22 +169,79 @@ AC_ARG_WITH(debugging, [  --with-debugging[=num]  enable debugging output, num i
                   AC_DEFINE_UNQUOTED(DEBUG, 4, [ Define debug 4 ] )
 )
 
-AC_MSG_CHECKING(for MMX support)
-HAVE_MMX=""
-AC_ARG_ENABLE(mmx, [  --enable-mmx            enable MMX assembly routines],
-               test "x$enableval" = "xyes" && HAVE_MMX="yes"
-              ,
-               if test x$build_os = xlinux-gnu; then
-                 grep mmx /proc/cpuinfo >/dev/null 2>&1 && HAVE_MMX="yes"
-               fi
-              )
-if test "x$HAVE_MMX" = "xyes"; then
-  AC_MSG_RESULT(yes)
-  AC_DEFINE_UNQUOTED(HAVE_MMX, "$HAVE_MMX", [ MMX instruction set ] )
-else
-  AC_MSG_RESULT(no)
-fi
-AM_CONDITIONAL(HAVE_MMX, test "x$HAVE_MMX" = "xyes")
+
+# LANGUAJE ENABLE
+# ====
+#
+AC_ARG_ENABLE([language],
+   AS_HELP_STRING( [[[--enable-language=@<:@none/ansi/dictionary/finnish/french/german/norwegian/scandinavian/swedish@:>@]]]
+                 , [Enable database language: @<:@default=none@:>@ ( none, ansi, dictionary, finnish , french , german,  norwegian, scandinavian, swedish )] )
+                 , [case "$enableval" in
+      ansi)
+         AC_DEFINE([S4ANSI], [0],
+                   [Enable ANSI language])
+        ;;
+
+      dictionary)
+         AC_DEFINE([S4DICTIONARY], [0],
+                   [Enable DICTIONARY language])
+        ;;
+
+      finnish)
+         AC_DEFINE([S4FINNISH], [0],
+                   [Enable Finnish language])
+        ;;
+
+      french)
+         AC_DEFINE([S4FRENCH], [0],
+                   [Enable French language])
+        ;;
+
+      german)
+         AC_DEFINE([S4GERMAN], [0],
+                   [Enable German language])
+        ;;
+
+      norwegian)
+         AC_DEFINE([S4NORWEGIAN], [0],
+                   [Enable Nowwegian language])
+        ;;
+
+      escandinavian)
+         AC_DEFINE([S4SCANDINAVIAN], [0],
+                   [Enable Scandinavian language])
+        ;;
+
+      swedish)
+         AC_DEFINE([S4SWEDISH], [0],
+                   [Enable Swedish language])
+        ;;
+   esac])
+
+
+# INDEX FORMAT
+# ====
+#
+
+AC_ARG_ENABLE([format],
+   AS_HELP_STRING( [[[--enable-format=@<:@fox/clipper/mdx@:>@]]]
+                 , [Enable database index format: @<:@default=fox@:>@ ( foxpro, clipper or dbase IV mdx )] )
+                 , [case "$enableval" in
+      fox)
+         AC_DEFINE([S4FOX], [0],
+                   [Enable FOXPRO index format])
+        ;;
+      clipper)
+         AC_DEFINE([S4CLIPPER], [],
+                   [Enable CLIPPER index format])
+         ;;
+      mdx)
+         AC_DEFINE([S4MDX], [], [Enable DBASE IV mdx format])
+         ;;
+      *)
+         AC_MSG_ERROR([--enable-index-format=${enable_index_format}: invalid value])
+   esac] )
+
 
 dnl Detect windows
 
@@ -192,9 +249,55 @@ AM_CONDITIONAL( WINDOWS,   test "${version_type}" = "windows" )
 
 AC_PATH_PROG([SLACKBUILD], [makepkg], [notfound])
 
-dnl AC_ARG_ENABLE([slack],
-dnl     AS_HELP_STRING([--disable-slack], [No general el paquete de instalacion]))
-dnl AS_IF([test "x$enable_slack" != "xno"], [ enable_slack=yes ])
+AC_ARG_ENABLE([exdebug],
+AS_HELP_STRING([--enable-exdebug=@<:@yes/no@:>@], [Extended CodeBase Error Checking @<:@default=yes@:>@]))
+
+AS_IF([test "x$enable_exdebug" != "xno"], AC_DEFINE([E4DEBUG], [], [Extended CodeBase Error Checking]) )
+
+AC_ARG_ENABLE([linkdbg],
+AS_HELP_STRING([--enable-linkdbg=@<:@yes/no@:>@], [Link List CodeBase Error Checking @<:@default=yes@:>@]))
+AS_IF([test "x$enable_linkdbg" != "xno"], AC_DEFINE([E4LINK], [], [Link List CodeBase Error Checking]) )
+
+AC_ARG_ENABLE([miscdbg],
+AS_HELP_STRING([--enable-miscdbg=@<:@yes/no@:>@], [Miscellaneous CodeBase Error Checking @<:@default=yes@:>@]))
+AS_IF([test "x$enable_miscdbg" != "xno"], AC_DEFINE([E4MISC], [], [Miscellaneous CodeBase Error Checking]) )
+
+AC_ARG_ENABLE([nodbg],
+AS_HELP_STRING([--enable-nodbg=@<:@yes/no@:>@], [No CodeBase Error Display @<:@default=no@:>@]))
+AS_IF([test "x$enable_nodbg" != "xno"], AC_DEFINE([E4OFF], [], [No CodeBase Error Display]) )
+
+AC_ARG_ENABLE([offstring],
+AS_HELP_STRING([--enable-offstring=@<:@yes/no@:>@], [No CodeBase Error Display @<:@default=no@:>@]))
+AS_IF([test "x$enable_offstring" != "xno"], AC_DEFINE([E4OFF_STRING], [], [No Extended String CodeBase Error Display]) )
+
+AC_ARG_ENABLE([paramhigh],
+AS_HELP_STRING([--enable-paramhigh=@<:@yes/no@:>@], [High-level Functional Parameter CodeBase Error Display @<:@default=no@:>@]))
+AS_IF([test "x$enable_paramhigh" != "xno"], AC_DEFINE([E4PARM_HIGH], [], [High-level Functional Parameter CodeBase Error Display]) )
+
+AC_ARG_ENABLE([estop],
+AS_HELP_STRING([--enable-estop=@<:@yes/no@:>@], [CodeBase Pause-on-error Enabled @<:@default=no@:>@]))
+AS_IF([test "x$enable_estop" != "xno"], AC_DEFINE([E4PAUSE], [], [CodeBase Pause-on-error Enabled]) )
+
+AC_ARG_ENABLE([ecritical],
+AS_HELP_STRING([--enable-ecritical=@<:@yes/no@:>@], [CodeBase Stop-on-critical-error Enabled @<:@default=no@:>@]))
+AS_IF([test "x$enable_ecritical" != "xno"], AC_DEFINE([E4STOP_CRITICAL], [], [CodeBase Stop-on-critical-error Enabled]) )
+
+AC_ARG_ENABLE([index],
+AS_HELP_STRING([--enable-index=@<:@yes/no@:>@], [Index Support Source Code Removed=no@:>@]))
+AS_IF([test "x$enable_index" != "xno"], AC_DEFINE([S4OFF_INDEX], [], [Index Support Source Code Removed]) )
+
+AC_ARG_ENABLE([memo],
+AS_HELP_STRING([--enable-memo=@<:@yes/no@:>@], [CodeBase Memo Support Source Code Removed=no@:>@]))
+AS_IF([test "x$enable_memo" != "xno"], AC_DEFINE([S4OFF_MEMO], [], [CodeBase Memo Support Source Code Removed]) )
+
+AC_ARG_ENABLE([multi],
+AS_HELP_STRING([--enable-multi=@<:@yes/no@:>@], [CodeBase Multi-user Support Source Code Removed=no@:>@]))
+AS_IF([test "x$enable_multi" != "xno"], AC_DEFINE([S4OFF_MULTI], [], [CodeBase Multi-user Support Source Code Removed]) )
+
+AC_ARG_ENABLE([optimize],
+AS_HELP_STRING([--disable-optimize=@<:@yes/no@:>@], [CodeBase Optimization Source Code included @<:@default=yes@:>@]))
+AS_IF([test "x$enable_optimize" != "xyes"], AC_DEFINE([S4OFF_OPTIMIZE], [], [CodeBase Optimization Source Code Removed]) )
+
 
 AC_ARG_ENABLE([slack],
   [AS_HELP_STRING([--enable-slack=@<:@yes/no@:>@],
@@ -238,6 +341,7 @@ Configuration:
   Compiler:                   $CC $CFLAGS
   Linker:                     $CC $LDFLAGS $LIBS
   Install path:               $prefix
+  Language:                   $enable_language
   Slackware packager:         $SLACKBUILD $enable_slack
 
   Now type 'make' to build $PACKAGE $VERSION $SVN_BUILD.

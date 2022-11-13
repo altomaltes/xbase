@@ -151,7 +151,7 @@ int S4FUNCTION dfile4unlockIndex( DATA4FILE *data, const long serverId )
       #endif
 
       #ifdef S4CLIPPER
-         if ( data->indexLocked == 0 )
+         if ( ! data->indexLocked  )
             return 0 ;
       #endif
 

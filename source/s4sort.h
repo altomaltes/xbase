@@ -32,10 +32,10 @@ typedef struct
    unsigned int spoolsMax ;    /* The # of "spools" memory is allocated for */
 
    char S4PTR * S4PTR *pointers ;
-   unsigned int pointersI ;    /* The next pointers to return using 'get'. */
-   unsigned int pointersUsed ; /* The number of pointers assigned so far. */
-   unsigned int pointersInit ; /* The number of pointers initialied so far. */
-   unsigned int pointersMax ;  /* The number of pointers for which memory */
+   unsigned int pointersI;    /* The next pointers to return using 'get'. */
+   unsigned int pointersUsed; /* The number of pointers assigned so far. */
+   unsigned int pointersInit; /* The number of pointers initialied so far. */
+   unsigned int pointersMax;  /* The number of pointers for which memory */
                          /* has been allocated. */
 
    LIST4 pool ;      /* A number of memory pools for sorting */

@@ -79,9 +79,8 @@ public:
 
 
 
-class Mem5zeroAllocator : public Mem5allocator
+struct Mem5zeroAllocator : public Mem5allocator
 {
-public:
    virtual Mem5piece *alloc( size_t sizeRequired )
    {
       Mem5piece *ptr = Mem5allocator::alloc( sizeRequired ) ;
@@ -188,8 +187,13 @@ private:
 class Mem5zeroDebug : public Mem5debug
 {
 protected:
-   Mem5zeroDebug( Mem5zeroAllocator *memAllocator, size_t unitSizeIn, short numStartUnits, short numExpandUnitsIn ) :
-      Mem5debug( memAllocator, unitSizeIn, numStartUnits, numExpandUnitsIn )
+   Mem5zeroDebug( Mem5zeroAllocator *memAllocator
+                , size_t unitSizeIn
+                , short numStartUnits, short numExpandUnitsIn )
+                : Mem5debug( memAllocator
+                           , unitSizeIn
+                           , numStartUnits
+                           , numExpandUnitsIn )
    { effectiveUnitSizeDeb = unitSizeIn ; }  // the actual quantity for the user
    // normally the debug allocator uses a filler character.  We need to counteract this with
    // a Mem5zeroDebug allocator.

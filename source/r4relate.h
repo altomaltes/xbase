@@ -1,17 +1,17 @@
 /* r4relate.h   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #define relate4filterRecord 101
-#define relate4doRemove 102
-#define relate4skipped 104
-#define relate4blank 105
-#define relate4skipRec 106
+#define relate4doRemove  102
+#define relate4skipped   104
+#define relate4blank     105
+#define relate4skipRec   106
 #define relate4terminate 107
-#define relate4exact 108
-#define relate4scan 109
-#define relate4approx 110
-#define relate4sortSkip 120
-#define relate4sortDone 121
-#define relate4continue 200
+#define relate4exact     108
+#define relate4scan      109
+#define relate4approx    110
+#define relate4sortSkip  120
+#define relate4sortDone  121
+#define relate4continue  200
 /* backward compatibility redefinitions */
 #define relate4skip_rec relate4skipRec
 
@@ -180,16 +180,16 @@ PUBLIC int S4FUNCTION relate4doAll( RELATE4 S4PTR * ) ;
 PUBLIC int S4FUNCTION relate4doOne( RELATE4 S4PTR * ) ;
 PUBLIC int S4FUNCTION relate4eof( RELATE4 S4PTR * ) ;
 PUBLIC int S4FUNCTION relate4errorAction( RELATE4 S4PTR *, const int ) ;  /* Set the error action */
-PUBLIC int S4FUNCTION relate4free( RELATE4 S4PTR *, const int ) ;
+PUBLIC int S4FUNCTION relate4free(        RELATE4 S4PTR *, const int ) ;
 PUBLIC RELATE4 S4PTR * S4FUNCTION relate4init( DATA4 S4PTR * ) ;
-PUBLIC int S4FUNCTION relate4matchLen( RELATE4 S4PTR *, const int ) ;
-PUBLIC int S4FUNCTION relate4next( RELATE4 S4PTR * S4PTR * ) ;
-PUBLIC int S4FUNCTION relate4querySet( RELATE4 S4PTR *, const char S4PTR * ) ;
-PUBLIC int S4FUNCTION relate4skip( RELATE4 S4PTR *, const long ) ;        /* Extended record skip */
-PUBLIC int S4FUNCTION relate4skipEnable( RELATE4 S4PTR *, const int ) ;
-PUBLIC int S4FUNCTION relate4sortSet( RELATE4 S4PTR *, const char S4PTR * ) ;
-PUBLIC int S4FUNCTION relate4top( RELATE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION relate4type( RELATE4 S4PTR *, int ) ;          /* Set the relate type */
+PUBLIC int S4FUNCTION relate4matchLen(    RELATE4 S4PTR *, const int ) ;
+PUBLIC int S4FUNCTION relate4next(        RELATE4 S4PTR * S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4querySet(    RELATE4 S4PTR *, const char S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4skip(        RELATE4 S4PTR *, const long ) ;        /* Extended record skip */
+PUBLIC int S4FUNCTION relate4skipEnable(  RELATE4 S4PTR *, const int ) ;
+PUBLIC int S4FUNCTION relate4sortSet(     RELATE4 S4PTR *, const char S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4top(         RELATE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION relate4type(        RELATE4 S4PTR *, int ) ;          /* Set the relate type */
 /* used by codeReporter */
 PUBLIC int S4FUNCTION relate4freeRelate( RELATE4 S4PTR *, const int ) ;
 PUBLIC int S4FUNCTION relate4lock( RELATE4 S4PTR * ) ;

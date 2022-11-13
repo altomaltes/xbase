@@ -38,6 +38,7 @@
 		<Linker>
 			<Add library="z" />
 		</Linker>
+		<Unit filename="../../configure.ac" />
 		<Unit filename="../../examples/source/c/append.c">
 			<Option compilerVar="CC" />
 			<Option target="Release" />
@@ -129,6 +130,7 @@
 		<Unit filename="../../examples/source/cc/ex1.cc">
 			<Option target="Release" />
 		</Unit>
+		<Unit filename="../../source/Makefile.am" />
 		<Unit filename="../../source/b4block.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -145,10 +147,6 @@
 		<Unit filename="../../source/c4code.c">
 			<Option compilerVar="CC" />
 		</Unit>
-		<Unit filename="../../source/c4com.h" />
-		<Unit filename="../../source/c4com.pdb" />
-		<Unit filename="../../source/c4comlow.h" />
-		<Unit filename="../../source/c4comws.h" />
 		<Unit filename="../../source/c4const.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -471,13 +469,10 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="../../source/o4opt.h" />
-		<Unit filename="../../source/out" />
 		<Unit filename="../../source/p4pascal.c">
 			<Option compilerVar="CC" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="../../source/p4port" />
-		<Unit filename="../../source/p4port.h" />
 		<Unit filename="../../source/pgi_dos32.bat" />
 		<Unit filename="../../source/pop4.h" />
 		<Unit filename="../../source/push4.h" />

@@ -338,17 +338,6 @@
    #ifndef S4OFF_TRAN
       #define S4STAND_ALONE_TRANS
    #endif
-   #ifdef __unix__
-      #define S4OFF_COMMUNICATIONS
-   #endif
-   #ifdef S4OS2
-      #define S4OFF_COMMUNICATIONS
-   #endif
-   /* #ifndef S4UTILS */ /* switch not needed anymore unless CodeUtil connects to the server */
-      #ifndef S4OFF_COMMUNICATIONS
-         #define S4OFF_COMMUNICATIONS
-      #endif
-   /* #endif */
 
 #ifndef S4MACINTOSH
    #ifndef S4WINDOWS
@@ -546,7 +535,6 @@
 
 #ifdef __unix__
    #define S4ERRNO           /* use global variable, 'errno' */
-   #define S4NO_DUP          /* use if dup() not found/not required */
 /* #define S4LSEEK        */ /* use if lseek() cannot seek past EOF */
    #define S4CASE_SEN
    #define S4STRUCT_PAD
@@ -554,12 +542,15 @@
 
    #define S4OFF_REPORT
    #define S4OFF_THREAD
+
    #ifndef S4OFF_REPORT
       #error - CodeReporter not supported under Unix. Set S4OFF_REPORT.
    #endif
+
    #ifndef S4OFF_THREAD
       #error - Multithreading not supported under Unix. Set S4OFF_THREAD.
    #endif
+
    #ifndef S4OFF_THREAD
       #define __unix___THREADS
    #endif
@@ -1603,17 +1594,6 @@
 #define CONNECTION4BUFFER_LEN 4096
 
 #define E4DEBUG_INT 0x5281
-
-#ifdef S4COMNB
-   #define S4SERVER_NAME_SIZE 16
-#endif
-
-#ifdef S4COMFILE
-   #define S4SERVER_NAME_SIZE 80
-#endif
-
-#define S4MAX_SERVER_NAME_SIZE 80
-
 
    #define S4CONST const
 

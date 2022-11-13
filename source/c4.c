@@ -330,7 +330,9 @@ int S4FUNCTION c4clip( char *ptr, int len)
    int i, negative ;
    char *p ;
 
-   for ( i= negative= 0, p= ptr; i< len; i++, p++ )
+   for ( i= negative= 0, p= ptr
+       ; i< len
+       ; i++, p++ )
    {
       if ( *p == ' ' )
       {
@@ -487,9 +489,7 @@ void S4FUNCTION c4encode( char *to, const char *f, char *tTo, const char *tF )
             to[pos++] = *from ;
          tFrom++ ;
          from++ ;
-      }
-   }
-}
+} } }
 
 /*  c4ltoa45
 
@@ -648,15 +648,9 @@ void S4FUNCTION c4upper( char *str )
          {
             switch( *ptr )
             {
-                   case 0x84:
-                      *ptr = 0x8E ;
-                      break ;
-                   case 0x94:
-                      *ptr = 0x99 ;
-                      break ;
-                   case 0x81:
-                      *ptr = 0x9A ;
-                      break ;
+                   case 0x84:                      *ptr = 0x8E ;                      break ;
+                   case 0x94:                      *ptr = 0x99 ;                      break ;
+                   case 0x81:                      *ptr = 0x9A ;                      break ;
             }
          }
          ptr++ ;
@@ -681,15 +675,9 @@ void S4FUNCTION c4upper( char *str )
          {
             switch( *ptr )
             {
-               case 0x8E:
-                        *ptr = 0x84 ;
-                        break ;
-               case 0x99:
-                        *ptr = 0x94 ;
-                        break ;
-               case 0x9A:
-                        *ptr = 0x81 ;
-                        break ;
+               case 0x8E:                        *ptr = 0x84 ;                        break ;
+               case 0x99:                        *ptr = 0x94 ;                        break ;
+               case 0x9A:                        *ptr = 0x81 ;                        break ;
             }
          }
          ptr++ ;
@@ -720,43 +708,34 @@ void S4FUNCTION c4upper( char *str )
             {
                case E4A_TRE :
                case E4A_GRA :
-                     case E4A_CIR :
-                     case E4A_CI2 :
-               case E4A_EGU :
-                        *ptr = 'A' ;        /* A */
-                        break ;
-               case E4C_CED :
-                  *ptr = 'C' ;        /* C */
-                  break ;
-                     case E4E_EGU :
+               case E4A_CIR :
+               case E4A_CI2 :
+               case E4A_EGU : *ptr = 'A' ;        /* A */                        break ;
+
+               case E4C_CED : *ptr = 'C' ;        /* C */                  break ;
+
+               case E4E_EGU :
                case E4E_GRA :
-                     case E4E_CIR :
-                     case E4E_TRE :
-                  *ptr = 'E' ;        /* E */
-                  break ;
-                     case E4I_TRE :
+               case E4E_CIR :
+               case E4E_TRE : *ptr = 'E' ;        /* E */                  break ;
+
+               case E4I_TRE :
                case E4I_EGU :
                case E4I_GRA :
-                     case E4I_CIR :
-                  *ptr = 'I' ;        /* I */
-                  break ;
-                     case E4U_CIR :
-                     case E4U_TRE :
-                     case E4U_GRA :
-                     case E4U_EGU :
-                  *ptr = 'O' ;        /* O */
-                  break ;
-                     case E4O_CIR :
-                     case E4O_GRA :
-                     case E4O_TRE :
-                     case E4O_EGU :
-                  *ptr = 'U' ;        /* U */
-                  break ;
-                     case E4Y_TRE :
-                  *ptr = 'Y' ;        /* Y */
-                  break ;
-            }
-         }
+               case E4I_CIR : *ptr = 'I' ;        /* I */                  break ;
+
+               case E4U_CIR :
+               case E4U_TRE :
+               case E4U_GRA :
+               case E4U_EGU : *ptr = 'O' ;        /* O */                  break ;
+
+               case E4O_CIR :
+               case E4O_GRA :
+               case E4O_TRE :
+               case E4O_EGU : *ptr = 'U' ;        /* U */                  break ;
+
+               case E4Y_TRE : *ptr = 'Y' ;        /* Y */                  break ;
+         }  }
          ptr++ ;
       }
    #endif
@@ -781,22 +760,12 @@ void S4FUNCTION c4upper( char *str )
          {
             switch( *ptr )
             {
-               case E4CM_CED:
-                  *ptr = 'c' ;       /* c */
-                  break ;
+               case E4CM_CED: *ptr = 'c' ;       /* c */                  break ;
                case E4AM_TRE:
-               case E4AM_CIR:
-                  *ptr = 'a' ;       /* a */
-                  break ;
-               case E4EM_EGU:
-                  *ptr = 'e' ;       /* e */
-                  break ;
-               case E4OM_TRE:
-                  *ptr = 'o' ;       /* o */
-                  break ;
-               case E4UM_TRE:
-                  *ptr = 'u' ;       /* u */
-                  break ;
+               case E4AM_CIR: *ptr = 'a' ;       /* a */                  break ;
+               case E4EM_EGU: *ptr = 'e' ;       /* e */                  break ;
+               case E4OM_TRE: *ptr = 'o' ;       /* o */                  break ;
+               case E4UM_TRE: *ptr = 'u' ;       /* u */                  break ;
             }
          }
          ptr++ ;
@@ -824,24 +793,12 @@ void S4FUNCTION c4upper( char *str )
          {
             switch( *ptr )
             {
-                   case 0x81:
-                      *ptr = 0x9A ;
-                      break ;
-                   case 0x82:
-                      *ptr = 0x90 ;
-                      break ;
-                   case 0x84:
-                      *ptr = 0x8E ;
-                      break ;
-                   case 0x86:
-                      *ptr = 0x8F ;
-                      break ;
-                   case 0x91:
-                      *ptr = 0x92 ;
-                      break ;
-                   case 0x94:
-                      *ptr = 0x99 ;
-                      break ;
+                   case 0x81: *ptr = 0x9A; break;
+                   case 0x82: *ptr = 0x90; break;
+                   case 0x84: *ptr = 0x8E; break;
+                   case 0x86: *ptr = 0x8F; break;
+                   case 0x91: *ptr = 0x92; break;
+                   case 0x94: *ptr = 0x99; break;
             }
          }
          ptr++ ;
@@ -852,7 +809,7 @@ void S4FUNCTION c4upper( char *str )
    void S4FUNCTION c4lower( char *str )
    {
    #ifdef S4ANSI
-      AnsiLower(str) ;
+      AnsiLower( str ) ;
    #else
       unsigned char *ptr ;
 
@@ -866,24 +823,12 @@ void S4FUNCTION c4upper( char *str )
          {
             switch( *ptr )
             {
-               case 0x8E:
-                        *ptr = 0x84 ;
-                        break ;
-               case 0x8F:
-                        *ptr = 0x86 ;
-                        break ;
-               case 0x90:
-                        *ptr = 0x82 ;
-                        break ;
-               case 0x92:
-                        *ptr = 0x91 ;
-                        break ;
-               case 0x99:
-                        *ptr = 0x94 ;
-                        break ;
-               case 0x9A:
-                        *ptr = 0x81 ;
-                        break ;
+               case 0x8E: *ptr = 0x84;  break ;
+               case 0x8F: *ptr = 0x86;  break ;
+               case 0x90: *ptr = 0x82;  break ;
+               case 0x92: *ptr = 0x91;  break ;
+               case 0x99: *ptr = 0x94;  break ;
+               case 0x9A: *ptr = 0x81;  break ;
             }
          }
          ptr++ ;

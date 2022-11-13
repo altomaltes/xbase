@@ -531,7 +531,10 @@ int S4FUNCTION group4swapHeader( PGROUP4 group, int swap_header )
    #pragma argsused
 #endif
 /* S4WINDOWS and S4OFF_REPORT */
-POBJ4 S4FUNCTION obj4bitmapFieldCreate( AREA4 *area, FIELD4 *field, long x, long y, long w, long h )
+POBJ4 S4FUNCTION obj4bitmapFieldCreate( AREA4 *area
+                                      , FIELD4 *field
+                                      , long x, long y
+                                      , long w, long h )
 {
    return 0 ;
 }
