@@ -342,10 +342,12 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
                   c4->singleOpen = oldSingleOpen ;
                if ( i4 == 0 )
                   return -1 ;
+
                #ifdef S4MDX
                   if ( !i4->indexFile->header.isProduction )
                      i4closeLow( i4 ) ;
                #endif
+
                d4->dataFile->openMdx = 1 ;
             }
          #endif
@@ -1096,16 +1098,13 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
                      dfile4close( d4 ) ;
                         error4describe( c4, e4data, E80501, name, dfile4name( d4 ), 0 ) ;
                      return 0 ;
-               }
-            }
+            }  }
             else
             {
                dfile4close( d4 ) ;
                   error4describe( c4, e4data, E80501, name, dfile4name( d4 ), 0 ) ;
                return 0 ;
-            }
-      }
-   }
+      }   }   }
 
 
       d4->valid = 1 ;   /* valid, so low closes will leave open. */

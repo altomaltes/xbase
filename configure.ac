@@ -250,53 +250,52 @@ AM_CONDITIONAL( WINDOWS,   test "${version_type}" = "windows" )
 AC_PATH_PROG([SLACKBUILD], [makepkg], [notfound])
 
 AC_ARG_ENABLE([exdebug],
-AS_HELP_STRING([--enable-exdebug=@<:@yes/no@:>@], [Extended CodeBase Error Checking @<:@default=yes@:>@]))
-
-AS_IF([test "x$enable_exdebug" != "xno"], AC_DEFINE([E4DEBUG], [], [Extended CodeBase Error Checking]) )
+AS_HELP_STRING([--enable-exdebug=@<:@yes/no@:>@], [Extended error checking @<:@default=yes@:>@]))
+AS_IF([test "x$enable_exdebug" != "xno"], AC_DEFINE([E4DEBUG], [], [Extended error checking]) )
 
 AC_ARG_ENABLE([linkdbg],
-AS_HELP_STRING([--enable-linkdbg=@<:@yes/no@:>@], [Link List CodeBase Error Checking @<:@default=yes@:>@]))
-AS_IF([test "x$enable_linkdbg" != "xno"], AC_DEFINE([E4LINK], [], [Link List CodeBase Error Checking]) )
+AS_HELP_STRING([--enable-linkdbg=@<:@yes/no@:>@], [Link list error checking @<:@default=yes@:>@]))
+AS_IF([test "x$enable_linkdbg" != "xno"], AC_DEFINE([E4LINK], [], [Link list error checking]) )
 
 AC_ARG_ENABLE([miscdbg],
-AS_HELP_STRING([--enable-miscdbg=@<:@yes/no@:>@], [Miscellaneous CodeBase Error Checking @<:@default=yes@:>@]))
-AS_IF([test "x$enable_miscdbg" != "xno"], AC_DEFINE([E4MISC], [], [Miscellaneous CodeBase Error Checking]) )
+AS_HELP_STRING([--enable-miscdbg=@<:@yes/no@:>@], [Miscellaneous error checking @<:@default=yes@:>@]))
+AS_IF([test "x$enable_miscdbg" != "xno"], AC_DEFINE([E4MISC], [], [Miscellaneous error checking]) )
 
 AC_ARG_ENABLE([nodbg],
-AS_HELP_STRING([--enable-nodbg=@<:@yes/no@:>@], [No CodeBase Error Display @<:@default=no@:>@]))
-AS_IF([test "x$enable_nodbg" != "xno"], AC_DEFINE([E4OFF], [], [No CodeBase Error Display]) )
+AS_HELP_STRING([--enable-nodbg=@<:@yes/no@:>@], [No error display @<:@default=no@:>@]))
+AS_IF([test "x$enable_nodbg" != "xno"], AC_DEFINE([E4OFF], [], [No error display]) )
 
 AC_ARG_ENABLE([offstring],
-AS_HELP_STRING([--enable-offstring=@<:@yes/no@:>@], [No CodeBase Error Display @<:@default=no@:>@]))
-AS_IF([test "x$enable_offstring" != "xno"], AC_DEFINE([E4OFF_STRING], [], [No Extended String CodeBase Error Display]) )
+AS_HELP_STRING([--enable-offstring=@<:@yes/no@:>@], [No error string display @<:@default=no@:>@]))
+AS_IF([test "x$enable_offstring" != "xno"], AC_DEFINE([E4OFF_STRING], [], [No error string display ]) )
 
 AC_ARG_ENABLE([paramhigh],
-AS_HELP_STRING([--enable-paramhigh=@<:@yes/no@:>@], [High-level Functional Parameter CodeBase Error Display @<:@default=no@:>@]))
-AS_IF([test "x$enable_paramhigh" != "xno"], AC_DEFINE([E4PARM_HIGH], [], [High-level Functional Parameter CodeBase Error Display]) )
+AS_HELP_STRING([--enable-paramhigh=@<:@yes/no@:>@], [High-level Functional parameter error display @<:@default=yes@:>@]))
+AS_IF([test "x$enable_paramhigh" != "xno"], AC_DEFINE([E4PARM_HIGH], [], [High-level Functional parameter error display]) )
 
 AC_ARG_ENABLE([estop],
-AS_HELP_STRING([--enable-estop=@<:@yes/no@:>@], [CodeBase Pause-on-error Enabled @<:@default=no@:>@]))
-AS_IF([test "x$enable_estop" != "xno"], AC_DEFINE([E4PAUSE], [], [CodeBase Pause-on-error Enabled]) )
+AS_HELP_STRING([--enable-estop=@<:@yes/no@:>@], [pause-on-error enabled @<:@default=no@:>@]))
+AS_IF([test "x$enable_estop" != "xno"], AC_DEFINE([E4PAUSE], [], [pause-on-error enabled]) )
 
 AC_ARG_ENABLE([ecritical],
-AS_HELP_STRING([--enable-ecritical=@<:@yes/no@:>@], [CodeBase Stop-on-critical-error Enabled @<:@default=no@:>@]))
-AS_IF([test "x$enable_ecritical" != "xno"], AC_DEFINE([E4STOP_CRITICAL], [], [CodeBase Stop-on-critical-error Enabled]) )
+AS_HELP_STRING([--enable-ecritical=@<:@yes/no@:>@], [Stop-on-critical-error enabled @<:@default=yes@:>@]))
+AS_IF([test "x$enable_ecritical" != "xno"], AC_DEFINE([E4STOP_CRITICAL], [], [Stop-on-critical-error enabled]) )
 
 AC_ARG_ENABLE([index],
-AS_HELP_STRING([--enable-index=@<:@yes/no@:>@], [Index Support Source Code Removed=no@:>@]))
-AS_IF([test "x$enable_index" != "xno"], AC_DEFINE([S4OFF_INDEX], [], [Index Support Source Code Removed]) )
+AS_HELP_STRING([--enable-index=@<:@yes/no@:>@], [Index support source code removed=no@:>@]))
+AS_IF([test "x$enable_index" != "xno"], AC_DEFINE([S4OFF_INDEX], [], [Index support source code removed]) )
 
 AC_ARG_ENABLE([memo],
-AS_HELP_STRING([--enable-memo=@<:@yes/no@:>@], [CodeBase Memo Support Source Code Removed=no@:>@]))
-AS_IF([test "x$enable_memo" != "xno"], AC_DEFINE([S4OFF_MEMO], [], [CodeBase Memo Support Source Code Removed]) )
+AS_HELP_STRING([--enable-memo=@<:@yes/no@:>@], [CodeBase memo support source code removed=no@:>@]))
+AS_IF([test "x$enable_memo" != "xno"], AC_DEFINE([S4OFF_MEMO], [], [CodeBase memo support source code removed]) )
 
 AC_ARG_ENABLE([multi],
-AS_HELP_STRING([--enable-multi=@<:@yes/no@:>@], [CodeBase Multi-user Support Source Code Removed=no@:>@]))
-AS_IF([test "x$enable_multi" != "xno"], AC_DEFINE([S4OFF_MULTI], [], [CodeBase Multi-user Support Source Code Removed]) )
+AS_HELP_STRING([--enable-multi=@<:@yes/no@:>@], [Multi-user support source code removed=no@:>@]))
+AS_IF([test "x$enable_multi" != "xno"], AC_DEFINE([S4OFF_MULTI], [], [Multi-user support source code removed]) )
 
 AC_ARG_ENABLE([optimize],
-AS_HELP_STRING([--disable-optimize=@<:@yes/no@:>@], [CodeBase Optimization Source Code included @<:@default=yes@:>@]))
-AS_IF([test "x$enable_optimize" != "xyes"], AC_DEFINE([S4OFF_OPTIMIZE], [], [CodeBase Optimization Source Code Removed]) )
+AS_HELP_STRING([--disable-optimize=@<:@yes/no@:>@], [Optimization source code removed @<:@default=no@:>@]))
+AS_IF([test "x$enable_optimize" != "xyes"], AC_DEFINE([S4OFF_OPTIMIZE], [], [Optimization source code removed]) )
 
 
 AC_ARG_ENABLE([slack],

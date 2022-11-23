@@ -670,11 +670,13 @@ int S4FUNCTION expr4keyLen( EXPR4 *e4expr )
             case r4numDoub:
                return len + e4expr->codeBase->numericStrLen ;
          #endif  /*  ifdef S4CLIPPER  */
+
          #ifdef S4NDX
             case r4num:
             case r4date:
                return len + (int)sizeof( double ) ;
          #endif  /*  ifdef S4NDX  */
+
          #ifdef S4MDX
             case r4num:
             case r4numDoub:

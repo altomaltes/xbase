@@ -197,10 +197,10 @@ int S4FUNCTION report4save_object( FILE4SEQ_WRITE *seq, OBJ4 *obj )
    h = (obj->h <= 0 )?1:obj->h;
 
    #ifdef S4BYTE_SWAP
-   x = x4reverseLong((void *)&x);
-   y = x4reverseLong((void *)&y);
-   w = x4reverseLong((void *)&w);
-   h = x4reverseLong((void *)&h);
+     x= x4reverseLong((void *)&x);
+     y= x4reverseLong((void *)&y);
+     w= x4reverseLong((void *)&w);
+     h= x4reverseLong((void *)&h);
    #endif
 
    if( save4long( seq, &(x) ) < 0 ||
@@ -210,16 +210,17 @@ int S4FUNCTION report4save_object( FILE4SEQ_WRITE *seq, OBJ4 *obj )
       return -1;
 
    lval = (long)obj->num_chars;
-   if( save4long( seq, &lval ) < 0 ||
-       save4short( seq, &(obj->is_active) ) < 0 ||
-       save4short( seq, &(obj->is_first) ) < 0 ||
-       save4short( seq, &(obj->alignment) ) < 0 ||
-       save4short( seq, &(obj->numeric_type) ) < 0 ||
-       save4short( seq, &(obj->display_zero) ) < 0 ||
-       save4short( seq, &(obj->dec) ) < 0 ||
-       save4short( seq, &(obj->use_brackets) ) < 0 ||
-       save4short( seq, &(obj->leading_zero) ) < 0 )
-      return -1;
+   if ( save4long( seq, &lval ) < 0 
+     || save4short( seq, &(obj->is_active) ) < 0 
+     || save4short( seq, &(obj->is_first) ) < 0 
+     || save4short( seq, &(obj->alignment) ) < 0 
+     || save4short( seq, &(obj->numeric_type) ) < 0 
+     || save4short( seq, &(obj->display_zero) ) < 0 
+     || save4short( seq, &(obj->dec) ) < 0 
+     || save4short( seq, &(obj->use_brackets) ) < 0 
+     || save4short( seq, &(obj->leading_zero) ) < 0 )
+    { return -1;   
+    }
 
    if( obj->display_once_expr )
    {

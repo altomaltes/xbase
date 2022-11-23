@@ -1219,15 +1219,19 @@ int S4FUNCTION code4indexFormat( CODE4 *c4 )
       #ifdef S4MDX
          return r4mdx ;
       #endif
+
       #ifdef S4FOX
          return r4cdx ;
       #endif
+
       #ifdef S4CLIPPER
          return r4ntx ;
       #endif
+
       #ifdef S4NDX
          return r4ndx ;
       #endif
+
    #endif
 }
 

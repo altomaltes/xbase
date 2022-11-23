@@ -1428,12 +1428,12 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
          swapTagHeader.root = x4reverseLong( (void *)&swapTagHeader.root ) ;
          swapTagHeader.freeList = x4reverseLong( (void *)&swapTagHeader.freeList ) ;
          /* version is written in non-intel order */
-         swapTagHeader.keyLen = x4reverseShort( (void *)&swapTagHeader.keyLen ) ;
-         swapTagHeader.descending = x4reverseShort( (void *)&swapTagHeader.descending ) ;
+         swapTagHeader.keyLen    = x4reverseShort( (void *)&swapTagHeader.keyLen ) ;
+         swapTagHeader.descending= x4reverseShort( (void *)&swapTagHeader.descending ) ;
          swapTagHeader.filterPos = x4reverseShort( (void *)&swapTagHeader.filterPos ) ;
          swapTagHeader.filterLen = x4reverseShort( (void *)&swapTagHeader.filterLen ) ;
-         swapTagHeader.exprPos = x4reverseShort( (void *)&swapTagHeader.exprPos ) ;
-         swapTagHeader.exprLen = x4reverseShort( (void *)&swapTagHeader.exprLen ) ;
+         swapTagHeader.exprPos   = x4reverseShort( (void *)&swapTagHeader.exprPos ) ;
+         swapTagHeader.exprLen   = x4reverseShort( (void *)&swapTagHeader.exprLen ) ;
 
          rc = file4seqWrite( &r4->seqwrite, &swapTagHeader, LEN4HEADER_WR ) ;  /* write first header part */
       #else
@@ -1480,12 +1480,12 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
          swapTagHeader.root = x4reverseLong( (void *)&swapTagHeader.root ) ;
          swapTagHeader.freeList = x4reverseLong( (void *)&swapTagHeader.freeList ) ;
          /* version is in non-intel ordering */
-         swapTagHeader.keyLen = x4reverseShort( (void *)&swapTagHeader.keyLen ) ;
-         swapTagHeader.descending = x4reverseShort( (void *)&swapTagHeader.descending ) ;
-         swapTagHeader.filterPos = x4reverseShort( (void *)&swapTagHeader.filterPos ) ;
-         swapTagHeader.filterLen = x4reverseShort( (void *)&swapTagHeader.filterLen ) ;
-         swapTagHeader.exprPos = x4reverseShort( (void *)&swapTagHeader.exprPos ) ;
-         swapTagHeader.exprLen = x4reverseShort( (void *)&swapTagHeader.exprLen ) ;
+         swapTagHeader.keyLen    = x4reverseShort( (void *)&swapTagHeader.keyLen     ) ;
+         swapTagHeader.descending= x4reverseShort( (void *)&swapTagHeader.descending ) ;
+         swapTagHeader.filterPos = x4reverseShort( (void *)&swapTagHeader.filterPos  ) ;
+         swapTagHeader.filterLen = x4reverseShort( (void *)&swapTagHeader.filterLen  ) ;
+         swapTagHeader.exprPos   = x4reverseShort( (void *)&swapTagHeader.exprPos    ) ;
+         swapTagHeader.exprLen   = x4reverseShort( (void *)&swapTagHeader.exprLen    ) ;
 
          rc = file4seqWrite( &r4->seqwrite, &swapTagHeader, LEN4HEADER_WR ) ;
       #else
@@ -1627,6 +1627,7 @@ int r4reindexWriteKeys( R4REINDEX *r4, short int errUnique )
       if ( r4->nodeHdr.freeSpace <= 0 || r4->keysmax <= 0 )
          return error4( r4->codeBase, e4index, E92102 ) ;
    #endif
+
    rc = sort4getInit( &r4->sort ) ;
    if ( rc < 0 )
       return error4stack( r4->codeBase, (short)rc, E92102 ) ;

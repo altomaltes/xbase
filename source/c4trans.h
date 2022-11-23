@@ -13,11 +13,12 @@
    #endif
    /* exported for utilities */
    PUBLIC int S4FUNCTION code4tranCommitPhaseOne( CODE4 S4PTR * ) ;
-   PUBLIC int S4FUNCTION code4tranStart( CODE4 S4PTR * ) ;
-   PUBLIC int S4FUNCTION code4tranRollback( CODE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION code4tranStart(          CODE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION code4tranRollback(       CODE4 S4PTR * ) ;
    PUBLIC int S4FUNCTION code4tranCommitPhaseOne( CODE4 S4PTR * ) ;
    PUBLIC int S4FUNCTION code4tranCommitPhaseTwo( CODE4 S4PTR *, int ) ;
-   PUBLIC int S4FUNCTION code4tranInit( CODE4 S4PTR * ) ;
+   PUBLIC int S4FUNCTION code4tranInit(           CODE4 S4PTR * ) ;
+
    #ifdef S4OFF_TRAN
          #define code4tranStatus( c4 ) ( 0 )
    #else
@@ -39,7 +40,7 @@
       }
    #endif
 
-PUBLIC int S4FUNCTION code4tranCommit( CODE4 S4PTR * ) ;
+PUBLIC int S4FUNCTION code4tranCommit(       CODE4 S4PTR * ) ;
 PUBLIC int S4FUNCTION code4tranCommitSingle( CODE4 S4PTR * ) ;
 
 #ifndef S4OFF_WRITE
@@ -94,11 +95,11 @@ PUBLIC int S4FUNCTION code4tranCommitSingle( CODE4 S4PTR * ) ;
          /* log file examination functionality */
          PUBLIC int  S4FUNCTION tran4fileAppend( TRAN4FILE S4PTR *, LOG4HEADER S4PTR *, void S4PTR *, int ) ;  /* a null pointer means use internal value */
          PUBLIC int  S4FUNCTION tran4fileBottom( TRAN4FILE S4PTR *, TRAN4 S4PTR * ) ;
-         PUBLIC int  S4FUNCTION tran4fileSkip( TRAN4FILE S4PTR *, TRAN4 S4PTR *, const int ) ;
-         PUBLIC int  S4FUNCTION tran4fileTop( TRAN4FILE S4PTR *, TRAN4 S4PTR * ) ;
-         int  code4tranInitUndoLow( TRAN4 *, const long ) ;
-         PUBLIC int  S4FUNCTION tran4set(  TRAN4 S4PTR *, const int, const long, const long, const int, const unsigned int, const long, const long ) ;
-         PUBLIC int  S4FUNCTION tran4putData(  TRAN4 S4PTR *, void *, unsigned ) ;
+         PUBLIC int  S4FUNCTION tran4fileSkip(   TRAN4FILE S4PTR *, TRAN4 S4PTR *, const int ) ;
+         PUBLIC int  S4FUNCTION tran4fileTop(    TRAN4FILE S4PTR *, TRAN4 S4PTR * ) ;
+         int  code4tranInitUndoLow(              TRAN4 *, const long ) ;
+         PUBLIC int  S4FUNCTION tran4set(        TRAN4 S4PTR *, const int, const long, const long, const int, const unsigned int, const long, const long ) ;
+         PUBLIC int  S4FUNCTION tran4putData(    TRAN4 S4PTR *, void *, unsigned ) ;
          /* log file examination functionality */
          #ifndef S4INLINE
             PUBLIC int  S4FUNCTION tran4bottom( TRAN4 S4PTR * ) ;

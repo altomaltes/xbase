@@ -1567,6 +1567,7 @@
 #ifdef S4MDX
    #define I4MAX_EXPR_SIZE 220
 #endif
+
 #ifdef S4NDX
    #define I4MAX_EXPR_SIZE 220
 #endif
@@ -1727,8 +1728,8 @@
 #endif
 
 #ifndef OLEDB5BUILD
-#define assert5( p )  ( (p) ? 0 : error4( 0, e4result, E99999 ) )
-#define assert5always( p ) ( (p) ? 0 :  error4( 0, e4result, E99999 ) )
+  #define assert5( p )  ( (p) ? 0 : error4( 0, e4result, E99999 ) )
+  #define assert5always( p ) ( (p) ? 0 :  error4( 0, e4result, E99999 ) )
 #endif
 
 #define tran4notRollbackOrCommit 10

@@ -22,6 +22,7 @@
 #ifndef S4OFF_WRITE
 
 #ifndef S4OFF_MULTI
+
 int S4FUNCTION d4lockAppendRecord( DATA4 *data )
 {
    int rc, oldUnlock ;
@@ -40,18 +41,20 @@ int S4FUNCTION d4lockAppendRecord( DATA4 *data )
       {
          case LOCK4ALL :
             code4unlock( data->codeBase ) ;
-            break ;
+         break ;
+
          case LOCK4DATA :
             rc = d4unlockLow( data, data4clientId( data ), 0 ) ;
-            break ;
+         break ;
+
          default:
-            break ;
+         break ;
       }
 
       oldUnlock = code4unlockAuto( data->codeBase ) ;
       if ( d4lockTestAppend( data ) == 0 )
       {
-            rc = d4lockAppend( data ) ;
+         rc = d4lockAppend( data ) ;
 
          if ( rc == 0 )
          {
@@ -133,6 +136,7 @@ static int d4doAppend( DATA4 *data )
       #ifndef S4OFF_MEMO
          long newId ;
       #endif
+
       #ifndef S4INDEX_OFF
          int saveError ;
          TAG4 *tagOn ;
@@ -141,6 +145,7 @@ static int d4doAppend( DATA4 *data )
             int indexLocked ;
          #endif
       #endif
+
    #ifndef S4OFF_MEMO
       F4MEMO *mfield ;
       short i ;

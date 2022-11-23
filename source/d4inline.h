@@ -28,12 +28,15 @@
    #define b4lastpos( b4 )        ( ( b4leaf( (b4) ) ) ? ( (b4)->nKeys - 1 ) : ( (b4)->nKeys ) )
    #define b4leaf( b4 )           ( ( b4key( (b4), 0 )->pointer == 0L ) )
    #define b4recNo( b4, i )       ( b4key( (b4), i )->num )
+
    #ifdef S4CLIPPER
       #define b4key( b4, iKey )     ( (B4KEY_DATA *)((char *)&((b4)->nKeys) + ((b4)->pointers)[(iKey)] ) )
    #endif /* S4CLIPPER */
+
    #ifdef S4NDX
       #define b4key( b4, iKey )     ( (B4KEY_DATA *)((char *)&(b4)->data + (b4)->tag->header.groupLen * (iKey) ) )
    #endif /* S4NDX */
+
 #endif /* N4OTHER */
 
 #endif  /* S4INDEX_OFF */
@@ -137,6 +140,8 @@ PUBLIC int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) ;
 #define E4PARM_TEST( param, errno  ) if (   param  ) {  return( error4( 0, e4parm, errno )); }
 #define E4PARM_TRET( prm, err, ret ) if (   prm    ) {  error4( 0, e4parm    , err ) ; return ret ; }
 #define E4PARM_HRET( prm, err, ret ) if (!( prm   )) {  error4( 0, e4parmNull, err ) ; return ret ; }
+
+#define  E4ANA( cond, ret ) if ( cond ) { return( ret ); } 
 
 
 

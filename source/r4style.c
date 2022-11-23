@@ -14,9 +14,9 @@ PSTYLE4 S4FUNCTION style4lookup( REPORT4 *report, char *style_name )
    while( style_on )
    {
       #ifdef S4WINDOWS
-      if( !lstrcmp( (LPCSTR)style_name, (LPCSTR)style_on->name ) )
+        if( !lstrcmp( (LPCSTR)style_name, (LPCSTR)style_on->name ) )
       #else
-      if( !strcmp( (char *)style_name, (char *)style_on->name ) )
+        if( !strcmp( (char *)style_name, (char *)style_on->name ) )
       #endif
          return style_on;
 

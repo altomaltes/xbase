@@ -379,12 +379,9 @@ static int e4massage( E4PARSE *p4 )
          case r4num:
             length[numParms] = f4len( info->fieldPtr ) ;
             break ;
-         case r4currency:
-            length[numParms] = sizeof(double) ;
-            break ;
-         case r4dateTime:
-            length[numParms] = sizeof(double) ;
-            break ;
+         case r4currency:            length[numParms] = sizeof(double);  break ;
+         case r4dateTime:            length[numParms] = sizeof(double);  break ;
+
          case r4int:
          #ifdef S5USE_EXTENDED_TYPES
             case r5ui4:
@@ -409,10 +406,12 @@ static int e4massage( E4PARSE *p4 )
                info->p1 = (char *)p4->expr.dataFile ;
             if ( info->functionI == E4RECNO )
                info->p1 = 0 ;  /* updated for c/s support, just use expr data4 */
-            break ;
+         break ;
+
          case r4date:
             length[numParms] = sizeof(double) ;
-            break ;
+         break ;
+
          case r4log:
             if ( info->functionI != E4FIELD_LOG )
             {
@@ -446,9 +445,8 @@ static int e4massage( E4PARSE *p4 )
                         info->p1 = (char *)1L ;
                      else
                         info->p1 = (char *)0L ;
-                  }
-               }
-            }
+            }  }  }
+
             length[numParms] = sizeof(int) ;
             break ;
          default:
@@ -467,34 +465,33 @@ static int e4massage( E4PARSE *p4 )
                case r4date:
                case r4numDoub:
                   storedKeyLen = sizeof( double ) ;
-                  break ;
+               break ;
             #endif  /*  ifdef S4FOX      */
+
             #ifdef S4CLIPPER
                case r4num:  /* numeric field return, must fix length problem */
                   storedKeyLen = f4len( info->fieldPtr ) ;
-                  break ;
+               break ;
+
                case r4numDoub:
                   storedKeyLen = codeBase->numericStrLen ;
-                  break ;
+               break ;
             #endif  /*  ifdef S4CLIPPER  */
+
             #ifdef S4NDX
                case r4num:
                case r4date:
                   storedKeyLen = sizeof( double ) ;
                   break ;
             #endif  /*  ifdef S4NDX  */
+
             #ifdef S4MDX
-               case r4num:
-                  storedKeyLen = (int)sizeof( C4BCD ) ;
-                  break ;
-               case r4numDoub:
-                  storedKeyLen = (int)sizeof( C4BCD ) ;
-                  break ;
+               case r4num:       storedKeyLen = (int)sizeof( C4BCD ) ; break ;
+               case r4numDoub:   storedKeyLen = (int)sizeof( C4BCD ) ; break ;
                case r4date:
-               case r4dateDoub:
-                  storedKeyLen = sizeof( double ) ;
-                  break ;
+               case r4dateDoub:  storedKeyLen = sizeof( double ) ;     break ;
             #endif  /* S4MDX */
+
             default:
                storedKeyLen = (unsigned)(length[numParms]) ;
          }

@@ -30,18 +30,21 @@ unsigned short int S4FUNCTION tfile4isDescending( TAG4FILE *tag )
       #ifdef S4NDX
          return 0 ;
       #endif
+
       #ifdef S4FOX
          if ( tag->header.descending )
             return r4descending ;
          else
             return 0 ;
       #endif
+
       #ifdef S4CLIPPER
          if ( tag->header.descending )
             return r4descending ;
          else
             return 0 ;
       #endif
+
       #ifdef S4MDX
          if ( tag->header.typeCode & 8 )
             return r4descending ;

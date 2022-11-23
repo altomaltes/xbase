@@ -443,7 +443,11 @@ int file4copyx( CODE4 *c4, FILE4 *f1, char *f2 )
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
-int S4FUNCTION file4optimizeLow( FILE4 *file, const int optFlagIn, const int fileType, const long expectedReadSize, const void *ownerPtr )
+int S4FUNCTION file4optimizeLow( FILE4 *file
+                               , const int optFlagIn
+                               , const int fileType
+                               , const long expectedReadSize
+                               , const void *ownerPtr )
 {
    #ifdef S4OPTIMIZE_OFF
       return 0 ;
@@ -451,6 +455,7 @@ int S4FUNCTION file4optimizeLow( FILE4 *file, const int optFlagIn, const int fil
       OPT4 *opt ;
       int rc, optFlag ;
       double hitCountAdd ;
+
       #ifdef E4ANALYZE_ALL
          #ifndef S4OPTIMIZE_OFF
             HANDLE hand ;

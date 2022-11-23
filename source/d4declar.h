@@ -615,10 +615,10 @@ long time4long( const char *, int ) ;
          #ifndef S4FOX
             int  S4CALL t4descMemcmp( S4CMP_PARM, S4CMP_PARM, size_t ) ;
          #endif
-         int  x4dupCnt( const B4BLOCK *, const int ) ;
-         int  x4putInfo( const B4NODE_HEADER *, void *, const S4LONG, const int, const int ) ;
-         S4LONG x4recNo( const B4BLOCK *, const int ) ;
-         int  x4trailCnt( const B4BLOCK *, const int ) ;
+         int    x4dupCnt(   const B4BLOCK *, const int ) ;
+         int    x4putInfo(  const B4NODE_HEADER *, void *, const S4LONG, const int, const int ) ;
+         S4LONG x4recNo(    const B4BLOCK *, const int ) ;
+         int    x4trailCnt( const B4BLOCK *, const int ) ;
          B4KEY_DATA S4PTR *b4key( B4BLOCK S4PTR *, const int ) ;
          #define b4numKeys( b4 ) ( (b4)->header.nKeys )
       #else

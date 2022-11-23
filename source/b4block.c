@@ -138,10 +138,8 @@ int b4free( B4BLOCK *b4 )
    E4PARMLOW( b4, E90438 ) ;
 
    #ifdef S4FOX
-      #ifdef E4ANALYZE
-         if ( b4->changed )
-            return error4( b4->tag->codeBase, e4info, E90438 ) ;
-      #endif
+      E4ANA( b4->changed, error4( b4->tag->codeBase, e4info, E90438 ));
+
       mem4free( b4->tag->builtKeyMemory, b4->builtKey ) ;
    #endif /* S4FOX */
 
@@ -163,6 +161,7 @@ int b4flush( B4BLOCK *b4 )
    INDEX4FILE *i4 ;
    TAG4FILE *t4file ;
    FILE4LONG fPos ;
+
    #ifdef S4BYTE_SWAP
       char *swap, *swapPtr ;
       int i ;
@@ -265,10 +264,8 @@ int b4insert( B4BLOCK *b4, const void *k, const long r )
    nextPtr = b4key( b4, b4->keyOn+1 ) ;
    leftLen = b4->tag->indexFile->header.blockRw - ( b4->keyOn + 1 ) * b4->tag->header.groupLen - sizeof(short) - sizeof(char[6]) ;
 
-   #ifdef E4ANALYZE
-      if ( b4->keyOn < 0 || b4->keyOn > b4numKeys( b4 ) || leftLen < 0 )
-         return error4( b4->tag->codeBase, e4info, E90438 ) ;
-   #endif
+   E4ANA( b4->keyOn < 0 || b4->keyOn > b4numKeys( b4 ) || leftLen < 0
+        , error4( b4->tag->codeBase, e4info, E90438 ));
 
    c4memmove( nextPtr, dataPtr, leftLen ) ;
    b4->nKeys++ ;
@@ -328,11 +325,11 @@ int b4lastpos( const B4BLOCK *b4 )
    return ( ( b4leaf( b4 ) ) ? ( b4numKeys( b4 ) - 1 ) : ( b4numKeys( b4 ) ) ) ;
 }
 
-/* S4MDX */
+/* S4MDX 
+ */
 int b4leaf( const B4BLOCK *b4 )
 {
    E4PARMLOW( b4, E90438 ) ;
-
 
    return( b4key( b4, b4numKeys( b4 ) )->num == 0L ) ;
 }
@@ -362,10 +359,8 @@ int b4remove( B4BLOCK *b4 )
    leftLen = b4->tag->indexFile->header.blockRw - sizeof( b4->nKeys ) - sizeof( b4->dummy )
             - ( b4->keyOn + 1 ) * b4->tag->header.groupLen ;
 
-   #ifdef E4ANALYZE
-      if ( b4->keyOn < 0 || b4->keyOn > b4lastpos( b4 ) )
-         return error4( b4->tag->codeBase, e4info, E90438 ) ;
-   #endif
+   E4ANA( b4->keyOn < 0 || b4->keyOn > b4lastpos( b4 )
+        , error4( b4->tag->codeBase, e4info, E90438 ));
 
    if ( leftLen > 0 )
       c4memmove( keyCur, keyNext, leftLen ) ;
@@ -566,10 +561,8 @@ int x4dupCnt( const B4BLOCK *b4, const int numInBlock )
 
    if ( b4->nodeHdr.infoLen > 4 )  /* > size of long, so must do careful shifting and copying */
    {
-      #ifdef E4ANALYZE
-         if ( b4->nodeHdr.recNumLen <= 16 )
-            return error4( b4->tag->codeBase, e4info, E80401 ) ;
-      #endif
+      E4ANA( b4->nodeHdr.recNumLen <= 16, error4( b4->tag->codeBase, e4info, E80401 )) ;
+   
       #ifdef S4DATA_ALIGN
          memcpy( (void *)&longPtr , b4->data + numInBlock * b4->nodeHdr.infoLen + 2, sizeof(S4LONG) ) ;
       #else
@@ -620,10 +613,8 @@ int x4trailCnt( const B4BLOCK *b4, const int numInBlock )
 
    if ( b4->nodeHdr.infoLen > 4 )  /* > size of long, so must do careful shifting and copying */
    {
-      #ifdef E4ANALYZE
-         if ( b4->nodeHdr.recNumLen <= 16 )
-            return error4( b4->tag->codeBase, e4info, E90438 ) ;
-      #endif
+      E4ANA( b4->nodeHdr.recNumLen <= 16, error4( b4->tag->codeBase, e4info, E90438 ));
+     
       #ifdef S4DATA_ALIGN
          memcpy( (void *)&longPtr , b4->data + numInBlock * b4->nodeHdr.infoLen + 2, sizeof(S4LONG) ) ;
       #else
@@ -699,10 +690,8 @@ int x4putInfo( const B4NODE_HEADER *b4nodeHdr, void *buffer, const S4LONG rec, c
 
    if ( b4nodeHdr->infoLen > 4 )  /* > size of long, so must do careful shifting and copying */
    {
-      #ifdef E4ANALYZE
-         if ( b4nodeHdr->recNumLen <= 16 )
-            return error4( 0, e4info, E80401 ) ;
-      #endif
+      E4ANA( b4nodeHdr->recNumLen <= 16, error4( 0, e4info, E80401 )) ;
+      
       #ifndef S4DATA_ALIGN
          lPtr = (unsigned long *)( buf + 2 ) ;  /* start at new pos */
       #else
@@ -890,10 +879,8 @@ int b4insertLeaf( B4BLOCK *b4
          leftLen = keyLen - leftDups - leftBlanks ;
          reqdLen = leftLen - extraDups ;
 
-         #ifdef E4ANALYZE
-            if ( reqdLen < 0 )
-               return error4( b4->tag->codeBase, e4info, E80401 ) ;
-         #endif
+         E4ANA( reqdLen < 0, error4( b4->tag->codeBase, e4info, E80401 )) ;
+        
 
          if ( (int)b4->nodeHdr.freeSpace < (reqdLen + (int)iLen) )  /* no room to add */
             return 1 ;
@@ -924,15 +911,15 @@ int b4insertLeaf( B4BLOCK *b4
          memcpy( infoPos, (void *)buffer, iLen ) ;
          x4putInfo( &b4->nodeHdr, buffer, x4recNo( b4, b4->keyOn + 1 ), rightBlanks, rightDups ) ;
          memcpy( infoPos + iLen, (void *)buffer, iLen ) ;
-      }
-   }
+   }   }
 
    b4->changed = 1 ;
    b4->header.nKeys++ ;
    b4->nodeHdr.freeSpace -= (short) (reqdLen + (int)iLen ) ;
    b4->curDupCnt = leftDups ;
    b4->curTrailCnt = leftBlanks ;
-   return 0 ;
+
+   return( 0 );
 }
 
 /* S4FOX */
@@ -1148,6 +1135,7 @@ int b4flush( B4BLOCK *b4 )
    INDEX4FILE *i4 ;
    TAG4FILE *t4file ;
    FILE4LONG fPos ;
+
    #ifdef S4BYTE_SWAP
       char swap[B4BLOCK_SIZE] ;
       char *swapPtr ;
