@@ -25,7 +25,7 @@ void main( void )
    DATA4 *data ;
 
    code4init( &cb );
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
 
    if ( d4lockFile( data ) == r4success)
    {

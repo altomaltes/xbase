@@ -25,7 +25,7 @@ void main( )
    DATA4 *data ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
    d4go( data, d4recCount( data ) + 1 ) ;
 
    printf("\nAn error message was displayed\n") ;

@@ -66,7 +66,7 @@ void S4FUNCTION f4assignInt( FIELD4 *field, const int iValue )
    switch( field->type )
    {
       case r4int:
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             *((S4LONG *)f4assignPtr( field )) = x4reverseLong(&iValue) ;
          #else
             *((int *)f4assignPtr( field )) = iValue ;
@@ -93,7 +93,7 @@ int S4FUNCTION f4int( const FIELD4 *field )
    #ifdef S4CFOX
       const char *ptr ;
    #endif
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       S4LONG rcLong ;
    #endif
    #ifdef S4VBASIC
@@ -132,7 +132,7 @@ int S4FUNCTION f4int( const FIELD4 *field )
    switch( field->type )
    {
       case r4int:
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             rcLong = x4reverseLong(f4ptr(field)) ;
             return (int)rcLong ;
          #else

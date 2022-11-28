@@ -27,15 +27,15 @@ void main( void )
    code4init( &cb ) ;
    cb.accessMode = OPEN4DENY_RW ;
 
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
 
    /* Open the file exclusively, default optimization is the same as if
          d4optimize( data, OPT4EXCLUSIVE ) were called.*/
    /* open a shared file. */
    cb.accessMode = OPEN4DENY_NONE ;
-   extra = d4open( &cb, "DATA" ) ;
+   extra = d4open( &cb, "data" ) ;
 
-   d4optimize( extra, OPT4ALL ) ;  /* read optimize the extra "DATA" file */
+   d4optimize( extra, OPT4ALL ) ;  /* read optimize the extra "data" file */
 
    code4optStart( &cb ) ;  /* Begin the memory optimizations.*/
 

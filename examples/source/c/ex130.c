@@ -27,7 +27,7 @@ void main()
    short j ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "DATA1") ;
+   data = d4open( &cb, "data1") ;
 
    /* list the fields that are character fields */
    for (j = 1 ; j < d4numFields( data ) ; j++ )

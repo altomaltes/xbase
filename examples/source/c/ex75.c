@@ -42,7 +42,7 @@ void main( )
    printf( "Yesterday was %s, %s\n", date4cdow( yesterday ), result ) ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
    birthField = d4field( data, "BIRTH_DATE" ) ;
    birthTag = d4tag( data, "INF_BRTH" ) ;
    d4tagSelect( data, birthTag ) ;

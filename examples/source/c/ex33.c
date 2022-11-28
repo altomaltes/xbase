@@ -27,7 +27,7 @@ void main( void )
    int i ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "DATA" ) ;
+   data = d4open( &cb, "data" ) ;
    error4exitTest( &cb );
 
    /* Add 20 blank records	 */

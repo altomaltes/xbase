@@ -42,8 +42,8 @@ void main( void )
    FIELD4 *classCode, *classTitle, *enrollStudentId ;
 
    code4init( &cb ) ;
-   enroll = d4open( &cb, "ENROLL" ) ;
-   master = d4open( &cb, "CLASSES" ) ;
+   enroll = d4open( &cb, "enroll" ) ;
+   master = d4open( &cb, "classes" ) ;
 
    enrollTag = d4tag( enroll, "ENR_CODE" ) ;
    codeTag = d4tag( master, "CODE_TAG" ) ;

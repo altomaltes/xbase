@@ -26,7 +26,7 @@ void main( void )
    FIELD4 *name ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "NAMES" ) ;
+   data = d4open( &cb, "names" ) ;
    /* Skip to the last record in the file whose NAME field is "John"*/
 
    code4optStart( &cb ) ;

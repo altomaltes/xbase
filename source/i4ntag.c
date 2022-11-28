@@ -118,7 +118,7 @@ int tfile4down( TAG4FILE *t4 )
    B4BLOCK *blockOn, *popBlock, *newBlock, *parent ;
    int rc ;
    FILE4LONG pos ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       char *swapPtr ;
       int i ;
       short shortVal ;
@@ -143,7 +143,7 @@ int tfile4down( TAG4FILE *t4 )
          if ( file4readAllInternal( &t4->file, pos, &t4->header.root, 2*sizeof(S4LONG)) < 0 )
             return -1 ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             t4->header.root = x4reverseLong( (void *)&t4->header.root ) ;
             t4->header.eof  = x4reverseLong( (void *)&t4->header.eof ) ;
          #endif
@@ -728,14 +728,14 @@ int tfile4update( TAG4FILE *t4 )
 
    if ( t4->rootWrite )
    {
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          t4->header.root = x4reverseLong( (void *)&t4->header.root ) ;
          t4->header.eof = x4reverseLong( (void *)&t4->header.eof ) ;
       #endif
       file4longAssign( pos, t4->headerOffset + 2*sizeof( short ), 0 ) ;
       if ( file4writeInternal( &t4->file, pos, &t4->header.root, 2*sizeof(S4LONG) ) < 0 )
          return -1 ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          t4->header.root = x4reverseLong( (void *)&t4->header.root ) ;
          t4->header.eof = x4reverseLong( (void *)&t4->header.eof ) ;
       #endif
@@ -1038,16 +1038,18 @@ static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
 
    file4longAssign( pos, 0, 0 ) ;
    file4seqReadInitDo( &seqRead, &tfile->file, pos, buffer, 1024, 1 ) ;
+
    #ifndef S4STRUCT_PAD
       if ( file4seqReadAll( &seqRead, &tfile->header.sign, sizeof(I4IND_HEAD_WRITE) ) < 0 )
    #else
       if ( file4seqReadAll( &seqRead, &tfile->header.sign, sizeof(I4IND_HEAD_WRITE)-2 ) < 0 )  /* Subtract 2 because sizeof is actually 22, not 24 */
    #endif
+
    {
       tfile4close( tfile, d4->dataFile ) ;
       return 0 ;
    }
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       tfile->header.sign = x4reverseShort( (void *)&tfile->header.sign ) ;
       tfile->header.version = x4reverseShort( (void *)&tfile->header.version ) ;
       tfile->header.root = x4reverseLong( (void *)&tfile->header.root ) ;
@@ -1107,7 +1109,7 @@ static TAG4FILE *tfile4open( DATA4 *d4, const char *fileName )
    file4seqReadAll( &seqRead, &tfile->header.unique, sizeof( tfile->header.unique ) ) ;
    file4seqReadAll( &seqRead, &garbage, sizeof( garbage ) ) ;
    file4seqReadAll( &seqRead, &tfile->header.descending, sizeof( tfile->header.descending ) ) ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       tfile->header.unique = x4reverseShort( (void *)&tfile->header.unique ) ;
       tfile->header.descending = x4reverseShort( (void *)&tfile->header.descending ) ;
    #endif
@@ -1294,9 +1296,10 @@ int tfile4updateHeader( TAG4FILE *t4 )
    FILE4 *file ;
    FILE4LONG tLong ;
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       I4IND_HEAD_WRITE swap ;
    #endif
+
    if ( error4code( t4->codeBase ) < 0 )
       return e4codeBase ;
 
@@ -1306,7 +1309,7 @@ int tfile4updateHeader( TAG4FILE *t4 )
 
    if ( header->oldVersion != header->version )
    {
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          swap.sign = x4reverseShort( (void *)&header->sign ) ;
          swap.version = x4reverseShort( (void *)&header->version ) ;
          swap.root = x4reverseLong( (void *)&header->root ) ;
@@ -1322,6 +1325,7 @@ int tfile4updateHeader( TAG4FILE *t4 )
 
          header->unique = x4reverseShort( (void *)&header->unique ) ;
          header->descending = x4reverseShort( (void *)&header->descending ) ;
+
          #ifndef S4STRUCT_PAD
             if ( file4write( file, sizeof(I4IND_HEAD_WRITE) + I4MAX_EXPR_SIZE, &header->unique, sizeof(header->unique)) < 0 )
                     return -1 ;
@@ -1420,7 +1424,7 @@ int tfile4doVersionCheck( TAG4FILE *t4, int doSeek, int updateVersion )
       #endif
       if ( rc < 0 )
          return rc ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          t4->header.sign = x4reverseShort( (void *)&t4->header.sign ) ;
          t4->header.version = x4reverseShort( (void *)&t4->header.version ) ;
          t4->header.root = x4reverseLong( (void *)&t4->header.root ) ;

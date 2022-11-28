@@ -33,7 +33,7 @@ void main ()
    DATA4 *data ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "DATA" ) ;
+   data = d4open( &cb, "data" ) ;
    compressAll( data ) ;
    code4initUndo( &cb ) ;
 }

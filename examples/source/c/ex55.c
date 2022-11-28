@@ -29,7 +29,7 @@ void main( void )
    code4init( &cb ) ;
    cb.accessMode = OPEN4DENY_RW ; /* open file exclusively*/
 
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
    error4exitTest( &cb ) ;
    code4optStart( &cb ) ;
 

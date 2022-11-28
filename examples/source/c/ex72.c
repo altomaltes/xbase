@@ -29,7 +29,7 @@ void main( void )
    int rc ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
    nameTag = d4tag( data, "INF_NAME" ) ;
    name = d4field( data, "NAME" ) ;
 

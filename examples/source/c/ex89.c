@@ -27,7 +27,7 @@ void main()
    char *result ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "DATA" ) ;
+   data = d4open( &cb, "data" ) ;
 
    d4go( data, 1L ) ;
    /* "FNAME" and "LNAME" are Character field names of data file "DATA.DBF"*/

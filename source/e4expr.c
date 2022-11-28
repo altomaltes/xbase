@@ -473,7 +473,7 @@ int expr4keyConvert( EXPR4 *e4expr, char **ptrPtr, const int rLen, const int exp
             dPtr = (double *)( cb->storedKey ) ;
             if ( *dPtr == 0 )
                *dPtr = 1.0E300 ;
-            #ifdef S4BYTE_SWAP
+            #ifdef WORDS_BIGENDIAN
                *(double *)cb->storedKey = x4reverseDouble((double *)cb->storedKey) ;
             #endif
             resultLen = (int)sizeof( double ) ;

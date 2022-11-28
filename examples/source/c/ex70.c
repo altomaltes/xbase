@@ -27,7 +27,7 @@ void main( void )
    TAG4 *tag ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "DBF" ) ;
+   data = d4open( &cb, "dbf" ) ;
    tag = d4tag( data, "DBF_NAME" ) ; /* A tag with '.NOT.DELETED()' filter */
 
    d4top( data ) ; /* Position to the first record that is not deleted.*/

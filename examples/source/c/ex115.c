@@ -33,7 +33,7 @@ void main( void )
 
    date4today( runDate ) ; /* initialize to the system clock*/
    runDate[8] = 0 ;
-   if( file4open( &file, &cb, "TEXT.FIL", 0 ) !=0 )
+   if( file4open( &file, &cb, "text.fil", 0 ) !=0 )
       return ;
 
    /* file is opened exclusively - no need to lock*/

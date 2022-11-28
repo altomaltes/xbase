@@ -72,7 +72,7 @@ int S4FUNCTION i4reindex( INDEX4 *i4 )
       char tagName[LEN4TAG_ALIAS + 1] ;
       S4LONG i ;
       int len ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          char *swapPtr ;
          S4LONG longVal ;
          short shortVal ;
@@ -269,7 +269,7 @@ int S4FUNCTION i4reindex( INDEX4 *i4 )
                   if ( rc < 0 )
                      break ;
 
-                  #ifdef S4BYTE_SWAP
+                  #ifdef WORDS_BIGENDIAN
                      block->header.nodeAttribute = x4reverseShort( (void *)&block->header.nodeAttribute ) ;
                      block->header.nKeys = x4reverseShort( (void *)&block->header.nKeys ) ;
                      block->header.leftNode = x4reverseLong( (void *)&block->header.leftNode ) ;
@@ -682,10 +682,10 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
    T4DESC tagInfo ;
    const char *ptr ;
    FILE4LONG fPos ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       I4HEADER swapHeader ;
       T4HEADER swapTagHeader ;
-   #endif  /* S4BYTE_SWAP */
+   #endif  /* WORDS_BIGENDIAN */
 
    E4PARMLOW( r4, E92102 ) ;
 
@@ -755,7 +755,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
    i4->header.freeList = 0L ;
    u4yymmdd( i4->header.yymmdd ) ;
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       memcpy( (void *)&swapHeader, (void *)&i4->header, sizeof(I4HEADER) ) ;
 
       swapHeader.blockChunks = x4reverseShort( (void *)&swapHeader.blockChunks ) ;
@@ -768,7 +768,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
       rc = file4seqWrite( &r4->seqwrite, &swapHeader, sizeof(I4HEADER) ) ;
    #else
       rc = file4seqWrite( &r4->seqwrite, &i4->header, sizeof(I4HEADER) ) ;
-   #endif  /* S4BYTE_SWAP */
+   #endif  /* WORDS_BIGENDIAN */
 
    if ( rc < 0 )
       return error4stack( c4, rc, E92102 ) ;
@@ -801,12 +801,12 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
 
          tagInfo.indexType = tagOn->header.type ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             tagInfo.headerPos = x4reverseLong( (void *)&tagInfo.headerPos ) ;
             tagInfo.x1000 = 0x0010 ;
          #else
             tagInfo.x1000 = 0x1000 ;
-         #endif  /* S4BYTE_SWAP */
+         #endif  /* WORDS_BIGENDIAN */
 
          tagInfo.x2 = 2 ;
          tagInfo.leftChld = (char) lower[iTag+1] ;
@@ -839,7 +839,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
       tagOn = (TAG4FILE *)l4next( &i4->tags, tagOn ) ;
       if ( tagOn == 0 )
          break ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          memcpy( (void *)&swapTagHeader, (void *)&tagOn->header, sizeof(T4HEADER) ) ;
 
          swapTagHeader.root = x4reverseLong( (void *)&swapTagHeader.root ) ;
@@ -852,7 +852,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
          rc = file4seqWrite( &r4->seqwrite, &swapTagHeader, sizeof( T4HEADER ) ) ;
       #else
          rc = file4seqWrite( &r4->seqwrite, &tagOn->header, sizeof( T4HEADER ) ) ;
-      #endif  /* S4BYTE_SWAP */
+      #endif  /* WORDS_BIGENDIAN */
       if ( rc < 0 )
          return error4stack( c4, rc, E92102 ) ;
 
@@ -1015,12 +1015,12 @@ static int r4reindexToDisk( R4REINDEX *r4 )
       S4LONG dif ;
    #endif
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       char *swap, *swapPtr ;
       int i ;
       S4LONG longVal ;
       short shortVal ;
-   #endif  /* S4BYTE_SWAP */
+   #endif  /* WORDS_BIGENDIAN */
 
    E4PARMLOW( r4, E92102 ) ;
 
@@ -1038,7 +1038,7 @@ static int r4reindexToDisk( R4REINDEX *r4 )
 
    for(;;)
    {
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          swap = (char *) u4allocEr( r4->codeBase, r4->blocklen + sizeof(S4LONG) ) ;
          if ( swap == 0 )
             return error4stack( r4->codeBase, e4memory, E92102 ) ;
@@ -1066,7 +1066,7 @@ static int r4reindexToDisk( R4REINDEX *r4 )
          u4free( swap ) ;
       #else
          rc = file4seqWrite( &r4->seqwrite, block, r4->blocklen ) ;
-      #endif  /* S4BYTE_SWAP */
+      #endif  /* WORDS_BIGENDIAN */
       if ( rc < 0 )
          return error4stack( r4->codeBase, rc, E92102 ) ;
 
@@ -1149,7 +1149,7 @@ int r4reindexFinish( R4REINDEX *r4 )
 
    E4PARMLOW( r4, E92102 ) ;
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       char *swap, *swapPtr ;
       int i ;
       S4LONG longVal ;
@@ -1184,7 +1184,7 @@ int r4reindexFinish( R4REINDEX *r4 )
       rc = file4seqWrite( &r4->seqwrite, r4->startBlock, r4->blocklen ) ;
       if ( rc < 0 )
          return error4stack( r4->codeBase, rc, E92102 ) ;
-   #endif  /* S4BYTE_SWAP */
+   #endif  /* WORDS_BIGENDIAN */
 
    r4->lastblock += r4->lastblockInc ;
    block = r4->startBlock ;
@@ -1202,7 +1202,7 @@ int r4reindexFinish( R4REINDEX *r4 )
          #endif
          keyTo->num = r4->lastblock ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             memcpy( (void *)swap, (void *)block, r4->blocklen ) ;
             /* position swapPtr at beginning of B4KEY's */
             swapPtr = swap ;
@@ -1232,14 +1232,14 @@ int r4reindexFinish( R4REINDEX *r4 )
             rc = file4seqWrite( &r4->seqwrite, block, r4->blocklen ) ;
             if ( rc < 0 )
                return error4stack( r4->codeBase, rc, E92102 ) ;
-         #endif  /* S4BYTE_SWAP */
+         #endif  /* WORDS_BIGENDIAN */
 
          r4->lastblock += r4->lastblockInc ;
       }
    }
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       u4free( swap ) ;
-   #endif  /* S4BYTE_SWAP */
+   #endif  /* WORDS_BIGENDIAN */
    return 0 ;
 }
 #endif  /* ifdef S4MDX */
@@ -1255,7 +1255,7 @@ static int r4reindexToDisk( R4REINDEX *r4, const char *keyValue )
    #ifdef S4DATA_ALIGN
       S4LONG longTemp ;
    #endif
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       char swap[B4BLOCK_SIZE] ;
       char *swapPtr ;
       int i ;
@@ -1294,7 +1294,7 @@ static int r4reindexToDisk( R4REINDEX *r4, const char *keyValue )
       if ( block->header.nodeAttribute >= 2 )  /* if leaf, record freeSpace */
          memcpy( ((char *)block) + sizeof( B4STD_HEADER ), (void *)&r4->nodeHdr.freeSpace, sizeof( r4->nodeHdr.freeSpace ) ) ;
 
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          memcpy( (void *)swap, (void *)block, B4BLOCK_SIZE ) ;
 
          /* position at either B4NODE_HEADER (leaf) or data (branch) */
@@ -1403,7 +1403,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
    unsigned int exprHdrLen ;
    const char *ptr ;
    FILE4LONG pos ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       T4HEADER swapTagHeader ;
    #endif
 
@@ -1422,7 +1422,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
 
    if ( i4file->tagIndex->header.typeCode >= 64 )
    {
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          memcpy( (void *)&swapTagHeader, (void *)&i4file->tagIndex->header, sizeof(T4HEADER) ) ;
 
          swapTagHeader.root = x4reverseLong( (void *)&swapTagHeader.root ) ;
@@ -1451,7 +1451,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
       if ( rc < 0 )
          return error4stack( r4->codeBase, (short)rc, E92102 ) ;
 
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          rc = file4seqWrite( &r4->seqwrite, &swapTagHeader.descending, exprHdrLen ) ;
       #else
          rc = file4seqWrite( &r4->seqwrite, &i4file->tagIndex->header.descending, exprHdrLen ) ;
@@ -1474,7 +1474,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
       else
          tagOn->headerOffset = 0L ;
 
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          memcpy( (void *)&swapTagHeader, (void *)&tagOn->header, sizeof(T4HEADER) ) ;
 
          swapTagHeader.root = x4reverseLong( (void *)&swapTagHeader.root ) ;
@@ -1503,7 +1503,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4 )
       if ( rc < 0 )
          return error4stack( r4->codeBase, (short)rc, E92102 ) ;
 
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          rc = file4seqWrite( &r4->seqwrite, &swapTagHeader.descending, exprHdrLen ) ;
       #else
          rc = file4seqWrite( &r4->seqwrite, &tagOn->header.descending, exprHdrLen ) ;
@@ -1777,7 +1777,7 @@ int r4reindexFinish( R4REINDEX *r4, char *keyValue )
    #ifdef S4DATA_ALIGN
       S4LONG longTemp ;
    #endif
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       char swap[B4BLOCK_SIZE] ;
       char *swapPtr ;
       int i ;
@@ -1795,7 +1795,7 @@ int r4reindexFinish( R4REINDEX *r4, char *keyValue )
 
       block->header.nodeAttribute |= (short)3 ;   /* leaf and root block */
 
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          memcpy( (void *)swap, (void *)block, B4BLOCK_SIZE ) ;
 
          /* position at either B4NODE_HEADER (leaf) or data (branch) */
@@ -1874,7 +1874,7 @@ int r4reindexFinish( R4REINDEX *r4, char *keyValue )
       if ( block->header.nodeAttribute >= 2 )  /* if leaf, record freeSpace */
          memcpy( ((char *)block) + sizeof( B4STD_HEADER ), (void *)&r4->nodeHdr, sizeof( B4NODE_HEADER ) ) ;
 
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          memcpy( (void *)swap, (void *)r4->startBlock, B4BLOCK_SIZE ) ;
 
          /* position at either B4NODE_HEADER (leaf) or data (branch) */
@@ -1958,7 +1958,7 @@ int r4reindexFinish( R4REINDEX *r4, char *keyValue )
          if ( iBlock == r4->nBlocksUsed - 1 )
             block->header.nodeAttribute = 1 ;  /* root block */
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             memcpy( (void *)swap, (void *)block, B4BLOCK_SIZE ) ;
 
             /* position at either B4NODE_HEADER (leaf) or data (branch) */

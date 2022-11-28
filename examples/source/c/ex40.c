@@ -27,7 +27,7 @@ void main( void )
 	code4init( &cb ) ;
    cb.accessMode = OPEN4DENY_RW ; /* open file exclusively to speed pack*/
 
-   data = d4open( &cb, "DATABASE" ) ;
+   data = d4open( &cb, "database" ) ;
 
    error4exitTest( &cb ) ;
    code4optStart( &cb ) ;

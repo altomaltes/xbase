@@ -47,4 +47,3 @@ void main( void )
     code4close( &cb ) ;
     code4initUndo( &cb ) ;
  }
-

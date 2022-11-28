@@ -27,7 +27,7 @@ void main( void )
    short num ;
 
    code4init( &cb ) ;
-   infoFile = d4open( &cb, "INFO" );
+   infoFile = d4open( &cb, "info" );
 
    for(num = d4numFields( infoFile ) ; num ; num-- )
    {

@@ -96,13 +96,13 @@ int S4CALL t4cmpDoub( S4CMP_PARM dataPtr, S4CMP_PARM searchPtr, size_t len )
 
       memcpy( (void *)&d1, dataPtr, sizeof(double) ) ;
       memcpy( (void *)&d2, searchPtr, sizeof(double) ) ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          d1 = x4reverseDouble( &d1 ) ;
          d2 = x4reverseDouble( &d2 ) ;
       #endif
       dif = d1 - d2 ;
    #else
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          dif = x4reverseDouble((double *)dataPtr) -
             x4reverseDouble((double *)searchPtr) ;
       #else
@@ -145,7 +145,7 @@ void t4strToDateMdx( char *result, const char *input, const int dummy )
 {
    double d ;
    d = (double) date4long(input) ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       d = x4reverseDouble( &d) ;
    #endif
    memcpy( result, (void *)&d, sizeof(double) ) ;
@@ -191,7 +191,7 @@ int tfile4init( TAG4FILE *t4, INDEX4 *i4, T4DESC *tagInfo )
    if ( file4seqReadAll( &seqread, &t4->header, sizeof(T4HEADER)) < 0 )
       return -1 ;
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       t4->header.keyLen = x4reverseShort( (void *)&t4->header.keyLen ) ;
       t4->header.keysMax = x4reverseShort( (void *)&t4->header.keysMax ) ;
       t4->header.groupLen = x4reverseShort( (void *)&t4->header.groupLen ) ;
@@ -411,7 +411,7 @@ int tfile4init( TAG4FILE *t4, INDEX4 *i4, long filePos, unsigned char *name )
    file4longAssign( pos, filePos + (long)topSize + 486L, 0 ) ;
    if ( file4readAllInternal( &i4->indexFile->file, pos, &t4->header.descending, ( 5 * sizeof(short) ) ) < 0 )
       return 0 ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       t4->header.root = x4reverseLong( (void *)&t4->header.root ) ;
       t4->header.freeList = x4reverseLong( (void *)&t4->header.freeList ) ;
       /* version is already stored in intel format */

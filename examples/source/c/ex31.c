@@ -26,9 +26,9 @@ void main( void )
    DATA4 *data ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO.DBF" ) ;
+   data = d4open( &cb, "info.dbf" ) ;
 
-   printf( "%s is the alias of the file INFO.DBF \n", d4alias( data )) ;
+   printf( "%s is the alias of the file info.dbf \n", d4alias( data )) ;
 
 	code4initUndo( &cb ) ;
 }

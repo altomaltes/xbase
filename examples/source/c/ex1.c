@@ -31,13 +31,13 @@ int main( )
    codeBase.accessMode = OPEN4DENY_RW ;
    codeBase.safety = 0 ;  /* Ensure the create overwrites any existing file*/
 
-   newDataFile = d4create( &codeBase, "NEWDBF", fieldInfo, 0 ) ;
+   newDataFile = d4create( &codeBase, "newdbf", fieldInfo, 0 ) ;
 
    d4close( newDataFile ) ;
 
   /* open in shared mode*/
    codeBase.accessMode = OPEN4DENY_NONE ;
-   newDataFile = d4open( &codeBase, "NEWDBF" ) ;
+   newDataFile = d4open( &codeBase, "newdbf" ) ;
 
    /* ... some other code ...*/
 

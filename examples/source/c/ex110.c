@@ -28,7 +28,7 @@ void main()
    int pos ;
 
    code4init( &cb ) ;
-   file4open( &file, &cb, "TEXT.FIL", 0 ) ;
+   file4open( &file, &cb, "text.fil", 0 ) ;
 
    memset( buf, 0, sizeof( buf ) ) ; /* ensure null termination for output */
    pos = file4read( &file, 0L, buf, sizeof( buf ) - 1 ) ;

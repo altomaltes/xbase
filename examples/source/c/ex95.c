@@ -27,8 +27,8 @@ void main( void )
 
    code4init( &cb ) ;
    cb.accessMode = OPEN4DENY_RW ;
-   info = d4open( &cb, "INFO" ) ;
-   data = d4open( &cb, "DATA" ) ;
+   info = d4open( &cb, "info" ) ;
+   data = d4open( &cb, "data" ) ;
    error4exitTest( &cb ) ;
 
    infoName = d4field( info, "NAME" ) ;

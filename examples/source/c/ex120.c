@@ -29,8 +29,8 @@ void main( void )
    code4init( &cb ) ;
    cb.autoOpen = 0 ; /* don't automatically open index file */
 
-   data = d4open( &cb, "INFO" ) ;
-   index = i4open( data, "INFO2" ) ; /* open a secondary index file */
+   data = d4open( &cb, "info" ) ;
+   index = i4open( data, "info2" ) ; /* open a secondary index file */
 
    cb.lockAttempts = WAIT4EVER ; /* wait until the lock succeeds*/
    d4lockAll ( data )  ;

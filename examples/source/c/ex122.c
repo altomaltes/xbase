@@ -30,9 +30,9 @@ void main( void )
    FIELD4 *classCode, *classTitle, *enrollStudentId, *studentName ;
 
    code4init( &cb ) ;
-   enroll = d4open( &cb, "ENROLL" ) ;
-   master = d4open( &cb, "CLASSES" ) ;
-   student = d4open( &cb, "STUDENT" ) ;
+   enroll = d4open( &cb, "enroll" ) ;
+   master = d4open( &cb, "classes" ) ;
+   student = d4open( &cb, "student" ) ;
 
    enrollTag = d4tag( enroll, "ENR_CODE" ) ;
    studentTag = d4tag( student, "STU_ID" ) ;
@@ -42,12 +42,12 @@ void main( void )
    relation2 = relate4createSlave( relation1, student, "STU_ID_TAG", studentTag);
 
    relate4type( relation1, relate4scan ) ;
-   relate4sortSet( MasterRelation,  "LEFT(STUDENT->L_NAME,8) + ENROLL->C_CODE_TAG" ) ;
+   relate4sortSet( MasterRelation,  "LEFT( student->L_NAME,8) + enroll->C_CODE_TAG" ) ;
 
-   classCode = d4field( master, "CODE" ) ;
-   classTitle = d4field( master, "TITLE" ) ;
+   classCode =       d4field( master, "CODE" ) ;
+   classTitle =      d4field( master, "TITLE" ) ;
    enrollStudentId = d4field( enroll, "STU_ID_TAG") ;
-   studentName = d4field( student, "L_NAME" ) ;
+   studentName =     d4field( student, "L_NAME" ) ;
 
    error4exitTest( &cb ) ;
 

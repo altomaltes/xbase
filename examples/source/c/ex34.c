@@ -25,7 +25,7 @@ void main( void )
     DATA4 *data ;
 
     code4init( &cb ) ;
-    data = d4open( &cb, "DATABASE") ;
+    data = d4open( &cb, "database") ;
 
     for( d4top( data ) ; !d4eof( data ) ; d4skip( data, 1L ) )
        d4blank( data )  ;

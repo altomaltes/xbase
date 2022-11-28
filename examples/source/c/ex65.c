@@ -43,7 +43,7 @@ void main()
    int rc ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "PEOPLE" ) ;
+   data = d4open( &cb, "people" ) ;
    nameTag = d4tag( data, "PPL_NAME") ;
    d4tagSelect( data, nameTag ) ;
    d4seek( data, "mickey" ) ;

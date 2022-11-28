@@ -12,7 +12,7 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-#include "d4all.h"
+#include "../../../source/d4all.h"
 
 #ifdef __TURBOC__
    extern unsigned _stklen = 10000;
@@ -36,13 +36,13 @@ void main ()
    code.optimize = OPT4ALL ;
    code.optimizeWrite = OPT4ALL ;
 
-   d = d4open( &code, "DATEFILE" ) ;
+   d = d4open( &code, "datefile" ) ;
    if( code.errorCode < 0 )
       code4exit( &code ) ;
 
    d4lockAll( d ) ; /* lock the file for optimizations to take place*/
 
-   dateField = d4field( d, "DATE" ) ;
+   dateField = d4field( d, "datefile" ) ;
    date4today( today );
 
    code4optStart( &code ) ;

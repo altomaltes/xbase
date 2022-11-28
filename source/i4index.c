@@ -329,7 +329,7 @@ long index4extend( INDEX4FILE *i4 )
          file4longAssign( pos, tagIndex->header.freeList * I4MULTIPLY, 0 ) ;
          len = file4readInternal( &i4->file, pos, (char *)&tagIndex->header.freeList, sizeof( tagIndex->header.freeList ) ) ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             tagIndex->header.freeList = x4reverseLong( &tagIndex->header.freeList ) ;
          #endif
 
@@ -366,7 +366,7 @@ long index4extend( INDEX4FILE *i4 )
          file4longAssign( pos, i4->header.freeList*I4MULTIPLY + sizeof(S4LONG), 0 ) ;
          len = file4readInternal( &i4->file, pos, (char *)&i4->header.freeList, sizeof(i4->header.freeList)) ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             i4->header.freeList = x4reverseLong( (void *)&i4->header.freeList ) ;
          #endif
 
@@ -907,7 +907,7 @@ INDEX4FILE *index4open( DATA4 *d4, const char *fileName, INDEX4 *index )
          return 0 ;
       }
 
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          i4->header.blockChunks = x4reverseShort( (void *)&i4->header.blockChunks ) ;
          i4->header.blockRw = x4reverseShort( (void *)&i4->header.blockRw ) ;
          i4->header.slotSize = x4reverseShort( (void *)&i4->header.slotSize ) ;
@@ -949,7 +949,7 @@ INDEX4FILE *index4open( DATA4 *d4, const char *fileName, INDEX4 *index )
             return 0 ;
          }
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             tagInfo[iTag].headerPos = x4reverseLong( (void *)&tagInfo[iTag].headerPos ) ;
             tagInfo[iTag].x1000 = 0x1000 ;
          #endif
@@ -1038,7 +1038,7 @@ int index4shrink( INDEX4FILE *i4, long blockNo )
       return e4codeBase ;
 
    #ifdef S4FOX
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          i4->tagIndex->header.freeList = x4reverseLong( (void *)&i4->tagIndex->header.freeList ) ;
       #endif
       file4longAssign( pos, blockNo, 0 ) ;
@@ -1048,7 +1048,7 @@ int index4shrink( INDEX4FILE *i4, long blockNo )
          return error4stack( i4->codeBase, (short)rc, E91708 ) ;
       i4->tagIndex->header.freeList = blockNo ;
    #else
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          i4->header.freeList = x4reverseLong( (void *)&i4->header.freeList ) ;
       #endif
       file4longAssign( pos, blockNo*I4MULTIPLY + sizeof(S4LONG), 0 ) ;
@@ -1075,7 +1075,7 @@ int index4updateHeader( INDEX4FILE *i4 )
    #ifdef S4MDX
       int rc ;
       TAG4FILE *tagOn ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          I4HEADER swap ;
       #endif
    #endif
@@ -1094,7 +1094,7 @@ int index4updateHeader( INDEX4FILE *i4 )
 
       if ( i4->versionOld != i4->tagIndex->header.version )
       {
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             i4->tagIndex->header.root = x4reverseLong( (void *)&i4->tagIndex->header.root ) ;
             i4->tagIndex->header.freeList = x4reverseLong( (void *)&i4->tagIndex->header.freeList ) ;
             i4->tagIndex->header.keyLen = x4reverseShort( (void *)&i4->tagIndex->header.keyLen ) ;
@@ -1106,7 +1106,7 @@ int index4updateHeader( INDEX4FILE *i4 )
          if ( file4writeInternal( &i4->file, pos, (char *)&i4->tagIndex->header, LEN4HEADER_WR ) < 0 )
             return -1;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             i4->tagIndex->header.root = x4reverseLong( (void *)&i4->tagIndex->header.root ) ;
             i4->tagIndex->header.freeList = x4reverseLong( (void *)&i4->tagIndex->header.freeList ) ;
             i4->tagIndex->header.keyLen = x4reverseShort( (void *)&i4->tagIndex->header.keyLen ) ;
@@ -1119,7 +1119,7 @@ int index4updateHeader( INDEX4FILE *i4 )
    #else
       if ( i4->changed )
       {
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             memcpy( (void *)&swap, (void *)&i4->header, sizeof(I4HEADER) ) ;
 
             swap.blockChunks = x4reverseShort( (void *)&swap.blockChunks ) ;
@@ -1306,7 +1306,7 @@ int index4versionCheck( INDEX4FILE *i4, const int updateVersion )
          if ( rc < 0 )
             return error4stack( i4->codeBase, (short)rc, E91712 ) ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             i4->tagIndex->header.root = x4reverseLong( (void *)&i4->tagIndex->header.root ) ;
             i4->tagIndex->header.freeList = x4reverseLong( (void *)&i4->tagIndex->header.freeList ) ;
             /* version is already in non-intel form */
@@ -1349,7 +1349,7 @@ int index4versionCheck( INDEX4FILE *i4, const int updateVersion )
          if ( rc < 0 )
             return error4stack( i4->codeBase, rc, E91712 ) ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             i4->header.blockChunks = x4reverseShort( (void *)&i4->header.blockChunks ) ;
             i4->header.blockRw = x4reverseShort( (void *)&i4->header.blockRw ) ;
             i4->header.slotSize = x4reverseShort( (void *)&i4->header.slotSize ) ;
@@ -1935,7 +1935,7 @@ TAG4 *i4tag_v( INDEX4 *ind, char *tagName )
 
 #endif  /* S4VB_DOS */
 
-#ifdef S4BYTE_SWAP
+#ifdef WORDS_BIGENDIAN
 #ifdef S4CLIPPER
 void index4swapBlockClipper(void *swap, int keysmax, int grouplen )
 {
@@ -1970,7 +1970,7 @@ void index4swapBlockClipper(void *swap, int keysmax, int grouplen )
    }
 }
 #endif /*S4CLIPPER*/
-#endif /*S4BYTE_SWAP*/
+#endif /*WORDS_BIGENDIAN*/
 
 
 int S4FUNCTION expr4getReturnType( EXPR4 *expr, int infoOn )

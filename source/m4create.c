@@ -87,11 +87,11 @@ int memo4fileCreate( MEMO4FILE *m4file, CODE4 *c4, DATA4FILE *d4, const char *na
       else
       {
          headerPtr->nextBlock = B4BLOCK_SIZE/m4file->blockSize ;
-         #ifndef S4BYTE_SWAP
+         #ifndef WORDS_BIGENDIAN
             headerPtr->nextBlock = x4reverseLong( (void *)&headerPtr->nextBlock) ;
          #endif
       }
-      #ifndef S4BYTE_SWAP
+      #ifndef WORDS_BIGENDIAN
          headerPtr->blockSize = x4reverseShort( (void *)&m4file->blockSize ) ;
       #else
          headerPtr->blockSize = m4file->blockSize ;
@@ -194,7 +194,7 @@ int memo4fileCreate( MEMO4FILE *m4file, CODE4 *c4, DATA4FILE *d4, const char *na
          return error4( c4, (short)rc, E85201 ) ;
       }
    }
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       #ifndef S4MFOX
          headerPtr->nextBlock = x4reverseLong( (void *)&headerPtr->nextBlock ) ;
          #ifndef S4MNDX
@@ -233,7 +233,7 @@ int memo4fileCreate( MEMO4FILE *m4file, CODE4 *c4, DATA4FILE *d4, const char *na
       MEMO4BLOCK  memoBlock ;
 
       #ifdef S4MFOX
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             memoBlock.type = type ;
             memoBlock.numChars = memoLen ;
          #else
@@ -244,7 +244,7 @@ int memo4fileCreate( MEMO4FILE *m4file, CODE4 *c4, DATA4FILE *d4, const char *na
          memoBlock.minusOne = -1 ;
          memoBlock.startPos = sizeof(S4LONG) + 2 * sizeof( short ) ;
          memoBlock.numChars = memoBlock.startPos + memoLen ;
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             memoBlock.startPos = x4reverseShort( (void *)&memoBlock.startPos ) ;
             memoBlock.numChars = x4reverseLong( (void *)&memoBlock.numChars ) ;
          #endif

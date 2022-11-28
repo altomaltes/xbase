@@ -35,7 +35,7 @@ long memo4lenPart( MEMO4FILE *f4memo, long memoId )
    rc = file4readAllInternal( &f4memo->file, pos, &memoBlock, sizeof( MEMO4BLOCK ) ) ;
    if ( rc < 0 )
       return error4stack( f4memo->file.codeBase, rc, E95204 ) ;
-   #ifndef S4BYTE_SWAP
+   #ifndef WORDS_BIGENDIAN
       return x4reverseLong( (void *)&memoBlock.numChars ) ;
    #else
       return memoBlock.numChars ;
@@ -289,7 +289,7 @@ int dfile4memoCompress( DATA4FILE *data, DATA4 *d4 )
 
 int memo4fileChainFlush( MEMO4FILE *f4memo, MEMO4CHAIN_ENTRY *chain )
 {
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       MEMO4CHAIN_ENTRY swap ;
    #endif
    FILE4LONG pos ;
@@ -298,7 +298,7 @@ int memo4fileChainFlush( MEMO4FILE *f4memo, MEMO4CHAIN_ENTRY *chain )
    {
       chain->toDisk = 0 ;
       file4longAssign( pos, chain->blockNo * f4memo->blockSize, 0 ) ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          memcpy( (void *)&swap, (void *)chain, sizeof( MEMO4CHAIN_ENTRY ) ) ;
          swap.next = x4reverseLong( (void *)&swap.next ) ;
          swap.num = x4reverseLong( (void *)&swap.num ) ;
@@ -326,7 +326,7 @@ int memo4fileChainSkip( MEMO4FILE *f4memo, MEMO4CHAIN_ENTRY *chain )
    else
    {
       lenRead = file4readInternal( &f4memo->file, pos, chain, sizeof( chain->next ) + sizeof( chain->num ) ) ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          chain->next = x4reverseLong( (void *)&chain->next ) ;
          chain->num = x4reverseLong( (void *)&chain->num ) ;
       #endif

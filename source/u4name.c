@@ -65,6 +65,7 @@ int S4FUNCTION u4nameExt( char *name, int lenResult, const char *newExt, const i
       #ifndef S4CASE_SEN
          c4upper( name ) ;
       #endif
+
       return 0 ;
    }
 
@@ -82,13 +83,14 @@ int S4FUNCTION u4nameExt( char *name, int lenResult, const char *newExt, const i
    strcpy( name + extPos, newExt ) ;
 
    #ifndef S4CASE_SEN
-      c4upper(name) ;
+      c4upper( name ) ;
    #endif
 
    return 0 ;
 }
 
-/* takes the input buffer and removes any "..\" or ".\"pieces */
+/* takes the input buffer and removes any "..\" or ".\"pieces 
+ */
 static int u4nameFix( char *buf )
 {
    int i, j, len, l2 ;
@@ -118,9 +120,7 @@ static int u4nameFix( char *buf )
                   len -= l2 ;
                   i -= l2 ;
                   break ;
-               }
-            }
-         }
+         }  }  }
          i-- ;  /* compensate for position */
       }
    }
@@ -136,13 +136,12 @@ static int u4nameFix( char *buf )
          len -= 2 ;
          c4memmove( buf+i, buf+i+2, (unsigned int)(len - i) ) ;
          i-- ;  /* compensate for position */
-      }
-   }
+   }  }
 
    buf[len] = 0 ;
 
    #ifndef S4CASE_SEN
-      c4upper(buf) ;
+      c4upper( buf ) ;
    #endif
 
    return 0 ;
@@ -587,8 +586,9 @@ int S4FUNCTION u4namePiece( char *result, const unsigned int lenResult, const ch
    result[newLen] = 0 ;
 
    #ifndef S4CASE_SEN
-      c4upper(result) ;
+      c4upper( result );
    #endif
+
    return 0 ;
 }
 

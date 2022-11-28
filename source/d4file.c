@@ -79,7 +79,7 @@ long S4FUNCTION dfile4recCount( DATA4FILE *data, const long serverId )
 
       file4longAssign( pos, 4, 0 ) ;
       len = file4readInternal( &data->file, pos, &tmpCount, sizeof(S4LONG) ) ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          tmpCount = x4reverseLong((void *)&tmpCount) ;
       #endif
       if ( tmpCount < 0L || len != sizeof( S4LONG ) )
@@ -181,13 +181,13 @@ int dfile4updateHeader( DATA4FILE *data, int doTimeStamp, int doCount )
    if ( !doCount || data->numRecs < 0 )
       len -= (sizeof( data->numRecs ) + sizeof( data->headerLen ) ) ;
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       data->numRecs = x4reverseLong( (void *)&data->numRecs ) ;
       data->headerLen = x4reverseShort( (void *)&data->headerLen ) ;
    #endif
       if ( file4writeInternal( &data->file, pos, (char *)&data->version + file4longGetLo( pos ), len ) < 0 )
          return -1 ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       data->numRecs = x4reverseLong( (void *)&data->numRecs ) ;
       data->headerLen = x4reverseShort( (void *)&data->headerLen ) ;
    #endif

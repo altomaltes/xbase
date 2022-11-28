@@ -26,7 +26,7 @@ void main()
    FILE4 file ;
 
    code4init( &cb ) ;
-   file4open( &file, &cb, "TEXT.FIL", 0 ) ;
+   file4open( &file, &cb, "text.fil", 0 ) ;
    error4exitTest( &cb ) ;
    printf( "File name: %s\n", file4name( &file ) ) ;
    printf( "Length: %ld\n", file4len( &file ) ) ;

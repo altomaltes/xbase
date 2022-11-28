@@ -227,11 +227,13 @@ int S4FUNCTION code4initLow( CODE4 *c4, const char *defaultProtocol, long versio
       int exclusiveFlag ;
       int openFlag ;
       char *envLog ;
+
       #ifdef S4CASE_SEN
          char *logFile = "T4TEST.log" ;
       #else
          char *logFile = "T4TEST.LOG" ;
       #endif
+
    #else
       #ifdef S4TRACK_FILES
          int openFlag ;

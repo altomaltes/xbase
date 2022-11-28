@@ -185,10 +185,12 @@ DATA4 *r4open_data_foo( char *file_name, char *alias, RELATE4 *relate, CODE4 *co
    relate_on = relate;
    while( relate_on )
    {
-         strcpy( fnbuf, relate_on->data->dataFile->file.name );
+      strcpy( fnbuf, relate_on->data->dataFile->file.name );
+
       #ifndef S4CASE_SEN
          c4upper( fnbuf );
       #endif
+
       strcpy( abuf, d4alias( relate_on->data ) );
       #ifndef S4CASE_SEN
          c4upper( abuf );

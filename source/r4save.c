@@ -57,7 +57,7 @@ void sort4calcList( REPORT4 *report )
 
 int save4long( FILE4SEQ_WRITE *seq, long *lval )
 {
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       S4LONG tval;
 
       tval = x4reverseLong( (void *)lval );
@@ -70,7 +70,7 @@ int save4long( FILE4SEQ_WRITE *seq, long *lval )
 
 int save4short( FILE4SEQ_WRITE *seq, short *sval )
 {
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       short tval;
 
       tval = x4reverseShort( (void *)sval );
@@ -82,7 +82,7 @@ int save4short( FILE4SEQ_WRITE *seq, short *sval )
 
 int ret4long( FILE4SEQ_READ *seq, long *lval )
 {
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       int file_int ;
 
       file_int = file4seqRead( seq, lval, sizeof(S4LONG) ) ;
@@ -97,7 +97,7 @@ int ret4long( FILE4SEQ_READ *seq, long *lval )
 
 int ret4short( FILE4SEQ_READ *seq, short *sval )
 {
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       int file_int ;
 
       file_int = file4seqRead( seq, sval, sizeof(short) ) ;
@@ -196,7 +196,7 @@ int S4FUNCTION report4save_object( FILE4SEQ_WRITE *seq, OBJ4 *obj )
    w = (obj->w <= 0 )?1:obj->w;
    h = (obj->h <= 0 )?1:obj->h;
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
      x= x4reverseLong((void *)&x);
      y= x4reverseLong((void *)&y);
      w= x4reverseLong((void *)&w);

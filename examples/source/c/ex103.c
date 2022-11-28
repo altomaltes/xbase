@@ -30,7 +30,7 @@ void main( void )
    code4init( &cb ) ;
    cb.safety = 0 ;
 
-   file4create( &file, &cb, "TEXT.FIL", 0 ) ;
+   file4create( &file, &cb, "text.fil", 0 ) ;
    error4exitTest( &cb ) ;
 
    file4write( &file, 0, "Some File Information", 21 ) ;

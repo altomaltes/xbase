@@ -12,7 +12,7 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-#include "d4all.h"
+#include "../../../source/d4all.h"
 
 #ifdef __TURBOC__
    extern unsigned _stklen = 10000;
@@ -34,7 +34,7 @@ void main ()
    cb.optimize = OPT4EXCLUSIVE ; /* optimize all new files */
    cb.accessMode = OPEN4DENY_RW ;
 
-   inventory = d4open( &cb, "INVENT.DBF") ; /* Read optimized */
+   inventory = d4open( &cb, "invent.dbf") ; /* Read optimized */
 
    minOnHand = d4field( inventory, "MIN_ON_HND" ) ;
    onHand = d4field( inventory, "ON_HAND" ) ;

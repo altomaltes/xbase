@@ -27,7 +27,7 @@ void main( void )
 	FIELD4 *field ;
 
 	code4init( &cb ) ;
-	data = d4open( &cb, "INFO" ) ;
+	data = d4open( &cb, "info" ) ;
 	field = d4field( data, "NAME" ) ;
 
    d4bottom( data ) ;

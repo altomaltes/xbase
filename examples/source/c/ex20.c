@@ -27,8 +27,8 @@ void main( void )
    long numRec;
 
    code4init( &cb ) ;
-   data1 = d4open( &cb, "DATABASE" ) ;
-   data2 = d4open( &cb, "DATA2" ) ;
+   data1 = d4open( &cb, "database" ) ;
+   data2 = d4open( &cb, "data2" ) ;
 
    d4top( data1 ) ;
    d4top( data2 ) ;

@@ -30,7 +30,7 @@ void main( )
    int rc ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
    expr = expr4parse( data, "AGE" ) ;
 
    for( rc = d4top( data ) ; rc != r4eof ; rc = d4skip( data, 1 ) )

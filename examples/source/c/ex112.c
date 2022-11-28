@@ -27,7 +27,7 @@ void main( void )
    char before[6], after[6] ;
 
    code4init( &cb ) ;
-   file4open( &file, &cb, "TEXT.FIL", 0 ) ;
+   file4open( &file, &cb, "text.fil", 0 ) ;
    memset( before, 0, sizeof( before ) ) ;
    memset( after, 0, sizeof( after ) ) ;
 

@@ -648,7 +648,7 @@ static int i4checkBlocks( INDEX4 *i4 )
                file4readAllInternal( &i4->indexFile->file, pos, &freeBlock, sizeof( freeBlock ) ) ;
             #endif
 
-            #ifdef S4BYTE_SWAP
+            #ifdef WORDS_BIGENDIAN
                freeBlock = x4reverseLong( (void *)&freeBlock ) ;
             #endif
          }
@@ -696,7 +696,7 @@ static int i4checkBlocks( INDEX4 *i4 )
                      file4longAssign( pos, tagOn->headerOffset, 0 ) ;
                      if ( file4readAllInternal( &i4->indexFile->file, pos, &node2, sizeof(node2)) < 0 )
                         return error4( i4->codeBase, e4index, E81601 ) ;
-                     #ifdef S4BYTE_SWAP
+                     #ifdef WORDS_BIGENDIAN
                         node2 = x4reverseLong( (void *)&node2 ) ;
                      #endif
                   }
@@ -719,7 +719,7 @@ static int i4checkBlocks( INDEX4 *i4 )
             tagOn = (TAG4FILE *)l4next( &i4->indexFile->tags, tagOn ) ;
             if ( tagOn == 0 )
                break ;
-            #ifdef S4BYTE_SWAP
+            #ifdef WORDS_BIGENDIAN
                desc[i].headerPos = x4reverseLong( (void *)&desc[i].headerPos ) ;
                desc[i].x1000 = 0x1000 ;
             #endif

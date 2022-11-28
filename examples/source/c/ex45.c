@@ -26,7 +26,7 @@ void main( void )
    int rc ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
 
    cb.lockAttempts = 1 ;
    cb.readLock = 1 ;

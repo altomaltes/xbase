@@ -27,8 +27,8 @@ void main( )
    char *result ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "DATA" ) ;
-   info = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "data" ) ;
+   info = d4open( &cb, "info" ) ;
    expr = expr4parse( data, "FNAME+' '+DTOS( INFO->BIRTH_DATE)" ) ;
 
    d4top( data ) ;

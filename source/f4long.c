@@ -62,7 +62,7 @@ void S4FUNCTION f4assignLong( FIELD4 *field, const long lValue )
          case r4memoBin:
          case r4gen:
             if ( f4len( field ) == 4 )
-               #ifdef S4BYTE_SWAP
+               #ifdef WORDS_BIGENDIAN
                   *((S4LONG *)f4assignPtr( field )) = x4reverseLong(&lValue) ;
                #else
                   *((S4LONG *)f4assignPtr( field )) = lValue ;
@@ -116,7 +116,7 @@ long S4FUNCTION f4long( const FIELD4 *field )
       case r4date:
          return date4long( f4ptr( field ) ) ;
       case r4int:
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             return x4reverseLong(f4ptr(field)) ;
          #else
             return *((S4LONG *)f4ptr( field )) ;
@@ -126,7 +126,7 @@ long S4FUNCTION f4long( const FIELD4 *field )
          case r4memoBin:
          case r4gen:
             if ( f4len( field ) == 4 )
-               #ifdef S4BYTE_SWAP
+               #ifdef WORDS_BIGENDIAN
                   return x4reverseLong(f4ptr(field)) ;
                #else
                   return *((S4LONG *)f4ptr( field )) ;

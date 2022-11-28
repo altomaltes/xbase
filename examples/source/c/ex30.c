@@ -29,7 +29,7 @@ void main( void )
 
    code4init( &cb ) ;
    cb.accessMode = OPEN4DENY_RW;
-   info = d4open( &cb, "DATABASE.DBF") ;
+   info = d4open( &cb, "database.dbf") ;
    code4optStart( &cb ) ;
 
    field = d4field( info, "NAME") ;

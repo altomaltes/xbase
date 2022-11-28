@@ -45,7 +45,7 @@ void main()
    char buffer[0x1400] ;
 
    code4init( &cb ) ;
-   file4open( &passFile, &cb, "TEST.FIL", 0 ) ;
+   file4open( &passFile, &cb, "test.fil", 0 ) ;
    file4seqReadInit( &readFile, &passFile, 0, buffer, sizeof(buffer) );
    person = ( MY_STRUCT *) malloc( sizeof( MY_STRUCT ) ) ;
    getNextStructure( &readFile, person ) ;

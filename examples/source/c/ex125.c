@@ -27,7 +27,7 @@ void main( void )
    RELATE4 *TopMaster ;
 
    code4init( &cb ) ;
-   info = d4open( &cb, "INFO" ) ;
+   info = d4open( &cb, "info" ) ;
 
    TopMaster = relate4init( info ) ;
 

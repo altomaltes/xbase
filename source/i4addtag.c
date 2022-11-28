@@ -342,7 +342,7 @@ static long tfile4swap( B4BLOCK *parent, B4BLOCK *left )
 {
    long tempFb ;
    FILE4LONG pos ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       S4LONG longVal ;
    #endif
 
@@ -354,7 +354,7 @@ static long tfile4swap( B4BLOCK *parent, B4BLOCK *left )
    if ( left->header.rightNode != -1 )
    {
       file4longAssign( pos, left->header.rightNode + 2*sizeof(short), 0 ) ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          longVal = x4reverseLong( (void *)&left->fileBlock ) ;
          file4writeInternal( &parent->tag->indexFile->file, pos, &longVal, sizeof( left->header.leftNode ) ) ;
       #else
@@ -365,7 +365,7 @@ static long tfile4swap( B4BLOCK *parent, B4BLOCK *left )
    if ( left->header.leftNode != -1 )
    {
       file4longAssign( pos, left->header.leftNode + 2*sizeof(short), 0 ) ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          longVal = x4reverseLong( (void *)&left->fileBlock ) ;
          file4write( &parent->tag->indexFile->file, pos, &longVal, sizeof( left->header.rightNode ) ) ;
       #else
@@ -376,7 +376,7 @@ static long tfile4swap( B4BLOCK *parent, B4BLOCK *left )
    if ( parent->header.rightNode != -1 )
    {
       file4longAssign( pos, parent->header.rightNode + 2*sizeof(short), 0 ) ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          longVal = x4reverseLong( (void *)&parent->fileBlock ) ;
          file4writeInternal( &parent->tag->indexFile->file, pos, &longVal, sizeof( parent->header.leftNode ) ) ;
       #else
@@ -387,7 +387,7 @@ static long tfile4swap( B4BLOCK *parent, B4BLOCK *left )
    if ( parent->header.leftNode != -1 )
    {
       file4longAssign( pos, parent->header.leftNode + 2*sizeof(short), 0 ) ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          longVal = x4reverseLong( (void *)&parent->fileBlock ) ;
          file4writeInternal( &parent->tag->indexFile->file, pos, &longVal, sizeof( parent->header.rightNode ) ) ;
       #else

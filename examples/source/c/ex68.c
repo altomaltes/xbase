@@ -50,7 +50,7 @@ void main()
    int rc ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
 
    rc = searchAll( data, key ) ;
    if (rc != -1 )

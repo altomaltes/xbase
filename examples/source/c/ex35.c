@@ -27,7 +27,7 @@ void main( void )
 	FIELD4 *field ;
 
 	code4init( &cb ) ;
-	data = d4open( &cb, "INFO" );
+	data = d4open( &cb, "info" );
  	field = d4fieldJ( data, 1 ) ;
 
    /* output the first field of every record in reverse sequential order.*/
@@ -36,4 +36,4 @@ void main( void )
    d4close( data ) ;
 	code4initUndo( &cb ) ;
 }
-
+

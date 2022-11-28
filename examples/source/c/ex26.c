@@ -29,7 +29,7 @@ void main()
 
    code4init( &codeBase ) ;
 
-   data = d4open( &codeBase, "VALUES" ) ;
+   data = d4open( &codeBase, "values" ) ;
    value = d4field( data, "VALUE" ) ;
 
    d4go( data, 1L ) ;

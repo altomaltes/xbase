@@ -25,7 +25,7 @@ void main( void )
    DATA4 *dataFile ;
 
    code4init( &codeBase ) ;
-   dataFile = d4open( &codeBase, "INFO" ) ;
+   dataFile = d4open( &codeBase, "info" ) ;
 
    d4optimize( dataFile, OPT4ALL ) ;
    code4optStart( &codeBase ) ;

@@ -27,10 +27,10 @@ void main( void )
    TAG4 *tag ;
 
    code4init( &settings ) ;
-   info = d4open( &settings, "INFO" ) ;
+   info = d4open( &settings, "info" ) ;
 
    /* List the names of the tags in any production index file corresponding
-      to "INFO" */
+      to "info" */
 
    printf( "Production index file tags for data file: %s\n", d4alias( info ) ) ;
          /*d4tagNext returns the first tag when NULL is passed to it */

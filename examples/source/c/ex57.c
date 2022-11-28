@@ -48,7 +48,7 @@ void main()
    long count  ;
 
    code4init( &cb ) ;
-   data = d4open( &cb , "INFO" ) ;
+   data = d4open( &cb , "info" ) ;
    count = recallAll( data, lockTries ) ;
    printf( "record count is %d \n", count ) ;
    code4initUndo( &cb ) ;

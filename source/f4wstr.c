@@ -27,7 +27,7 @@ void S4FUNCTION f4assignUnicode( FIELD4 *field, const WSTR5 *wideString )
 #ifndef S4OFF_WRITE
    void S4FUNCTION f4assignWideString( FIELD4 *field, const WSTR5 *wideString )
    {
-      #ifdef S4BYTE_SWAP   // LY Aug 27/04
+      #ifdef WORDS_BIGENDIAN   // LY Aug 27/04
          short *shrtPtr ;
          int i = 0 ;
       #endif
@@ -74,7 +74,7 @@ void S4FUNCTION f4assignUnicode( FIELD4 *field, const WSTR5 *wideString )
       {
          /* LY 2001/07/13 : changed to c4wcslen for 4 byte wchar on Linux */
          f4assignN( field, (char *)wideString, (unsigned)(c4wcslen(wideString) * 2) ) ;
-         #ifdef S4BYTE_SWAP   // LY Aug 27/04
+         #ifdef WORDS_BIGENDIAN   // LY Aug 27/04
             shrtPtr = (short *)f4ptr( field ) ;
             for ( i = 0 ; i < c4wcslen(wideString) ; i++ )
             {
@@ -93,7 +93,7 @@ void S4FUNCTION f4assignUnicode( FIELD4 *field, const WSTR5 *wideString )
             len = field->len - sizeof( unsigned short ) ;
          /* LY 2001/07/13 : changed to c4wcslen for 4 byte wchar on Linux */
          f4assignN( field, (char *)wideString, (unsigned)(c4wcslen(wideString) * 2) ) ;
-         #ifdef S4BYTE_SWAP   // LY Aug 27/04
+         #ifdef WORDS_BIGENDIAN   // LY Aug 27/04
             shrtPtr = (short *)f4ptr( field ) ;
             for ( i = 0 ; i < c4wcslen(wideString) ; i++ )
             {
@@ -103,7 +103,7 @@ void S4FUNCTION f4assignUnicode( FIELD4 *field, const WSTR5 *wideString )
          #endif
          unsigned short *lenPos = (unsigned short *)(f4ptr( field ) + field->len - sizeof( unsigned short )) ;
          *lenPos = len / 2 ;
-         #ifdef S4BYTE_SWAP   // LY Aug 27/04
+         #ifdef WORDS_BIGENDIAN   // LY Aug 27/04
             *lenPos = x4reverseShort( lenPos ) ;
          #endif
          return ;

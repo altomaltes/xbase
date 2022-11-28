@@ -39,7 +39,7 @@ void main( void )
    code4init( &cb ) ;
    cb.safety = 0 ;
 
-   file4create( &passFile, &cb, "TEST.FIL", 0 ) ;
+   file4create( &passFile, &cb, "test.fil", 0 ) ;
    file4seqWriteInit( &writePassFile, &passFile, 0, buffer, sizeof( buffer ) ) ;
    for( i = 10 ; i ; i-- )
    {

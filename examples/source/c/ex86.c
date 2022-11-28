@@ -28,7 +28,7 @@ void main( )
    char date1[8], date2[8] ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
    bdate = d4field( data, "BIRTH_DATE" ) ;
    d4top( data ) ;
 

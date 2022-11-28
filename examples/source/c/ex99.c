@@ -26,7 +26,7 @@ void main( void )
    FIELD4 *comments, *name ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "DATA3" ) ;
+   data = d4open( &cb, "data3" ) ;
    comments = d4field( data, "COMMENTS" ) ;
    name = d4field( data, "NAME" ) ;
 

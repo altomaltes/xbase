@@ -26,7 +26,7 @@ void main( void )
 
    code4init( &cb ) ;
    cb.accessMode = OPEN4DENY_RW ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
 
    printf( "Reindexing %s Please Wait\n", d4alias( data ) ) ;
    if( d4reindex( data ) != 0 )

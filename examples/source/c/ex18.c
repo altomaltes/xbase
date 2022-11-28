@@ -25,7 +25,7 @@ void openAFile( CODE4 *cb )
    DATA4 *d ;
 
    /* 'd' falls out of scope.  Data file is still open*/
-   d = d4open( cb, "INFO" ) ;
+   d = d4open( cb, "info" ) ;
 }
 
 
@@ -37,13 +37,13 @@ void main( void )
    code4init( &cb ) ;
    openAFile( &cb ) ;
 
-   d = code4data( &cb, "INFO" ) ; /* obtain a new DATA4 structure*/
+   d = code4data( &cb, "info" ) ; /* obtain a new DATA4 structure*/
 
    if( d != NULL )
    {
       printf("INFO has %d records.\n", d4recCount( d )) ;
       d4top( d ) ;
-      d4close( code4data( &cb, "INFO") ) ; /*an alternative way to close the file*/
+      d4close( code4data( &cb, "info") ) ; /*an alternative way to close the file*/
    }
 
    code4initUndo( &cb ) ;

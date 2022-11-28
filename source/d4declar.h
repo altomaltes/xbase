@@ -10,16 +10,20 @@
    char *f4ecvt( double, int, int *, int * ) ;
    char *ecvt( double, int, int*, int* ) ;
 #endif
+
 #ifdef S4NO_FCVT
    char *fcvt( double, int, int*, int* ) ;
    char *f4fcvt( double, int, int *, int * ) ;
 #endif
+
 #ifdef S4NO_STRNICMP
    int strnicmp(char *, char *, size_t ) ;
 #endif
+
 #ifdef S4NO_ATOF
    double c4atof(const char *) ;
 #endif
+
 #ifdef S4NO_TOUPPER
    char toupper(char) ;
 #endif
@@ -27,13 +31,15 @@
 
 /* CONVERSIONS */
 PUBLIC double S4FUNCTION c4atod( const char S4PTR *, const int ) ;
-PUBLIC void S4FUNCTION c4atod2( char S4PTR *, int, double S4PTR *);
-PUBLIC int S4FUNCTION c4atoi( const char S4PTR *, const int ) ;
-PUBLIC long S4FUNCTION c4atol( const char S4PTR *, const int ) ;
+PUBLIC void   S4FUNCTION c4atod2( char S4PTR *, int, double S4PTR *);
+PUBLIC int    S4FUNCTION c4atoi( const char S4PTR *, const int ) ;
+PUBLIC long   S4FUNCTION c4atol( const char S4PTR *, const int ) ;
+
 #ifdef S4WINCE
    PUBLIC void S4FUNCTION c4atou(const char *, unsigned short *,  int ) ;
    PUBLIC void S4FUNCTION c4utoa( unsigned short *from) ;
 #endif
+
 PUBLIC void S4FUNCTION c4encode( char S4PTR *, const char S4PTR *, char S4PTR *, const char S4PTR * ) ;
 PUBLIC void S4FUNCTION c4trimN( char S4PTR *, int ) ;
 
@@ -41,12 +47,12 @@ PUBLIC void S4FUNCTION c4trimN( char S4PTR *, int ) ;
 PUBLIC CODE4 S4PTR *S4FUNCTION code4allocLow( int, const char S4PTR *, long ) ;
 PUBLIC DATA4 S4PTR *S4FUNCTION code4data( CODE4 S4PTR *, const char S4PTR * ) ;
 PUBLIC const char S4PTR * S4FUNCTION code4indexExtension( CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION code4initLow( CODE4 S4PTR *, const char S4PTR *, long, long ) ;
-PUBLIC int S4FUNCTION code4initUndo( CODE4 S4PTR * ) ;
-PUBLIC int S4FUNCTION code4lock( CODE4 S4PTR * ) ;
-PUBLIC void S4FUNCTION code4largeOn( CODE4 S4PTR * ) ;
-PUBLIC void S4FUNCTION tran4freeLocks( CODE4 S4PTR *, SINGLE4DISTANT S4PTR *t ) ;
-PUBLIC void S4FUNCTION code4lockClear( CODE4 S4PTR * ) ;
+PUBLIC                int S4FUNCTION code4initLow( CODE4 S4PTR *, const char S4PTR *, long, long ) ;
+PUBLIC int                S4FUNCTION code4initUndo( CODE4 S4PTR * ) ;
+PUBLIC int                S4FUNCTION code4lock( CODE4 S4PTR * ) ;
+PUBLIC void               S4FUNCTION code4largeOn( CODE4 S4PTR * ) ;
+PUBLIC               void S4FUNCTION tran4freeLocks( CODE4 S4PTR *, SINGLE4DISTANT S4PTR *t ) ;
+PUBLIC              void S4FUNCTION code4lockClear( CODE4 S4PTR * ) ;
 PUBLIC const char S4PTR *S4FUNCTION code4lockFileName( CODE4 S4PTR * ) ;
 PUBLIC long S4FUNCTION code4lockItem( CODE4 S4PTR * ) ;
 PUBLIC const char S4PTR *S4FUNCTION code4lockNetworkId( CODE4 S4PTR * ) ;
@@ -450,31 +456,34 @@ PUBLIC void S4FUNCTION mem4release( MEM4 S4PTR * ) ;
    #define t4open( a, b, c ) t4openLow( (a), (b), (c), 0 )
    PUBLIC TAG4 S4PTR *S4FUNCTION t4openLow( DATA4 S4PTR *, INDEX4 S4PTR *, const char S4PTR *, const char S4PTR * ) ;
    PUBLIC short int S4FUNCTION t4unique( const TAG4 S4PTR * ) ;
+
    #ifdef S4CLIPPER
       PUBLIC TAG4 S4PTR *S4FUNCTION t4create( DATA4 S4PTR *, const TAG4INFO S4PTR *, INDEX4 S4PTR *, int ) ;
    #endif
-      PUBLIC int S4FUNCTION t4uniqueSet( TAG4 S4PTR *, const short ) ;
-      PUBLIC S4CONST char S4PTR *S4FUNCTION t4exprLow( TAG4 S4PTR * ) ;
-      PUBLIC S4CONST char S4PTR *S4FUNCTION t4filterLow( TAG4 S4PTR * ) ;
+
+   PUBLIC int S4FUNCTION t4uniqueSet(                 TAG4 S4PTR *, const short ) ;
+   PUBLIC S4CONST char S4PTR *S4FUNCTION t4exprLow(   TAG4 S4PTR * ) ;
+   PUBLIC S4CONST char S4PTR *S4FUNCTION t4filterLow( TAG4 S4PTR * ) ;
          /* 'source' members are constant, so can use defines */
          #define t4expr( t4 )   ( (t4)->tagFile->expr->source )
       #define t4filter( t4 ) ( ( (t4)->tagFile->filter == 0 ? 0 : (t4)->tagFile->filter->source ) )
       PUBLIC unsigned short int S4FUNCTION tfile4isDescending( TAG4FILE * ) ;  /* for SQL */
 #endif /* S4COMP_OFF_INDEX */
 
-/* UTIL4 */
-PUBLIC int S4FUNCTION u4allocAgainDefault( CODE4 S4PTR *, char S4PTR * S4PTR *, unsigned int S4PTR *, const unsigned int ) ;
+/* UTIL4 
+ */
+PUBLIC int         S4FUNCTION u4allocAgainDefault( CODE4 S4PTR *, char S4PTR * S4PTR *, unsigned int S4PTR *, const unsigned int ) ;
 PUBLIC void S4PTR *S4FUNCTION u4allocDefault( long ) ;
 PUBLIC void S4PTR *S4FUNCTION u4allocErDefault( CODE4 S4PTR *, long ) ;
 PUBLIC void S4PTR *S4FUNCTION u4allocFreeDefault( CODE4 S4PTR *, long ) ;
-PUBLIC int S4FUNCTION u4freeDefault( void S4PTR * ) ;
-PUBLIC void S4FUNCTION u4freeFixedDefault( FIXED4MEM ) ;
-PUBLIC int S4FUNCTION u4nameChar( unsigned char ) ;
+PUBLIC int         S4FUNCTION u4freeDefault( void S4PTR * ) ;
+PUBLIC void        S4FUNCTION u4freeFixedDefault( FIXED4MEM ) ;
+PUBLIC int         S4FUNCTION u4nameChar( unsigned char ) ;
 /* u4nameCurrent for utils */
-PUBLIC int S4FUNCTION u4nameCurrent( char S4PTR *, const int, const char S4PTR * ) ;
+PUBLIC int S4FUNCTION u4nameCurrent(         char S4PTR *, const int, const char S4PTR * ) ;
 PUBLIC int S4FUNCTION u4nameCurrentExtended( char S4PTR *, const int, const char S4PTR *, const char S4PTR * ) ;
-PUBLIC int S4FUNCTION u4nameExt( char S4PTR *, int, const char S4PTR *, const int ) ;
-PUBLIC int S4FUNCTION u4namePiece( char S4PTR *, const unsigned int, const char S4PTR *, const int, const int ) ;
+PUBLIC int S4FUNCTION u4nameExt(             char S4PTR *, int, const char S4PTR *, const int ) ;
+PUBLIC int S4FUNCTION u4namePiece(           char S4PTR *, const unsigned int, const char S4PTR *, const int, const int ) ;
 #ifdef S4MACINTOSH
    char *u4getMacPath(CODE4 *c4, char *buf, int buflen ) ;
 #endif
@@ -536,25 +545,25 @@ PUBLIC long S4FUNCTION u4switch( void ) ;  /* used for example start-up verifica
 
  PUBLIC const char *S4FUNCTION t4getExprSource( TAG4 S4PTR * ) ;
 
- PUBLIC void S4FUNCTION c4setAccessMode( CODE4 S4PTR *, char ) ;
- PUBLIC void S4FUNCTION c4setAutoOpen( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setErrorCode( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setErrExpr( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setErrFieldName( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setErrGo( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setErrOpen( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setErrRelate( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setErrSkip( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setErrTagName( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setLockAttempts( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setLockEnforce( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setOptimize( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setOptimizeWrite( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setReadLockDo( CODE4 S4PTR *, char ) ;
- PUBLIC void S4FUNCTION c4setReadOnlyDo( CODE4 S4PTR *, int ) ;
- PUBLIC void S4FUNCTION c4setSafety( CODE4 S4PTR *, char ) ;
- PUBLIC void S4FUNCTION c4setSingleOpen( CODE4 S4PTR *, short ) ;
- PUBLIC void S4FUNCTION c4setErrDefaultUnique( CODE4 S4PTR *, short ) ;
+ PUBLIC void S4FUNCTION c4setAccessMode(       CODE4 S4PTR *, char ) ;
+ PUBLIC void S4FUNCTION c4setAutoOpen(         CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrorCode(        CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrExpr(          CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrFieldName(     CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrGo(            CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrOpen(          CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrRelate(        CODE4 S4PTR *, int ) ;
+ PUBLIC void S4FUNCTION c4setErrSkip(          CODE4 S4PTR *, int   );
+ PUBLIC void S4FUNCTION c4setErrTagName(       CODE4 S4PTR *, int   );
+ PUBLIC void S4FUNCTION c4setLockAttempts(     CODE4 S4PTR *, int   );
+ PUBLIC void S4FUNCTION c4setLockEnforce(      CODE4 S4PTR *, int   );
+ PUBLIC void S4FUNCTION c4setOptimize(         CODE4 S4PTR *, int   );
+ PUBLIC void S4FUNCTION c4setOptimizeWrite(    CODE4 S4PTR *, int   );
+ PUBLIC void S4FUNCTION c4setReadLockDo(       CODE4 S4PTR *, char  );
+ PUBLIC void S4FUNCTION c4setReadOnlyDo(       CODE4 S4PTR *, int   );
+ PUBLIC void S4FUNCTION c4setSafety(           CODE4 S4PTR *, char  );
+ PUBLIC void S4FUNCTION c4setSingleOpen(       CODE4 S4PTR *, short );
+ PUBLIC void S4FUNCTION c4setErrDefaultUnique( CODE4 S4PTR *, short );
 
  #define c4systemPath( c4 ) ( "" )
  #define D4close( d4 ) ( d4close( d4 ) )

@@ -42,7 +42,7 @@ void main()
    DATA4 *data ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
    d4top( data ) ;
    displayTheRecord( data ) ;
    code4initUndo( &cb ) ;

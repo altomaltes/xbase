@@ -28,7 +28,7 @@ void main(  )
    short fieldNum ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
 
    code4optStart( &cb ) ;
 

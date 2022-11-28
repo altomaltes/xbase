@@ -27,7 +27,7 @@ void main( )
    char *result, *name ;
 
    code4init( &settings ) ;
-   db = d4open( &settings, "DATA" ) ;
+   db = d4open( &settings, "data" ) ;
 
    d4top( db ) ;
    fullName = expr4parse( db, "TRIM( LNAME )+', '+FNAME" ) ;

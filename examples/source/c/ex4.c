@@ -30,7 +30,7 @@ void main( )
       return r4unique when attempted.*/
    cb.errDefaultUnique = r4unique ;
 
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
 
    d4top( data ) ;
    d4appendStart( data, 0 ) ;

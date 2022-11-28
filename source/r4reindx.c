@@ -414,7 +414,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4, TAG4FILE *t4 )
    int len ;
    const char *ptr ;
    FILE4LONG pos ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       I4IND_HEAD_WRITE *swap ;
    #endif
 
@@ -424,7 +424,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4, TAG4FILE *t4 )
 
    t4->header.eof = 0 ;
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       /* swap = (I4IND_HEAD_WRITE *) t4->codeBase, u4allocEr( sizeof(I4IND_HEAD_WRITE ) ) ;*/
       swap = (I4IND_HEAD_WRITE *)u4allocEr( t4->codeBase, sizeof(I4IND_HEAD_WRITE ) ) ;
       if ( swap == 0 )
@@ -460,7 +460,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4, TAG4FILE *t4 )
 
    file4seqWrite( &r4->seqwrite, ptr, len) ;
    file4seqWriteRepeat( &r4->seqwrite, I4MAX_EXPR_SIZE - len + 1, 0 ) ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       t4->header.unique = x4reverseLong( (void *)&t4->header.unique ) ;
       file4seqWrite( &r4->seqwrite, &t4->header.unique, sizeof( t4->header.unique ) ) ;
       t4->header.unique = x4reverseLong( (void *)&t4->header.unique ) ;
@@ -470,7 +470,7 @@ int r4reindexTagHeadersWrite( R4REINDEX *r4, TAG4FILE *t4 )
 
    file4seqWriteRepeat( &r4->seqwrite, 1, (char)0 ) ;
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       t4->header.descending = x4reverseLong( (void *)&t4->header.descending ) ;
       file4seqWrite( &r4->seqwrite, &t4->header.descending, sizeof( t4->header.descending ) ) ;
       t4->header.descending = x4reverseLong( (void *)&t4->header.descending ) ;
@@ -598,7 +598,7 @@ static int r4reindexToDisk( R4REINDEX *r4, long rec, const char *keyValue )
       long dif ;
       B4KEY_DATA *keyOn ;
    #endif
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       char *swap, *swapPtr ;
       int j ;
       long longVal ;
@@ -621,7 +621,7 @@ static int r4reindexToDisk( R4REINDEX *r4, long rec, const char *keyValue )
    for(;;)
    {
       tnUsed++ ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          swap = (char *)u4allocEr( r4->codeBase, B4BLOCK_SIZE ) ;
          if ( swap == 0 )
             return -1 ;
@@ -736,7 +736,7 @@ int r4reindexFinish( R4REINDEX *r4 )
    #endif
    int iBlock = 0, tBlock ;
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       char *swap, *swapPtr ;
       int j ;
       long longVal ;
@@ -763,7 +763,7 @@ int r4reindexFinish( R4REINDEX *r4 )
       r4->stranded = 0 ;
       pointer = 0 ;
 
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          swap = (char *)u4allocEr( r4->codeBase, B4BLOCK_SIZE ) ;
          if ( swap == 0 )
             return error4describe( r4->codeBase, e4memory, 0, 0, 0, 0 ) ;
@@ -788,7 +788,7 @@ int r4reindexFinish( R4REINDEX *r4 )
       /* just grab the pointer for upward placement where belongs */
       r4->stranded = 0 ;
 
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          swap = (char *) u4allocEr( r4->codeBase, B4BLOCK_SIZE ) ;
          if ( swap == 0 )
             return -1 ;
@@ -825,7 +825,7 @@ int r4reindexFinish( R4REINDEX *r4 )
       block->nKeys -- ;
       if( block->nKeys > 0 )
       {
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             swap = (char *)u4allocEr( r4->codeBase, B4BLOCK_SIZE ) ;
             if ( swap == 0 )
                return -1 ;
@@ -874,7 +874,7 @@ int r4reindexFinish( R4REINDEX *r4 )
          keyTo->pointer = pointer ;
          pointer = 0 ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             swap = (char *) u4allocEr( r4->codeBase, B4BLOCK_SIZE ) ;
             if ( swap == 0 )
                return -1 ;
@@ -913,7 +913,7 @@ int r4reindexFinish( R4REINDEX *r4 )
       #endif
       keyTo->pointer = r4->lastblock * 512 ;
 
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          swap = (char *)u4allocEr( r4->codeBase, B4BLOCK_SIZE ) ;
          if ( swap == 0 )
             return -1 ;

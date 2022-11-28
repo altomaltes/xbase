@@ -538,14 +538,13 @@
 /* #define S4LSEEK        */ /* use if lseek() cannot seek past EOF */
    #define S4CASE_SEN
    #define S4STRUCT_PAD
-   #define S4NO_INET_ATON
 
-   #define S4OFF_REPORT
+ //  #define S4OFF_REPORT
    #define S4OFF_THREAD
 
-   #ifndef S4OFF_REPORT
-      #error - CodeReporter not supported under Unix. Set S4OFF_REPORT.
-   #endif
+//   #ifndef S4OFF_REPORT
+//      #error - CodeReporter not supported under Unix. Set S4OFF_REPORT.
+//   #endif
 
    #ifndef S4OFF_THREAD
       #error - Multithreading not supported under Unix. Set S4OFF_THREAD.
@@ -568,7 +567,7 @@
 
 #ifdef S4MACINTOSH
    #define S4BYTEORDER_3210
-   #define S4BYTE_SWAP
+   #define WORDS_BIGENDIAN
    #define S4NO_FCVT
    #define S4NO_ECVT
    #define S4NO_FILELENGTH

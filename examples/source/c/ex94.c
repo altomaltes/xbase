@@ -30,7 +30,7 @@ void main( void )
 
    code4init( &cb ) ;
    cb.accessMode = OPEN4DENY_RW ;
-   info = d4open( &cb , "INFO" ) ;
+   info = d4open( &cb , "info" ) ;
    birthDate = d4field( info, "BIRTH_DATE" ) ;
    error4exitTest( &cb ) ;
 
@@ -43,7 +43,9 @@ void main( void )
    printf( "Age in days: %d\n", ageInDays ) ;
 
    /* display all current birth dates in a formatted manner */
-   for(rc = d4top( info ); rc == 0; rc = d4skip( info, 1L ) )
+   for( rc = d4top( info )
+      ; rc == 0
+      ; rc = d4skip( info, 1L ) )
    {
       date4format( f4str( birthDate ), result, "MMM DD, CCYY" ) ;
       printf( "%s\n", result ) ;

@@ -48,7 +48,7 @@ int tfile4removeBranch( TAG4FILE *t4, B4BLOCK *blockOn )
    long lNode, rNode ;
    INDEX4FILE *i4 ;
    FILE4LONG pos ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       char *swapPtr ;
       S4LONG longVal ;
       short shortVal ;
@@ -95,7 +95,7 @@ int tfile4removeBranch( TAG4FILE *t4, B4BLOCK *blockOn )
          if ( file4readAllInternal( &i4->file, pos, &blockOn->header, B4BLOCK_SIZE) < 0 )
             return 0 ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             blockOn->header.nodeAttribute = x4reverseShort( (void *)&blockOn->header.nodeAttribute ) ;
             blockOn->header.nKeys = x4reverseShort( (void *)&blockOn->header.nKeys ) ;
             blockOn->header.leftNode = x4reverseLong( (void *)&blockOn->header.leftNode ) ;
@@ -139,7 +139,7 @@ int tfile4removeBranch( TAG4FILE *t4, B4BLOCK *blockOn )
          if ( file4readAllInternal( &i4->file, pos, &blockOn->header, B4BLOCK_SIZE) < 0 )
             return 0 ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             blockOn->header.nodeAttribute = x4reverseShort( (void *)&blockOn->header.nodeAttribute ) ;
             blockOn->header.nKeys = x4reverseShort( (void *)&blockOn->header.nKeys ) ;
             blockOn->header.leftNode = x4reverseLong( (void *)&blockOn->header.leftNode ) ;
@@ -311,12 +311,12 @@ int tfile4removeCurrent( TAG4FILE *t4 )
                   {
                      /* first update the tags root */
                      t4->header.root = b4key( b4, 0 )->num ;
-                     #ifdef S4BYTE_SWAP
+                     #ifdef WORDS_BIGENDIAN
                         t4->header.root = x4reverseLong( (void *)&t4->header.root ) ;
                      #endif
                      file4longAssign( pos, t4->headerOffset, 0 ) ;
                      file4writeInternal( &t4->indexFile->file, pos, (void *)&t4->header.root, sizeof(t4->header.root) ) ;
-                     #ifdef S4BYTE_SWAP
+                     #ifdef WORDS_BIGENDIAN
                         t4->header.root = x4reverseLong( (void *)&t4->header.root ) ;
                      #endif
                      updateReqd = 0 ;

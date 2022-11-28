@@ -25,7 +25,7 @@ void main( void )
    DATA4 *infoFile ;
 
    code4init( &cb ) ;
-   infoFile = d4open( &cb, "INFO" ) ;
+   infoFile = d4open( &cb, "info" ) ;
 
    /* Go to the end of file and set the End of file flag*/
    d4goEof( infoFile ) ;

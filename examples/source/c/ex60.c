@@ -26,10 +26,10 @@ void main( void )
    long iRec ;
 
    code4init( &cb ) ;
-   from = d4open ( &cb, "DATABASE" ) ;
+   from = d4open ( &cb, "database" ) ;
    code4optStart( &cb ) ;
 
-   to = d4open( &cb, "DATA2" ) ;
+   to = d4open( &cb, "data2" ) ;
      /* Database 'DATA2' has an identical database
         structure as database 'DATABASE'. */
 

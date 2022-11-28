@@ -72,9 +72,9 @@ static int r4reindexTagHeadersWriteSp( R4REINDEX *r4 )
    int nTag, iTag, jField, saveCode ;
    T4DESC tagInfo ;
    FILE4LONG pos ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       I4HEADER swapHeader ;
-   #endif  /* S4BYTE_SWAP */
+   #endif  /* WORDS_BIGENDIAN */
 
    memset( (void *)higher, 0, sizeof(higher) ) ;
    memset( (void *)lower,  0, sizeof(lower) ) ;
@@ -136,7 +136,7 @@ static int r4reindexTagHeadersWriteSp( R4REINDEX *r4 )
    i4->header.freeList = 0L ;
    u4yymmdd( i4->header.yymmdd ) ;
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       memcpy( (void *)&swapHeader, (void *)&i4->header, sizeof(I4HEADER) ) ;
 
       swapHeader.blockChunks = x4reverseShort( (void *)&swapHeader.blockChunks ) ;
@@ -149,7 +149,7 @@ static int r4reindexTagHeadersWriteSp( R4REINDEX *r4 )
       file4seqWrite( &r4->seqwrite, &swapHeader, sizeof(I4HEADER) ) ;
    #else
       file4seqWrite( &r4->seqwrite, &i4->header, sizeof(I4HEADER) ) ;
-   #endif  /* S4BYTE_SWAP */
+   #endif  /* WORDS_BIGENDIAN */
 
    file4seqWriteRepeat( &r4->seqwrite, 512-sizeof(I4HEADER)+17, 0 ) ;
    /* There is a 0x01 on byte 17 of the first 32 bytes. */
@@ -173,12 +173,12 @@ static int r4reindexTagHeadersWriteSp( R4REINDEX *r4 )
 
          tagInfo.indexType = tagOn->header.type ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             tagInfo.headerPos = x4reverseLong( (void *)&tagInfo.headerPos ) ;
             tagInfo.x1000 = 0x0010 ;
          #else
             tagInfo.x1000 = 0x1000 ;
-         #endif  /* S4BYTE_SWAP */
+         #endif  /* WORDS_BIGENDIAN */
 
          tagInfo.x2 = 2 ;
          tagInfo.leftChld = (char) lower[iTag+1] ;
@@ -222,7 +222,7 @@ static int i4addOneTag( INDEX4 *i4, const TAG4INFO *tagData )
       B4BLOCK *b4 ;
       long rNode, goTo ;
       int totLen, exprHdrLen ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          T4HEADER swapTagHeader ;
          char *swapPtr ;
          S4LONG longVal ;
@@ -234,9 +234,9 @@ static int i4addOneTag( INDEX4 *i4, const TAG4INFO *tagData )
       #endif
    #endif
    #ifdef S4MDX
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          T4HEADER swapTagHeader ;
-      #endif  /* S4BYTE_SWAP */
+      #endif  /* WORDS_BIGENDIAN */
       int len ;
    #endif
 
@@ -414,7 +414,7 @@ static int i4addOneTag( INDEX4 *i4, const TAG4INFO *tagData )
          file4longAssign( pos, tagFile->headerOffset, 0 ) ;
          file4seqWriteInitLow( &reindex.seqwrite, &i4->indexFile->file, pos, reindex.buffer, reindex.bufferLen ) ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             memcpy( (void *)&swapTagHeader, (void *)&tagFile->header, sizeof(T4HEADER) ) ;
 
             swapTagHeader.root = x4reverseLong( (void *)&swapTagHeader.root ) ;
@@ -431,7 +431,7 @@ static int i4addOneTag( INDEX4 *i4, const TAG4INFO *tagData )
             rc = file4seqWrite( &reindex.seqwrite, &tagFile->header, sizeof(T4HEADER) ) ;
             if ( rc < 0 )
                break ;
-         #endif  /* S4BYTE_SWAP */
+         #endif  /* WORDS_BIGENDIAN */
 
          ptr = tagFile->expr->source ;
          len = strlen( ptr ) ;
@@ -627,7 +627,7 @@ static int i4addOneTag( INDEX4 *i4, const TAG4INFO *tagData )
          if ( rc < 0 )
             break ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             memcpy( (void *)&swapTagHeader, (void *)&tagFile->header, sizeof(T4HEADER) ) ;
 
             swapTagHeader.root = x4reverseLong( (void *)&swapTagHeader.root ) ;
@@ -660,7 +660,7 @@ static int i4addOneTag( INDEX4 *i4, const TAG4INFO *tagData )
 
          exprHdrLen = 5*sizeof(short) ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             rc = file4seqWrite( &reindex.seqwrite, &swapTagHeader.descending, exprHdrLen ) ;
          #else
             rc = file4seqWrite( &reindex.seqwrite, &tagFile->header.descending, (unsigned int)exprHdrLen ) ;
@@ -713,7 +713,7 @@ static int i4addOneTag( INDEX4 *i4, const TAG4INFO *tagData )
                   if ( rc < 0 )
                      break ;
 
-                  #ifdef S4BYTE_SWAP
+                  #ifdef WORDS_BIGENDIAN
                      b4->header.nodeAttribute = x4reverseShort( (void *)&b4->header.nodeAttribute ) ;
                      b4->header.nKeys = x4reverseShort( (void *)&b4->header.nKeys ) ;
                      b4->header.leftNode = x4reverseLong( (void *)&b4->header.leftNode ) ;

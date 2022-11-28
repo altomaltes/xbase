@@ -174,7 +174,7 @@ int i4readBlock( FILE4 *file, const long blockNo, B4BLOCK *parent, B4BLOCK *b4 )
    #ifndef S4CLIPPER
       INDEX4FILE *i4file ;
    #endif
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       char *swapPtr ;
       int i ;
       S4LONG longVal ;
@@ -209,7 +209,7 @@ int i4readBlock( FILE4 *file, const long blockNo, B4BLOCK *parent, B4BLOCK *b4 )
       #endif
       if ( rc < 0 )
          return -1 ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          /* swap the numKeys value */
          b4->nKeys = x4reverseShort( (void *)&b4->nKeys ) ;
 
@@ -231,7 +231,7 @@ int i4readBlock( FILE4 *file, const long blockNo, B4BLOCK *parent, B4BLOCK *b4 )
             longVal = x4reverseLong( (void *)swapPtr ) ;
             memcpy( swapPtr, (void *) &longVal, sizeof(S4LONG) ) ;
          }
-      #endif  /* S4BYTE_SWAP */
+      #endif  /* WORDS_BIGENDIAN */
    #endif
 
    rc = 0 ;
@@ -248,7 +248,7 @@ int i4readBlock( FILE4 *file, const long blockNo, B4BLOCK *parent, B4BLOCK *b4 )
       if ( rc < 0 )
          return error4stack( c4, (short)rc, E91604 ) ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             b4->header.nodeAttribute = x4reverseShort( (void *)&b4->header.nodeAttribute ) ;
             b4->header.nKeys = x4reverseShort( (void *)&b4->header.nKeys ) ;
             b4->header.leftNode = x4reverseLong( (void *)&b4->header.leftNode ) ;
@@ -292,7 +292,7 @@ int i4readBlock( FILE4 *file, const long blockNo, B4BLOCK *parent, B4BLOCK *b4 )
       #endif
       if ( rc < 0 )
          return error4stack( c4, rc, E91604 ) ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          index4swapBlockClipper(&b4->nKeys, tag->header.keysMax, tag->header.groupLen ) ;
       #endif
       b4->fileBlock = blockNo/512 ;
@@ -781,7 +781,7 @@ int tfile4down( TAG4FILE *t4 )
          rc = file4readAllInternal( &i4->file, pos, &t4->header.root,sizeof(t4->header.root)) ;
          if ( rc < 0 )
             return error4stack( t4->codeBase, (short)rc, E91642 ) ;
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             t4->header.root = x4reverseLong( (void *)&t4->header.root ) ;
          #endif
       }
@@ -963,7 +963,7 @@ int tfile4update( TAG4FILE *t4 )
 
    if ( t4->rootWrite )
    {
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          t4->header.root = x4reverseLong( (void *)&t4->header.root ) ;
       #endif
 
@@ -972,7 +972,7 @@ int tfile4update( TAG4FILE *t4 )
       if ( rc < 0 )
          return error4stack( t4->codeBase, (short)rc, E91642 ) ;
 
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          t4->header.root = x4reverseLong( (void *)&t4->header.root ) ;
       #endif
 
@@ -1711,14 +1711,14 @@ B4BLOCK *tfile4split( TAG4FILE *t4, B4BLOCK *oldBlock )
 
       if ( newBlock->header.rightNode != -1 )   /* must change left ptr for next block over */
       {
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             newBlock->fileBlock = x4reverseLong( (void *)&newBlock->fileBlock ) ;
          #endif
          file4longAssign( pos, newBlock->header.rightNode + 2 * sizeof( short ), 0 ) ;
          rc = file4writeInternal( &t4->indexFile->file, pos, &newBlock->fileBlock, sizeof( newBlock->header.leftNode ) ) ;
          if ( rc < 0 )
             return 0 ;
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             newBlock->fileBlock = x4reverseLong( (void *)&newBlock->fileBlock ) ;
          #endif
       }

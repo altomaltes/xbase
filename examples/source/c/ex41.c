@@ -26,7 +26,7 @@ void main( void )
    long count ;
 
    code4init( &codeBase ) ;
-   file = d4open( &codeBase, "INFO") ;
+   file = d4open( &codeBase, "info") ;
 
    code4optStart( &codeBase ) ;
 

@@ -26,7 +26,7 @@ void main( )
    char badExpr[] = "NAME = 5" ;
 
    code4init( &code ) ;
-   data = d4open( &code, "INFO" );
+   data = d4open( &code, "info" );
    expression = expr4parse( data, badExpr ) ;
 
    printf( "\nAn error message just displayed\n") ;

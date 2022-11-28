@@ -28,9 +28,9 @@ void main( void )
    RELATE4 *master, *toOffice, *toBuilding ;
 
    code4init( &cb ) ;
-   employee = d4open( &cb, "EMPLOYEE" );
-   office = d4open( &cb, "OFFICE" ) ;
-   building = d4open( &cb, "BUILDING" ) ;
+   employee = d4open( &cb, "employee" );
+   office   = d4open( &cb, "office" ) ;
+   building = d4open( &cb, "building" ) ;
 
    /*set up the tags */
    officeNo = d4tag( office, "OFF_NUM" ) ;
@@ -38,8 +38,8 @@ void main( void )
 
    /* Create the relations */
    master = relate4init( employee ) ;
-   toOffice = relate4createSlave(master,office, "EMPLOYEE->OFFICE_NO", officeNo );
-   toBuilding = relate4createSlave( toOffice, building, "OFFICE->BUILD_NO", buildNo ) ;
+   toOffice = relate4createSlave(master,office, "employee->OFFICE_NO", officeNo );
+   toBuilding = relate4createSlave( toOffice, building, "office->BUILD_NO", buildNo ) ;
    /* Go to employee, at record 2*/
    d4go( employee, 2L ) ;
 

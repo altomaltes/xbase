@@ -26,7 +26,7 @@ void main( void )
    TAG4 *tag ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
    tag = d4tagDefault( data ) ;
 
    error4exitTest( &cb ) ;

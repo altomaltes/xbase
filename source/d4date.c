@@ -445,7 +445,7 @@ int S4FUNCTION date4formatMdx2( const char *datePtr, double *doubPtr )
       *doubPtr = (double)S4NULL_DATE ;  /* Blank or Null date */
    else
       *doubPtr = (double)ldate ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       *doubPtr = x4reverseDouble(doubPtr) ;
    #endif
 

@@ -25,7 +25,7 @@ void openAFile( CODE4 *cb )
    DATA4 *d ;
 
    /* 'd' falls out of scope.  Data file is still open*/
-   d = d4open( cb, "INFO" ) ;
+   d = d4open( cb, "info" ) ;
 }
 
 void main( void )
@@ -37,7 +37,7 @@ void main( void )
    cb.autoOpen = 0 ;
    openAFile( &cb ) ;
 
-   d = d4open( &cb, "DATA" ) ;   /* open a second file */
+   d = d4open( &cb, "data" ) ;   /* open a second file */
    printf("Number of records in DATA: %d\n",d4recCount( d ) ) ;
 
    code4close( &cb ) ; /* INFO and DATAFILE are both closed*/

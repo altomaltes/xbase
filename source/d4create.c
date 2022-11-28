@@ -614,11 +614,11 @@ int dfile4create( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, cons
       createHeader.codePage = (char)c4->codePage ;   /* write codepage stamp */
    #endif
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       createHeader.numRecs = x4reverseLong( (void *)&createHeader.numRecs ) ;
       createHeader.headerLen = x4reverseShort( (void *)&createHeader.headerLen ) ;
       createHeader.recordLen = x4reverseShort( (void *)&createHeader.recordLen ) ;
-   #endif  /* S4BYTE_SWAP */
+   #endif  /* WORDS_BIGENDIAN */
 
    rc = file4seqWrite( &seqWrite, (char *) &createHeader, sizeof(createHeader) ) ;
    if ( rc < 0 )
@@ -643,7 +643,7 @@ int dfile4create( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, cons
       c4upper( &createFieldImage.type ) ;
       #ifdef S4FOX
          createFieldImage.offset = (short)calcRecordLen ;
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             createFieldImage.offset = x4reverseLong( (void *)&createFieldImage.offset ) ;
          #endif
          calcRecordLen += fieldData[i].len ;

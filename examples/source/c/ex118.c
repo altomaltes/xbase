@@ -25,7 +25,7 @@ int addLotsOfRecords( DATA4 *d )
 	INDEX4 *index ;
 	int i ;
 
-	index = d4index( d, "INFO2" ) ; /* get the secondary index file*/
+	index = d4index( d, "info2" ) ; /* get the secondary index file*/
     								
 	if( index != NULL )
        i4close( index ) ;
@@ -38,7 +38,7 @@ int addLotsOfRecords( DATA4 *d )
     }
 
     /* open the index file and update it*/
-    index = i4open( d, "INFO2" ) ;
+    index = i4open( d, "info2" ) ;
     return i4reindex( index ) ;
 }
 
@@ -48,8 +48,8 @@ void main()
 	DATA4 *data ;
 
 	code4init( &cb ) ;
-	data = d4open( &cb, "INFO") ;
-   i4open( data, "INFO2" ) ;
+	data = d4open( &cb, "info") ;
+   i4open( data, "info2" ) ;
 	addLotsOfRecords( data ) ;
 	code4initUndo( &cb ) ;
 }

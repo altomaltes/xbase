@@ -12,6 +12,8 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
+#ifdef _WIN32
+
 #include <windows.h>
 #include "d4all.h"
 
@@ -23,6 +25,7 @@ DATA4 *data ;
 #ifdef __BORLANDC__
    #pragma argsused
 #endif
+
 int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdParam, int nCmdShow )
 {
    static char szAppName[] = "testapp";
@@ -61,7 +64,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpszCmdP
    cb.hInst = hInstance;
    cb.autoOpen = 0;
 
-   data = d4open( &cb, "INFO" );
+   data = d4open( &cb, "info" );
    if (data)
       /* Cause a CodeBase message box to appear*/
       d4go( data, d4recCount( data ) + 1 ) ;
@@ -74,3 +77,10 @@ long FAR PASCAL WndProc( HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
    return( DefWindowProc(hwnd, msg, wParam, lParam) );
 }
+
+
+#else
+  int main()
+  { puts( "only windows version" );
+  }
+#endif

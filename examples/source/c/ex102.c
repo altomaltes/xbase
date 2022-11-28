@@ -27,7 +27,7 @@ void main ()
    FIELD4 *field1, *field2 ;
 
    code4init( &cb ) ;
-   data = d4open( &cb , "INFO" ) ;
+   data = d4open( &cb , "info" ) ;
    field1 = d4fieldJ( data, 1 ) ;
    field2 = d4fieldJ( data, 2 ) ;
    d4top( data ) ;

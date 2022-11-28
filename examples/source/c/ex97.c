@@ -36,7 +36,7 @@ void main()
    char *buffer ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
    field = d4field( data, "NAME" ) ;
    d4top( data ) ;
    buffer = createBufCopy( field ) ;

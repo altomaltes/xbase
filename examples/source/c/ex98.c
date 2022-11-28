@@ -27,7 +27,7 @@ void main( void )
    long count ;
 
    code4init( &cb ) ;
-   data = d4open( &cb , "DATA3" ) ;
+   data = d4open( &cb , "data3" ) ;
    comments = d4field( data, "COMMENTS" ) ;
 
    error4exitTest( &cb ) ;

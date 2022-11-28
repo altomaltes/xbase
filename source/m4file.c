@@ -96,7 +96,7 @@ int memo4fileOpen( MEMO4FILE *f4memo, DATA4FILE *d4, char *name )
    if ( (rc = file4readAllInternal(&f4memo->file, pos, &header, sizeof(header))) < 0 )
       return -1 ;
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       #ifdef S4MFOX
          f4memo->blockSize = header.blockSize  ;
       #else
@@ -142,7 +142,7 @@ int memo4fileReadPart( MEMO4FILE *f4memo, long memoId, char **ptrPtr, unsigned *
    if ( file4readAllInternal( &f4memo->file, pos, &memoBlock, sizeof( MEMO4BLOCK ) ) < 0)
       return -1 ;
 
-   #ifndef S4BYTE_SWAP
+   #ifndef WORDS_BIGENDIAN
       memoBlock.type = x4reverseLong( (void *)&memoBlock.type ) ;
       memoBlock.numChars = x4reverseLong( (void *)&memoBlock.numChars ) ;
    #endif
@@ -287,7 +287,7 @@ int memo4fileRead( MEMO4FILE *f4memo, long memoId, char **ptrPtr, unsigned int *
          if ( file4readAllInternal( &f4memo->file, pos, &memoBlock, sizeof( MEMO4BLOCK ) ) < 0)
             return -1 ;
 
-         #ifdef S4BYTE_SWAP
+         #ifdef WORDS_BIGENDIAN
             memoBlock.startPos = x4reverseShort( (void *)&memoBlock.startPos ) ;
             memoBlock.numChars = x4reverseLong( (void *)&memoBlock.numChars ) ;
          #endif
@@ -381,7 +381,7 @@ int memo4fileWritePart( MEMO4FILE *f4memo, long *memoIdPtr, const char *ptr, con
 
          file4readAllInternal( &f4memo->file, pos, (char *)&oldMemoBlock, sizeof(oldMemoBlock) ) ;
 
-         #ifndef S4BYTE_SWAP
+         #ifndef WORDS_BIGENDIAN
             oldMemoBlock.type = x4reverseLong( (void *)&oldMemoBlock.type ) ;
             oldMemoBlock.numChars = x4reverseLong( (void *)&oldMemoBlock.numChars ) ;
          #endif
@@ -402,7 +402,7 @@ int memo4fileWritePart( MEMO4FILE *f4memo, long *memoIdPtr, const char *ptr, con
 
          file4longAssign( pos, 0, 0 ) ;
          lenRead = file4readInternal( &f4memo->file, pos, &mh, sizeof( mh ) ) ;
-         #ifndef S4BYTE_SWAP
+         #ifndef WORDS_BIGENDIAN
             mh.nextBlock = x4reverseLong( (void *)&mh.nextBlock ) ;
             /* block size isn't needed */
          #endif
@@ -432,7 +432,7 @@ int memo4fileWritePart( MEMO4FILE *f4memo, long *memoIdPtr, const char *ptr, con
          *memoIdPtr = mh.nextBlock ;
          mh.nextBlock = *memoIdPtr + strNumBlocks ;
 
-         #ifndef S4BYTE_SWAP
+         #ifndef WORDS_BIGENDIAN
             mh.nextBlock = x4reverseLong( (void *)&mh.nextBlock ) ;
          #endif
 
@@ -542,7 +542,7 @@ int memo4fileWrite( MEMO4FILE *f4memo, long *memoIdPtr, const char *ptr, const u
 
             file4longAssign( pos, 0, 0 ) ;
             lenRead = file4readInternal( &f4memo->file, pos, &mh, sizeof( mh ) ) ;
-            #ifdef S4BYTE_SWAP
+            #ifdef WORDS_BIGENDIAN
                mh.nextBlock = x4reverseLong( (void *)&mh.nextBlock ) ;
             #endif
             if ( error4code( f4memo->data->c4 ) < 0 )
@@ -570,7 +570,7 @@ int memo4fileWrite( MEMO4FILE *f4memo, long *memoIdPtr, const char *ptr, const u
 
             *memoIdPtr = mh.nextBlock ;
             mh.nextBlock = *memoIdPtr + strNumBlocks ;
-            #ifdef S4BYTE_SWAP
+            #ifdef WORDS_BIGENDIAN
                mh.nextBlock = x4reverseLong( (void *)&mh.nextBlock ) ;
             #endif
 
@@ -584,7 +584,7 @@ int memo4fileWrite( MEMO4FILE *f4memo, long *memoIdPtr, const char *ptr, const u
                #endif
             #endif
 
-            #ifdef S4BYTE_SWAP
+            #ifdef WORDS_BIGENDIAN
                mh.nextBlock = x4reverseLong( (void *)&mh.nextBlock ) ;
             #endif
          }
@@ -621,7 +621,7 @@ int memo4fileWrite( MEMO4FILE *f4memo, long *memoIdPtr, const char *ptr, const u
             file4longAssign( pos, newEntry.blockNo * f4memo->blockSize, 0 ) ;
 
             file4readAllInternal( &f4memo->file, pos, (char *)&oldMemoBlock, sizeof(oldMemoBlock) ) ;
-            #ifdef S4BYTE_SWAP
+            #ifdef WORDS_BIGENDIAN
                oldMemoBlock.startPos = x4reverseShort( (void *)&oldMemoBlock.startPos ) ;
                oldMemoBlock.numChars = x4reverseLong( (void *)&oldMemoBlock.numChars ) ;
             #endif

@@ -25,7 +25,7 @@ void main( void )
    FILE4 test ;
 
    code4init( &cb ) ;
-   if( file4open( &test, &cb, "TEXT.FIL", 0 ) < 0 )
+   if( file4open( &test, &cb, "text.fil", 0 ) < 0 )
       code4exit( &cb ) ;
    cb.lockAttempts = 20 ; /* attempt a lock 20 times*/
    if( file4lock( &test, 0, LONG_MAX ) != 0 )

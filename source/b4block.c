@@ -162,12 +162,12 @@ int b4flush( B4BLOCK *b4 )
    TAG4FILE *t4file ;
    FILE4LONG fPos ;
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       char *swap, *swapPtr ;
       int i ;
       S4LONG longVal ;
       short shortVal ;
-   #endif  /* S4BYTE_SWAP */
+   #endif  /* WORDS_BIGENDIAN */
 
    E4PARMLOW( b4, E90438 );
 
@@ -181,7 +181,7 @@ int b4flush( B4BLOCK *b4 )
       i4 = t4file->indexFile ;
       file4longAssign( fPos, b4->fileBlock*I4MULTIPLY, 0 ) ;
 
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          swap = (char *)u4allocEr( t4file->codeBase, t4file->indexFile->header.blockRw ) ;
          if ( swap == 0 )
             return error4stack( t4file->codeBase, e4memory, E90438 ) ;
@@ -228,7 +228,7 @@ int b4flush( B4BLOCK *b4 )
          #ifndef S4OFF_OPTIMIZE
             i4->readBlockTag = 0 ;
          #endif
-      #endif  /* S4BYTE_SWAP */
+      #endif  /* WORDS_BIGENDIAN */
 
       if ( rc < 0 )
          return error4stack( t4file->codeBase, rc, E90438 ) ;
@@ -1136,7 +1136,7 @@ int b4flush( B4BLOCK *b4 )
    TAG4FILE *t4file ;
    FILE4LONG fPos ;
 
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       char swap[B4BLOCK_SIZE] ;
       char *swapPtr ;
       int i ;
@@ -1155,7 +1155,7 @@ int b4flush( B4BLOCK *b4 )
       #ifndef S4OFF_OPTIMIZE
          i4->readBlockTag = t4file ;
       #endif
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          memcpy( (void *)swap, (void *)&b4->header.nodeAttribute, B4BLOCK_SIZE ) ;
 
          /* position at either B4NODE_HEADER (leaf) or data (branch) */
@@ -1869,7 +1869,7 @@ int b4skip( B4BLOCK *b4, const long num )
 int b4flush( B4BLOCK *b4 )
 {
    int rc ;
-   #ifdef S4BYTE_SWAP
+   #ifdef WORDS_BIGENDIAN
       char *swap, *swapPtr ;
       int i ;
       S4LONG longVal ;
@@ -1890,7 +1890,7 @@ int b4flush( B4BLOCK *b4 )
       #ifndef S4OFF_OPTIMIZE
          b4->tag->readBlockTag = b4->tag ;
       #endif
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          swap = (char *)u4allocEr( b4->tag->codeBase, B4BLOCK_SIZE ) ;
          if ( swap == 0 )
             return -1 ;

@@ -38,7 +38,7 @@ void main()
 
    code4init( &cb ) ;
    cb.accessMode = OPEN4DENY_RW ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
    rc = zapLast( data, toDelete ) ;
    code4initUndo( &cb ) ;
 }

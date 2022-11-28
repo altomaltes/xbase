@@ -26,7 +26,7 @@ void main( )
    char badField[] = "notAField" ;
 
    code4init( &code ) ;
-   data = d4open( &code, "INFO" ) ;
+   data = d4open( &code, "info" ) ;
    field = d4field( data, badField ) ;
    printf( "\nAn error message just displayed\n") ;
 

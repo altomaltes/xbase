@@ -25,7 +25,7 @@ void main( void )
    DATA4 *data ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "FILE" ) ;
+   data = d4open( &cb, "file" ) ;
    error4exitTest( &cb ) ; /* the application will exit if FILE cannot be opened */
 
    /*... other code ... */

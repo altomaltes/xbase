@@ -364,11 +364,13 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
                rc = u4nameCurrent( nameBuf, sizeof( nameBuf ), dfile4name( d4->dataFile ) ) ;
                if ( rc < 0 )
                   return error4stack( c4, rc, E94301 ) ;
+
                #ifdef S4CASE_SEN
                   rc = u4nameExt( nameBuf, sizeof( nameBuf ), "dbf", 0 ) ;
                #else
                   rc = u4nameExt( nameBuf, sizeof( nameBuf ), "DBF", 0 ) ;
                #endif
+
                if ( rc < 0 )
                   return error4stack( c4, rc, E94301 ) ;
                #ifdef S4MACINTOSH
@@ -867,7 +869,7 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
          return 0 ;
       }
 
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          fullHeader.numRecs = x4reverseLong( (void *)&fullHeader.numRecs ) ;
          fullHeader.headerLen = x4reverseShort( (void *)&fullHeader.headerLen ) ;
          fullHeader.recordLen = x4reverseShort( (void *)&fullHeader.recordLen ) ;

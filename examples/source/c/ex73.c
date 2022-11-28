@@ -28,7 +28,7 @@ void main( void )
 
    code4init( &cb ) ;
    cb.accessMode = OPEN4DENY_RW ; /* open exclusively to avoid corruption*/
-   data = d4open( &cb, "INFO1" ) ;
+   data = d4open( &cb, "info1" ) ;
    d4top( data ) ;
 
    /* Make all of the records in the data file the same as the first record*/

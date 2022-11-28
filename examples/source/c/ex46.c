@@ -26,11 +26,11 @@ void main( void )
    INDEX4 *index ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
 
    /* Since CODE4.autoOpen is by default true (non-zero),
       the INFO index file should have been opened.*/
-   index = d4index( data, "INFO" ) ;
+   index = d4index( data, "info" ) ;
    if ( index != NULL )
       printf( "INDEX: INFO has been opened\n") ;
 

@@ -47,7 +47,7 @@ void main()
    int userNum ;
 
    code4init( &cb  );
-   file4open( &testFile, &cb, "TEST.FIL", 0 ) ;
+   file4open( &testFile, &cb, "test.fil", 0 ) ;
    info = ( MY_STRUCT * )malloc( sizeof( MY_STRUCT ) ) ;
    for (userNum = 0; userNum <= 9 ; userNum++ )
       readUserInfo( &testFile, info, userNum ) ;

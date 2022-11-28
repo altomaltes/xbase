@@ -26,8 +26,8 @@ void main( void )
    DATA4 *info, *data;
 
    code4init( &cb );
-   info = d4open( &cb, "INFO" ) ;
-   data = d4open( &cb, "DATA" ) ;
+   info = d4open( &cb, "info" ) ;
+   data = d4open( &cb, "data" ) ;
 
    d4lock( info, 1L ) ;
    d4lockAll( data ) ;

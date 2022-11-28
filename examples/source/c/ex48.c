@@ -26,7 +26,7 @@ void main( void )
    int rc ;
 
    code4init( &code ) ;
-   df = d4open( &code, "INFO" ) ;
+   df = d4open( &code, "info" ) ;
 
    rc = d4lockAll( df ) ;
 

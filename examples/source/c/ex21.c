@@ -29,7 +29,7 @@ void main( void )
    code4init( &code ) ;
    code.accessMode = OPEN4DENY_RW ;
 
-   dataFile = d4open( &code, "INFO" ) ;
+   dataFile = d4open( &code, "info" ) ;
    error4exitTest( &code ) ;
 
    /* initialize optimization with default settings. */

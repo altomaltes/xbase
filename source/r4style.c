@@ -429,6 +429,7 @@ int S4FUNCTION report4styleSheetLoad( REPORT4 *report, char *file_name, int over
 
    u4ncpy( name_buf, file_name, sizeof(name_buf) );
    u4nameExt( name_buf, sizeof(name_buf), "CRS", 0 );
+
    #ifndef S4CASE_SEN
       c4upper( name_buf );
    #endif

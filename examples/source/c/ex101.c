@@ -27,7 +27,7 @@ void main()
    FIELD4 *field ;
 
    code4init( &cb );
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
    field = d4fieldJ( data, 1 );
    printf( "The first field is called %s\n", f4name( field ) ) ;
    code4initUndo( &cb ) ;

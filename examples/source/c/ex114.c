@@ -51,7 +51,7 @@ void main()
    char buffer[]= "Add this string to the file" ;
 
    code4init( &cb );
-   file4open( &file, &cb, "TEXT.FIL", 0 ) ;
+   file4open( &file, &cb, "text.fil", 0 ) ;
 
    addToFile( &cb, &file, buffer ) ;
    file4close( &file ) ;

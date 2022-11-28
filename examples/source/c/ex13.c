@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /*ex13.c*/
-#include "d4all.h"
+#include "../../../source/d4all.h"
 
 #ifdef __TURBOC__
    extern unsigned _stklen = 10000;
@@ -60,7 +60,7 @@ void modifyRecordValues( void )
 void main()
 {
    code4init( &cb ) ;
-   d = d4open( &cb, "DATEFILE" ) ;
+   d = d4open( &cb, "datefile" ) ;
    modifyRecordValues();
    code4initUndo( &cb );
 }

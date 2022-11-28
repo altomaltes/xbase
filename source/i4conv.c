@@ -523,7 +523,7 @@ char *c4descend( char *to, const char *from, int len )
       // for ( unsigned int inputIndex = numChars - 1 ; ( inputIndex >= 0 && input[inputIndex] == 0 ) ; inputIndex-- )
       /* LY 00/11/07 : if inputIndex = 0, then inputIndex-- = UINT_MAX >= 0 */
       // for ( unsigned int inputIndex = numChars - 1 ; ( inputIndex >= 0 && inputIndex != UINT_MAX && input[inputIndex] == L' ' ) ; inputIndex-- )
-      #ifdef S4BYTE_SWAP  /* LY 2001/07/28 */
+      #ifdef WORDS_BIGENDIAN  /* LY 2001/07/28 */
          for ( long inputIndex = numChars - 1 ; ( inputIndex >= 0 && x4reverseShort( &input[inputIndex] ) == L' ' ) ; inputIndex-- )  // CS 2000/12/01 condition was always true
       #else
          for ( long inputIndex = numChars - 1 ; ( inputIndex >= 0 && input[inputIndex] == L' ' ) ; inputIndex-- )  // CS 2000/12/01 condition was always true
@@ -536,7 +536,7 @@ char *c4descend( char *to, const char *from, int len )
 
       for ( unsigned int charIndex = 0 ; charIndex < numChars ; charIndex++ )
       {
-         #ifdef S4BYTE_SWAP  /* LY 2001/07/27 */
+         #ifdef WORDS_BIGENDIAN  /* LY 2001/07/27 */
             unsigned short unicodeToCollate = x4reverseShort( &input[charIndex] ) ;
          #else
             unsigned short unicodeToCollate = input[charIndex] ;
@@ -572,7 +572,7 @@ char *c4descend( char *to, const char *from, int len )
             result[resultHeadIndex++] = translateArray[unicodeToCollate].headChar ;
             unsigned short tailChar = translateArray[unicodeToCollate].tailChar ;
             if ( tailChar != collate->noTailUnicode )  // means we have a tail character...
-               #ifdef S4BYTE_SWAP  /* LY 2001/07/28 */
+               #ifdef WORDS_BIGENDIAN  /* LY 2001/07/28 */
                   tailCharacters[resultTailIndex++] = tailChar ;
                #else
                   tailCharacters[resultTailIndex++] = x4reverseShort( &tailChar ) ;
@@ -621,7 +621,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       assert5( lenOut != 0 ) ;  // should not be used.
       /* seek string must be:  CCYYMMDDHH:MM:SS */
       S4LONG dt[2] ;  /* LY 2001/07/28 : changed from long for 64-bit */
-      #ifdef S4BYTE_SWAP  /* LY 2001/02/20 */
+      #ifdef WORDS_BIGENDIAN  /* LY 2001/02/20 */
          S4LONG tmpLong ;  /* LY 2001/07/28 : changed from long for 64-bit */
       #endif
 
@@ -631,7 +631,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
          return ;
       }
 
-      #ifdef S4BYTE_SWAP  /* LY 2001/02/20 */
+      #ifdef WORDS_BIGENDIAN  /* LY 2001/02/20 */
          tmpLong = date4long( input ) ;
          dt[0] = x4reverseLong( &tmpLong ) ;
          tmpLong = time4long( input + 8, len - 8, 0 ) ;
@@ -654,7 +654,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       assert5( lenOut != 0 ) ;  // should not be used.
       /* seek string must be:  CCYYMMDDHH:MM:SS */
       S4LONG dt[2] ;  /* LY 2001/07/28 : changed from long for 64-bit */
-      #ifdef S4BYTE_SWAP  /* LY 2001/02/20 */
+      #ifdef WORDS_BIGENDIAN  /* LY 2001/02/20 */
          S4LONG tmpLong ;  /* LY 2001/07/28 : changed from long for 64-bit */
       #endif
 
@@ -664,7 +664,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
          return ;
       }
 
-      #ifdef S4BYTE_SWAP  /* LY 2001/02/20 */
+      #ifdef WORDS_BIGENDIAN  /* LY 2001/02/20 */
          tmpLong = date4long( input ) ;
          dt[0] = x4reverseLong( &tmpLong ) ;
          tmpLong = time4long( input + 8, len - 8, 1 ) ;
@@ -690,11 +690,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
    {
       assert5( lenOut != 0 ) ;  // should not be used.
       S4LONG val ;  /* LY 2001/07/28 : changed from long for 64-bit */
-      #ifdef S4BYTE_SWAP  /* LY 2001/02/21 */
+      #ifdef WORDS_BIGENDIAN  /* LY 2001/02/21 */
          S4LONG tmpLong ;  /* LY 2001/07/28 */
       #endif
 
-      #ifdef S4BYTE_SWAP /* LY 2001/02/21 */
+      #ifdef WORDS_BIGENDIAN /* LY 2001/02/21 */
          tmpLong = c4atol( input, len ) ;
          val = x4reverseLong( &tmpLong ) ;
       #else
@@ -716,7 +716,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       assert5( lenOut != 0 ) ;  // should not be used.
       float val ;  /* LY 2001/07/28 : changed from long for 64-bit */
 
-      #ifdef S4BYTE_SWAP /* LY 2001/02/21 */
+      #ifdef WORDS_BIGENDIAN /* LY 2001/02/21 */
          val = c4atofloat( input, len ) ;
          val = x4reverseFloat( &tmpLong ) ;
       #else
@@ -754,11 +754,11 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
    void t4dblToInt( char *result, const double d )
    {
       S4LONG val ;  /* LY 2001/07/28 : changed from long for 64-bit */
-      #ifdef S4BYTE_SWAP  /* LY 2001/02/21 */
+      #ifdef WORDS_BIGENDIAN  /* LY 2001/02/21 */
          S4LONG tmpLong ;  /* LY 2001/07/28 */
       #endif
 
-      #ifdef S4BYTE_SWAP  /* LY 2001/02/21 */
+      #ifdef WORDS_BIGENDIAN  /* LY 2001/02/21 */
          tmpLong = (int) d ;
          val = x4reverseLong( &tmpLong ) ;
       #else
@@ -777,7 +777,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
    {
       float val ;  /* LY 2001/07/28 : changed from long for 64-bit */
 
-      #ifdef S4BYTE_SWAP  /* LY 2001/02/21 */
+      #ifdef WORDS_BIGENDIAN  /* LY 2001/02/21 */
          val = (float)d ;
          val = x4reverseFloat( &val ) ;
       #else
@@ -800,7 +800,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       if ( d < 0 )  // should be unsigned, just make smallest unsigned long if < 0
          val = 0 ;
       else
-         #ifdef S4BYTE_SWAP   // LY Aug 24/04
+         #ifdef WORDS_BIGENDIAN   // LY Aug 24/04
             {
                unsigned long tempLong = (unsigned long)d ;
                val = x4reverseLong( &tempLong ) ;
@@ -822,7 +822,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       assert5( dummyCollate == 0 && dummyIntOut == 0 ) ;  // not used here, should be 0
 
       double d = (double) date4long(input) ;
-      #ifdef S4BYTE_SWAP
+      #ifdef WORDS_BIGENDIAN
          d = x4reverseDouble( &d) ;
       #endif
       c4memcpy( result, (void *)&d, sizeof(double) ) ;
@@ -849,7 +849,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       time->minute = (short)c4atol( input + 3, 2 ) ;
       time->second = (short)c4atol( input + 6, 2 ) ;
 
-      #ifdef S4BYTE_SWAP   // LY Aug 24/04
+      #ifdef WORDS_BIGENDIAN   // LY Aug 24/04
          time->hour = x4reverseShort( &time->hour ) ;
          time->minute = x4reverseShort( &time->minute ) ;
          time->second = x4reverseShort( &time->second ) ;
@@ -882,7 +882,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
    void t4dblToLongLong( char *result, const double input )
    {
       LONGLONG *lngLng = (LONGLONG *)result ;
-      #ifdef S4BYTE_SWAP   // LY Aug 24/04
+      #ifdef WORDS_BIGENDIAN   // LY Aug 24/04
          long long tempLongLong = (long long)input ;
          *lngLng = x4reverseLongLong( &tempLongLong ) ;
       #else
@@ -1029,7 +1029,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
          tempLong = x4reverseLong( val ) ;
          memcpy( result, &tempLong, sizeof(S4LONG) ) ;   /* LY 2002/12/17 : result can be on wrong byte boundary */
       #else
-         #ifdef S4BYTE_SWAP   // LY Aug 24/04
+         #ifdef WORDS_BIGENDIAN   // LY Aug 24/04
             S4LONG tempLong = x4reverseLong( val ) ;
             isPositive = tempLong > 0 ;
          #else
@@ -1106,13 +1106,13 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
    {
       int isPositive ;
 
-      // LY Aug 24/04 : moved from below, removed S4BYTE_SWAP
+      // LY Aug 24/04 : moved from below, removed WORDS_BIGENDIAN
       *((LONGLONG *)result) = x4reverseLongLong( val ) ;
 
       // LY Jun 29/04 : added S4DATA_ALIGN
       #ifdef S4DATA_ALIGN
          isPositive = !( ((char *)val)[sizeof(LONGLONG)-1] >> 7 ) ;
-      #elif defined( S4BYTE_SWAP )  // LY Aug 24/04
+      #elif defined( WORDS_BIGENDIAN )  // LY Aug 24/04
          isPositive = *((LONGLONG *)result) > 0 ;
       #else
          isPositive = *val > 0 ;
@@ -1155,7 +1155,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
       dbDate.month = c4atoi( inputPtr + 4, 2 ) ;
       dbDate.day = c4atoi( inputPtr + 6, 2 ) ;
 
-      #ifdef S4BYTE_SWAP   // LY Aug 24/04
+      #ifdef WORDS_BIGENDIAN   // LY Aug 24/04
          dbDate.year = x4reverseShort( &dbDate.year ) ;
          dbDate.month = x4reverseShort( &dbDate.month ) ;
          dbDate.day = x4reverseShort( &dbDate.day ) ;
@@ -1228,7 +1228,7 @@ void t4unicodeToMachine( COLLATE4 *collate, char *output, const char *input, con
 #if  defined( S4FOX )
    void t4strToFox( COLLATE4 *collate, char *result, const char *inputPtr, const int inputPtrLen, int *lenOut )
    {
-      //#ifdef S4BYTE_SWAP  /* LY 2001/06/26 */
+      //#ifdef WORDS_BIGENDIAN  /* LY 2001/06/26 */
       //   double tempDoub ;  LY 2001/07/22 : shouldn't be required since t4dbltoFox handles own byte swapping
 
       //   tempDoub = c4atod( inputPtr, inputPtrLen ) ;
@@ -1348,7 +1348,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
    if ( numLen > 17 )  // there is a fractional component...
       dbTimeStampResult.fraction = c4atol( fromPtr + 17, numLen - 17 ) ;
 
-   #ifdef S4BYTE_SWAP   // LY Aug 24/04
+   #ifdef WORDS_BIGENDIAN   // LY Aug 24/04
       dbTimeStampResult.year = x4reverseShort( &dbTimeStampResult.year ) ;
       dbTimeStampResult.month = x4reverseShort( &dbTimeStampResult.month ) ;
       dbTimeStampResult.day = x4reverseShort( &dbTimeStampResult.day ) ;
@@ -2219,7 +2219,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
    {
       double date, time ;
       double val ;
-      #if defined(S4DATA_ALIGN) || defined(S4BYTE_SWAP) || defined(S4WIN64)  // CS 2011/04/29
+      #if defined(S4DATA_ALIGN) || defined(WORDS_BIGENDIAN) || defined(S4WIN64)  // CS 2011/04/29
          S4LONG tempLong ;  /* LY 2001/07/28 : changed from long for 64-bit */
          double tmpDbl ;
       #endif
@@ -2236,11 +2236,11 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
          long extraTime = tempLong % 1000 ;
          long tmLong = tempLong - extraTime ;
       #else
-         #if defined(S4DATA_ALIGN) || defined(S4BYTE_SWAP)  // CS 2001/07/05
+         #if defined(S4DATA_ALIGN) || defined(WORDS_BIGENDIAN)  // CS 2001/07/05
             // AS 09/14/00 - FoxPro rounds up to the nearest second...
             /* LY 2002/10/08 : date not swapped under CE */
-            /* LY July 14/03 : changed from S4WINCE to !S4BYTE_SWAP */
-            #ifndef S4BYTE_SWAP /* LY 2001/08/24 : (void*)... resulted in wrong address under CE */
+            /* LY July 14/03 : changed from S4WINCE to !WORDS_BIGENDIAN */
+            #ifndef WORDS_BIGENDIAN /* LY 2001/08/24 : (void*)... resulted in wrong address under CE */
                // LY Jun 29/04 : added (char *) to &input[0], to avoid compiler
                // optimization issue (assembly treating input[0] as long
                memcpy( &tempLong, (char *)&input[0], sizeof(S4LONG) ) ;
@@ -2273,7 +2273,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
       if ( isSet )  // must decrement the first byte...
       {
          /* LY 2002/09/02 : don't swap for Win CE - removed S4DATA_ALIGN */
-         #ifdef S4BYTE_SWAP  // CS 2001/07/05
+         #ifdef WORDS_BIGENDIAN  // CS 2001/07/05
             tmpDbl = x4reverseDouble( &val ) ;
             unsigned char *valPtr = (unsigned char *)&tmpDbl ;
          #else
@@ -2287,7 +2287,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
          else
             valPtr[0]-- ;
          /* LY 2002/09/02 : don't swap for Win CE - removed S4DATA_ALIGN */
-         #ifdef S4BYTE_SWAP  // CS 2001/07/05
+         #ifdef WORDS_BIGENDIAN  // CS 2001/07/05
             val = x4reverseDouble( &tmpDbl ) ;
          #endif
       }
@@ -2302,7 +2302,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
    {
       double date, time ;
       double val ;
-      #if defined(S4DATA_ALIGN) || defined(S4BYTE_SWAP) || defined(S4WIN64)  // CS 2011/04/29
+      #if defined(S4DATA_ALIGN) || defined(WORDS_BIGENDIAN) || defined(S4WIN64)  // CS 2011/04/29
          S4LONG tempLong ;  /* LY 2001/07/28 : changed from long for 64-bit */
          double tmpDbl ;
       #endif
@@ -2319,7 +2319,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
          // long extraTime = tempLong % 1000 ;
          long tmLong = tempLong ; // - extraTime ;
       #else
-         #if defined(S4DATA_ALIGN) || defined(S4BYTE_SWAP)  // CS 2001/07/05
+         #if defined(S4DATA_ALIGN) || defined(WORDS_BIGENDIAN)  // CS 2001/07/05
             // AS 09/14/00 - FoxPro rounds up to the nearest second...
             /* LY 2002/10/08 : date not swapped under CE */
             #ifdef S4WINCE /* LY 2001/08/24 : (void*)... resulted in wrong address under CE */
@@ -2350,7 +2350,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
       if ( isSet )  // must decrement the first byte...
       {
          /* LY 2002/09/02 : don't swap for Win CE - removed S4DATA_ALIGN */
-         #ifdef S4BYTE_SWAP  // CS 2001/07/05
+         #ifdef WORDS_BIGENDIAN  // CS 2001/07/05
             tmpDbl = x4reverseDouble( &val ) ;
             unsigned char *valPtr = (unsigned char *)&tmpDbl ;
          #else
@@ -2364,7 +2364,7 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
          else
             valPtr[0]-- ;
          /* LY 2002/09/02 : don't swap for Win CE - removed S4DATA_ALIGN */
-         #ifdef S4BYTE_SWAP  // CS 2001/07/05
+         #ifdef WORDS_BIGENDIAN  // CS 2001/07/05
             val = x4reverseDouble( &tmpDbl ) ;
          #endif
       }
@@ -2458,9 +2458,9 @@ void t4strToDbTimeStamp( COLLATE4 *collate, char *toPtr, const char *fromPtr, co
          }
       #else
          #ifdef S4BYTEORDER_2301
-            memcpy( (char *)result, ((char *)&doub) + 4, 4 ) ;
+            memcpy( (char *)result      , ((char *)&doub) + 4, 4 ) ;
             memcpy( ((char *)result) + 4, ((char *)&doub), 4 ) ;
-            memcpy( (void *)&doub, result, sizeof(double) ) ;
+            memcpy( (void *)&doub       , result, sizeof(double) ) ;
          #endif
          if ( isPositive )
          {

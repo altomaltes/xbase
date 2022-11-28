@@ -28,16 +28,16 @@ void main( void )
    code4init( &cb ) ;
    cb.autoOpen = 0 ;      /* Do not automatically open production index file. */
    cb.errOpen = 0 ;
-   info = d4open( &cb, "INFO" ) ;
+   info = d4open( &cb, "info" ) ;
 
-   infoIndex = i4open( info, "INFO" ) ;
+   infoIndex = i4open( info, "info" ) ;
 
    if( cb.errorCode < 0 )
       printf("Production index file is not opened.\n") ;
 
    /* DATA.DBF has a production index. Open it. */
    cb.autoOpen = 1 ;
-   data = d4open( &cb, "DATA" ) ;
+   data = d4open( &cb, "data" ) ;
 
    /*  Some other code */
 

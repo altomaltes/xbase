@@ -20,6 +20,9 @@
    extern unsigned _stklen = 10000;
 #endif
 
+
+// COREDUMP
+
 void main( void )
 {
    CODE4 cb ;
@@ -32,7 +35,7 @@ void main( void )
    SORT4 dbSort ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
    name = d4field( data, "NAME" ) ;
 
    sort4init( &dbSort, &cb, f4len( name ), d4recWidth( data ) + 1 ) ;

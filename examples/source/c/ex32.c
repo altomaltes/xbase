@@ -28,7 +28,7 @@ void main( void )
 {
     code4init( &cb ) ;
 	 cb.accessMode = OPEN4DENY_RW ;
- 	 data = d4open( &cb, "DATABASE" ) ;
+ 	 data = d4open( &cb, "database" ) ;
     code4optStart( &cb ) ;
 
     d4appendBlank( data ) ;
@@ -55,4 +55,4 @@ void main( void )
     /* close all open files and release any allocated memory */
     code4initUndo( &cb ) ;
 }
-
+

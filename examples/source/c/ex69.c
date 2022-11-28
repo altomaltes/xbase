@@ -27,7 +27,7 @@ void main( void )
    TAG4 *nameTag, *defaultTag ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ; /* automatically open data & index file.*/
+   data = d4open( &cb, "info" ) ; /* automatically open data & index file.*/
    nameTag = d4tag( data, "INF_NAME" ) ;
    defaultTag = d4tagDefault( data ) ;
 

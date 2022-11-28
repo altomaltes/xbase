@@ -77,14 +77,12 @@ struct DATA4FILESt ;
 
 #ifdef S4CBPP
    class S4CLASS FILE4 ;
-#else
-   struct FILE4St ;
-#endif
-#ifdef S4CBPP
    class S4CLASS CODE4 ;
 #else
+   struct FILE4St ;
    struct CODE4St ;
 #endif
+
 
 #ifdef S4CBPP
    class S4CLASS Code4 ;
@@ -165,11 +163,13 @@ typedef struct
                     /* If nRepeat is '-1', it is a temporary entry. */
    int nUsed ;      /* The number of entries used */
    #ifdef S4DOS    /* no memory sharing under DOS, so can use a CODE4 for limited memory */
+
       #ifdef S4CBPP
          CODE4 S4PTR    *codeBase ;
       #else
          struct CODE4St *codeBase ;
       #endif
+
    #endif
 }  MEM4 ;
 
@@ -607,8 +607,8 @@ typedef struct
 
 typedef struct S4CLASS TRAN4St
 {
-   /* transaction capabilities for a client */
-   struct CODE4TRANSSt *c4trans ;
+   
+   struct CODE4TRANSSt *c4trans ; /* transaction capabilities for a client */
    LIST4 *dataList ;        /* A list of open data files. */
    LIST4 localDataList ;
    char dateFormat[LEN4DATE_FORMAT];          /* Longest is September 15, 1990 */
@@ -618,6 +618,7 @@ typedef struct S4CLASS TRAN4St
    #else
       int space1 ;
    #endif
+
    #ifndef S4OFF_MULTI
       short unlockAuto ;        /* automatic unlocking on or off? */
       short savedUnlockAuto ;
@@ -646,12 +647,12 @@ typedef struct S4CLASS TRAN4St
       char      *space12 ;
    #endif
 
-      int userIdNo ;    /* used to determine the id of user */
+   int userIdNo ;    /* used to determine the id of user */
 
    LIST4 closedDataFiles ;  /* during a transaction */
 
-      char userId[LEN4USERID+1] ;
-      char netId[LEN4NETID+1] ;
+   char userId[LEN4USERID+1] ;
+   char netId[LEN4NETID+1] ;
 } TRAN4 ;
 
 typedef struct S4CLASS CODE4TRANSSt
@@ -743,14 +744,15 @@ typedef struct CODE4St
    S4CONV( int errOff, int off_error ) ;                 /* Show error messages? */
    S4CONV( int errOpen, int open_error ) ;               /* Do 'file4open' error ? */
    short log ;
-   S4CONV( int memExpandData, int mem_expand_data ) ;          /* Expanding data allocation */
-   S4CONV( unsigned memSizeBuffer, unsigned mem_size_buffer ) ;/* Pack, Zap */
+   S4CONV( int memExpandData,          int mem_expand_data ) ;          /* Expanding data allocation */
+   S4CONV( unsigned memSizeBuffer,     unsigned mem_size_buffer ) ;/* Pack, Zap */
    S4CONV( unsigned memSizeSortBuffer, unsigned mem_size_sort_buffer ) ; /* The default file buffer size when sorting */
-   S4CONV( unsigned memSizeSortPool, unsigned mem_size_sort_pool ) ;   /* The default pool size for sorting */
-   S4CONV( unsigned memStartData, unsigned mem_start_data ) ;      /* Initial data allocation */
+   S4CONV( unsigned memSizeSortPool,   unsigned mem_size_sort_pool ) ;   /* The default pool size for sorting */
+   S4CONV( unsigned memStartData,      unsigned mem_start_data ) ;      /* Initial data allocation */
    char safety ;                                          /* File create with safety ? */
    long timeout ;
    short int compatibility ;                                   /* FoxPro compatibility with... 25, 26, 30 */
+
    #ifdef __WIN32 /* documented member */
       void S4PTR *hWnd;            /* For use under Microsoft Windows */
    #else
@@ -782,12 +784,12 @@ typedef struct CODE4St
    MEM4 S4PTR *bitmapMemory ;
    MEM4 S4PTR *dataMemory ;
    S4CONV( MEM4 S4PTR *calcMemory, MEM4 S4PTR *calc_memory ) ;
-   MEM4 S4PTR *data4fileMemory ;
-   MEM4 S4PTR *relateDataListMemory ;  /* for R4DATA_LIST */
-   MEM4 S4PTR *relateListMemory ;  /* for RELATE4LIST */
-   MEM4 S4PTR *relateMemory ;
-   MEM4 S4PTR *relationMemory ;
-   MEM4 S4PTR *dataListMemory ;  /* for DATA4LIST */
+   MEM4 S4PTR * data4fileMemory ;
+   MEM4 S4PTR * relateDataListMemory ;  /* for R4DATA_LIST */
+   MEM4 S4PTR * relateListMemory ;  /* for RELATE4LIST */
+   MEM4 S4PTR * relateMemory ;
+   MEM4 S4PTR * relationMemory ;
+   MEM4 S4PTR * dataListMemory ;  /* for DATA4LIST */
 
    LIST4 dataFileList ;         /* A list of open data files. */
 
@@ -825,13 +827,13 @@ typedef struct CODE4St
          #ifdef S4OFF_OPTIMIZE
             S4CONV( unsigned memSizeBlock, unsigned mem_size_block ) ;  /* Block size (bytes) for memo and index files */
          #endif
-         S4CONV( int errTagName, int tag_name_error ) ;
-         S4CONV( int memExpandBlock, int mem_expand_block ) ;        /* Expanding block memory allocation */
-         S4CONV( int memExpandIndex, int mem_expand_index ) ;        /* Expanding index allocation */
-         S4CONV( int memExpandTag, int mem_expand_tag ) ;            /* Expanding tag allocation */
+         S4CONV( int errTagName,         int tag_name_error ) ;
+         S4CONV( int memExpandBlock,     int mem_expand_block ) ;        /* Expanding block memory allocation */
+         S4CONV( int memExpandIndex,     int mem_expand_index ) ;        /* Expanding index allocation */
+         S4CONV( int memExpandTag,       int mem_expand_tag ) ;            /* Expanding tag allocation */
          S4CONV( unsigned memStartBlock, unsigned mem_start_block ) ;     /* Initial block memory allocation for index files */
          S4CONV( unsigned memStartIndex, unsigned mem_start_index ) ;     /* Initial index file allocation */
-         S4CONV( unsigned memStartTag, unsigned mem_start_tag ) ;       /* Initial tag allocation */
+         S4CONV( unsigned memStartTag,   unsigned mem_start_tag ) ;       /* Initial tag allocation */
          int memExpandTagFile ;
          unsigned memStartTagFile ;
          MEM4 S4PTR *indexMemory ;
@@ -944,12 +946,12 @@ typedef struct CODE4St
       S4CONV( int errSkip, int skip_error ) ;           /* Do 'DataIndex::skip' error ? */
       int lockEnforce ;         /* are pre-locks required for record modifications? */
 
-      char *lockedNetName ;
-      char *lockedNetNameBuf ;
-      char *lockedUserName ;
-      char *lockedUserNameBuf ;
-      char *lockedFileName ;
-      char *lockedFileNameBuf ;
+      char        * lockedNetName ;
+      char        * lockedNetNameBuf ;
+      char        * lockedUserName ;
+      char        * lockedUserNameBuf ;
+      char        * lockedFileName ;
+      char        * lockedFileNameBuf ;
       unsigned int lockedFileNameLen ;
       unsigned int lockedUserNameLen ;
       unsigned int lockedNetNameLen ;
@@ -957,9 +959,9 @@ typedef struct CODE4St
 
       CODE4TRANS c4trans ;
       S4CONV( MEM4 S4PTR *totalMemory, MEM4 S4PTR *total_memory ) ;
-      S4CONV( LIST4 calcList, LIST4 calc_list ) ;
-      S4CONV( LIST4 totalList, LIST4 total_list ) ;
-      S4CONV( int numReports, int num_reports ) ;
+      S4CONV( LIST4 calcList, LIST4 calc_list   );
+      S4CONV( LIST4 totalList, LIST4 total_list );
+      S4CONV( int numReports, int num_reports   );
       short pageno ;
       long clientDataCount ;
 
@@ -1004,9 +1006,8 @@ typedef struct CODE4St
       #endif
       LIST4 dummy3 ;
       MEM4 S4PTR *dummy4 ;
-      long dummy5 ;   /* request to uninitialize delay-writes */
-      HANDLE dummy6 ;    /* event for delay-write thread to notify main
-                                       thread that uninitialization is complete */
+      long dummy5 ;      /* request to uninitialize delay-writes */
+      HANDLE dummy6 ;    /* event for delay-write thread to notify main  thread that uninitialization is complete */
       HANDLE dummy7 ;    /* event to notify delay-write thread that
                                        there is an action to perform */
    #endif
@@ -1021,9 +1022,11 @@ typedef struct CODE4St
       HANDLE pendingReadEvent ;
    #else
       int dummy8 ;
+
       #ifdef __WIN32
          CRITICAL_SECTION dummy9 ;
       #endif
+
       LIST4 dummy10 ;
       MEM4 S4PTR *dummy11 ;
       HANDLE dummy12 ;
@@ -1041,6 +1044,7 @@ typedef struct CODE4St
 #endif
 
 #ifndef S4OFF_MEMO
+
 typedef struct
 {
    FILE4     file ;

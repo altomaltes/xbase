@@ -27,7 +27,7 @@ void main( void )
 	FIELD4 *field ;
 
 	code4init( &cb ) ;
-	data = d4open( &cb, "DATA2" ) ;
+	data = d4open( &cb, "data2" ) ;
  	field = d4field( data, "NAME" ) ;
    d4top( data ) ;
 	if ( d4changed( data, -1 ) != 0 )     /*Displays FALSE */

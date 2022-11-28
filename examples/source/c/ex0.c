@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /*ex0.c*/
-#include "d4all.h"
+#include "../../../source/d4all.h"
 
 #ifdef __TURBOC__
    extern unsigned _stklen = 10000;
@@ -31,7 +31,7 @@ void main( )
 
    settings.errDefaultUnique = r4unique ;
 
-   dataFile = d4open( &settings, "INFO.DBF" ) ;
+   dataFile = d4open( &settings, "info.dbf" ) ;
 
    /* this is equivalent to calling error4exitTest( )*/
    if( settings.errorCode < 0 )  code4exit( &settings ) ;

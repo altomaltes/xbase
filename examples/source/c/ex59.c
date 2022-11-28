@@ -27,7 +27,7 @@ void main( void )
    long count = 0 ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
    tag = d4tagDefault( data ) ;
 
    d4tagSelect( data, tag  ) ;  /* select the default tag*/

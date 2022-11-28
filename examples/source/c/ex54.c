@@ -27,7 +27,7 @@ void main( void )
    long age ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" ) ;
+   data = d4open( &cb, "info" ) ;
 
    d4optimizeWrite( data, OPT4ALL ) ;
    /* when doing write optimization on shared files, it is necessary to

@@ -48,4 +48,4 @@ void main( int argc, char *argv[ 2 ] )
     else
        printf( "\nUsage: PROGRAM  DataFile  IndexFile\n") ;
  }
-
+

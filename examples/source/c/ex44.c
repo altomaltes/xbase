@@ -26,7 +26,7 @@ void main( void )
    FIELD4 *age ;
 
    code4init( &cb ) ;
-   data = d4open( &cb, "INFO" );
+   data = d4open( &cb, "info" );
    d4top( data ) ;
    d4go( data, 2 ) ;
    age = d4field( data, "AGE" ) ;

@@ -50,11 +50,12 @@ void main( void )
    RELATE4 *relate1, *relate2, *relate3, *relate4 ;
 
    code4init( &cb ) ;
-   master = d4open( &cb, "M1" ) ;
-   sl1 = d4open( &cb, "SL1" ) ;
-   sl2 = d4open( &cb, "SL2" ) ;
-   sl3 = d4open( &cb, "SL3" ) ;
-   sl4 = d4open( &cb, "SL4" ) ;
+   master = d4open( &cb, "m1" ) ;
+
+   sl1 = d4open( &cb, "sl1" ) ;
+   sl2 = d4open( &cb, "sl2" ) ;
+   sl3 = d4open( &cb, "sl3" ) ;
+   sl4 = d4open( &cb, "sl4" ) ;
 
    /* create the tree*/
    MasterRelation = relate4init( master ) ;
