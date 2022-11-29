@@ -21,7 +21,7 @@
 
 
 #ifdef S4REGISTERS
-#ifndef S4STAND_ALONE
+#ifndef S4STAND _ALONE
 #ifndef S4COMFILE
 #ifdef S4WINDOWS
 
@@ -169,5 +169,5 @@ void int4freeCallback( void *realAddress )
 
 #endif /* S4WINDOWS */
 #endif /* S4COMFILE */
-#endif /* S4STAND_ALONE */
+#endif /* S4STAND _ALONE */
 #endif /* S4REGISTERS */

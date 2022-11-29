@@ -262,10 +262,12 @@ int r4memicmp_foo( char *str1, char *str2, int len, char *buffer )
 {
    memset( buffer, 0, len + 1 );
    memcpy( buffer, str1, len );
+
    #ifndef S4CASE_SEN
       c4upper( buffer );
       c4upper( str2 );
    #endif
+
    return c4memcmp( str1, str2, len );
 }
 

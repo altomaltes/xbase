@@ -1,11 +1,14 @@
 #include "d4all.h"
-#ifndef S4STAND_ALONE
+#ifndef S4STAND _ALONE
 #ifndef S4OFF_THREAD
 
 static int signal4arrayWaitHere(SIGNAL4ROUTINE_ARRAY *, unsigned long, int, int, SIGNAL4ROUTINE ** ) ;
 
 
-int signal4routineInit(SIGNAL4ROUTINE *signalRoutine, HANDLE handle, COMPLETION4ROUTINE *routine, void *signalStructure, void *data )
+int signal4routineInit( SIGNAL4ROUTINE *signalRoutine
+                      , HANDLE handle
+                      , COMPLETION4ROUTINE *routine
+                      , void *signalStructure, void *data )
 {
 /* ERRORS
 
@@ -438,4 +441,4 @@ static int signal4arrayWaitHere(SIGNAL4ROUTINE_ARRAY *signalArray, unsigned long
 }
 
 #endif /*!S4OFF_THREAD  */
-#endif /*!S4STAND_ALONE */
+#endif /*!S4STAND _ALONE */

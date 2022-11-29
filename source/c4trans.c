@@ -1029,11 +1029,13 @@ int tran4lowUnwrite( TRAN4 *trans )
 int S4FUNCTION tran4lowStart( TRAN4 *trans, long clientId, int doUnlock )
 {
    int rc ;
-   #ifdef S4STAND_ALONE_TRANS
+
+   #ifndef S4OFF_TRAN
       #ifndef S4OFF_MULTI
          int oldLockAttempts ;
       #endif
    #endif
+
    CODE4 *c4 ;
 
    E4PARHIGH( trans, E93801 ) ;
@@ -1067,7 +1069,7 @@ int S4FUNCTION tran4lowStart( TRAN4 *trans, long clientId, int doUnlock )
       }
    #endif
 
-   #ifdef S4STAND_ALONE_TRANS
+   #ifndef S4OFF_TRAN
       #ifndef S4OFF_MULTI
          oldLockAttempts = c4->lockAttempts ;
          c4->lockAttempts = WAIT4EVER ;
@@ -1174,7 +1176,7 @@ int S4FUNCTION tran4lowRollback( TRAN4 *trans, long id, const int doInvalidate )
 
    #ifndef S4OFF_MULTI
       trans->unlockAuto = trans->savedUnlockAuto ;
-      #ifdef S4STAND_ALONE_TRANS
+      #ifndef S4OFF_TRAN
          #ifndef S4UTILS
             rc = code4tranUnlockTransactions( &c4->c4trans, TRAN4LOCK_MULTIPLE ) ;
          #endif
@@ -1404,7 +1406,7 @@ int S4FUNCTION tran4lowCommitPhaseTwo( TRAN4 *trans, long id, int doUnlock )
          if ( code4unlockAuto( trans->c4trans->c4 ) == 1 )
             rc = code4unlock( trans->c4trans->c4 ) ;
       }
-      #ifdef S4STAND_ALONE_TRANS
+      #ifndef S4OFF_TRAN
          #ifndef S4UTILS
                rc = code4tranUnlockTransactions( &c4->c4trans, TRAN4LOCK_MULTIPLE ) ;
          #endif

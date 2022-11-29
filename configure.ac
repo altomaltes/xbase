@@ -6,8 +6,8 @@
 
 AC_INIT([xbase],[6.4.1])
 AC_CONFIG_SRCDIR([source/d4all.h])
+AC_CONFIG_HEADERS( d4config.h )
 AM_INIT_AUTOMAKE( [subdir-objects] )
-AC_CONFIG_HEADERS( config.h )
 
 AC_CONFIG_MACRO_DIR([m4])
 AM_MAINTAINER_MODE([disable])
@@ -87,7 +87,7 @@ if test "${CFLAGS_GIVEN}" -ne 1; then
 fi
 
 CFLAGS+=" -fPIC -fsigned-char"
-CPPFLAGS+="-I../../include"
+#CPPFLAGS+="-I../../include"
 
 AC_PROG_INSTALL
 
@@ -101,8 +101,8 @@ AM_SANITY_CHECK
 
 
 
-dnl# If it's there, what the hell?
-AM_WITH_DMALLOC
+#dnl# If it's there, what the hell?
+#AM_WITH_DMALLOC
 
 dnl# Look for needed programs
 AC_CHECK_PROG( RM, rm, rm, true  )
@@ -114,39 +114,27 @@ AC_C_BIGENDIAN
 
 AC_C_CONST
 AC_C_INLINE
-#AC_PATH_XTRA
 
 dnl# Checks for header files.
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS( include/procesos.h signal.h errno.h fcntl.h sys/times.h sys/ioctl.h sys/select.h sys/time.h malloc.h unistd.h stdarg.h sys/filio.h sys/wait.h sys/sendfile.h sys/socket.h sys/un.h netinet/in.h netinet/ip6.h netdb.h)
+AC_CHECK_HEADERS( errno.h fcntl.h sys/times.h sys/time.h malloc.h )
 
-dnl# Structure members
-AC_CHECK_MEMBER( siginfo_t.si_utime, AC_DEFINE_UNQUOTED( SIGINFO_SI_UTIME, 1, [ Defined if siginfo has si_utime field ] ) ,,[#include<signal.h>])
+#dnl# Structure members
+#AC_CHECK_MEMBER( siginfo_t.si_utime, AC_DEFINE_UNQUOTED( SIGINFO_SI_UTIME, 1, [ Defined if siginfo has si_utime field ] ) ,,[#include<signal.h>])
 
 
 
 dnl# Missing typedefs and replacements
 AC_TYPE_MODE_T
-AC_CHECK_TYPE(   off_t, long )
-AC_CHECK_TYPE(  temp_t, unsigned long long )
-AC_CHECK_TYPE( ticks_t, unsigned long      )
-AC_CHECK_TYPE(    byte, unsigned char      )
 AC_CHECK_TYPE(    word, unsigned short     )
 AC_CHECK_TYPE(   dword, unsigned int       )
 AC_CHECK_TYPE(   qword, unsigned long long )
-AC_CHECK_TYPE(  handle, int                )
-AC_CHECK_TYPE(socklen_t, int )
-AC_TYPE_PID_T
-AC_TYPE_UID_T
+#AC_TYPE_PID_T
+#AC_TYPE_UID_T
 
 dnl# Checks for library functions.
 
-AC_CHECK_FUNCS( atexit unsetenv setutent seteuid putenv setresuid setresgid usleep fork vsnprintf )
-
-dnl# Portability checks for various functions
-#AC_SEARCH_LIBS( getpwuid, sun )
-#AC_SEARCH_LIBS( connect, socket )
-#AC_SEARCH_LIBS( gethostbyname, nsl )
+#AC_CHECK_FUNCS( atexit unsetenv setutent seteuid putenv setresuid setresgid usleep fork vsnprintf )
 
 dnl#
 dnl# Utility stuff
@@ -178,42 +166,42 @@ AC_ARG_ENABLE([language],
                  , [Enable database language: @<:@default=none@:>@ ( none, ansi, dictionary, finnish , french , german,  norwegian, scandinavian, swedish )] )
                  , [case "$enableval" in
       ansi)
-         AC_DEFINE([S4ANSI], [0],
+         AC_DEFINE([S4ANSI], [],
                    [Enable ANSI language])
         ;;
 
       dictionary)
-         AC_DEFINE([S4DICTIONARY], [0],
+         AC_DEFINE([S4DICTIONARY], [],
                    [Enable DICTIONARY language])
         ;;
 
       finnish)
-         AC_DEFINE([S4FINNISH], [0],
+         AC_DEFINE([S4FINNISH], [],
                    [Enable Finnish language])
         ;;
 
       french)
-         AC_DEFINE([S4FRENCH], [0],
+         AC_DEFINE([S4FRENCH], [],
                    [Enable French language])
         ;;
 
       german)
-         AC_DEFINE([S4GERMAN], [0],
+         AC_DEFINE([S4GERMAN], [],
                    [Enable German language])
         ;;
 
       norwegian)
-         AC_DEFINE([S4NORWEGIAN], [0],
+         AC_DEFINE([S4NORWEGIAN], [],
                    [Enable Nowwegian language])
         ;;
 
       escandinavian)
-         AC_DEFINE([S4SCANDINAVIAN], [0],
+         AC_DEFINE([S4SCANDINAVIAN], [],
                    [Enable Scandinavian language])
         ;;
 
       swedish)
-         AC_DEFINE([S4SWEDISH], [0],
+         AC_DEFINE([S4SWEDISH], [],
                    [Enable Swedish language])
         ;;
    esac])
@@ -228,18 +216,34 @@ AC_ARG_ENABLE([format],
                  , [Enable database index format: @<:@default=fox@:>@ ( foxpro, clipper or dbase IV mdx )] )
                  , [case "$enableval" in
       fox)
-         AC_DEFINE([S4FOX], [0],
-                   [Enable FOXPRO index format])
+         AC_DEFINE([S4FOX], [], [Enable FOXPRO index format])
         ;;
+
       clipper)
-         AC_DEFINE([S4CLIPPER], [],
-                   [Enable CLIPPER index format])
+         AC_DEFINE([S4CLIPPER], [], [Enable CLIPPER index format])
          ;;
+
       mdx)
          AC_DEFINE([S4MDX], [], [Enable DBASE IV mdx format])
          ;;
+
       *)
          AC_MSG_ERROR([--enable-index-format=${enable_index_format}: invalid value])
+   esac],  AC_DEFINE([S4FOX], [], [Enable FOXPRO index format]) )
+
+
+AC_ARG_ENABLE([case],
+   AS_HELP_STRING( [[[--enable-case=@<:@none/upper@:>@]]]
+                 , [ filename case policy  @<:@default=none@:>@( none or upper, for legacy MSDOS ] )
+                 , [case "$enableval" in
+      none)
+         AC_DEFINE([S4CASE_SENS], [],
+                   [Don't uppercase filenames])
+        ;;
+      upper)
+         ;;
+      *)
+         AC_MSG_ERROR([--enable-case=${enable_case}: invalid value])
    esac] )
 
 
@@ -263,7 +267,7 @@ AS_IF([test "x$enable_miscdbg" != "xno"], AC_DEFINE([E4MISC], [], [Miscellaneous
 
 AC_ARG_ENABLE([dbg],
 AS_HELP_STRING([--disable-dbg=@<:@yes/no@:>@], [disable error display @<:@default=no@:>@]))
-AS_IF([test "x$disable_nodbg" != "xno"], AC_DEFINE([E4OFF], [], [No error display]) )
+AS_IF([test "x$disable_dbg" != "xno"], AC_DEFINE([E4OFF], [], [No error display]) )
 
 AC_ARG_ENABLE([string],
 AS_HELP_STRING([--disable-errstring=@<:@yes/no@:>@], [disable error string display @<:@default=no@:>@]))
@@ -274,12 +278,20 @@ AS_HELP_STRING([--enable-paramhigh=@<:@yes/no@:>@], [High-level Functional param
 AS_IF([test "x$enable_paramhigh" != "xno"], AC_DEFINE([E4PARM_HIGH], [], [High-level Functional parameter error display]) )
 
 AC_ARG_ENABLE([estop],
-AS_HELP_STRING([--enable-estop=@<:@yes/no@:>@], [pause-on-error enabled @<:@default=no@:>@]))
-AS_IF([test "x$enable_estop" != "xno"], AC_DEFINE([E4PAUSE], [], [pause-on-error enabled]) )
+AS_HELP_STRING([--enable-estop=@<:@yes/no@:>@], [stop-on-error enabled @<:@default=no@:>@]))
+AS_IF([test "x$enable_estop" != "xno"], AC_DEFINE([E4STOP], [], [stop-on-error enabled]) )
+
+AC_ARG_ENABLE([epause],
+AS_HELP_STRING([--enable-pause=@<:@yes/no@:>@], [pause-on-error enabled @<:@default=no@:>@]))
+AS_IF([test "x$enable_pause" == "xyes"], AC_DEFINE([E4PAUSE], [], [pause-on-error enabled]) )
 
 AC_ARG_ENABLE([ecritical],
 AS_HELP_STRING([--enable-ecritical=@<:@yes/no@:>@], [Stop-on-critical-error enabled @<:@default=yes@:>@]))
-AS_IF([test "x$enable_ecritical" != "xno"], AC_DEFINE([E4STOP_CRITICAL], [], [Stop-on-critical-error enabled]) )
+AS_IF([test "x$enable_ecritical" == "xyes"], AC_DEFINE([E4STOP_CRITICAL], [], [Stop-on-critical-error enabled]) )
+
+AC_ARG_ENABLE([analize],
+AS_HELP_STRING([--enable-analize=@<:@yes/no@:>@], [Structure Analysis CodeBase Error Checking @<:@default=yes@:>@]))
+AS_IF([test "x$enable_analize" == "xyes"], AC_DEFINE([E4ANALIZE], [], [Structure Analysis CodeBase Error Checking]) )
 
 AC_ARG_ENABLE([index],
 AS_HELP_STRING([--disable-index=@<:@yes/no@:>@], [Index support source code removed=no@:>@]))
@@ -296,6 +308,18 @@ AS_IF([test "x$disable_multi" != "xno"], AC_DEFINE([S4OFF_MULTI], [], [Multi-use
 AC_ARG_ENABLE([optimize],
 AS_HELP_STRING([--disable-optimize=@<:@yes/no@:>@], [Optimization source code removed @<:@default=no@:>@]))
 AS_IF([test "x$disable_optimize" != "xno"], AC_DEFINE([S4OFF_OPTIMIZE], [], [Optimization source code removed]) )
+
+AC_ARG_ENABLE([transactions],
+AS_HELP_STRING([--disable-transactions=@<:@yes/no@:>@], [Disable transaction capability @<:@default=no@:>@]))
+AS_IF([test "x$disable_transactions" != "xno"], AC_DEFINE([S4OFF_TRAN], [], [Transactions disabled]) )
+
+AC_ARG_ENABLE([lockhook],
+AS_HELP_STRING([--enable-lockhook=@<:@no/yes@:>@], [Enable custom lock failure function @<:@default=no@:>@]))
+AS_IF([test "x$enable_lockhook" == "xyes"], AC_DEFINE([S4LOCK_HOOK], [1], [custom lock failure function enabled]) )
+
+AC_ARG_ENABLE([memory],
+AS_HELP_STRING([--enable-memory=@<:@yes/no@:>@], [Enable memory limit checking @<:@default=no@:>@]))
+AS_IF([test "x$enable_memory" == "xyes"], AC_DEFINE([S4MAX], [1], [memory limit checking enabled]) )
 
 
 AC_ARG_ENABLE([slack],
@@ -341,6 +365,7 @@ Configuration:
   Linker:                     $CC $LDFLAGS $LIBS
   Install path:               $prefix
   Language:                   $enable_language
+  Format:                     $enable_format
   Slackware packager:         $SLACKBUILD $enable_slack
 
   Now type 'make' to build $PACKAGE $VERSION $SVN_BUILD.

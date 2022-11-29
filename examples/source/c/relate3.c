@@ -39,9 +39,9 @@ void openDataFiles(void)
 
    code4init(&codeBase);
 
-   student = d4open(&codeBase,"student");
-   enrollment = d4open(&codeBase,"enroll");
-   classes = d4open(&codeBase,"classes");
+   student   = d4open(&codeBase,"student");
+   enrollment= d4open(&codeBase,"enroll");
+   classes   = d4open(&codeBase,"classes");
 
    studentId = d4field(student,"ID");
    firstName = d4field(student,"F_NAME");

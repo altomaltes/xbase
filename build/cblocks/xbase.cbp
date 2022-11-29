@@ -975,6 +975,7 @@
 		</Unit>
 		<Unit filename="../../source/s4signal.c">
 			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../../source/s4sort.c">
 			<Option compilerVar="CC" />

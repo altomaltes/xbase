@@ -814,9 +814,11 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
 
       u4nameCurrent( nameBuf, sizeof( nameBuf ), name ) ;
       u4nameExt( nameBuf, sizeof(nameBuf), "dbf", 0 ) ;
+
       #ifndef S4CASE_SEN                     /* preserve the case sensitivity for unix */
          c4upper( nameBuf ) ;
       #endif
+
       d4 = dfile4data( c4, nameBuf ) ;
 
    if ( d4 != 0 )

@@ -367,9 +367,9 @@ int PASCAL WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLin
    cb.autoOpen = 0 ;
    cb.errOpen = 0 ;
 
-   #ifdef S4CLIENT
-      d4displayStr("Attempting implicit connection...", 1 ) ;
-   #endif
+//   #ifdef S4 CLIENT
+//      d4displayStr("Attempting implicit connection...", 1 ) ;
+//   #endif
 
    if( d4open( &cb, "TEST.DBF" ) != 0 )
       d4displayStr( "TEST.DBF Opened", 1 ) ;
@@ -408,96 +408,63 @@ void verifySwitches( void )
 
    d4displayStr( " ", 1 ) ;
    d4displayStr( " ", 1 ) ;
+
    d4displayStr( "Library Conditional Compilation Switches:", 1 ) ;
-   if( d4switch & 1L )
-      d4displayStr( "S4FOX - FoxPro Index File Compatibility", 1 ) ;
-   if( d4switch & 2L )
-      d4displayStr( "S4CLIPPER - Clipper Index File Compatibility", 1 ) ;
-   if( d4switch & 4L )
-      d4displayStr( "S4MDX - dBASE IV Index File Compatibility", 1 ) ;
-   if( d4switch & 0x10L )
-      d4displayStr( "S4DOS - DOS", 1 ) ;
-   if( d4switch & 0x20L )
-      d4displayStr( "S4WIN16 - Microsoft Windows 16-Bit Application", 1 ) ;
-   if( d4switch & 0x40L )
-      d4displayStr( "S4WIN32 - Microsoft Windows 32-Bit Application", 1 ) ;
-   if( d4switch & 0x100L )
-      d4displayStr( "S4OS2 - OS/2", 1 ) ;
-   if( d4switch & 0x200L )
-      d4displayStr( "S4UNIX - UNIX", 1 ) ;
-   if( d4switch & 0x400L )
-      d4displayStr( "S4MACINTOSH - MACINTOSH", 1 ) ;
-   if( d4switch & 0x800L )
-      d4displayStr( "S4PACAL_WIN - PASCAL Windows", 1 ) ;
-   if( d4switch & 0x1000L )
-      d4displayStr( "S4CB51 - CodeBase 5.1 compatibility", 1 ) ;
-   if( d4switch & 0x2000L )
-      d4displayStr( "S4SAFE  - Immediate File Length Updates", 1 ) ;
-   if( d4switch & 0x4000L )
-      d4displayStr( "S4LOCK_HOOK - Custom Lock Failure Function", 1 ) ;
-   if( d4switch & 0x8000L )
-      d4displayStr( "S4MAX - Maximum Memory Allocation Testing", 1 ) ;
-   if( d4switch & 0x10000L )
-      d4displayStr( "S4TIMEOUT_HOOK - Custom Timeout Hook Function", 1 ) ;
-   if( d4switch & 0x20000L )
-      d4displayStr( "E4ANALYZE - Structure Analysis CodeBase Error Checking", 1 ) ;
-   if( d4switch & 0x40000L )
-      d4displayStr( "E4DEBUG - Extended CodeBase Error Checking", 1 ) ;
-   if( d4switch & 0x80000L )
-      d4displayStr( "E4HOOK - Custom Error Function", 1 ) ;
-   if( d4switch & 0x100000L )
-      d4displayStr( "E4LINK - Link List CodeBase Error Checking", 1 ) ;
-   if( d4switch & 0x200000L )
-      d4displayStr( "E4MISC - Miscellaneous CodeBase Error Checking", 1 ) ;
-   if( d4switch & 0x400000L )
-      d4displayStr( "E4OFF - No CodeBase Error Display", 1 ) ;
-   if( d4switch & 0x800000L )
-      d4displayStr( "E4OFF_STRING - No Extended String CodeBase Error Display", 1 ) ;
-   if( d4switch & 0x1000000L )
-      d4displayStr( "E4PARM_HIGH - High-level Functional Parameter CodeBase Error Display", 1 ) ;
-   if( d4switch & 0x2000000L )
-      d4displayStr( "E4PAUSE - CodeBase Pause-on-error Enabled", 1 ) ;
-   if( d4switch & 0x4000000L )
-      d4displayStr( "E4STOP - CodeBase Stop-on-error Enabled", 1 ) ;
-   if( d4switch & 0x8000000L )
-      d4displayStr( "E4STOP_CRITICAL - CodeBase Stop-on-critical-error Enabled", 1 ) ;
-   if( d4switch & 0x10000000L )
-      d4displayStr( "S4OFF_INDEX - CodeBase Index Support Source Code Removed", 1 ) ;
-   if( d4switch & 0x20000000L )
-      d4displayStr( "S4OFF_MEMO - CodeBase Memo Support Source Code Removed", 1 ) ;
-   if( d4switch & 0x40000000L )
-      d4displayStr( "S4OFF_MULTI - CodeBase Multi-user Support Source Code Removed", 1 ) ;
-   if( d4switch & 0x80000000L )
-      d4displayStr( "S4OFF_OPTIMIZE - CodeBase Optimization Source Code Removed", 1 ) ;
-   if( d4switch & 0x8L )
-      d4displayStr( "S4CLIENT - CodeBase In Client/Server Mode", 1 ) ;
-   if( d4switch & 0x80L )
-      d4displayStr( "S4STAND_ALONE - CodeBase In Stand Alone Mode", 1 ) ;
+
+   if ( d4switch &          1L ) d4displayStr( "S4FOX - FoxPro Index File Compatibility", 1 ) ;
+   if ( d4switch &          2L ) d4displayStr( "S4CLIPPER - Clipper Index File Compatibility", 1 ) ;
+   if ( d4switch &          4L ) d4displayStr( "S4MDX - dBASE IV Index File Compatibility", 1 ) ;
+   if ( d4switch &       0x10L ) d4displayStr( "S4DOS - DOS", 1 ) ;
+   if ( d4switch &       0x20L ) d4displayStr( "S4WIN16 - Microsoft Windows 16-Bit Application", 1 ) ;
+   if ( d4switch &       0x40L ) d4displayStr( "S4WIN32 - Microsoft Windows 32-Bit Application", 1 ) ;
+   if ( d4switch &      0x100L ) d4displayStr( "S4OS2 - OS/2", 1 ) ;
+   if ( d4switch &      0x200L ) d4displayStr( "S4UNIX - UNIX", 1 ) ;
+   if ( d4switch &      0x400L ) d4displayStr( "S4MACINTOSH - MACINTOSH", 1 ) ;
+   if ( d4switch &      0x800L ) d4displayStr( "S4PACAL_WIN - PASCAL Windows", 1 ) ;
+   if ( d4switch &     0x1000L ) d4displayStr( "S4CB51 - CodeBase 5.1 compatibility", 1 ) ;
+   if ( d4switch &     0x2000L ) d4displayStr( "S4SAFE  - Immediate File Length Updates", 1 ) ;
+   if ( d4switch &     0x4000L ) d4displayStr( "S4LOCK_HOOK - Custom Lock Failure Function", 1 ) ;
+   if ( d4switch &     0x8000L ) d4displayStr( "S4MAX - Maximum Memory Allocation Testing", 1 ) ;
+   if ( d4switch &    0x10000L ) d4displayStr( "S4TIMEOUT_HOOK - Custom Timeout Hook Function", 1 ) ;
+   if ( d4switch &    0x20000L ) d4displayStr( "E4ANALYZE - Structure Analysis CodeBase Error Checking", 1 ) ;
+   if ( d4switch &    0x40000L ) d4displayStr( "E4DEBUG - Extended CodeBase Error Checking", 1 ) ;
+   if ( d4switch &    0x80000L ) d4displayStr( "E4HOOK - Custom Error Function", 1 ) ;
+   if ( d4switch &   0x100000L ) d4displayStr( "E4LINK - Link List CodeBase Error Checking", 1 ) ;
+   if ( d4switch &   0x200000L ) d4displayStr( "E4MISC - Miscellaneous CodeBase Error Checking", 1 ) ;
+   if ( d4switch &   0x400000L ) d4displayStr( "E4OFF - No CodeBase Error Display", 1 ) ;
+   if ( d4switch &   0x800000L ) d4displayStr( "E4OFF_STRING - No Extended String CodeBase Error Display", 1 ) ;
+   if ( d4switch &  0x1000000L ) d4displayStr( "E4PARM_HIGH - High-level Functional Parameter CodeBase Error Display", 1 ) ;
+   if ( d4switch &  0x2000000L ) d4displayStr( "E4PAUSE - CodeBase Pause-on-error Enabled", 1 ) ;
+   if ( d4switch &  0x4000000L ) d4displayStr( "E4STOP - CodeBase Stop-on-error Enabled", 1 ) ;
+   if ( d4switch &  0x8000000L ) d4displayStr( "E4STOP_CRITICAL - CodeBase Stop-on-critical-error Enabled", 1 ) ;
+   if ( d4switch & 0x10000000L ) d4displayStr( "S4OFF_INDEX - CodeBase Index Support Source Code Removed", 1 ) ;
+   if ( d4switch & 0x20000000L ) d4displayStr( "S4OFF_MEMO - CodeBase Memo Support Source Code Removed", 1 ) ;
+   if ( d4switch & 0x40000000L ) d4displayStr( "S4OFF_MULTI - CodeBase Multi-user Support Source Code Removed", 1 ) ;
+   if ( d4switch & 0x80000000L ) d4displayStr( "S4OFF_OPTIMIZE - CodeBase Optimization Source Code Removed", 1 ) ;
+//   if( d4switch & 0x8L )  d4displayStr( "S4 CLIENT - CodeBase In Client/Server Mode", 1 ) ;
+     if( d4switch &      0x80L ) d4displayStr( "S4STAND_ALONE - CodeBase In Stand Alone Mode", 1 ) ;
 
 /* no room for these switches
-   if( d4switch & 0x100000000L )
-      d4displayStr( "S4OFF_REPORT - CodeBase Reporter Source Code Removed", 1 ) ;
-   if( d4switch & 0x200000000L )
-      d4displayStr( "S4OFF_TRAN - CodeBase Transactions Support Source Code Removed", 1 ) ;
-   if( d4switch & 0x400000000L )
-      d4displayStr( "S4OFF_WRITE - CodeBase File Write Source Code Removed", 1 ) ;
+   if( d4switch & 0x100000000L )  d4displayStr( "S4OFF_REPORT - CodeBase Reporter Source Code Removed", 1 ) ;
+   if( d4switch & 0x200000000L )  d4displayStr( "S4OFF_TRAN - CodeBase Transactions Support Source Code Removed", 1 ) ;
+   if( d4switch & 0x400000000L )  d4displayStr( "S4OFF_WRITE - CodeBase File Write Source Code Removed", 1 ) ;
 */
 
-   #ifdef S4STAND_ALONE
-      if( ( d4switch & 0x80L ) == 0 )
-         error4describe( &cb, e4result, E87001, "S4STAND_ALONE must be used in Library Build too.", 0, 0 ) ;
-   #else
-      if( d4switch & 0x80L )
-         error4describe( &cb, e4result, E87001, "S4STAND_ALONE must be off in Library Build too.", 0, 0 ) ;
-   #endif
+//   #ifdef S4STAND _ALONE
+//      if( ( d4switch & 0x80L ) == 0 )
+//         error4describe( &cb, e4result, E87001, "S4STAND _ALONE must be used in Library Build too.", 0, 0 ) ;
+//   #else
+//      if( d4switch & 0x80L )
+//         error4describe( &cb, e4result, E87001, "S4STAND _ALONE must be off in Library Build too.", 0, 0 ) ;
+//   #endif
 
-   #ifdef S4CLIENT
-      if( ( d4switch & 0x8L ) == 0 )
-         error4describe( &cb, e4result, E87001, "S4CLIENT must be used in Library Build too.", 0, 0 ) ;
-   #else
-      if( d4switch & 0x8L )
-         error4describe( &cb, e4result, E87001, "S4CLIENT must be off in Library Build too.", 0, 0 ) ;
-   #endif
+//   #ifdef S4 CLIENT
+//      if( ( d4switch & 0x8L ) == 0 )
+//         error4describe( &cb, e4result, E87001, "S4 CLIENT must be used in Library Build too.", 0, 0 ) ;
+//   #else
+//      if( d4switch & 0x8L )
+//         error4describe( &cb, e4result, E87001, "S4 CLIENT must be off in Library Build too.", 0, 0 ) ;
+//   #endif
 
    #ifdef S4OFF_OPTIMIZE
       if( (d4switch & 0x80000000L )  ==  0 )

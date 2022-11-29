@@ -28,16 +28,6 @@
    #include "malloc.h"
 #endif
 
-
-
-#ifdef S4MAX
-   #define S4MAX_OR_SERVER
-#else
-      #ifdef S4TRACK_MEMORY
-         #define S4MAX_OR_SERVER
-      #endif
-#endif
-
 #ifdef S4OS2
    #ifdef __DLL__
       #include <bsememf.h>
@@ -913,7 +903,7 @@ void S4FUNCTION mem4release( MEM4 *memoryType )
    int s4allocOff = 0 ;
 #endif
 
-#ifdef S4MAX_OR_SERVER
+#ifdef S4MAX
    long mem4allocated = 0L ;
 
    long u4allocated( void )
@@ -964,10 +954,8 @@ void *S4FUNCTION u4allocDefault( long n )
       n += mem4extraChars * 2 + sizeof( unsigned ) ;
    #endif
 
-   #ifdef S4MAX_OR_SERVER
-      n += sizeof( S4LONG ) ;   /* room for length */
-   #endif
    #ifdef S4MAX
+      n += sizeof( S4LONG ) ;   /* room for length */
       if ( mem4allocated + n > mem4maxMemory )
          return 0 ;
    #endif
@@ -1085,7 +1073,7 @@ void *S4FUNCTION u4allocDefault( long n )
       #endif
    #endif
 
-   #ifdef S4MAX_OR_SERVER
+   #ifdef S4MAX
       #ifdef S4SEMAPHORE
          mem4start( 0 ) ;
       #endif
@@ -1176,7 +1164,7 @@ int S4FUNCTION u4freeDefault( void *ptr )
       HANDLE  hand ;
    #endif
 
-   #ifdef S4MAX_OR_SERVER
+   #ifdef S4MAX
       long amount ;
    #endif
 
@@ -1200,7 +1188,7 @@ int S4FUNCTION u4freeDefault( void *ptr )
    if ( ptr == 0 )
       return 0 ;
 
-   #ifdef S4MAX_OR_SERVER
+   #ifdef S4MAX
       ptr = ((char *)ptr) - sizeof(S4LONG) ;
       amount = *((long *)ptr) ;
       #ifdef S4SEMAPHORE
@@ -1456,10 +1444,6 @@ void mem4init( void )
       mem4stop( 0 ) ;
    #endif
 }
-
-#ifdef S4MAX_OR_SERVER
-   #undef S4MAX_OR_SERVER
-#endif
 
 #ifdef S4WIN_ALLOC
    #undef S4WIN_ALLOC

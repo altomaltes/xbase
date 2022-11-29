@@ -2112,7 +2112,7 @@ int S4FUNCTION i4reindex( INDEX4 *i4 )
          return -1 ;
    #endif  /* S4VBASIC */
 
-   E4PARMLOW( i44, E92101 ) ;
+   E4PARMLOW( i4, E92101 ) ;
 
    return error4( i4->codeBase, e4notSupported, E92101 ) ;
 }

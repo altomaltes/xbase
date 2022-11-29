@@ -245,6 +245,7 @@ int S4FUNCTION file4lockInternal( FILE4 *file, unsigned long posStart, long posS
          if ( numAttempts == 0 )
             numAttempts = 1 ;
       #endif
+
       #ifndef __WIN32
          errno = 0 ;
       #endif

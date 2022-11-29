@@ -18,9 +18,7 @@
    #ifndef __cplusplus
       #error must build OLEDB as C++ (compiler build says compile is C, not C++)
    #endif
-   #ifdef S4STATIC
-      #undef S4STATIC
-   #endif
+
    #ifdef S4DOS
       #undef S4DOS
    #endif
@@ -335,9 +333,7 @@
    #endif
 #endif
 
-   #ifndef S4OFF_TRAN
-      #define S4STAND_ALONE_TRANS
-   #endif
+   
 
 #ifndef S4MACINTOSH
    #ifndef S4WINDOWS
@@ -600,12 +596,15 @@
    #ifndef S4OFF_MULTI
       #error - Multiuser is not supported under Windows CE. Set S4OFF_MULTI.
    #endif
+
    #ifndef S4OFF_OPTIMIZE
       #error - Optimization is not supported under Windows CE. Set S4OFF_OPTIMIZE.
    #endif
+
    #ifndef S4OFF_TRAN
       #error - Transaction Processing is not supported under Windows CE. Set S4OFF_TRAN.
    #endif
+
 #endif
 
 #ifdef S4BYTEORDER_3210
@@ -735,12 +734,6 @@
          #define S4FUNCTION far pascal _export
       #endif
    #endif
-#endif
-
-#ifdef S4STATIC
-#ifdef S4DLL
-   #error - Both S4STATIC and S4DLL switches set - only one is allowed.
-#endif
 #endif
 
 #ifndef S4DLL_BUILD

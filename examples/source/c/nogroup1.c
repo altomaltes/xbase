@@ -41,9 +41,9 @@ int main(void)
 {
    code4init(&codeBase);
 
-   #ifdef S4CLIENT
-      code4connect(&codeBase,0,0,0,0,0);
-   #endif
+ //  #ifdef S4 CLIENT
+  //    code4connect(&codeBase,0,0,0,0,0);
+  // #endif
 
    if (strcmp(code4indexExtension(&codeBase),"NTX") == 0)
    {

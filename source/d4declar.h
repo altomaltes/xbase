@@ -931,10 +931,12 @@ int mem4reset( void ) ;
 #ifdef S4MEM_DBF
    INDEX4 *mem4index( void ) ;
 #endif
+
 #ifdef S4SEMAPHORE
    int mem4start( CODE4 * ) ;
    void mem4stop( CODE4 * ) ;
 #endif
+
 #ifdef S4MEM_PRINT
    #define mem4alloc( a ) ( code4memFileNameSet( __FILE__ ), code4memLineNoSet( __LINE__ ), mem4allocDefault( a ) )
    #define mem4alloc2( a, b ) ( code4memFileNameSet( __FILE__ ), code4memLineNoSet( __LINE__ ), mem4alloc2Default( a, b ) )

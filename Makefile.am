@@ -21,12 +21,13 @@ check_PROGRAMS+= ex120 ex121 ex122 ex123 ex124 ex125 ex126 ex127 ex128 ex129
 check_PROGRAMS+= ex130 ex131 
 
 check_PROGRAMS+= seeker append bank capieg copydat2 copydata custlist d4test d4verify datainfo date1 deletion
-check_PROGRAMS+= relate1 relate2 relate3 relate4  
+check_PROGRAMS+= relate1 relate2 relate3 relate4  transfer
 
 relate1_SOURCES=examples/source/c/relate1.c
 relate2_SOURCES=examples/source/c/relate2.c
 relate3_SOURCES=examples/source/c/relate3.c
 relate4_SOURCES=examples/source/c/relate4.c
+transfer_SOURCES=examples/source/c/transfer.c
 
 ex1_SOURCES=examples/source/c/ex1.c 
 ex2_SOURCES=examples/source/c/ex2.c 

@@ -1,9 +1,9 @@
 lib_LTLIBRARIES= libxbase.la # xbase-thread.la
 
-library_includedir=$(includedir)
+library_includedir=$(includedir)/xbase
 library_include_HEADERS= d4all.h
 
-#libxbase_la_SOURCES= b4node.c c4baspas.c c4blast.c c4buffer.c c4com.c c4com2.c c4send.c c4set.c  c4thread.c  c4util.c d4info.c e4event.c f4wstr.c  i4conv.c  i4thread.c l4mutex.c
+#libxbase_la_SOURCES= b4node.c c4baspas.c c4blast.c c4buffer.c c4com.c c4com2.c c4send.c c4set.c  c4thread.c  c4util.c d4info.c e4event.c f4wstr.c  i4conv.c  i4thread.c l4mutex.c r4regs.h
 
 libxbase_la_SOURCES=  b4block.c  o4opt.c m4create.c m4file.c m4map.c m4memo.c m4memory.c
 libxbase_la_SOURCES+= c4.c  c4bcd.c  c4code.c   c4const.c c4hook.c  c4trans.c
@@ -18,11 +18,11 @@ libxbase_la_SOURCES+= f4true.c f4write.c
 libxbase_la_SOURCES+= i4add.c i4addtag.c i4check.c  i4create.c i4dump.c i4index.c i4info.c i4init.c i4key.c i4lock.c
 libxbase_la_SOURCES+= i4ntag.c i4positi.c i4remove.c i4tag.c
 libxbase_la_SOURCES+= l4link.c l4lock_c.c m4check.c
-libxbase_la_SOURCES+= r4area.c r4bit.c r4drive2.c r4driver.c r4group.c r4log.c r4obj.c r4regs.c r4reinde.c r4reindx.c
+libxbase_la_SOURCES+= r4area.c r4bit.c r4drive2.c r4driver.c r4group.c r4log.c r4obj.c r4reinde.c r4reindx.c
 libxbase_la_SOURCES+= r4relate.c r4report.c r4save.c r4save_2.c r4style.c r4total.c
 libxbase_la_SOURCES+= s4init.c s4initfr.c s4next.c s4quick.c s4sort.c s4signal.c sema4.c u4name.c u4util.c
 
-LDFLAGS+= -release $(VERSION) -shared -L$(top_builddir)/source/.libs
+AM_LDFLAGS= -release $(VERSION) -shared -L$(top_builddir)/source/.libs
 
 MODULE_FLAGS= -module -lxbase-$(VERSION) -no-undefined
 

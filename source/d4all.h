@@ -3,23 +3,21 @@
 #ifndef D4ALL_INC
 #define D4ALL_INC
 
+#include "d4config.h"
+
 /**********************************************************************/
 /**********            USER SWITCH SETTINGS AREA            ***********/
 
 /* CodeBase configuration */
-   #define S4STAND_ALONE
 
 /* Index File compatibility options */
-
-/* #define S4CLIPPER */
-   #define S4FOX
-/* #define S4MDX     */
 
 #ifdef S4FOX
    /* FoxPro collating sequence support (select none, some or all) */
    #define S4GENERAL       /* Supports German FoxPro 2.5a and Visual FoxPro with general collating sequences */
 
-   /* FoxPro codepage support (select none, some or all) */
+/* FoxPro codepage support (select none, some or all) 
+ */
    #define S4CODEPAGE_437   /* U.S. MS-DOS CodePage */
    #define S4CODEPAGE_1252  /* WINDOWS ANSI CodePage */
 #endif
@@ -29,7 +27,6 @@
 /* #define S4CONSOLE */
 
 /* Specify Library Type (choose one) */
-   #define S4STATIC
 /* #define S4DLL     */
 /* #define S4DLL_BUILD */
 
@@ -42,49 +39,15 @@
 /* #define S4MACINTOSH  */   /* requires CodeBase Mac version */
 /* #define S4PASCAL_WIN */   /* requires CodePascal version */
 
-/* General Configuration Options
- */
-/* #define S4LOCK_HOOK    */
-/* #define S4MAX          */
-
 /* Error Configuration Options
  */
 
- #define E4ANALYZE
- #define E4DEBUG
-/* #define E4HOOK       */
-
-/* #define E4LINK       */
-/* #define E4MISC       */
-/* #define E4OFF        */
-/* #define E4OFF_STRING */
-   #define E4PARM_HIGH
-   #define E4PAUSE
-/* #define E4STOP       */
-   #define E4STOP_CRITICAL
 /* #define E4MAC_ALERT 4444 */
 
 /* Library Reducing Switches
  */
-/* #define S4OFF_INDEX    */
-/* #define S4OFF_MEMO     */
-/* #define S4OFF_MULTI    */
-/* #define S4OFF_OPTIMIZE */
 /* #define S4OFF_REPORT   */
 /* #define S4OFF_THREAD   */
-/* #define S4OFF_TRAN     */
-/* #define S4OFF_WRITE    */
-
-/* Spoken Language Switches
- */
-/* #define S4ANSI         */
-/* #define S4DICTIONARY   */
-/* #define S4FINNISH      */
-/* #define S4FRENCH       */
-/* #define S4GERMAN       */
-/* #define S4NORWEGIAN    */
-/* #define S4SCANDINAVIAN */
-/* #define S4SWEDISH      */
 
 /**********************************************************************/
 

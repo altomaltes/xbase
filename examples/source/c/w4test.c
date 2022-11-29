@@ -148,7 +148,7 @@ D4CHILD_INFO children[] =
 {  
 	{ LABEL_ST,                                             115,    10,     40,  12,        CLS_LABEL,  UTEXT("Server ID"),  0,     NULL, IDD_NONE  },
 	{ LABEL_ST,                                             115,    24,     40,  12,        CLS_LABEL,  UTEXT("Process ID"), 0,     NULL, IDD_NONE  },
-	{ EDIT_ST,                                              160,    8,              105, 12,        CLS_EDIT,   UTEXT("S4SERVER"),  0,      NULL, IDD_SERV },
+//	{ EDIT_ST,                                              160,    8,              105, 12,        CLS_EDIT,   UTEXT("S4 SERVER"),  0,      NULL, IDD_SERV },
 	{ EDIT_ST,                                              160,    23,     105, 12,        CLS_EDIT,   UTEXT("23165"),      0,     NULL, IDD_PROC },
 	{ GBUTTON_ST | WS_GROUP,        5,              5,              110, 70,        CLS_BUTTON, UTEXT("Protocols"), 0,      NULL, IDD_NONE  },
 /*      { RBUTTON_ST | TABGRP,          10,     20,     40,  8,         CLS_BUTTON, UTEXT("IPX/SPX"),           0,      NULL, IDD_IPX },*/
