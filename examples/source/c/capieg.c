@@ -12,19 +12,14 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-#include "../../../source/d4all.h"
+#include "xbase.fox/d4all.h"
 
-
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000;
-#endif
 
 FIELD4INFO fields[ ] =
-{
- 	{ "NAME", 'C', 20, 0 },
- 	{ "AGE", 'N', 3, 0 },
-	{ 0,0,0,0 },
-} ;
+{{ "NAME", 'C', 20, 0 }
+,{ "AGE", 'N', 3, 0 }
+,{ 0,0,0,0 },
+};
 
 void main( )
 {

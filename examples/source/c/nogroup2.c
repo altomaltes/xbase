@@ -21,10 +21,6 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000;
-#endif
-
 CODE4   codeBase;
 DATA4   *data = 0;
 TAG4    *nameTag,*ageTag,*idTag;

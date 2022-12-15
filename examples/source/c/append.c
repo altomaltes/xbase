@@ -19,12 +19,8 @@
 \***********************************************************************/
 /* See User's Manual, chapter 11 */
 
-#include "../../../source/d4all.h"
+#include "xbase.fox/d4all.h"
 
-
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000;
-#endif
 
 CODE4 cb ;
 DATA4 *dataFrom, *dataTo ;

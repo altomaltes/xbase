@@ -21,10 +21,6 @@
 
 #include "d4all.h"
 
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000;
-#endif
-
 typedef struct
 {
    LINK4   link;

@@ -19,14 +19,10 @@
 \***********************************************************************/
 /* See User's Manual, chapter 5 */
 
-#include "../../../source/d4all.h"
+#include "xbase.fox/d4all.h"
 
 #ifdef S4MACINTOSH
    #include <console.h>
-#endif
-
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000;
 #endif
 
 void main(int argc,char *argv[])

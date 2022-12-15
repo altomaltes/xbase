@@ -224,7 +224,9 @@ AC_ARG_ENABLE([format],
 
       *)
          AC_MSG_ERROR([--enable-index-format=${enable_index_format}: invalid value])
-   esac],  AC_DEFINE([S4FOX], [1], [Enable FOXPRO index format]), , fox )
+   esac],  [ AC_DEFINE([S4FOX], [1], [Enable FOXPRO index format]) 
+             AC_DEFINE([S4FORMAT], [1], [Choosen format ( 1 -> fox, 2 -> clipper, 3 -> sbase ])
+             enable_format=fox ] )
 
 
 AC_ARG_ENABLE([case],
@@ -330,7 +332,7 @@ AC_ARG_ENABLE([slack],
 AM_CONDITIONAL(BUILDING_SLACK, test "x$enable_slack" = "xyes" )
 
 LDFLAGS+=-L/usr/local/lib
-
+FORMAT_NAME=$enable_format
 
 
 AC_SUBST(DIST_ROOT)
@@ -344,6 +346,7 @@ AC_SUBST(SLACKBUILD)
 AC_SUBST(AUTHORS)
 AC_SUBST(DATE)
 AC_SUBST(SVN_BUILD)
+AC_SUBST(FORMAT_NAME)
 
 AC_CONFIG_FILES([Makefile source/Makefile ])
 AC_OUTPUT
@@ -364,8 +367,8 @@ Configuration:
 
 Features:
 
-            Choosen Indexes format: $enable_format
-                Enabled languarg:s: $enable_language
+ Choosen Indexes format: $FORMAT_NAME
+     Enabled languarges: $enable_language
                                  
            Extended error checking: $enable_exdebug
           Link list error checking: $enable_linkdbg

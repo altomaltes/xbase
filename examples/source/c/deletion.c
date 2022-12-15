@@ -20,12 +20,8 @@
 /* See User's Manual, chapter 4 */
 
 
-#include "../../../source/d4all.h"
+#include "xbase.fox/d4all.h"
 
-
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000;
-#endif
 
 CODE4      codeBase;
 DATA4      *dataFile = 0;

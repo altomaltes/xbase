@@ -13,12 +13,8 @@
 /* *********************************************************************************************** */
 
 /*ex83.c*/
-#include "../../../source/d4all.h"
+#include "xbase.fox/d4all.h"
 
-
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000;
-#endif
 
 static int daysInMonth[] = { 0,31,28,31,30,31,30,31,31,30,31,30,31 } ;
 

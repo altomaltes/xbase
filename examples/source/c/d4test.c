@@ -18,17 +18,13 @@
 *                                                                       *
 \***********************************************************************/
 
-#include "../../../source/d4all.h"
+#include "xbase.fox/d4all.h"
 
 void AddNewRecord(char *, char *, char *, int, int, double, char * ) ;
 void ConnectToServer( char *, char * ) ;
 int  OpenDataFile( void ) ;
 void ParseCmdLine( int ) ;
 void PrintRecords( void ) ;
-
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000;
-#endif
 
 
 CODE4    codeBase;

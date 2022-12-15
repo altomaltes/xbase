@@ -193,7 +193,7 @@ deletion_SOURCES=examples/source/c/deletion.c
 
 LDADD= $(top_builddir)/source/libxbase.la
 
-library_includedir= $(includedir)/xbase
+library_includedir= $(includedir)/xbase.$(FORMAT_NAME)
 library_include_HEADERS=source/d4all.h 
 
 

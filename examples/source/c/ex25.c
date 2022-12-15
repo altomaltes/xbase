@@ -13,13 +13,9 @@
 /* *********************************************************************************************** */
 
 /* 'f4int()' uses 'c4atoi' because database field data is not null terminated */
-#include "../../../source/d4all.h"
+#include "xbase.fox/d4all.h"
 
 
-
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000;
-#endif
 
 int function( char *string, int len )
 {

@@ -1633,8 +1633,6 @@ DATA4 *d4data_v( CODE4 *c4, char *alias )
 #ifndef S4WINCE
 #ifndef S4PASCAL_DOS
 
-#define CTRL4SERVERNAMESIZE 260
-
 /*Structures for CodeControls Functions */
 
 typedef   struct ctrl4code_tag
@@ -1645,8 +1643,7 @@ typedef   struct ctrl4code_tag
    int         alloc ;
    LIST4       form ;
 
-
-}CTRL4CODE ;
+} CTRL4CODE ;
 
 /***************************************************************\
 \***************************************************************/
@@ -1654,15 +1651,15 @@ typedef   struct ctrl4code_tag
 #ifdef __cplusplus
    extern "C" {
 #endif
-int         S4FUNCTION ctrl4addCode( HINSTANCE hInst ) ;                                 /*450*/
-void        S4FUNCTION ctrl4codeListInit( void ) ;                                        /*451*/
-void        S4FUNCTION ctrl4freeCtrlNode( CTRL4CODE *node ) ;
-void        S4FUNCTION ctrl4freeCodeList( void ) ;                                        /*452*/
-CTRL4CODE * S4FUNCTION ctrl4getCtrlCode( HINSTANCE hInst ) ;                              /*453*/
-void        S4FUNCTION ctrl4getServerName( HINSTANCE hInst,char *serverName,int strLen ) ; /* 5 oh something */
-void        S4FUNCTION ctrl4setServerName( HINSTANCE hInst,char *serverName ) ; /* 5 oh something */
-void        S4FUNCTION ctrl4initVBX( CODE4 *code,HINSTANCE hInstance,int initialize ) ;   /*454*/
-void        S4FUNCTION ctrl4initVBXUndo( CODE4 *code,HINSTANCE hInstance ) ;              /*455*/
+//int         S4FUNCTION ctrl4addCode( HINSTANCE hInst ) ;                                 /*450*/
+//void        S4FUNCTION ctrl4codeListInit( void ) ;                                        /*451*/
+//void        S4FUNCTION ctrl4freeCtrlNode( CTRL4CODE *node ) ;
+//void        S4FUNCTION ctrl4freeCodeList( void ) ;                                        /*452*/
+//CTRL4CODE * S4FUNCTION ctrl4getCtrlCode( HINSTANCE hInst ) ;                              /*453*/
+//void        S4FUNCTION ctrl4getServerName( HINSTANCE hInst,char *serverName,int strLen ) ; /* 5 oh something */
+//void        S4FUNCTION ctrl4setServerName( HINSTANCE hInst,char *serverName ) ; /* 5 oh something */
+//void        S4FUNCTION ctrl4initVBX( CODE4 *code,HINSTANCE hInstance,int initialize ) ;   /*454*/
+//void        S4FUNCTION ctrl4initVBXUndo( CODE4 *code,HINSTANCE hInstance ) ;              /*455*/
 #ifdef __cplusplus
    }
 #endif

@@ -30,15 +30,6 @@
 /* #define S4DLL     */
 /* #define S4DLL_BUILD */
 
-/* Choose Operating System */
-//   #define S4DOS
-/* #define S4OS2        */   /* for OS/2 */
-/* #define S4WIN16      */   /* for Windows 3.x */
-/* #define S4WINCE      */   /* for Windows CE */
-/* #define __unix__       */   /* requires CodeBase Portability version */
-/* #define S4MACINTOSH  */   /* requires CodeBase Mac version */
-/* #define S4PASCAL_WIN */   /* requires CodePascal version */
-
 /* Error Configuration Options
  */
 
@@ -144,6 +135,13 @@
 
 #ifdef __TURBOC__
    #pragma hdrstop
+
+  #ifndef TURBOC_STKLEN
+    #define TURBOC_STKLEN 10000
+  #define  
+
+   extern unsigned _stklen = TURBOC_STKLEN;
+
 #endif  /* __TUROBC__ */
 
 

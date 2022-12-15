@@ -19,11 +19,7 @@
 \***********************************************************************/
 /* See User's Manual, chapter 8 */
 
-#include "../../../source/d4all.h"
-
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000;
-#endif
+#include "xbase.fox/d4all.h"
 
 int validDate(char *date)
 {

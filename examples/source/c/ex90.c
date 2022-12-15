@@ -13,11 +13,7 @@
 /* *********************************************************************************************** */
 
 /*ex90.c*/
-#include "../../../source/d4all.h"
-
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000;
-#endif
+#include "xbase.fox/d4all.h"
 
 #define VOTE_AGE 18.0
 
