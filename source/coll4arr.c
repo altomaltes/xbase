@@ -216,6 +216,7 @@ static Translate4arrayChar cp1252generalCollationArray[] =
 ,{ (unsigned char) 96, (unsigned char)1             }   /*1 A 193 */
 ,{ (unsigned char) 96, (unsigned char)3             }   /*1 A 194 */
 ,{ (unsigned char) 96, (unsigned char)5             }   /*1 A 195 */
+
    #ifdef S4ELICON   // LY Dec 15/04 : proposed change by Elicon Data AB for proper Swedish character sort
    ,{ (unsigned char)128, (unsigned char)NO4TAIL_BYTES }   /*1 é 196 */
    ,{ (unsigned char)127, (unsigned char)NO4TAIL_BYTES }   /*1 è 197 */
@@ -225,6 +226,7 @@ static Translate4arrayChar cp1252generalCollationArray[] =
    ,{ (unsigned char) 96, (unsigned char)6             }   /*1 è 197 */
    ,{ (unsigned char)EXPAND4CHAR_TO_TWO_BYTES, (unsigned char)1             }   /*1 í 198 */
    #endif
+
 ,{ (unsigned char) 98, (unsigned char)7             }   /*1 Ä 199 */
 ,{ (unsigned char)102, (unsigned char)2             }   /*1 E 200 */
 ,{ (unsigned char)102, (unsigned char)1             }   /*1 ê 201 */
@@ -240,11 +242,13 @@ static Translate4arrayChar cp1252generalCollationArray[] =
 ,{ (unsigned char)114, (unsigned char)1             }   /*1 O 211 */
 ,{ (unsigned char)114, (unsigned char)3             }   /*1 O 212 */
 ,{ (unsigned char)114, (unsigned char)5             }   /*1 O 213 */
+
    #ifdef S4ELICON   // LY Dec 15/04 : proposed change by Elicon Data AB for proper Swedish character sort
    ,{ (unsigned char)129, (unsigned char)NO4TAIL_BYTES }   /*1 ô 214 */
    #else
    ,{ (unsigned char)114, (unsigned char)4             }   /*1 ô 214 */
    #endif
+
 ,{ (unsigned char) 84, (unsigned char)NO4TAIL_BYTES }   /*1 X 215 */
 ,{ (unsigned char)129, (unsigned char)NO4TAIL_BYTES }   /*1 0 216 */
 ,{ (unsigned char)120, (unsigned char)2             }   /*1 U 217 */
@@ -258,6 +262,7 @@ static Translate4arrayChar cp1252generalCollationArray[] =
 ,{ (unsigned char) 96, (unsigned char)1             }   /*1 † 225 */
 ,{ (unsigned char) 96, (unsigned char)3             }   /*1 É 226 */
 ,{ (unsigned char) 96, (unsigned char)5             }   /*1 a 227 */
+
    #ifdef S4ELICON   // LY Dec 15/04 : proposed change by Elicon Data AB for proper Swedish character sort
    ,{ (unsigned char)128, (unsigned char)NO4TAIL_BYTES }   /*1 Ñ 228 */
    ,{ (unsigned char)127, (unsigned char)NO4TAIL_BYTES }   /*1 Ü 229 */
@@ -267,6 +272,7 @@ static Translate4arrayChar cp1252generalCollationArray[] =
    ,{ (unsigned char) 96, (unsigned char)6             }   /*1 Ü 229 */
    ,{ (unsigned char)EXPAND4CHAR_TO_TWO_BYTES, (unsigned char)1             }   /*1 ë 230 */
    #endif
+
 ,{ (unsigned char) 98, (unsigned char)7             }   /*1 á 231 */
 ,{ (unsigned char)102, (unsigned char)2             }   /*1 ä 232 */
 ,{ (unsigned char)102, (unsigned char)1             }   /*1 Ç 233 */
@@ -282,11 +288,13 @@ static Translate4arrayChar cp1252generalCollationArray[] =
 ,{ (unsigned char)114, (unsigned char)1             }   /*1 ¢ 243 */
 ,{ (unsigned char)114, (unsigned char)3             }   /*1 ì 244 */
 ,{ (unsigned char)114, (unsigned char)5             }   /*1 o 245 */
+
    #ifdef S4ELICON   // LY Dec 15/04 : proposed change by Elicon Data AB for proper Swedish character sort
    ,{ (unsigned char)129, (unsigned char)NO4TAIL_BYTES }   /*1 î 246 */
    #else
    ,{ (unsigned char)114, (unsigned char)4             }   /*1 î 246 */
    #endif
+
 ,{ (unsigned char) 85, (unsigned char)NO4TAIL_BYTES }   /*1 ˆ 247 */
 ,{ (unsigned char)129, (unsigned char)NO4TAIL_BYTES }   /*1 0 248 */
 ,{ (unsigned char)120, (unsigned char)2             }   /*1 ó 249 */

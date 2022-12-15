@@ -115,7 +115,7 @@ void main( void )
    codeBase.lockAttempts = 5 ;
    codeBase.lockEnforce = 1 ;
 
-      OpenLogFile() ;
+   OpenLogFile() ;
 
    OpenDataFile() ;
 

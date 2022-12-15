@@ -7,6 +7,7 @@
 #ifdef P4ARGS_USED
    #pragma argsused
 #endif
+
 int code4verify( CODE4 *c4, int subs )
 {
    if ( !c4 )   return error4( 0, e4parmNull, E93901 ) ;
@@ -22,7 +23,7 @@ int dfile4verify( DATA4FILE *d4, int subs )
    int rc ;
 
    if ( !d4     )  return error4( 0, e4parmNull, E91102 ) ;
-   if ( !d4->c4 )  return error4( 0, e4struct, E91102 ) ;
+   if ( !d4->c4 )  return error4( 0,   e4struct, E91102 ) ;
 
    if ( subs == 1 )
       if ( ( rc = code4verify( d4->c4, 1 ) ) < 0 )

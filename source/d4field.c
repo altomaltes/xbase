@@ -34,16 +34,19 @@ FIELD4 *S4FUNCTION d4fieldJ( DATA4 *data, const int jField )
    #endif
 
    #ifdef E4PARM_HIGH
+
       if ( data == 0 )
       {
          error4( 0, e4parmNull, E94002 ) ;
-         return (FIELD4 *)0 ;
+         return (FIELD4 *)NULL ;
       }
+
       if ( jField <= 0 || data->fields == 0 || jField > data->dataFile->nFields )
       {
          error4( data->codeBase, e4parm, E94002 ) ;
-         return (FIELD4 *)0 ;
+         return (FIELD4 *)NULL ;
       }
+
    #endif
 
    return data->fields + jField - 1 ;
@@ -62,14 +65,18 @@ int S4FUNCTION d4fieldNumber( DATA4 *data, const char *fieldName )
       c4trimN( buf, sizeof( buf ) ) ;
       c4upper( buf ) ;
 
-      for ( i = 0 ; i < data->dataFile->nFields ; i++ )
-         if ( !strcmp( buf, data->fields[i].name ) )
-            return i + 1 ;
-   }
+      for ( i = 0 
+          ; i < data->dataFile->nFields 
+          ; i++ )
+      {  if ( !strcmp( buf, data->fields[i].name ) )
+         {  return( i + 1 );
+   }  }  }
 
    if ( data->codeBase->errFieldName )
-      return error4describe( data->codeBase, e4fieldName, E94003, fieldName, 0, 0 ) ;
-   return e4fieldName ;
+   {  return( error4describe( data->codeBase, e4fieldName, E94003, fieldName, 0, 0 )) ;
+   }
+
+   return( e4fieldName );
 }
 
 #ifdef S4VB_DOS

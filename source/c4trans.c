@@ -1406,6 +1406,7 @@ int S4FUNCTION tran4lowCommitPhaseTwo( TRAN4 *trans, long id, int doUnlock )
          if ( code4unlockAuto( trans->c4trans->c4 ) == 1 )
             rc = code4unlock( trans->c4trans->c4 ) ;
       }
+
       #ifndef S4OFF_TRAN
          #ifndef S4UTILS
                rc = code4tranUnlockTransactions( &c4->c4trans, TRAN4LOCK_MULTIPLE ) ;
@@ -1565,72 +1566,70 @@ int S4FUNCTION code4tranRollback( CODE4 *c4 )
 
 int S4FUNCTION code4transFileEnable( CODE4TRANS *c4trans, const char *logName, const int doCreate )
 {
-   #ifdef E4ANALYZE
-      int rc ;
-   #else
-         int rc ;
-   #endif
-
-      CODE4 *c4 ;
+   int rc ;
+   CODE4 *c4 ;
 
    if ( c4trans->enabled == 1 )
-      return 0 ;
+   { return 0 ;
+   }
 
-      rc = code4tranInitLow( &c4trans->trans, c4trans ) ;
-      if ( rc < 0 )
-         return rc ;
+   rc = code4tranInitLow( &c4trans->trans, c4trans ) ;
+   if ( rc < 0 )
+      return rc ;
 
    #ifdef E4ANALYZE
       if ( ( rc = code4transVerify( c4trans, 1 ) ) < 0 )
          return rc ;
    #endif
 
-      rc = 0 ;
+   rc = 0 ;
 
-      c4 = c4trans->c4 ;
+   c4 = c4trans->c4 ;
 
-      if ( c4trans->enabled == 0 )
+   if ( c4trans->enabled == 0 )
+   {
+      if ( logName != 0 )
       {
-         if ( logName != 0 )
-         {
-            if ( c4->transFileName != 0 )
-               u4free( c4->transFileName ) ;
-            c4->transFileName = (char *)u4allocFree( c4, (long)strlen( logName ) + 1L ) ;
-            if ( c4->transFileName == 0 )
-               rc = e4memory ;
-            else
-               strcpy( c4->transFileName, logName ) ;
-         }
+         if ( c4->transFileName )
+            u4free( c4->transFileName ) ;
 
-         if( c4->transFileName != 0 )
+         c4->transFileName = (char *)u4allocFree( c4, (long)strlen( logName ) + 1L ) ;
+
+         if ( c4->transFileName == 0 )
+            rc = e4memory ;
+
+         else
+            strcpy( c4->transFileName, logName ) ;
+      }
+
+      if( c4->transFileName != 0 )
+      {
+         rc = tran4fileInit( &c4->transFile, c4trans ) ;
+         if ( rc == 0 )
          {
-               rc = tran4fileInit( &c4->transFile, c4trans ) ;
+            if ( doCreate == 0 )
+            {
+                rc = tran4fileOpen( &c4->transFile, c4->transFileName ) ;
+            }
+            else
+            {
+                rc = tran4fileCreate( &c4->transFile, c4->transFileName ) ;
+            }
+
             if ( rc == 0 )
             {
-               if ( doCreate == 0 )
-               {
-                     rc = tran4fileOpen( &c4->transFile, c4->transFileName ) ;
-               }
-               else
-               {
-                     rc = tran4fileCreate( &c4->transFile, c4->transFileName ) ;
-               }
-               if ( rc == 0 )
-               {
-                  c4trans->enabled = 1 ;
-                     c4trans->transFile = &c4->transFile ;
-               }
-            }
-         }
-      }
-      if ( rc == 0 )
-         c4trans->transFile->status = tran4notRollbackOrCommit ;
-      else
-      {
-         u4free( c4->transFileName ) ;
-         c4->transFileName = 0 ;
-      }
-      return rc ;
+               c4trans->enabled = 1 ;
+               c4trans->transFile = &c4->transFile ;
+   }  }  }  }
+
+   if ( rc )
+   {  u4free( c4->transFileName ) ;
+      c4->transFileName = 0 ;
+   }
+   else
+   {  c4trans->transFile->status = tran4notRollbackOrCommit ;
+   } 
+   return( rc );
 }
 
 int tran4addUser( TRAN4 *trans, const long clientId, const char *charId, const unsigned short int lenIn )
@@ -1641,6 +1640,7 @@ int tran4addUser( TRAN4 *trans, const long clientId, const char *charId, const u
    char *netId ;
    CODE4 *c4 ;
    static char defaultUser[] = "PUBLIC" ;
+
       #ifndef S4OFF_MULTI
          int i, oldNumAttempts ;
       #endif
@@ -1680,11 +1680,14 @@ int tran4addUser( TRAN4 *trans, const long clientId, const char *charId, const u
       rc = tran4set( trans, trans->currentTranStatus, -1L, clientId, TRAN4INIT, len + netIdLen + sizeof( len ) + sizeof( netIdLen), 0L, 0L ) ;
       if ( rc < 0 )
          return rc ;
+
       if ( tran4putData( trans, (void *)&netIdLen, sizeof( netIdLen ) ) == e4memory )
          return e4memory ;
+
       if ( netIdLen != 0 )
          if ( tran4putData( trans, (void *)netId, (unsigned int)netIdLen ) == e4memory )
             return e4memory ;
+
       if ( tran4putData( trans, (void *)&len, sizeof( len ) ) == e4memory )
          return e4memory ;
       if ( len == 0 )  /* empty char id */
@@ -1721,8 +1724,7 @@ void S4FUNCTION tran4freeLocks( CODE4 *c4, SINGLE4DISTANT *toFree )
          return ;
       single4distantPop( toFree ) ;
       mem4free( c4->lockMemory, lock ) ;
-   }
-}
+}  }
 
 static void tran4unlock( SINGLE4DISTANT *toAdd, SINGLE4DISTANT *toUnlock )
 {
@@ -1736,8 +1738,7 @@ static void tran4unlock( SINGLE4DISTANT *toAdd, SINGLE4DISTANT *toUnlock )
       single4distantPop( toUnlock ) ;
       single4add( single4distantToSingle( toAdd ), &lock->link ) ;
       lock4unlock( lock ) ;
-   }
-}
+} }
 
 #endif /* SOFF_MULTI */
 
@@ -1753,9 +1754,9 @@ int S4FUNCTION code4lock( CODE4 *c4 )
       SINGLE4DISTANT locked ;
       int rc = 0 ;
       CODE4TRANS *c4trans ;
-         SINGLE4 locks ;
-         int saveErr, count, saveUnlockAuto ;
-         TRAN4 *trans ;
+       SINGLE4 locks ;
+       int saveErr, count, saveUnlockAuto ;
+       TRAN4 *trans ;
 
       #ifdef E4ANALYZE
          if ( ( rc = code4verify( c4, 1 ) ) < 0 )
