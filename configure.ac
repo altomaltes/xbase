@@ -166,43 +166,35 @@ AC_ARG_ENABLE([language],
                  , [Enable database language: @<:@default=none@:>@ ( none, ansi, dictionary, finnish , french , german,  norwegian, scandinavian, swedish )] )
                  , [case "$enableval" in
       ansi)
-         AC_DEFINE([S4ANSI], [],
-                   [Enable ANSI language])
+         AC_DEFINE([S4ANSI], [1], [Enable ANSI language])
         ;;
 
       dictionary)
-         AC_DEFINE([S4DICTIONARY], [],
-                   [Enable DICTIONARY language])
+         AC_DEFINE([S4DICTIONARY], [1],[Enable DICTIONARY language])
         ;;
 
       finnish)
-         AC_DEFINE([S4FINNISH], [],
-                   [Enable Finnish language])
+         AC_DEFINE([S4FINNISH], [1],[Enable Finnish language])
         ;;
 
       french)
-         AC_DEFINE([S4FRENCH], [],
-                   [Enable French language])
+         AC_DEFINE([S4FRENCH], [1],                   [Enable French language])
         ;;
 
       german)
-         AC_DEFINE([S4GERMAN], [],
-                   [Enable German language])
+         AC_DEFINE([S4GERMAN], [1],                   [Enable German language])
         ;;
 
       norwegian)
-         AC_DEFINE([S4NORWEGIAN], [],
-                   [Enable Nowwegian language])
+         AC_DEFINE([S4NORWEGIAN], [1],                   [Enable Nowwegian language])
         ;;
 
       escandinavian)
-         AC_DEFINE([S4SCANDINAVIAN], [],
-                   [Enable Scandinavian language])
+         AC_DEFINE([S4SCANDINAVIAN], [1], [Enable Scandinavian language])
         ;;
 
       swedish)
-         AC_DEFINE([S4SWEDISH], [],
-                   [Enable Swedish language])
+         AC_DEFINE([S4SWEDISH], [1], [Enable Swedish language])
         ;;
    esac])
 
@@ -216,20 +208,23 @@ AC_ARG_ENABLE([format],
                  , [Enable database index format: @<:@default=fox@:>@ ( foxpro, clipper or dbase IV mdx )] )
                  , [case "$enableval" in
       fox)
-         AC_DEFINE([S4FOX], [], [Enable FOXPRO index format])
+         AC_DEFINE([S4FOX]   , [], [Enable FOXPRO index format])
+         AC_DEFINE([S4FORMAT], [1], [Choosen format ( 1 -> fox, 2 -> clipper, 3 -> sbase ])
         ;;
 
       clipper)
          AC_DEFINE([S4CLIPPER], [], [Enable CLIPPER index format])
+         AC_DEFINE([S4FORMAT], [2], [Choosen format ( 1 -> fox, 2 -> clipper, 3 -> sbase ])
          ;;
 
       mdx)
          AC_DEFINE([S4MDX], [], [Enable DBASE IV mdx format])
+         AC_DEFINE([S4FORMAT], [3], [Choosen format ( 1 -> fox, 2 -> clipper, 3 -> sbase ])
          ;;
 
       *)
          AC_MSG_ERROR([--enable-index-format=${enable_index_format}: invalid value])
-   esac],  AC_DEFINE([S4FOX], [], [Enable FOXPRO index format]) )
+   esac],  AC_DEFINE([S4FOX], [1], [Enable FOXPRO index format]), , fox )
 
 
 AC_ARG_ENABLE([case],
@@ -237,8 +232,7 @@ AC_ARG_ENABLE([case],
                  , [ filename case policy  @<:@default=none@:>@( none or upper, for legacy MSDOS ] )
                  , [case "$enableval" in
       none)
-         AC_DEFINE([S4CASE_SENS], [],
-                   [Don't uppercase filenames])
+         AC_DEFINE([S4CASE_SENS], [1], [Don't uppercase filenames])
         ;;
       upper)
          ;;
@@ -253,73 +247,74 @@ AM_CONDITIONAL( WINDOWS,   test "${version_type}" = "windows" )
 
 AC_PATH_PROG([SLACKBUILD], [makepkg], [notfound])
 
-AC_ARG_ENABLE([exdebug],
-AS_HELP_STRING([--enable-exdebug=@<:@yes/no@:>@], [Extended error checking @<:@default=yes@:>@]))
-AS_IF([test "x$enable_exdebug" != "xno"], AC_DEFINE([E4DEBUG], [], [Extended error checking]) )
+AC_ARG_ENABLE([exdebug], 
+  AS_HELP_STRING([--enable-exdebug=@<:@yes/no@:>@], 
+                 [Extended error checking @<:@default=yes@:>@]),,enable_exdebug=yes)
+AS_IF([test "x$enable_exdebug" == "xyes"], AC_DEFINE([E4DEBUG], [1], [Extended error checking]) )
 
 AC_ARG_ENABLE([linkdbg],
-AS_HELP_STRING([--enable-linkdbg=@<:@yes/no@:>@], [Link list error checking @<:@default=yes@:>@]))
-AS_IF([test "x$enable_linkdbg" != "xno"], AC_DEFINE([E4LINK], [], [Link list error checking]) )
+  AS_HELP_STRING([--enable-linkdbg=@<:@yes/no@:>@], [Link list error checking @<:@default=yes@:>@]),,enable_linkdbg=yes)
+AS_IF([test "x$enable_linkdbg" == "xyes"], AC_DEFINE([E4LINK], [1], [Link list error checking]) )
 
 AC_ARG_ENABLE([miscdbg],
-AS_HELP_STRING([--enable-miscdbg=@<:@yes/no@:>@], [Miscellaneous error checking @<:@default=yes@:>@]))
-AS_IF([test "x$enable_miscdbg" != "xno"], AC_DEFINE([E4MISC], [], [Miscellaneous error checking]) )
+  AS_HELP_STRING([--enable-miscdbg=@<:@yes/no@:>@], [Miscellaneous error checking @<:@default=yes@:>@]),,enable_miscdbg=yes)
+AS_IF([test "x$enable_miscdbg" == "xyes"], AC_DEFINE([E4MISC], [1], [Miscellaneous error checking]) )
 
 AC_ARG_ENABLE([dbg],
-AS_HELP_STRING([--disable-dbg=@<:@yes/no@:>@], [disable error display @<:@default=no@:>@]))
-AS_IF([test "x$disable_dbg" != "xno"], AC_DEFINE([E4OFF], [], [No error display]) )
+  AS_HELP_STRING([--disable-dbg=@<:@yes/no@:>@], [disable error display @<:@default=no@:>@]),,disable_dbg=no)
+AS_IF([test "x$disable_dbg" == "xyes"], AC_DEFINE([E4OFF], [1], [No error display]) )
 
-AC_ARG_ENABLE([string],
-AS_HELP_STRING([--disable-errstring=@<:@yes/no@:>@], [disable error string display @<:@default=no@:>@]))
-AS_IF([test "x$disable_errstring" != "xno"], AC_DEFINE([E4OFF_STRING], [], [No error string display ]) )
+AC_ARG_ENABLE([errstring],
+AS_HELP_STRING([--disable-errstring=@<:@yes/no@:>@], [disable error string display @<:@default=no@:>@]),,disable_errstring=no )
+AS_IF([test "x$disable_errstring" == "xyes"], AC_DEFINE([E4OFF_STRING], [1], [No error string display ]) )
 
 AC_ARG_ENABLE([paramhigh],
-AS_HELP_STRING([--enable-paramhigh=@<:@yes/no@:>@], [High-level Functional parameter error display @<:@default=yes@:>@]))
-AS_IF([test "x$enable_paramhigh" != "xno"], AC_DEFINE([E4PARM_HIGH], [], [High-level Functional parameter error display]) )
+  AS_HELP_STRING([--enable-paramhigh=@<:@yes/no@:>@], [High-level Functional parameter error display @<:@default=yes@:>@]),,enable_paramhigh=yes)
+AS_IF([test "x$enable_paramhigh" == "xyes"], AC_DEFINE([E4PARM_HIGH], [1], [High-level Functional parameter error display]) )
 
-AC_ARG_ENABLE([estop],
-AS_HELP_STRING([--enable-estop=@<:@yes/no@:>@], [stop-on-error enabled @<:@default=no@:>@]))
-AS_IF([test "x$enable_estop" != "xno"], AC_DEFINE([E4STOP], [], [stop-on-error enabled]) )
+AC_ARG_ENABLE( [estop], 
+  AS_HELP_STRING( [--enable-estop=@<:@yes/no@:>@], [stop-on-error enabled @<:@default=no@:>@]) , , enable_estop=no )
+AS_IF([test "x$enable_estop"      == "xyes"], AC_DEFINE([E4STOP],       [1], [stop-on-error enabled]) )
 
-AC_ARG_ENABLE([epause],
-AS_HELP_STRING([--enable-pause=@<:@yes/no@:>@], [pause-on-error enabled @<:@default=no@:>@]))
-AS_IF([test "x$enable_pause" == "xyes"], AC_DEFINE([E4PAUSE], [], [pause-on-error enabled]) )
+AC_ARG_ENABLE( [epause], 
+  AS_HELP_STRING([--enable-epause=@<:@yes/no@:>@], [pause-on-error enabled @<:@default=no@:>@]) , , enable_pause=no )
+AS_IF([test "x$enable_pause"      == "xyes"], AC_DEFINE([E4PAUSE],      [1], [pause-on-error enabled]) )
 
-AC_ARG_ENABLE([ecritical],
-AS_HELP_STRING([--enable-ecritical=@<:@yes/no@:>@], [Stop-on-critical-error enabled @<:@default=yes@:>@]))
-AS_IF([test "x$enable_ecritical" == "xyes"], AC_DEFINE([E4STOP_CRITICAL], [], [Stop-on-critical-error enabled]) )
+AC_ARG_ENABLE( [ecritical], 
+  AS_HELP_STRING( [--enable-ecritical=@<:@yes/no@:>@], [Stop-on-critical-error enabled @<:@default=yes@:>@]),,enable_ecritical=yes)
+AS_IF([test "x$enable_ecritical" == "xyes"], AC_DEFINE([E4STOP_CRITICAL], [1], [Stop-on-critical-error enabled]) )
 
 AC_ARG_ENABLE([analize],
-AS_HELP_STRING([--enable-analize=@<:@yes/no@:>@], [Structure Analysis CodeBase Error Checking @<:@default=yes@:>@]))
-AS_IF([test "x$enable_analize" == "xyes"], AC_DEFINE([E4ANALIZE], [], [Structure Analysis CodeBase Error Checking]) )
+  AS_HELP_STRING([--enable-analize=@<:@yes/no@:>@], [Structure Analysis CodeBase Error Checking @<:@default=yes@:>@]),,enable_analize=yes)
+AS_IF([test "x$enable_analize" == "xyes"], AC_DEFINE([E4ANALIZE], [1], [Structure Analysis CodeBase Error Checking]) )
 
 AC_ARG_ENABLE([index],
-AS_HELP_STRING([--disable-index=@<:@yes/no@:>@], [Index support source code removed=no@:>@]))
-AS_IF([test "x$disable_index" != "xno"], AC_DEFINE([S4OFF_INDEX], [], [Index support source code removed]) )
+  AS_HELP_STRING([--disable-index=@<:@yes/no@:>@], [Index support source code removed @<:@default=no@:>@]),,disable_index=no)
+AS_IF([test "x$disable_index" == "xyes"], AC_DEFINE([S4OFF_INDEX], [1], [Index support source code removed]) )
 
 AC_ARG_ENABLE([memo],
-AS_HELP_STRING([--disable-memo=@<:@yes/no@:>@], [CodeBase memo support source code removed=no@:>@]))
-AS_IF([test "x$disable_memo" != "xno"], AC_DEFINE([S4OFF_MEMO], [], [CodeBase memo support source code removed]) )
+  AS_HELP_STRING([--disable-memo=@<:@yes/no@:>@], [Memo support source code removed @<:@default=no@:>@]),,disable_memo=no)
+AS_IF([test "x$disable_memo" == "xyes"], AC_DEFINE([S4OFF_MEMO], [1], [CodeBase memo support source code removed]) )
 
 AC_ARG_ENABLE([multi],
-AS_HELP_STRING([--disable-multi=@<:@yes/no@:>@], [Multi-user support source code removed=no@:>@]))
-AS_IF([test "x$disable_multi" != "xno"], AC_DEFINE([S4OFF_MULTI], [], [Multi-user support source code removed]) )
+  AS_HELP_STRING([--disable-multi=@<:@yes/no@:>@], [Multi-user support source code removed @<:@default=no@:>@]),,disable_multi=no )
+AS_IF([test "x$disable_multi" == "xyes"], AC_DEFINE([S4OFF_MULTI], [1], [Multi-user support source code removed]) )
 
 AC_ARG_ENABLE([optimize],
-AS_HELP_STRING([--disable-optimize=@<:@yes/no@:>@], [Optimization source code removed @<:@default=no@:>@]))
-AS_IF([test "x$disable_optimize" != "xno"], AC_DEFINE([S4OFF_OPTIMIZE], [], [Optimization source code removed]) )
+  AS_HELP_STRING([--disable-optimize=@<:@yes/no@:>@], [Optimization source code removed @<:@default=no@:>@]),,disable_optimize=no )
+AS_IF([test "x$disable_optimize" == "xyes"], AC_DEFINE([S4OFF_OPTIMIZE], [1], [Optimization source code removed]) )
 
 AC_ARG_ENABLE([transactions],
-AS_HELP_STRING([--disable-transactions=@<:@yes/no@:>@], [Disable transaction capability @<:@default=no@:>@]))
-AS_IF([test "x$disable_transactions" != "xno"], AC_DEFINE([S4OFF_TRAN], [], [Transactions disabled]) )
+  AS_HELP_STRING([--disable-transactions=@<:@yes/no@:>@], [Disable transaction capability @<:@default=no@:>@]),,disable_transactions=no )
+AS_IF([test "x$disable_transactions" == "xyes"], AC_DEFINE([S4OFF_TRAN], [1], [Transactions disabled]) )
 
 AC_ARG_ENABLE([lockhook],
-AS_HELP_STRING([--enable-lockhook=@<:@no/yes@:>@], [Enable custom lock failure function @<:@default=no@:>@]))
+  AS_HELP_STRING([--enable-lockhook=@<:@yes/no@:>@], [Enable custom lock failure function @<:@default=no@:>@]),,enable_lockhook=no )
 AS_IF([test "x$enable_lockhook" == "xyes"], AC_DEFINE([S4LOCK_HOOK], [1], [custom lock failure function enabled]) )
 
 AC_ARG_ENABLE([memory],
-AS_HELP_STRING([--enable-memory=@<:@yes/no@:>@], [Enable memory limit checking @<:@default=no@:>@]))
-AS_IF([test "x$enable_memory" == "xyes"], AC_DEFINE([S4MAX], [1], [memory limit checking enabled]) )
+  AS_HELP_STRING([--enable-memory=@<:@yes/no@:>@], [Enable memory limit checking @<:@default=no@:>@]),,enable_memory=no )
+AS_IF([test "x$enable_memory" == "xyes"],  AC_DEFINE([S4MAX],       [1], [memory limit checking enabled]) )
 
 
 AC_ARG_ENABLE([slack],
@@ -365,8 +360,30 @@ Configuration:
   Linker:                     $CC $LDFLAGS $LIBS
   Install path:               $prefix
   Language:                   $enable_language
-  Format:                     $enable_format
   Slackware packager:         $SLACKBUILD $enable_slack
+
+Features:
+
+            Choosen Indexes format: $enable_format
+                Enabled languarg:s: $enable_language
+                                 
+           Extended error checking: $enable_exdebug
+          Link list error checking: $enable_linkdbg
+      Miscellaneous error checking: $enable_miscdbg      
+            Error display disabled: $disable_dbg
+     Error string display disabled: $disable_errstring
+High-level Parameter error display: $enable_paramhigh
+             stop-on-error enabled: $enable_estop
+            pause-on-error enabled: $enable_pause
+            Stop-on-critical-error: $enable_ecritical
+ Structure Analysis Error Checking: $enable_analize
+         Remove Index support code: $disable_index
+          Remove Memo support code: $disable_memo
+         Remove Multi-user support: $disable_multi
+  Optimization source code removed: $disable_optimize
+    Disable transaction capability: $disable_transactions
+  custom lock failure hook enabled: $enable_lockhook
+     memory limit checking enabled: $enable_memory
 
   Now type 'make' to build $PACKAGE $VERSION $SVN_BUILD.
 "
