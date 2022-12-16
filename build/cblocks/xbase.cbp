@@ -38,6 +38,7 @@
 		<Linker>
 			<Add library="z" />
 		</Linker>
+		<Unit filename="../../Makefile.am" />
 		<Unit filename="../../configure.ac" />
 		<Unit filename="../../examples/source/c/append.c">
 			<Option compilerVar="CC" />
@@ -609,7 +610,6 @@
 		</Unit>
 		<Unit filename="../../source/d4all.h" />
 		<Unit filename="../../source/d4all.hpp" />
-		<Unit filename="../../source/d4all.pch" />
 		<Unit filename="../../source/d4append.c">
 			<Option compilerVar="CC" />
 		</Unit>

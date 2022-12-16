@@ -6,7 +6,7 @@
 
 AC_INIT([xbase],[6.4.1])
 AC_CONFIG_SRCDIR([source/d4all.h])
-AC_CONFIG_HEADERS( d4config.h )
+AC_CONFIG_HEADERS( d4define.h )
 AM_INIT_AUTOMAKE( [subdir-objects] )
 
 AC_CONFIG_MACRO_DIR([m4])
@@ -60,6 +60,8 @@ fi
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
+
+PKG_PROG_PKG_CONFIG
 
 dnl# These must be run after AC_PROG_CC but before any other macros that use
 dnl# the C compiler
@@ -204,7 +206,7 @@ AC_ARG_ENABLE([language],
 #
 
 AC_ARG_ENABLE([format],
-   AS_HELP_STRING( [[[--enable-format=@<:@fox/clipper/mdx@:>@]]]
+   AS_HELP_STRING( [[[--enable-format=@<:@fox/ntx/mdx@:>@]]]
                  , [Enable database index format: @<:@default=fox@:>@ ( foxpro, clipper or dbase IV mdx )] )
                  , [case "$enableval" in
       fox)
@@ -243,7 +245,7 @@ AC_ARG_ENABLE([case],
    esac] )
 
 
-dnl Detect windows
+dnl Detect windowsM_CONDITIONAL
 
 AM_CONDITIONAL( WINDOWS,   test "${version_type}" = "windows" )
 
@@ -329,11 +331,13 @@ AC_ARG_ENABLE([slack],
           [AC_MSG_ERROR([makepkg is required for --enable-slack])])])],
   [enable_slack=yes])
 
-AM_CONDITIONAL(BUILDING_SLACK, test "x$enable_slack" = "xyes" )
+AM_CONDITIONAL( BUILDING_SLACK, test "x$enable_slack"  = "xyes" )
+AM_CONDITIONAL(   BUILDING_FOX, test "x$enable_format" = "xfox" )
+AM_CONDITIONAL(   BUILDING_MDX, test "x$enable_format" = "xmdx" )
+AM_CONDITIONAL(   BUILDING_NTX, test "x$enable_format" = "xclipper" )
 
 LDFLAGS+=-L/usr/local/lib
 FORMAT_NAME=$enable_format
-
 
 AC_SUBST(DIST_ROOT)
 AC_SUBST(GDB_CMD_FILE)
@@ -348,8 +352,7 @@ AC_SUBST(DATE)
 AC_SUBST(SVN_BUILD)
 AC_SUBST(FORMAT_NAME)
 
-AC_CONFIG_FILES([Makefile source/Makefile ])
-AC_OUTPUT
+AC_CONFIG_FILES([ Makefile source/Makefile libxbase-$enable_format-$VERSION.pc:libxbase.pc.in ])
 
 echo "
 $PACKAGE $VERSION $AC_REVISION
@@ -369,6 +372,7 @@ Features:
 
  Choosen Indexes format: $FORMAT_NAME
      Enabled languarges: $enable_language
+         pkgconfig file: libxbase-$enable_format-$VERSION.pc
                                  
            Extended error checking: $enable_exdebug
           Link list error checking: $enable_linkdbg
@@ -390,3 +394,6 @@ High-level Parameter error display: $enable_paramhigh
 
   Now type 'make' to build $PACKAGE $VERSION $SVN_BUILD.
 "
+
+AC_OUTPUT
+

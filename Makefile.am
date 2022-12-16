@@ -127,6 +127,7 @@ ex87_SOURCES=examples/source/c/ex87.c
 ex88_SOURCES=examples/source/c/ex88.c 
 ex89_SOURCES=examples/source/c/ex89.c 
 
+ex98_SOURCES=examples/source/c/ex98.c 
 ex90_SOURCES=examples/source/c/ex90.c 
 ex91_SOURCES=examples/source/c/ex91.c 
 ex92_SOURCES=examples/source/c/ex92.c 
@@ -135,7 +136,6 @@ ex94_SOURCES=examples/source/c/ex94.c
 ex95_SOURCES=examples/source/c/ex95.c 
 ex96_SOURCES=examples/source/c/ex96.c 
 ex97_SOURCES=examples/source/c/ex97.c 
-ex98_SOURCES=examples/source/c/ex98.c 
 ex99_SOURCES=examples/source/c/ex99.c 
 
 ex100_SOURCES=examples/source/c/ex100.c 
@@ -194,8 +194,19 @@ deletion_SOURCES=examples/source/c/deletion.c
 LDADD= $(top_builddir)/source/libxbase.la
 
 library_includedir= $(includedir)/xbase.$(FORMAT_NAME)
-library_include_HEADERS=source/d4all.h 
+library_include_HEADERS=source/d4defs.h source/d4all.h $(abs_top_builddir)/d4define.h 
+library_include_HEADERS+=source/d4data.h
+library_include_HEADERS+=source/d4declar.h
+library_include_HEADERS+=source/d4inline.h
+library_include_HEADERS+=source/f4flag.h
+library_include_HEADERS+=source/e4expr.h
+library_include_HEADERS+=source/s4sort.h
+library_include_HEADERS+=source/e4string.h
+library_include_HEADERS+=source/e4error.h
+library_include_HEADERS+=source/o4opt.h
+library_include_HEADERS+=source/c4trans.h
 
+library_include_HEADERS+=source/r4relate.h source/r4report.h
 
 if BUILDING_SLACK
 
@@ -213,4 +224,6 @@ slack:
 	echo "No slackware package requested ${PACKAGE}-${VERSION}-${SVN_BUILD}"
 endif
 
+pkgconfigdir= '${libdir}/pkgconfig'
+pkgconfig_DATA= libxbase-@FORMAT_NAME@-@VERSION@.pc
 

@@ -18,8 +18,10 @@
 *                                                                       *
 \***********************************************************************/
 /* See User's Manual, chapter 8 */
+#include <stdio.h>
 
 #include "xbase.fox/d4all.h"
+
 
 int validDate(char *date)
 {

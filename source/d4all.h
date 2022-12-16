@@ -3,7 +3,7 @@
 #ifndef D4ALL_INC
 #define D4ALL_INC
 
-#include "d4config.h"
+#include "d4define.h"
 
 /**********************************************************************/
 /**********            USER SWITCH SETTINGS AREA            ***********/
@@ -138,7 +138,7 @@
 
   #ifndef TURBOC_STKLEN
     #define TURBOC_STKLEN 10000
-  #define  
+  #endif
 
    extern unsigned _stklen = TURBOC_STKLEN;
 
