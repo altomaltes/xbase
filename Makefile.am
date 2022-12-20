@@ -191,10 +191,11 @@ datainfo_SOURCES=examples/source/c/datainfo.c
 date1_SOURCES=examples/source/c/date1.c 
 deletion_SOURCES=examples/source/c/deletion.c 
 
-LDADD= $(top_builddir)/source/libxbase.la
+#LDADD= $(top_builddir)/source/libxbase.la
+LDADD=-lxbase
 
 library_includedir= $(includedir)/xbase.$(FORMAT_NAME)
-library_include_HEADERS=source/d4defs.h source/d4all.h $(abs_top_builddir)/d4define.h 
+library_include_HEADERS=source/d4defs.h source/d4all.h $(abs_top_builddir)/d4opts.h 
 library_include_HEADERS+=source/d4data.h
 library_include_HEADERS+=source/d4declar.h
 library_include_HEADERS+=source/d4inline.h
@@ -224,6 +225,20 @@ slack:
 	echo "No slackware package requested ${PACKAGE}-${VERSION}-${SVN_BUILD}"
 endif
 
-pkgconfigdir= '${libdir}/pkgconfig'
+pkgconfigdir = @pkgconfigdir@
 pkgconfig_DATA= libxbase-@FORMAT_NAME@-@VERSION@.pc
+
+install-libxbase-pc:                          
+	@set -ex; cd '$(DESTDIR)$(pkgconfigdir)'; rm -f libxbase.pc; \
+	$(LN_S) 'libxbase-$(FORMAT_NAME)-$(VERSION).pc' libxbase.pc                        
+                                                                               
+uninstall-libxbase-pc:                                                            
+	rm -f '$(DESTDIR)$(pkgconfigdir)/libxbase.pc'                          
+
+
+install-data-hook: install-libxbase-pc
+uninstall-hook:  uninstall-libxbase-pc
+
+
+
 

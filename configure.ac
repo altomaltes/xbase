@@ -6,7 +6,7 @@
 
 AC_INIT([xbase],[6.4.1])
 AC_CONFIG_SRCDIR([source/d4all.h])
-AC_CONFIG_HEADERS( d4define.h )
+AC_CONFIG_HEADERS( d4config.h )
 AM_INIT_AUTOMAKE( [subdir-objects] )
 
 AC_CONFIG_MACRO_DIR([m4])
@@ -60,6 +60,8 @@ fi
 AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_CXX
+AC_PROG_LN_S
+AC_PROG_INSTALL
 
 PKG_PROG_PKG_CONFIG
 
@@ -180,15 +182,15 @@ AC_ARG_ENABLE([language],
         ;;
 
       french)
-         AC_DEFINE([S4FRENCH], [1],                   [Enable French language])
+         AC_DEFINE([S4FRENCH], [1],     [Enable French language])
         ;;
 
       german)
-         AC_DEFINE([S4GERMAN], [1],                   [Enable German language])
+         AC_DEFINE([S4GERMAN], [1],     [Enable German language])
         ;;
 
       norwegian)
-         AC_DEFINE([S4NORWEGIAN], [1],                   [Enable Nowwegian language])
+         AC_DEFINE([S4NORWEGIAN], [1],  [Enable Nowwegian language])
         ;;
 
       escandinavian)
@@ -210,24 +212,24 @@ AC_ARG_ENABLE([format],
                  , [Enable database index format: @<:@default=fox@:>@ ( foxpro, clipper or dbase IV mdx )] )
                  , [case "$enableval" in
       fox)
-         AC_DEFINE([S4FOX]   , [], [Enable FOXPRO index format])
+         AC_DEFINE([S4FOX]   , [], [codebase FOXPRO index format])
          AC_DEFINE([S4FORMAT], [1], [Choosen format ( 1 -> fox, 2 -> clipper, 3 -> sbase ])
         ;;
 
       clipper)
-         AC_DEFINE([S4CLIPPER], [], [Enable CLIPPER index format])
+         AC_DEFINE([S4CLIPPER], [], [codebase CLIPPER index format])
          AC_DEFINE([S4FORMAT], [2], [Choosen format ( 1 -> fox, 2 -> clipper, 3 -> sbase ])
          ;;
 
       mdx)
-         AC_DEFINE([S4MDX], [], [Enable DBASE IV mdx format])
+         AC_DEFINE([S4MDX], [], [codebase DBASE IV mdx format])
          AC_DEFINE([S4FORMAT], [3], [Choosen format ( 1 -> fox, 2 -> clipper, 3 -> sbase ])
          ;;
 
       *)
          AC_MSG_ERROR([--enable-index-format=${enable_index_format}: invalid value])
-   esac],  [ AC_DEFINE([S4FOX], [1], [Enable FOXPRO index format]) 
-             AC_DEFINE([S4FORMAT], [1], [Choosen format ( 1 -> fox, 2 -> clipper, 3 -> sbase ])
+   esac],  [ AC_DEFINE([S4FOX], [1], [ codebase FOXPRO index format]) 
+             AC_DEFINE([S4FORMAT], [1], [codebase Choosen format ( 1 -> fox, 2 -> clipper, 3 -> sbase ])
              enable_format=fox ] )
 
 
@@ -236,7 +238,7 @@ AC_ARG_ENABLE([case],
                  , [ filename case policy  @<:@default=none@:>@( none or upper, for legacy MSDOS ] )
                  , [case "$enableval" in
       none)
-         AC_DEFINE([S4CASE_SENS], [1], [Don't uppercase filenames])
+         AC_DEFINE([S4CASE_SENS], [1], [codebase Don't uppercase filenames])
         ;;
       upper)
          ;;
@@ -254,71 +256,80 @@ AC_PATH_PROG([SLACKBUILD], [makepkg], [notfound])
 AC_ARG_ENABLE([exdebug], 
   AS_HELP_STRING([--enable-exdebug=@<:@yes/no@:>@], 
                  [Extended error checking @<:@default=yes@:>@]),,enable_exdebug=yes)
-AS_IF([test "x$enable_exdebug" == "xyes"], AC_DEFINE([E4DEBUG], [1], [Extended error checking]) )
+AS_IF([test "x$enable_exdebug" == "xyes"],  AC_DEFINE([E4DEBUG], [1], [codebase Extended error checking]) )
 
 AC_ARG_ENABLE([linkdbg],
   AS_HELP_STRING([--enable-linkdbg=@<:@yes/no@:>@], [Link list error checking @<:@default=yes@:>@]),,enable_linkdbg=yes)
-AS_IF([test "x$enable_linkdbg" == "xyes"], AC_DEFINE([E4LINK], [1], [Link list error checking]) )
+AS_IF([test "x$enable_linkdbg" == "xyes"],  AC_DEFINE([E4LINK], [1], [codebase Link list error checking])  )
 
 AC_ARG_ENABLE([miscdbg],
   AS_HELP_STRING([--enable-miscdbg=@<:@yes/no@:>@], [Miscellaneous error checking @<:@default=yes@:>@]),,enable_miscdbg=yes)
-AS_IF([test "x$enable_miscdbg" == "xyes"], AC_DEFINE([E4MISC], [1], [Miscellaneous error checking]) )
+AS_IF([test "x$enable_miscdbg" == "xyes"], AC_DEFINE([E4MISC], [1], [codebase Miscellaneous error checking]) )
 
 AC_ARG_ENABLE([dbg],
   AS_HELP_STRING([--disable-dbg=@<:@yes/no@:>@], [disable error display @<:@default=no@:>@]),,disable_dbg=no)
-AS_IF([test "x$disable_dbg" == "xyes"], AC_DEFINE([E4OFF], [1], [No error display]) )
+AS_IF([test "x$disable_dbg" == "xyes"], AC_DEFINE([E4OFF], [1], [codebase No error display]) )
 
 AC_ARG_ENABLE([errstring],
 AS_HELP_STRING([--disable-errstring=@<:@yes/no@:>@], [disable error string display @<:@default=no@:>@]),,disable_errstring=no )
-AS_IF([test "x$disable_errstring" == "xyes"], AC_DEFINE([E4OFF_STRING], [1], [No error string display ]) )
+AS_IF([test "x$disable_errstring" == "xyes"], AC_DEFINE([E4OFF_STRING], [1], [codebase No error string display ]) )
 
 AC_ARG_ENABLE([paramhigh],
   AS_HELP_STRING([--enable-paramhigh=@<:@yes/no@:>@], [High-level Functional parameter error display @<:@default=yes@:>@]),,enable_paramhigh=yes)
-AS_IF([test "x$enable_paramhigh" == "xyes"], AC_DEFINE([E4PARM_HIGH], [1], [High-level Functional parameter error display]) )
+AS_IF([test "x$enable_paramhigh" == "xyes"], AC_DEFINE([E4PARM_HIGH], [1], [codebase High-level Functional parameter error display]) )
 
 AC_ARG_ENABLE( [estop], 
   AS_HELP_STRING( [--enable-estop=@<:@yes/no@:>@], [stop-on-error enabled @<:@default=no@:>@]) , , enable_estop=no )
-AS_IF([test "x$enable_estop"      == "xyes"], AC_DEFINE([E4STOP],       [1], [stop-on-error enabled]) )
+AS_IF([test "x$enable_estop"      == "xyes"], AC_DEFINE([E4STOP],       [1], [codebase stop-on-error enabled]) )
 
 AC_ARG_ENABLE( [epause], 
   AS_HELP_STRING([--enable-epause=@<:@yes/no@:>@], [pause-on-error enabled @<:@default=no@:>@]) , , enable_pause=no )
-AS_IF([test "x$enable_pause"      == "xyes"], AC_DEFINE([E4PAUSE],      [1], [pause-on-error enabled]) )
+AS_IF([test "x$enable_pause"      == "xyes"], AC_DEFINE([E4PAUSE],      [1], [codebase pause-on-error enabled]) )
 
 AC_ARG_ENABLE( [ecritical], 
   AS_HELP_STRING( [--enable-ecritical=@<:@yes/no@:>@], [Stop-on-critical-error enabled @<:@default=yes@:>@]),,enable_ecritical=yes)
-AS_IF([test "x$enable_ecritical" == "xyes"], AC_DEFINE([E4STOP_CRITICAL], [1], [Stop-on-critical-error enabled]) )
+AS_IF([test "x$enable_ecritical" == "xyes"], AC_DEFINE([E4STOP_CRITICAL], [1], [codebase Stop-on-critical-error enabled]) )
 
 AC_ARG_ENABLE([analize],
   AS_HELP_STRING([--enable-analize=@<:@yes/no@:>@], [Structure Analysis CodeBase Error Checking @<:@default=yes@:>@]),,enable_analize=yes)
-AS_IF([test "x$enable_analize" == "xyes"], AC_DEFINE([E4ANALIZE], [1], [Structure Analysis CodeBase Error Checking]) )
+AS_IF([test "x$enable_analize" == "xyes"], AC_DEFINE([E4ANALIZE], [1], [codebase Structure Analysis CodeBase Error Checking]) )
 
 AC_ARG_ENABLE([index],
   AS_HELP_STRING([--disable-index=@<:@yes/no@:>@], [Index support source code removed @<:@default=no@:>@]),,disable_index=no)
-AS_IF([test "x$disable_index" == "xyes"], AC_DEFINE([S4OFF_INDEX], [1], [Index support source code removed]) )
+AS_IF([test "x$disable_index" == "xyes"], AC_DEFINE([S4OFF_INDEX], [1], [codebase Index support source code removed]) )
 
 AC_ARG_ENABLE([memo],
   AS_HELP_STRING([--disable-memo=@<:@yes/no@:>@], [Memo support source code removed @<:@default=no@:>@]),,disable_memo=no)
-AS_IF([test "x$disable_memo" == "xyes"], AC_DEFINE([S4OFF_MEMO], [1], [CodeBase memo support source code removed]) )
+AS_IF([test "x$disable_memo" == "xyes"], AC_DEFINE([S4OFF_MEMO], [1], [codebase memo support source code removed]) )
 
 AC_ARG_ENABLE([multi],
   AS_HELP_STRING([--disable-multi=@<:@yes/no@:>@], [Multi-user support source code removed @<:@default=no@:>@]),,disable_multi=no )
-AS_IF([test "x$disable_multi" == "xyes"], AC_DEFINE([S4OFF_MULTI], [1], [Multi-user support source code removed]) )
+AS_IF([test "x$disable_multi" == "xyes"], AC_DEFINE([S4OFF_MULTI], [1], [codebase Multi-user support source code removed]) )
 
 AC_ARG_ENABLE([optimize],
   AS_HELP_STRING([--disable-optimize=@<:@yes/no@:>@], [Optimization source code removed @<:@default=no@:>@]),,disable_optimize=no )
-AS_IF([test "x$disable_optimize" == "xyes"], AC_DEFINE([S4OFF_OPTIMIZE], [1], [Optimization source code removed]) )
+AS_IF([test "x$disable_optimize" == "xyes"], AC_DEFINE([S4OFF_OPTIMIZE], [1], [codebase Optimization source code removed]) )
 
 AC_ARG_ENABLE([transactions],
   AS_HELP_STRING([--disable-transactions=@<:@yes/no@:>@], [Disable transaction capability @<:@default=no@:>@]),,disable_transactions=no )
-AS_IF([test "x$disable_transactions" == "xyes"], AC_DEFINE([S4OFF_TRAN], [1], [Transactions disabled]) )
+AS_IF([test "x$disable_transactions" == "xyes"], AC_DEFINE([S4OFF_TRAN], [1], [codebase Transactions disabled]) )
 
 AC_ARG_ENABLE([lockhook],
   AS_HELP_STRING([--enable-lockhook=@<:@yes/no@:>@], [Enable custom lock failure function @<:@default=no@:>@]),,enable_lockhook=no )
-AS_IF([test "x$enable_lockhook" == "xyes"], AC_DEFINE([S4LOCK_HOOK], [1], [custom lock failure function enabled]) )
+AS_IF([test "x$enable_lockhook" == "xyes"], AC_DEFINE([S4LOCK_HOOK], [1], [codebase custom lock failure function enabled]) )
 
 AC_ARG_ENABLE([memory],
   AS_HELP_STRING([--enable-memory=@<:@yes/no@:>@], [Enable memory limit checking @<:@default=no@:>@]),,enable_memory=no )
-AS_IF([test "x$enable_memory" == "xyes"],  AC_DEFINE([S4MAX],       [1], [memory limit checking enabled]) )
+AS_IF([test "x$enable_memory" == "xyes"],  AC_DEFINE([S4MAX],       [1], [codebase memory limit checking enabled]) )
+
+# Allow the pkg-config directory to be set
+AC_ARG_WITH(pkgconfigdir,
+   AS_HELP_STRING([[[--with-pkgconfigdir]]],                        
+      [Use the specified pkgconfig dir (default is libdir/pkgconfig)]),
+   [pkgconfigdir=${withval}],
+   [pkgconfigdir='${libdir}/pkgconfig'])                            
+                                             
+AC_SUBST([pkgconfigdir])                      
 
 
 AC_ARG_ENABLE([slack],
@@ -336,7 +347,7 @@ AM_CONDITIONAL(   BUILDING_FOX, test "x$enable_format" = "xfox" )
 AM_CONDITIONAL(   BUILDING_MDX, test "x$enable_format" = "xmdx" )
 AM_CONDITIONAL(   BUILDING_NTX, test "x$enable_format" = "xclipper" )
 
-LDFLAGS+=-L/usr/local/lib
+#LDFLAGS+=-L/usr/local/lib
 FORMAT_NAME=$enable_format
 
 AC_SUBST(DIST_ROOT)
@@ -352,7 +363,11 @@ AC_SUBST(DATE)
 AC_SUBST(SVN_BUILD)
 AC_SUBST(FORMAT_NAME)
 
+
 AC_CONFIG_FILES([ Makefile source/Makefile libxbase-$enable_format-$VERSION.pc:libxbase.pc.in ])
+
+cat  d4config.h |  sed -n "\:codebase: {n;p;}"  > d4opts.h
+
 
 echo "
 $PACKAGE $VERSION $AC_REVISION

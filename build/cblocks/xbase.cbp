@@ -6,8 +6,8 @@
 		<Option pch_mode="2" />
 		<Option compiler="gcc" />
 		<Build>
-			<Target title="Debug">
-				<Option output="../../examples/xbase" prefix_auto="1" extension_auto="1" />
+			<Target title="seeker">
+				<Option output="xbase" prefix_auto="1" extension_auto="1" />
 				<Option working_dir="../../examples/data" />
 				<Option object_output="obj/Debug/" />
 				<Option type="1" />
@@ -16,6 +16,9 @@
 					<Add option="-fPIC" />
 					<Add option="-g" />
 				</Compiler>
+				<Linker>
+					<Add library="xbase" />
+				</Linker>
 			</Target>
 			<Target title="Release">
 				<Option output="bin/Release/xbase" prefix_auto="1" extension_auto="1" />
@@ -31,6 +34,39 @@
 					<Add option="-s" />
 				</Linker>
 			</Target>
+			<Target title="xbase-fox">
+				<Option output="$(TARGET_COMPILER_DIR)/lib/xbase-fox" imp_lib="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).a" def_file="$(TARGET_OUTPUT_DIR)$(TARGET_OUTPUT_BASENAME).def" prefix_auto="1" extension_auto="1" />
+				<Option object_output="obj/Debug/" />
+				<Option type="3" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="-fPIC" />
+					<Add option="-g" />
+				</Compiler>
+				<ExtraCommands>
+					<Add before="install -d /usr/include/xbase.fox" />
+					<Add before="ln -sf  /usr/include/xbase.fox /usr/include/xbase" />
+					<Add before="cp $(PROJECT_DIR)../../source/d4all.h  $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/d4opts.h $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/d4data.h  $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/d4declar.h  $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/d4defs.h $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/d4inline.h    $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/f4flag.h $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/e4expr.h $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/s4sort.h $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/e4string.h $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/e4error.h $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/o4opt.h $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/c4trans.h $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/r4relate.h $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add before="cp $(PROJECT_DIR)../../source/r4report.h $(TARGET_COMPILER_DIR)include/xbase.fox" />
+					<Add after="cd  $(TARGET_OUTPUT_DIR) ; ln -sf $(TARGET_OUTPUT_FILENAME)  libxbase.so; cd -" />
+					<Mode after="always" />
+				</ExtraCommands>
+			</Target>
 		</Build>
 		<Compiler>
 			<Add option="-Wall" />
@@ -38,8 +74,14 @@
 		<Linker>
 			<Add library="z" />
 		</Linker>
-		<Unit filename="../../Makefile.am" />
-		<Unit filename="../../configure.ac" />
+		<Unit filename="../../Makefile.am">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
+		<Unit filename="../../configure.ac">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../examples/source/c/append.c">
 			<Option compilerVar="CC" />
 			<Option target="Release" />
@@ -86,402 +128,535 @@
 		</Unit>
 		<Unit filename="../../examples/source/c/ex0.c">
 			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex1.c">
 			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex10.c">
 			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex100.c">
 			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex101.c">
 			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex102.c">
 			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex103.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex104.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex105.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex106.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex107.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex108.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex109.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex11.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex110.c">
 			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex111.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex112.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex113.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex114.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex115.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex116.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex117.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex118.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex119.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex12.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex120.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex121.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex122.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex123.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex124.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex125.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex126.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex127.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex128.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex129.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex13.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex130.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex131.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex14.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex15.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex16.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex17.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex18.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex19.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex2.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex20.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex21.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex22.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex23.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex24.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex25.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex26.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex27.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex28.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex29.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex2a.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex3.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex30.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex31.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex32.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex33.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex34.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex35.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex36.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex37.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex38.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex39.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex4.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex40.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex41.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex42.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex43.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex44.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex45.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex46.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex47.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex48.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex49.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex5.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex50.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex51.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex52.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex53.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex54.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex55.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex56.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex57.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex58.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex59.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex6.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex60.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex61.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex62.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex63.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex64.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex65.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex66.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex67.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex68.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex69.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex7.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex70.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex71.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex72.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex73.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex74.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex75.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex76.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex77.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex78.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex79.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex8.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex80.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex81.c">
 			<Option compilerVar="CC" />
+			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex82.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex83.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex84.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex85.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex86.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex87.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex88.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex89.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex9.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex90.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex91.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex92.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex93.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex94.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex95.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex96.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex97.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex98.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/ex99.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
 		</Unit>
 		<Unit filename="../../examples/source/c/list1.c">
 			<Option compilerVar="CC" />
@@ -529,6 +704,7 @@
 		</Unit>
 		<Unit filename="../../examples/source/c/seeker.c">
 			<Option compilerVar="CC" />
+			<Option target="seeker" />
 		</Unit>
 		<Unit filename="../../examples/source/c/showdat2.c">
 			<Option compilerVar="CC" />
@@ -565,9 +741,14 @@
 		<Unit filename="../../examples/source/cc/ex1.cc">
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="../../source/Makefile.am" />
+		<Unit filename="../../source/Makefile.am">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/b4block.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/b4node.c">
 			<Option compilerVar="CC" />
@@ -575,162 +756,306 @@
 		</Unit>
 		<Unit filename="../../source/c4.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/c4bcd.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/c4code.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/c4const.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/c4dll.exp" />
+		<Unit filename="../../source/c4dll.exp">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/c4dll.rc">
 			<Option compilerVar="WINDRES" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/c4dll.res">
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="../../source/c4dll_lib.lst" />
+		<Unit filename="../../source/c4dll_lib.lst">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/c4hook.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/c4long.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/c4source.lst" />
+		<Unit filename="../../source/c4source.lst">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/c4trans.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/c4trans.h" />
+		<Unit filename="../../source/c4trans.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/coll4arr.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="../../source/d4all.h" />
-		<Unit filename="../../source/d4all.hpp" />
+		<Unit filename="../../source/d4all.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
+		<Unit filename="../../source/d4all.hpp">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/d4append.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4bottom.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4close.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4create.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4data.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/d4data.h" />
-		<Unit filename="../../source/d4data.hpp" />
+		<Unit filename="../../source/d4data.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
+		<Unit filename="../../source/d4data.hpp">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/d4date.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/d4declar.h" />
-		<Unit filename="../../source/d4defs.h" />
+		<Unit filename="../../source/d4declar.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
+		<Unit filename="../../source/d4defs.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/d4extra.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4field.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4file.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4flush.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4fresh.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4go.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/d4inc.h" />
+		<Unit filename="../../source/d4inc.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/d4index.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4inline.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/d4inline.h" />
+		<Unit filename="../../source/d4inline.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/d4lock.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4modify.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4open.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4opt.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
+		<Unit filename="../../source/d4opts.h">
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4pack.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4positi.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4remove.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/d4secure.h" />
+		<Unit filename="../../source/d4secure.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/d4seek.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4skip.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/d4stamp.h" />
+		<Unit filename="../../source/d4stamp.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/d4tag.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4top.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4unlock.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4write.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/d4zap.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/df4lock.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/df4unlok.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/e4calc.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/e4calc_2.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/e4defs.h" />
+		<Unit filename="../../source/e4defs.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/e4error.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/e4error.h" />
+		<Unit filename="../../source/e4error.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/e4expr.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/e4expr.h" />
+		<Unit filename="../../source/e4expr.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/e4functi.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/e4not_s.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/e4parse.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/e4str2.c">
 			<Option compilerVar="CC" />
@@ -738,83 +1063,141 @@
 		</Unit>
 		<Unit filename="../../source/e4string.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/e4string.h" />
+		<Unit filename="../../source/e4string.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/f4ass_f.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4char.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4close.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4create.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4cur.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4double.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4dtime.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4dttime.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4field.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4file.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4filese.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4flag.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/f4flag.h" />
+		<Unit filename="../../source/f4flag.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/f4flush.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4info.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4int.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4lock.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4long.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4memo.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4open.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4opt.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4ptr.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4str.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4temp.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4true.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4write.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/f4wstr.c">
 			<Option compilerVar="CC" />
@@ -822,12 +1205,18 @@
 		</Unit>
 		<Unit filename="../../source/i4add.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/i4addtag.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/i4check.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/i4conv.c">
 			<Option compilerVar="CC" />
@@ -835,143 +1224,252 @@
 		</Unit>
 		<Unit filename="../../source/i4create.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/i4dump.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/i4index.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/i4info.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/i4init.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/i4key.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/i4lock.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/i4ntag.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/i4positi.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/i4remove.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/i4tag.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/l4link.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/l4lock_c.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/m4check.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/m4create.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/m4file.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/m4map.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/m4mem2.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="../../source/m4mem2.h" />
+		<Unit filename="../../source/m4mem2.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/m4memo.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/m4memory.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/mutex4.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/o4opt.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/o4opt.h" />
+		<Unit filename="../../source/o4opt.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/p4pascal.c">
 			<Option compilerVar="CC" />
 			<Option target="Release" />
 		</Unit>
-		<Unit filename="../../source/pgi_dos32.bat" />
-		<Unit filename="../../source/pop4.h" />
-		<Unit filename="../../source/push4.h" />
-		<Unit filename="../../source/r4area,c" />
+		<Unit filename="../../source/pgi_dos32.bat">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
+		<Unit filename="../../source/pop4.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
+		<Unit filename="../../source/push4.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
+		<Unit filename="../../source/r4area,c">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/r4area.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/r4bit.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/r4drive2.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/r4driver.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/r4group.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/r4log.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/r4obj.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/r4regs.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/r4reinde.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/r4reinde.h" />
+		<Unit filename="../../source/r4reinde.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/r4reindx.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/r4relate.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/r4relate.h" />
+		<Unit filename="../../source/r4relate.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/r4report.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/r4report.h" />
+		<Unit filename="../../source/r4report.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/r4save.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/r4save_2.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/r4style.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/r4total.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/s4init.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/s4initfr.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/s4next.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/s4quick.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/s4signal.c">
 			<Option compilerVar="CC" />
@@ -979,29 +1477,52 @@
 		</Unit>
 		<Unit filename="../../source/s4sort.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/s4sort.h" />
+		<Unit filename="../../source/s4sort.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/sema4.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/sort4init.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="../../source/timer5.h" />
+		<Unit filename="../../source/timer5.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/u4name.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
 		<Unit filename="../../source/u4util.c">
 			<Option compilerVar="CC" />
+			<Option target="Release" />
+			<Option target="xbase-fox" />
 		</Unit>
-		<Unit filename="../../source/util5.hpp" />
+		<Unit filename="../../source/util5.hpp">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Unit filename="../../source/v4basic.c">
 			<Option compilerVar="CC" />
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
-		<Unit filename="../../source/zconf.h" />
-		<Unit filename="../../source/zlib.h" />
+		<Unit filename="../../source/zconf.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
+		<Unit filename="../../source/zlib.h">
+			<Option target="Release" />
+			<Option target="xbase-fox" />
+		</Unit>
 		<Extensions />
 	</Project>
 </CodeBlocks_project_file>
