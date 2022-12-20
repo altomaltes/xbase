@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /*ex74.c*/
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 
 long zapLast( DATA4 *info, long toDelete )

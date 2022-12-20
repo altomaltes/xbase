@@ -19,7 +19,7 @@
 \***********************************************************************/
 /* See User's Manual, chapter 5 */
 
-#include "d4all.h"
+#include "xbase/d4all.h"
 #ifdef S4WINTEL
    #include <conio.h>
 #endif

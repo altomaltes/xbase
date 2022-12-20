@@ -20,7 +20,7 @@
 /* See User's Manual, chapter 5 */
 
 
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 CODE4    codeBase;
 DATA4    *dataFile = 0;
@@ -68,9 +68,9 @@ void printRecord(int rc)
    const char     *commentStr;
    char     status[15];
 
-   f4ncpy(fName,fNameStr,sizeof(fNameStr));
-   f4ncpy(lName,lNameStr,sizeof(lNameStr));
-   f4ncpy(address,addressStr,sizeof(addressStr));
+   f4ncpy(   fName,   fNameStr, sizeof(fNameStr));
+   f4ncpy(   lName,   lNameStr, sizeof(lNameStr));
+   f4ncpy( address, addressStr, sizeof(addressStr));
    ageValue = f4int(age);
 
    amountValue = f4double(amount);

@@ -15,25 +15,23 @@
 // BANK.C
 // Creates new data file for TRANSFER.C program
 
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 
 CODE4    codeBase ;
 DATA4   *dataFile ;
 FIELD4  *acctNo, *balance ;
 TAG4    *acctTag, *balTag ;
+
 FIELD4INFO  fieldInfo [] =
-{
-   {"ACCT_NO",r4num,5,0},
-   {"BALANCE",r4num,8,2},
-   {0,0,0,0},
-};
+{{ "ACCT_NO",r4num,5,0}
+,{ "BALANCE",r4num,8,2}
+,{ 0,0,0,0 }};
 
 TAG4INFO tagInfo [] =
-{
-   {"ACCT_TAG","ACCT_NO",0,0,0},
-   {"BAL_TAG","BALANCE",0,0,0},
-   {0,0,0,0,0},
+{{"ACCT_TAG","ACCT_NO",0,0,0}
+,{"BAL_TAG","BALANCE",0,0,0}
+,{0,0,0,0,0}
 };
 
 void  OpenDataFile( void )

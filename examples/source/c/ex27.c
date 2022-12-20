@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /*ex27.c*/
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 
 long function( char *string, int len )

@@ -12,7 +12,7 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-#include "d4all.h"
+#include "xbase/d4all.h"
 
 CODE4 cb ;
 DATA4 *data ;

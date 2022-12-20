@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /*ex97.c*/
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 char *createBufCopy( FIELD4 *f )
 {

@@ -21,7 +21,7 @@ similar in operation to D4TEST.C
 
 *********************************************************************/
 
-#include "d4all.h"
+#include "xbase/d4all.h"
 #include <windows.h>
 
 #ifdef WIN32

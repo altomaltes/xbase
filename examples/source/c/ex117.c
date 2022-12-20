@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /*ex117.c*/
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 
 typedef struct myStructSt

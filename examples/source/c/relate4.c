@@ -19,7 +19,7 @@
 \***********************************************************************/
 /* See User's Manual, chapter 6 */
 
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 CODE4   codeBase;
 DATA4   *student = NULL,*enrolment = NULL;

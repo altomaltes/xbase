@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /* ex119.c */
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 
 static FIELD4INFO fieldInfo[ ] =

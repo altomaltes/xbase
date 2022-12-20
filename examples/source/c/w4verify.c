@@ -21,7 +21,7 @@ d4verify.c
 
 *********************************************************************/
 
-#include "d4all.h"
+#include "xbase/d4all.h"
 #include <windows.h>
 
 CODE4 cb ;

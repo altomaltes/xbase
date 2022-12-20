@@ -18,7 +18,7 @@
 *                                                                       *
 \***********************************************************************/
 
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 void AddNewRecord(char *, char *, char *, int, int, double, char * ) ;
 void ConnectToServer( char *, char * ) ;

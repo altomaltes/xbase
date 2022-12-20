@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /*ex24.c*/
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 
 double function( void ) /* This function returns '(double) 67.3'. */

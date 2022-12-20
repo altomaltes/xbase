@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /* 'f4int()' uses 'c4atoi' because database field data is not null terminated */
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 
 

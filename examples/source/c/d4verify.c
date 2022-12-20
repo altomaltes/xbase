@@ -14,11 +14,7 @@
 
 /* d4verify.c (c)Copyright Sequiter Software Inc., 1988-2001.  All rights reserved. */
 
-#include "xbase.fox/d4all.h"
-
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000 ;
-#endif
+#include "xbase/d4all.h"
 
 void verifySwitches( void ) ;
 

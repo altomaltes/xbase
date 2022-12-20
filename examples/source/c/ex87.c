@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /* ex87.c */
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 
 int display( CODE4 *cb, char *p )

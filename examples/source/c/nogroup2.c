@@ -19,7 +19,7 @@
 \***********************************************************************/
 /* See User's Manual, chapter 4 */
 
-#include "d4all.h"
+#include "xbase/d4all.h"
 
 CODE4   codeBase;
 DATA4   *data = 0;

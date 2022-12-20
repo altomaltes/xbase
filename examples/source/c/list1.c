@@ -19,7 +19,7 @@
 \***********************************************************************/
 /* See User's Manual, chapter 9 */
 
-#include "d4all.h"
+#include "xbase/d4all.h"
 
 typedef struct
 {

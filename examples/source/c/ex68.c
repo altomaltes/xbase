@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /*ex68.c*/
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 
 int searchAll( DATA4 *d, char *value )

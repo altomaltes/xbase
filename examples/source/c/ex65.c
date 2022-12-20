@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /* ex65.c */
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 
 int SeekSeries( DATA4 *d, const char *s )

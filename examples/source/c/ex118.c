@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /*ex118.c*/
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
   
 
 int addLotsOfRecords( DATA4 *d ) 

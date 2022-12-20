@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /*ex96.c*/
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 void displayFieldStats( FIELD4 *f )
 {

@@ -12,7 +12,7 @@
 /* program. If not, see <https://www.gnu.org/licenses/>.                                           */
 /* *********************************************************************************************** */
 
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 
 void main()

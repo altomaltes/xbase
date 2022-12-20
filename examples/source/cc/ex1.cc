@@ -14,10 +14,6 @@
 
 #include "d4all.hpp"
 
-#ifdef __TURBOC__
-   extern unsigned _stklen = 10000 ;  // for all Borland compilers
-#endif
-
 void main( )
 {
    Code4 codeBase ;

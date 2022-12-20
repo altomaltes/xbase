@@ -15,7 +15,7 @@
 #ifdef _WIN32
 
 #include <windows.h>
-#include "d4all.h"
+#include "xbase/d4all.h"
 
 long FAR PASCAL WndProc( HWND, UINT, WPARAM, LPARAM );
 

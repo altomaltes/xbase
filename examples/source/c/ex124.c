@@ -13,7 +13,7 @@
 /* *********************************************************************************************** */
 
 /*ex124.c*/
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 
 int seekMaster( DATA4 *master, RELATE4 *r, TAG4 *masterTag, char *seekKey )

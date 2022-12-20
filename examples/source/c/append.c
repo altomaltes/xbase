@@ -19,7 +19,7 @@
 \***********************************************************************/
 /* See User's Manual, chapter 11 */
 
-#include "xbase.fox/d4all.h"
+#include "xbase/d4all.h"
 
 
 CODE4 cb ;
