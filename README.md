@@ -2,13 +2,13 @@
 
 ## Autotools port
 
-This is an autotools ( configure, make, make install ) so this code could be used in many compatible systems.
+This is an autotools port ( configure, make, make install ) so this code could be used in many compatible systems.
 The net code is removed. Fine to local files.
 These is also a codeblocks project, so it can be easily debugged.
 The poor build structure does not allow an easy coesistence among NTX, MDB and foxpro formats, there is a intermediate solution ( 3 libraries, 3 include sets )
 The configure script allows to tune out the library fetures.
 
- Enjoy it
+ Enjoy it !!
 
 ## Copyright and Release to Open Source
 CodeBase(tm) is copyright Sequiter, Inc., and has been released to Open Source by Sequiter, Inc.  A PDF containing the agreement to release the software and the applicable GNU Lesser GPL V.3.0 license is included in this repository.  This formerly proprietary software is now available to the larger community for development and refinement.
