@@ -1,7 +1,7 @@
 #
 # José Angel Caso Sánchez  ( altomaltes@yahoo.es )
 #
-#  Jul 2004
+#  Jul 2022
 #
 
 AC_INIT([xbase],[6.4.1])
