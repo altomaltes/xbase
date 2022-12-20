@@ -1,5 +1,6 @@
 /* r4report.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 #include "d4all.h"
+
 #ifndef S4OFF_REPORT
 #ifdef S4WINDOWS
    #include <commdlg.h>

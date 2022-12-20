@@ -3,7 +3,13 @@
 #ifndef D4ALL_INC
 #define D4ALL_INC
 
-#include "d4define.h"
+#ifdef HAVE_CONFIG_H
+  #include "d4config.h"    /* building phase */
+#else
+  #include "d4opts.h"      /* Using phase */
+#endif
+
+//#include "d4define.h"
 
 /**********************************************************************/
 /**********            USER SWITCH SETTINGS AREA            ***********/

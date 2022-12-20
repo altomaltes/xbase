@@ -18,22 +18,51 @@ SOURCES+= r4relate.c r4report.c r4save.c r4save_2.c r4style.c r4total.c
 SOURCES+= s4init.c s4initfr.c s4next.c s4quick.c s4sort.c s4signal.c sema4.c u4name.c u4util.c
 
 
-library_includedir=$(includedir)/xbase
-library_include_HEADERS= d4all.h
+library_includedir= $(includedir)/xbase.$(FORMAT_NAME)
+library_include_HEADERS=$(abs_top_builddir)/d4opts.h
+library_include_HEADERS+=d4defs.h d4all.h 
+library_include_HEADERS+=d4data.h   
+library_include_HEADERS+=d4declar.h   
+library_include_HEADERS+=d4inline.h
+library_include_HEADERS+=f4flag.h
+library_include_HEADERS+=e4expr.h
+library_include_HEADERS+=s4sort.h
+library_include_HEADERS+=e4string.h e4error.h
+library_include_HEADERS+=o4opt.h
+library_include_HEADERS+=c4trans.h
+library_include_HEADERS+=r4relate.h r4report.h
+
+# Make links between installed files with release-specific names and the generic
+# file names.  If this install rule is run the generic names will be deleted and
+# recreated - this has obvious issues for systems with multiple installations.
+                                        
+install-links:                   
+	@set -ex; \
+ 	cd '$(DESTDIR)$(includedir)'; rm -f xbase;       $(LN_S) "xbase.@FORMAT_NAME@" xbase; \
+	cd '$(DESTDIR)$(libdir)';     rm -f libxbase.so; $(LN_S) "libxbase-@FORMAT_NAME@.so" libxbase.so 
+                                       
+uninstall-links:                  
+	cd '$(DESTDIR)$(includedir)'; rm -f d4all.h \
+	cd '$(DESTDIR)$(libdir)';     rm -f libxbase.so
+
+install-data-hook: install-links
+uninstall-hook:  uninstall-links                                      
+
+
 
 if BUILDING_FOX 
   lib_LTLIBRARIES= libxbase-fox.la 
-  libxbase_fox_la_SOURCES=$SOURCES
+  libxbase_fox_la_SOURCES=$(SOURCES)
 endif
 
 if BUILDING_MDX 
   lib_LTLIBRARIES= libxbase-mdx.la 
-  libxbase_mdx_la_SOURCES=$SOURCES
+  libxbase_mdx_la_SOURCES=$(SOURCES)
 endif
 
 if BUILDING_NTX 
   lib_LTLIBRARIES= libxbase-clipper.la 
-  libxbase_clipper_la_SOURCES=$SOURCES
+  libxbase_clipper_la_SOURCES=$(SOURCES)
 endif
 
 

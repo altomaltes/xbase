@@ -1,6 +1,7 @@
 /* f4lock.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
+
 #ifdef S4IBMOS2
    #define INCL_DOSFILEMGR
    #include <os2.h>

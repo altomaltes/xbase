@@ -22,6 +22,7 @@
       #define  INCL_DOSMEMMGR
    #endif
 #endif
+
 #include "d4all.h"
 
 #ifdef S4VB_DOS

@@ -74,6 +74,7 @@ public:
    Expr4()                    { expr = 0 ; }
    Expr4( EXPR4 S4PTR *ex )   { expr = ex ; }
    Expr4( Data4 d, const char * ) ;
+
    #ifdef __TURBOC__
       operator double() const { double d ; expr4double2( expr, &d ) ; return d ; }
    #else
@@ -212,11 +213,13 @@ public:
    int optimize( const int optFlag ) { return d4optimize( data, optFlag ) ; }
    int optimizeWrite( const int optFlag ) { return d4optimizeWrite( data,  optFlag ) ; }
    int pack()                     { return d4pack( data ) ; }
+
    #ifdef __TURBOC__
       double position()           { double d; d4position2( data, &d ) ; return d; }
    #else
       double position()           { return d4position( data ) ; }
    #endif
+
    int position( const double pos ) { return d4positionSet( data, pos ) ; }
    void recall()                  { d4recall( data ) ; }
    long recCount()                { return d4recCount( data ) ; }
@@ -550,9 +553,8 @@ private:
    friend class Index4 ;
 } ;
 
-class S4CLASS Field4memo : public Field4
+struct S4CLASS Field4memo : public Field4
 {
-public:
    Field4memo() ;
    Field4memo( Data4 &, int ) ;
    Field4memo( Data4 &, const char * ) ;

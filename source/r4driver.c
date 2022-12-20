@@ -17,8 +17,8 @@
 
 /* r4driver.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
-#include "d4all.h"
 #ifndef S4OFF_REPORT
+#include "d4all.h"
 
 #ifdef S4WINTEL
    #ifndef S4WINDOWS

@@ -30,10 +30,10 @@
 /* EXTERNAL FUNCTIONS : */
 
 /* CONVERSIONS */
-PUBLIC double S4FUNCTION c4atod( const char S4PTR *, const int ) ;
+PUBLIC double S4FUNCTION c4atod(  const char S4PTR *, const int ) ;
 PUBLIC void   S4FUNCTION c4atod2( char S4PTR *, int, double S4PTR *);
-PUBLIC int    S4FUNCTION c4atoi( const char S4PTR *, const int ) ;
-PUBLIC long   S4FUNCTION c4atol( const char S4PTR *, const int ) ;
+PUBLIC int    S4FUNCTION c4atoi(  const char S4PTR *, const int ) ;
+PUBLIC long   S4FUNCTION c4atol(  const char S4PTR *, const int ) ;
 
 #ifdef S4WINCE
    PUBLIC void S4FUNCTION c4atou(const char *, unsigned short *,  int ) ;
@@ -414,6 +414,7 @@ PUBLIC void S4PTR* S4FUNCTION l4firstLow( const LIST4 S4PTR * ) ;  /* Returns 0 
 PUBLIC void S4PTR* S4FUNCTION l4lastLow( const LIST4 S4PTR * ) ;   /* Returns 0 if none */
 PUBLIC void S4PTR* S4FUNCTION l4nextLow( const LIST4 S4PTR *, const void S4PTR * ) ;  /* Returns 0 if none */
 PUBLIC void S4FUNCTION l4addLow( LIST4 S4PTR *, void S4PTR * ) ;
+
 #ifdef E4LINK
    #define l4first( l4 )         ( l4firstLow( l4 ) )
    #define l4last( l4 )          ( l4lastLow( l4 ) )
@@ -736,15 +737,15 @@ int dfile4writeData( DATA4FILE *, const long, const char * ) ;
    int dfile4lockAppend( DATA4FILE *, const long, const long ) ;
    int dfile4lockAppendRecord( DATA4FILE *, const long, const long ) ;
    PUBLIC int S4FUNCTION dfile4lockIndex( DATA4FILE *, const long ) ;
-   int dfile4lockTest( DATA4FILE *, const long, const long, const long ) ;
+   int dfile4lockTest(      DATA4FILE *, const long, const long, const long ) ;
    int dfile4lockTestIndex( DATA4FILE *, const long ) ;
-   int dfile4lockTestRecs( DATA4FILE *, const long, const long ) ;
-   int dfile4unlockData( DATA4FILE *, const long, const long ) ;
-   int dfile4unlockFile( DATA4FILE *, const long, const long ) ;
+   int dfile4lockTestRecs(  DATA4FILE *, const long, const long ) ;
+   int dfile4unlockData(    DATA4FILE *, const long, const long ) ;
+   int dfile4unlockFile(    DATA4FILE *, const long, const long ) ;
    int dfile4unlockRecords( DATA4FILE *, const long, const long ) ;
-   int dfile4unlockAppend( DATA4FILE *, const long, const long ) ;
-   int dfile4unlockRange( DATA4FILE *, const long, long ) ;
-      int dfile4lockFile( DATA4FILE *, const long, const long ) ;
+   int dfile4unlockAppend(  DATA4FILE *, const long, const long ) ;
+   int dfile4unlockRange(   DATA4FILE *, const long, long ) ;
+      int dfile4lockFile(   DATA4FILE *, const long, const long ) ;
 #endif /* S4OFF_MULTI */
    int dfile4optimize( DATA4FILE *, const int ) ;
    int dfile4optimizeWrite( DATA4FILE *, const int ) ;

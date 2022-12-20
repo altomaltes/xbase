@@ -6,6 +6,7 @@
    for the actual implementation of a semaphore */
 
 #include "d4all.h"
+
 #ifndef S4OFF_THREAD
 int semaphore4init(SEMAPHORE4 *semaphore )
 {

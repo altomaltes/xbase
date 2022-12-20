@@ -280,7 +280,7 @@ static int tran4fileStatusFile( TRAN4FILE *t4 )
             file4unlockInternal( &t4->file, TRAN4LOCK_USERS + loop, 0, 1, 0 ) ;
          }
          c4->lockAttempts = oldNumAttempts ;
-         if ( rc != 0 )
+         if ( rc  )
          {
             file4unlockInternal( &t4->file, TRAN4LOCK_USERS + TRAN4MAX_USERS + 1, 0, 1, 0 ) ;
             if ( rc == r4locked )
@@ -403,7 +403,7 @@ static int tran4fileOpen( TRAN4FILE *t4, char *name )
    #ifndef S4UTILS
       if ( rc != r4noOpen && rc >= 0 )
       {
-         if ( tran4fileStatusFile( t4 ) != 0 )
+         if ( tran4fileStatusFile( t4 ) )
          {
             t4->validState = 0 ;
             file4close( &t4->file ) ;

@@ -1310,14 +1310,14 @@ int tfile4updateHeader( TAG4FILE *t4 )
    if ( header->oldVersion != header->version )
    {
       #ifdef WORDS_BIGENDIAN
-         swap.sign = x4reverseShort( (void *)&header->sign ) ;
-         swap.version = x4reverseShort( (void *)&header->version ) ;
-         swap.root = x4reverseLong( (void *)&header->root ) ;
-         swap.eof = x4reverseLong( (void *)&header->eof ) ;
+         swap.sign     = x4reverseShort( (void *)&header->sign ) ;
+         swap.version  = x4reverseShort( (void *)&header->version ) ;
+         swap.root     = x4reverseLong( (void *)&header->root ) ;
+         swap.eof      = x4reverseLong( (void *)&header->eof ) ;
          swap.groupLen = x4reverseShort( (void *)&header->groupLen ) ;
-         swap.keyLen = x4reverseShort( (void *)&header->keyLen ) ;
-         swap.keyDec = x4reverseShort( (void *)&header->keyDec ) ;
-         swap.keysMax = x4reverseShort( (void *)&header->keysMax ) ;
+         swap.keyLen   = x4reverseShort( (void *)&header->keyLen ) ;
+         swap.keyDec   = x4reverseShort( (void *)&header->keyDec ) ;
+         swap.keysMax  = x4reverseShort( (void *)&header->keysMax ) ;
          swap.keysHalf = x4reverseShort( (void *)&header->keysHalf ) ;
 
          if ( file4write( file, 0L, &swap, 2 * sizeof(S4LONG ) + 2 * sizeof( short ) ) < 0)

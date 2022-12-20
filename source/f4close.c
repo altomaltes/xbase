@@ -1,6 +1,7 @@
 /* f4close.c   (c)Copyright Sequiter Software Inc., 1988-1998.  All rights reserved. */
 
 #include "d4all.h"
+
 #ifdef S4TEMP
    #include "t4test.h"
 #endif

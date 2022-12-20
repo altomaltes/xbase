@@ -17,6 +17,7 @@
 
 
 #include "d4all.h"
+
 #include <math.h>
 
 #ifdef S4WINDOWS

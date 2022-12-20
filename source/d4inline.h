@@ -88,10 +88,11 @@
 #ifdef __cplusplus
    extern "C" {
 #endif
-PUBLIC void S4PTR * S4FUNCTION l4first( const LIST4 S4PTR * ) ;  /* Returns 0 if none */
-PUBLIC void S4PTR * S4FUNCTION l4last( const LIST4 S4PTR * ) ;   /* Returns 0 if none */
-PUBLIC void S4PTR * S4FUNCTION l4next( const LIST4 S4PTR *, const void S4PTR * ) ;  /* Returns 0 if none */
-PUBLIC void S4FUNCTION l4add( LIST4 S4PTR *, void S4PTR * ) ;
+
+PUBLIC void S4PTR * S4FUNCTION l4first( S4CONST LIST4 S4PTR * ) ;  /* Returns 0 if none */
+PUBLIC void S4PTR * S4FUNCTION l4last(  S4CONST LIST4 S4PTR * ) ;   /* Returns 0 if none */
+PUBLIC void S4PTR * S4FUNCTION l4next(  S4CONST LIST4 S4PTR *, S4CONST void S4PTR * ) ;  /* Returns 0 if none */
+PUBLIC void S4FUNCTION l4add(  LIST4 S4PTR *, void S4PTR * ) ;
 
 PUBLIC int S4FUNCTION error4code( CODE4 S4PTR * ) ;
 

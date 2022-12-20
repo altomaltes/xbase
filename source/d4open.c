@@ -32,7 +32,8 @@ static DATA4 *d4openInit( CODE4 *c4 )
    #endif
 
    if ( error4code( c4 ) < 0 )
-      return 0 ;
+   {  return 0 ;
+   }
 
    #ifdef E4ANALYZE
       if ( c4->debugInt != 0x5281 )
@@ -93,6 +94,7 @@ static int d4openConclude( DATA4 *d4, const char *name, char *info )
    char *savePtr ;
    char fieldBuf[2] ;
    FIELD4IMAGE *image ;
+
    #ifdef S4CFOX
       int nullCount ;
    #endif
@@ -448,7 +450,7 @@ DATA4 *S4FUNCTION d4open( CODE4 *c4, const char *name )
 
 
    d4 = d4openInit( c4 ) ;
-   if ( d4 != 0 )
+   if ( d4 )
    {
       d4->dataFile = dfile4open( c4, d4, name, &info ) ;
       if ( d4->dataFile == 0 )
@@ -473,7 +475,7 @@ DATA4 *S4FUNCTION d4open( CODE4 *c4, const char *name )
       #endif
    }
 
-   return d4 ;
+   return( d4 );
 }
 
 DATA4 *S4FUNCTION d4openClone( DATA4 *dataOld )
@@ -1062,6 +1064,7 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
                #endif
             }
             break ;
+
          #ifdef S4CFOX
             case r4currency:
             case r4int:
