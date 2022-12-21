@@ -14,15 +14,7 @@ int S4FUNCTION d4go( DATA4 *data, const long recNo )
       int i ;
    #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93101 ) )
-         return -1 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parmNull, E93101 ) ;
-   #endif
+   C4PARMDATA( data, E93001, -1 );
 
    c4 = data->codeBase ;
    rc = 0 ;

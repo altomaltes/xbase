@@ -162,12 +162,7 @@ int d4unlockFile( DATA4 *data )
 {
    #ifndef S4SINGLE
       int rc ;
-      #ifdef S4VBASIC
-         if ( c4parm_check( data, 2, E92804 ) )
-            return -1 ;
-      #endif
-
-      E4PARHIGH( data, E92804 ) ;
+   C4PARMDATA( data, E92804, -1 ); 
 
       if ( code4unlockAuto( data->codeBase ) == LOCK4OFF )
          return 0 ;

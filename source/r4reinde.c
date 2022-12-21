@@ -42,9 +42,7 @@ void i4deleteRemoveKeys( INDEX4 *index )
             break ;
          l4remove( &tagOn->removedKeys, removed ) ;
          u4free( removed ) ;
-      }
-   }
-}
+}  }  }
 #endif /* S4OFF_TRAN */
 
 #ifndef N4OTHER

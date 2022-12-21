@@ -7,17 +7,9 @@ void S4FUNCTION f4assignLong( FIELD4 *field, const long lValue )
 {
    CODE4 *c4 ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( (void *)field, 3, E90516 ) )
-         return ;
-   #endif
+   C4PARMFIELD( field, E90516,  );
 
    #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90516 ) ;
-         return ;
-      }
       switch( field->type )
       {
          case r4log:
@@ -86,17 +78,10 @@ long S4FUNCTION f4long( const FIELD4 *field )
    #ifdef S4CFOX
       const char *ptr ;
    #endif
-   #ifdef S4VBASIC
-      if ( c4parm_check( (void *)field, 3, E90517 ) )
-         return 0L ;
-   #endif
+
+   C4PARMFIELD( field, E90517, -1L );
 
    #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90517 ) ;
-         return -1L ;
-      }
       switch( field->type )
       {
          case r4log:

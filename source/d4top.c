@@ -13,12 +13,7 @@ int S4FUNCTION d4top( DATA4 *data )
    #endif
       int saveFlag ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E92301 ) )
-         return -1;
-   #endif  /* S4VBASIC */
-
-      E4PARHIGH( data, E92301 ) ;
+   C4PARMDATA( data, E92301, -1 ); 
 
    c4 = data->codeBase ;
    if ( error4code( c4 ) < 0 )

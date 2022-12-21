@@ -960,12 +960,7 @@ int S4FUNCTION code4close( CODE4 *c4 )
    DATA4 *dataOn, *dataNext ;
    LIST4 *list ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( c4, 1, E91003 ) )
-         return -1 ;
-   #endif  /* S4VBASIC */
-
-   E4PARHIGH( c4, E91003 ) ;
+   C4PARMCODE( c4, E91003, -1 );
 
    list = tran4dataList( (&(c4->c4trans.trans)) ) ;
    for ( dataNext = (DATA4 *)l4first( list ) ; ; )
@@ -1181,14 +1176,11 @@ DATA4 *tran4data( TRAN4 *trans, const long serverId, const long clientId )
 #endif
 DATA4 *S4FUNCTION code4data( CODE4 *c4, const char *aliasName )
 {
-   char buf[LEN4DATA_ALIAS+2] ;
+   char buf[ LEN4DATA_ALIAS+2 ] ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( c4, 1, E91102 ) )
-         return 0 ;
-   #endif  /* S4VBASIC */
+   C4PARMCODE( c4, E91102, NULL );
 
-   E4PARHIGH( c4 && aliasName, E91102 ) ;
+   E4PARHIGH( aliasName, E91102 ) ;
 
    u4ncpy( buf, aliasName, sizeof( buf ) ) ;
    #ifndef S4CASE_SEN

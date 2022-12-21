@@ -8,15 +8,7 @@ int S4FUNCTION d4pack( DATA4 *d4 )
       int rc ;
    CODE4 *c4 ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( d4, 2, E94601 ) )
-         return 0 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( d4 == 0 )
-         return error4( 0, e4parmNull, E94601 ) ;
-   #endif
+   C4PARMDATA( d4, E94601, -1 );
 
    c4 = d4->codeBase ;
 

@@ -11,13 +11,10 @@ TAG4 *S4FUNCTION d4tag( DATA4 *d4, const char* const tagName )
       char tagLookup[LEN4TAG_ALIAS+1] ;
       TAG4 *tagOn ;
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( d4, 2, E92401 ) )
-            return 0 ;
-      #endif
+   C4PARMDATA( d4, E92401, NULL ); 
 
       #ifdef E4PARM_HIGH
-         if ( d4 == 0 || tagName == 0 )
+         if ( tagName == 0 )
          {
             error4( 0, e4parmNull, E92401 ) ;
             return 0 ;
@@ -105,18 +102,7 @@ TAG4 *S4FUNCTION d4tagDefault( DATA4 *d4 )
       TAG4 *tag ;
       INDEX4 *index ;
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( d4, 2, E92403 ) )
-            return 0 ;
-      #endif
-
-      #ifdef E4PARM_HIGH
-         if ( d4 == 0 )
-         {
-            error4( 0, e4parmNull, E92403 ) ;
-            return 0 ;
-         }
-      #endif
+   C4PARMDATA( d4, E92403, NULL ); 
 
       tag = d4->tagSelected ;
       if ( tag )
@@ -167,18 +153,7 @@ TAG4 *S4FUNCTION d4tagNext( DATA4 *d4, TAG4 * tag )
 
       tagOn = tag ;
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( d4, 2, E92405 ) )
-            return 0 ;
-      #endif
-
-      #ifdef E4PARM_HIGH
-         if ( d4 == 0 )
-         {
-            error4( 0, e4parmNull, E92405 ) ;
-            return 0 ;
-         }
-      #endif
+   C4PARMDATA( d4, E92405, NULL ); 
 
       if ( tagOn == 0 )
       {
@@ -262,18 +237,7 @@ TAG4 *S4FUNCTION d4tagPrev( DATA4 *d4, TAG4 *tag )
 
       tagOn = tag ;
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( d4, 2, E92407 ) )
-            return 0 ;
-      #endif
-
-      #ifdef E4PARM_HIGH
-         if ( d4 == 0 )
-         {
-            error4( 0, e4parmNull, E92407 ) ;
-            return 0 ;
-         }
-      #endif
+   C4PARMDATA( d4, E92407, -1 ); 
 
       if ( tagOn == 0 )
       {
@@ -349,18 +313,7 @@ TAG4FILE *dfile4tagPrev( DATA4FILE *d4, TAG4FILE *tagOn )
 #endif
 void S4FUNCTION d4tagSelect( DATA4 *d4, TAG4 *t4 )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( d4, 2, E92409 ) )
-         return ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( d4 == 0 )
-      {
-         error4( 0, e4parmNull, E92409 ) ;
-         return ;
-      }
-   #endif
+   C4PARMDATA( d4, E92409, -1 ); 
 
    #ifdef S4INDEX_OFF
       if ( t4 != 0 )

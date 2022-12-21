@@ -34,22 +34,14 @@ unsigned long data4clientId( DATA4 *d4 )
 
 S4CONST char *S4FUNCTION d4alias( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93301 ) )
-         return (char *) NULL;
-   #endif  /* S4VBASIC */
-
-   E4PARM_HRET( data, E93301, NULL ) ;
+   C4PARMDATA( data, E93301, NULL );
 
    return data->alias ;
 }
 
 void S4FUNCTION d4aliasSet( DATA4 *data, const char * newAlias )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93302 ) )
-         return ;
-   #endif  /* S4VBASIC */
+   C4PARMDATA( data, E93302, );
 
    E4PARM_HRET( data && newAlias, E93302, ) ;
 
@@ -74,12 +66,7 @@ void d4blankLow( DATA4 *data, char *record )
 
 void S4FUNCTION d4blank( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93303 ) )
-         return ;
-   #endif  /* S4VBASIC */
-
-   E4PARHIGH( data, E93303 ) ;
+   C4PARMDATA( data, E93303,  );
 
       #ifndef S4OFF_ENFORCE_LOCK
          if ( data->codeBase->lockEnforce && data->recNum > 0L )
@@ -99,12 +86,7 @@ void S4FUNCTION d4blank( DATA4 *data )
 
 int S4FUNCTION d4bof( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93304 ) )
-         return -1;
-   #endif  /* S4VBASIC */
-
-   E4PARHIGH( data, E93304 ) ;
+   C4PARMDATA( data, E93304, -1 );
 
    if ( error4code( data->codeBase ) < 0 )
       return e4codeBase ;
@@ -115,12 +97,7 @@ int S4FUNCTION d4bof( DATA4 *data )
 #ifndef S4OFF_WRITE
 void S4FUNCTION d4delete( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93305 ) )
-         return ;
-   #endif  /* S4VBASIC */
-
-   E4PARHIGH( data, E93305 ) ;
+   C4PARMDATA( data, E93305,  );
    #ifdef E4MISC
       if ( data->record[0] != ' ' && data->record[0] != '*' )
       {
@@ -150,12 +127,8 @@ void S4FUNCTION d4delete( DATA4 *data )
 #ifdef S4OLEDB_OR_NOT_SERVER
 int S4FUNCTION d4deleted( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93306 ) )
-         return -1;
-   #endif  /* S4VBASIC */
+   C4PARMDATA( data, E93306, -1 );
 
-   E4PARHIGH( data, E93306 ) ;
    #ifdef E4MISC
       if ( data->record[0] != ' ' && data->record[0] != '*' )
          return error4( data->codeBase, e4info, E83301 ) ;
@@ -167,12 +140,7 @@ int S4FUNCTION d4deleted( DATA4 *data )
 
 int S4FUNCTION d4eof( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93307 ) )
-         return -1;
-   #endif  /* S4VBASIC */
-
-   E4PARHIGH( data, E93307 ) ;
+   C4PARMDATA( data, E93307, -1 );
 
    if ( error4code( data->codeBase ) < 0 )
       return e4codeBase ;
@@ -226,12 +194,7 @@ int S4FUNCTION d4log( DATA4 *data, const int logging )
 
 short int S4FUNCTION d4numFields( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93308 ) )
-         return -1;
-   #endif  /* S4VBASIC */
-
-   E4PARHIGH( data, E93308 ) ;
+   C4PARMDATA( data, E93308, -1 );
 
    #ifdef S4CFOX
       if ( data->fields[data->dataFile->nFields-1].type == '0' )   /* null flags field */
@@ -288,10 +251,7 @@ int d4readOld( DATA4 *data, const long recNum )
 #ifndef S4OFF_WRITE
 void S4FUNCTION d4recall( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93311 ) )
-         return ;
-   #endif  /* S4VBASIC */
+   C4PARMDATA( data, E93311,  );
 
    E4PARHIGH( data, E93311 ) ;
 
@@ -345,12 +305,7 @@ int d4recCountLessEq( DATA4 *data, long count )
 
 long S4FUNCTION d4recCountDo( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93312 ) )
-         return -1L ;
-   #endif  /* S4VBASIC */
-
-   E4PARHIGH( data, E93312 ) ;
+   C4PARMDATA( data, E93312, -1 );
 
    if ( data->dataFile->numRecs >= 0L )
    {
@@ -368,12 +323,7 @@ long S4FUNCTION d4recCountDo( DATA4 *data )
 
 long S4FUNCTION d4recNo( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93313 ) )
-         return -1L;
-   #endif  /* S4VBASIC */
-
-   E4PARHIGH( data, E93313 ) ;
+   C4PARMDATA( data, E93313, -1 );
 
    return data->recNum ;
 }

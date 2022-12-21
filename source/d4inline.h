@@ -144,5 +144,11 @@ PUBLIC int    S4FUNCTION u4ptrEqual( const void S4PTR *, const void S4PTR * ) ;
 
 #define  E4ANA( cond, ret ) if ( cond ) { return( ret ); } 
 
+#define  C4PARMTAG(    tag, msg, ret ) if ( c4ParmCheckTag(   tag, msg ) < 0 ) return ret ;
+#define  C4PARMRELATE( rel, msg, ret ) if ( c4ParmCheckRelate(rel, msg ) < 0 ) return ret ;
+#define  C4PARMDATA(   dat, msg, ret ) if ( c4ParmCheckData(  dat, msg ) < 0 ) return ret ;
+#define  C4PARMCODE(    cb, msg, ret ) if ( c4ParmCheckCode(   cb, msg ) < 0 ) return ret ;
+#define  C4PARMFIELD(  fld, msg, ret ) if ( c4ParmCheckField( fld, msg ) < 0 ) return ret ;
+
 
 

@@ -12,13 +12,10 @@ int S4FUNCTION d4lock( DATA4 *data, const long rec )
       int rc ;
       CODE4 *c4 ;
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( data, 2, E92701 ) )
-            return -1 ;
-      #endif
+   C4PARMDATA( data, E94701, -1 );
 
       #ifdef E4PARM_HIGH
-         if ( data == 0 || rec < 1L )
+         if ( rec < 1L )
             return error4( 0, e4parm, E92701 ) ;
       #endif
 
@@ -283,12 +280,7 @@ int S4FUNCTION d4lockAppend( DATA4 *data )
    #else
       CODE4 *c4 ;
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( data, 2, E92708 ) )
-            return -1 ;
-      #endif
-
-     E4PARHIGH( data, E92708 ) ;
+   C4PARMDATA( data, E92708, -1 );
 
       c4 = data->codeBase ;
       if ( error4code( c4 ) < 0 )
@@ -333,12 +325,7 @@ int S4FUNCTION d4lockFile( DATA4 *data )
       CODE4 *c4 ;
          int rc ;
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( data, 2, E92709 ) )
-            return -1 ;
-      #endif
-
-     E4PARHIGH( data, E92709 ) ;
+   C4PARMDATA( data, E92709, -1 );
 
       c4 = data->codeBase ;
       if ( error4code( c4 ) < 0 )

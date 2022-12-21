@@ -1717,30 +1717,14 @@ int S4FUNCTION d4changed( DATA4 *data, int flag )
 
 int S4FUNCTION d4append( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E91103 ) )
-         return -1 ;
-   #endif  /* S4VBASIC */
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parmNull, E91103 ) ;
-   #endif
+   C4PARMDATA( d4, E91103, -1 ); 
 
    return error4( data->codeBase, e4notWrite, E91103 ) ;
 }
 
 int S4FUNCTION d4appendBlank( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E91104 ) )
-         return -1 ;
-   #endif  /* S4VBASIC */
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parmNull, E91104 ) ;
-   #endif
+   C4PARMDATA( d4, E91104, -1 ); 
 
    return error4( data->codeBase, e4notWrite, E91104 ) ;
 }
@@ -1749,15 +1733,7 @@ int S4FUNCTION d4appendBlank( DATA4 *data )
 #endif
 int S4FUNCTION d4appendStart( DATA4 *data, int useMemoEntries )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E91107 ) )
-         return -1 ;
-   #endif  /* S4VBASIC */
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parmNull, E91107 ) ;
-   #endif
+   C4PARMDATA( d4, E91107, -1 ); 
 
    return error4( data->codeBase, e4notWrite, E91107 ) ;
 }
@@ -1786,33 +1762,14 @@ DATA4 *S4FUNCTION d4create( CODE4 *c4, const char *name, const FIELD4INFO *field
 
 void S4FUNCTION d4delete( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93305 ) )
-         return ;
-   #endif  /* S4VBASIC */
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-      {
-         error4( 0, e4parmNull, E93305 ) ;
-         return ;
-      }
-   #endif
+   C4PARMDATA( d4, E93305,  ); 
 
    error4( data->codeBase, e4notWrite, E93305 ) ;
 }
 
 int S4FUNCTION d4pack( DATA4 *d4 )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( d4, 2, E94601 ) )
-         return 0 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( d4 == 0 )
-         return error4( 0, e4parmNull, E94601 ) ;
-   #endif
+   C4PARMDATA( d4, E94601, -1 ); 
 
    return error4( d4->codeBase, e4notWrite, E94601 ) ;
 }
@@ -1832,15 +1789,7 @@ void S4FUNCTION d4recall( DATA4 *data )
 
 int S4FUNCTION d4reindex( DATA4 *data )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E93004 ) )
-         return -1 ;
-   #endif  /* S4VBASIC */
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parmNull, E93004 ) ;
-   #endif
+   C4PARMDATA( d4, E93004, -1 ); 
 
    return error4( data->codeBase, e4notWrite, E93004 ) ;
 }
@@ -1850,15 +1799,7 @@ int S4FUNCTION d4reindex( DATA4 *data )
 #endif
 int S4FUNCTION d4writeLow( DATA4 *d4, const long rec, const int unlock )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( d4, 2, E92601 ) )
-         return 0 ;
-   #endif  /* S4VBASIC */
-
-   #ifdef E4PARM_HIGH
-      if ( d4 == 0 )
-         return error4( 0, e4parmNull, E92601 ) ;
-   #endif
+   C4PARMDATA( d4, E94604, -1 ); 
 
    return error4( d4->codeBase, e4notWrite, E92601 ) ;
 }
@@ -1868,15 +1809,7 @@ int S4FUNCTION d4writeLow( DATA4 *d4, const long rec, const int unlock )
 #endif
 int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( d4, 2, E94604 ) )
-         return -1 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( d4 == 0 )
-         return error4( 0, e4parmNull, E94604 ) ;
-   #endif
+   C4PARMDATA( d4, E94604, -1 ); 
 
    return error4( d4->codeBase, e4notWrite, E94604 ) ;
 }
@@ -1886,20 +1819,9 @@ int S4FUNCTION d4zap( DATA4 *d4, const long r1, const long r2 )
 #endif
 void S4FUNCTION f4assign( FIELD4 *field, const char *str )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90533 ) )
-         return ;
-   #endif
+  C4PARMFIELD( field, E90533, );
 
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90533 ) ;
-         return ;
-      }
-   #endif
-
-   error4( field->data->codeBase, e4notWrite, E90533 ) ;
+  error4( field->data->codeBase, e4notWrite, E90533 ) ;
 }
 
 #ifdef P4ARGS_USED
@@ -1907,18 +1829,7 @@ void S4FUNCTION f4assign( FIELD4 *field, const char *str )
 #endif
 void S4FUNCTION f4assignChar( FIELD4 *field, const int chr )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90502 ) )
-         return ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90502 ) ;
-         return ;
-      }
-   #endif
+   C4PARMFIELD( field, E90502, );
 
    error4( field->data->codeBase, e4notWrite, E90502 ) ;
 }
@@ -1928,18 +1839,7 @@ void S4FUNCTION f4assignChar( FIELD4 *field, const int chr )
 #endif
 void S4FUNCTION f4assignDouble( FIELD4 *field, const double dValue )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check ( field, 3, E90504 ) )
-         return ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90504 ) ;
-         return ;
-      }
-   #endif
+   C4PARMFIELD( field, E90504, );
 
    error4( field->data->codeBase, e4notWrite, E90504 ) ;
 }
@@ -1949,13 +1849,7 @@ void S4FUNCTION f4assignDouble( FIELD4 *field, const double dValue )
 #endif
 void S4FUNCTION f4assignField( FIELD4 *fieldTo, const FIELD4 *fieldFrom )
 {
-   #ifdef E4PARM_HIGH
-      if ( fieldTo == 0 )
-      {
-         error4( 0, e4parmNull, E90501 ) ;
-         return ;
-      }
-   #endif
+   C4PARMFIELD( fieldTo, E90501, );
 
    error4( fieldTo->data->codeBase, e4notWrite, E90501 ) ;
 }
@@ -1965,18 +1859,7 @@ void S4FUNCTION f4assignField( FIELD4 *fieldTo, const FIELD4 *fieldFrom )
 #endif
 void S4FUNCTION f4assignInt( FIELD4 *field, const int iValue )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90514 ) )
-         return ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90514 ) ;
-         return ;
-      }
-   #endif
+   C4PARMFIELD( field, E90514, );
 
    error4( field->data->codeBase, e4notWrite, E90514 ) ;
 }
@@ -1986,18 +1869,7 @@ void S4FUNCTION f4assignInt( FIELD4 *field, const int iValue )
 #endif
 void S4FUNCTION f4assignLong( FIELD4 *field, const long lValue )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90516 ) )
-         return ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parm, E90516 ) ;
-         return ;
-      }
-   #endif
+   C4PARMFIELD( field, E90516, );
 
    error4( field->data->codeBase, e4notWrite, E90516 ) ;
 }
@@ -2007,45 +1879,23 @@ void S4FUNCTION f4assignLong( FIELD4 *field, const long lValue )
 #endif
 void S4FUNCTION f4assignN( FIELD4 *field, const char *ptr, const unsigned ptrLen )
 {
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90534 ) ;
-         return ;
-      }
-   #endif
+   C4PARMFIELD( field, E90534, );
+
 
    error4( field->data->codeBase, e4notWrite, E90534) ;
 }
 
-char *S4FUNCTION f4assignPtr( FIELD4 *field )
+char * S4FUNCTION f4assignPtr( FIELD4 *field )
 {
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90507 ) ;
-         return 0 ;
-      }
-   #endif
+   C4PARMFIELD( field, E90507, NULL );
 
    error4( field->data->codeBase, e4notWrite, E90507 ) ;
-   return 0 ;
+   return NULL ;
 }
 
 void S4FUNCTION f4blank( FIELD4 *field )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90508 ) )
-         return ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90508 ) ;
-         return ;
-      }
-   #endif
+   C4PARMFIELD( field, E90508,  );
 
    error4( field->data->codeBase, e4notWrite, E90508 ) ;
 }
@@ -2055,10 +1905,7 @@ void S4FUNCTION f4blank( FIELD4 *field )
 #endif
 int S4FUNCTION f4memoAssign( FIELD4 *field, const char *ptr )
 {
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-         return error4( 0, e4parmNull, E90518 ) ;
-   #endif
+   C4PARMFIELD( field, E90518, -1 );
 
    return error4( field->data->codeBase, e4notWrite, E90518 ) ;
 }
@@ -2068,15 +1915,8 @@ int S4FUNCTION f4memoAssign( FIELD4 *field, const char *ptr )
 #endif
 int S4FUNCTION f4memoAssignN( FIELD4 *field, const char *ptr, const unsigned ptrLen )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90519 ) )
-         return -1 ;
-   #endif
+   C4PARMFIELD( field, E90519, -1 );
 
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-         return error4( 0, e4parmNull, E90519 ) ;
-   #endif
 
    return error4( field->data->codeBase, e4notWrite, E90519 ) ;
 }
@@ -2088,18 +1928,8 @@ int S4FUNCTION f4memoAssignN( FIELD4 *field, const char *ptr, const unsigned ptr
 #endif
 INDEX4 *S4FUNCTION i4create( DATA4 *d4, const char *fileName, const TAG4INFO *tagData )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( d4, 2, E95301 ) )
-         return 0 ;
-   #endif
 
-   #ifdef E4PARM_HIGH
-      if ( d4 == 0 )
-      {
-         error4( 0, e4parmNull, E95301 ) ;
-         return 0 ;
-      }
-   #endif
+   C4PARMDATA( d4, E95301, NULL ); 
 
    error4( d4->codeBase, e4notSupported, E95301 ) ;
    return 0 ;

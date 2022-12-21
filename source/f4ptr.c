@@ -4,18 +4,7 @@
 
 char *S4FUNCTION f4ptr( const FIELD4 *field )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( (void *)field, 3, E90532 ) )
-         return 0 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90532 ) ;
-         return 0 ;
-      }
-   #endif
+   C4PARMFIELD( field, E90532, NULL );
 
    return ( field->data->record + field->offset ) ;
 }

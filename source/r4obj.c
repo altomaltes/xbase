@@ -30,18 +30,22 @@ OBJ4 * S4FUNCTION   obj4create( AREA4 *area, long x, long y, long w, long h )
 {
    OBJ4 *obj;
 
-   if( x > area->report->report_width || y > area->height ||
-      x < 0 || y < 0 || w < 0 || h < 0 )
-      return NULL;
+   if ( x > area->report->report_width 
+     || y > area->height 
+     || x < 0 || y < 0 || w < 0 || h < 0 )
+   {  
+       return NULL;
+   }
 
-   if( !area )
+   if ( !area )
    {
-      return NULL;
+       return NULL;
    }
 
    /* allocate the OBJ4 structure */
    obj = (POBJ4)u4allocEr( area->report->codeBase, sizeof( OBJ4 ) );
-   if( !obj )
+
+   if ( !obj )
    {
       error4describe( area->report->codeBase, e4objCreate, 0L, E4_REP_OBJMEM, 0, 0 );
       return NULL;
@@ -50,8 +54,11 @@ OBJ4 * S4FUNCTION   obj4create( AREA4 *area, long x, long y, long w, long h )
    /* set the internal members */
    obj->area = area;
    obj->style = area->report->active_style;
-   if( obj->style == NULL )
-      obj->style = (PSTYLE4)l4first( &area->report->styles );
+
+   if ( obj->style == NULL )
+   {  obj->style = (PSTYLE4)l4first( &area->report->styles );
+   }
+
    obj->alignment = justify4left;
    obj->x = x;
    obj->y = y;
@@ -60,7 +67,8 @@ OBJ4 * S4FUNCTION   obj4create( AREA4 *area, long x, long y, long w, long h )
    obj->numeric_type = obj4numNumber;
    obj->display_zero = 1;
 
-   /* add the object to the areas object list */
+/* add the object to the areas object list 
+ */
    area4add_object( area, obj );
    return obj;
 }
@@ -90,16 +98,19 @@ void S4FUNCTION   obj4free( OBJ4 *obj )
 
    area = obj->area;
 
-   /* if necessary remove the object from the selected object list */
+/* if necessary remove the object from the selected object list 
+ */
    link = (LINK4 *)obj;
+
    if( obj->is_active || obj->is_first )
    {
       l4remove( &area->report->active_objects, (link+1) );
       obj->is_active = obj->is_first = 0;
    }
 
-   /* if the object is in a list of objects remove it, it will either be in
-      the object list of an area, or the object list of a containing object */
+ /* if the object is in a list of objects remove it, it will either be in
+    the object list of an area, or the object list of a containing object 
+  */
    if( !(!link->n && !link->p) )
    {
       /* remove the object from the database generation variables,
@@ -117,7 +128,8 @@ void S4FUNCTION   obj4free( OBJ4 *obj )
          out_obj = (POUT4OBJ)l4next( &obj->area->report->output_objs, out_obj );
       }
 
-      if( cleanup && !(obj->area->report->output_objs.nLink) )
+      if ( cleanup 
+        && !(obj->area->report->output_objs.nLink) )
       {
          if( obj->area->report->dfile_name )
          {
@@ -135,28 +147,29 @@ void S4FUNCTION   obj4free( OBJ4 *obj )
       else
       {
          l4remove( &area->objects, obj );
-      }
-   }
+   }  }
 
-   /* if the object being freed contains any objects don't delete them, return
-      them to the parent area */
+/* if the object being freed contains any objects don't delete them, return
+   them to the parent area 
+*/
    while( (obj_on = (OBJ4 *)l4pop( &obj->contained )) != NULL )
       area4add_object( area, obj_on );
 
-   /* free the associated memory */
-   if( obj->wintext )
+/* free the associated memory 
+  */
+   if ( obj->wintext )
        u4free( obj->wintext );
 
-   if( obj->date_format )
+   if ( obj->date_format )
       u4free( obj->date_format );
 
-   if( obj->eval_text )
+   if ( obj->eval_text )
       u4free( obj->eval_text );
 
-   if( obj->display_once_expr )
+   if ( obj->display_once_expr )
       expr4free( obj->display_once_expr );
 
-   if( obj->last_display_val )
+   if ( obj->last_display_val )
       u4free( obj->last_display_val );
 
    #ifdef S4WINDOWS
@@ -202,23 +215,23 @@ POBJ4 S4FUNCTION   obj4fieldCreate( AREA4 *area, FIELD4 *field_ptr, long x, long
       case 'D':
          obj->num_chars = 10;
          obj->dec = f4decimals( field_ptr );
-         break;
+      break;
 
       case 'M':
          obj->num_chars = 42;
-         break;
+      break;
 
       case 'L':
          obj->num_chars = 2;
-         break;
+      break;
 
       case 'C':
          obj->num_chars = f4len( field_ptr )+2;
-         break;
+      break;
 
       default:
          obj->num_chars = 12;
-         break;
+      break;
    }
 
    return obj;
@@ -227,11 +240,13 @@ POBJ4 S4FUNCTION   obj4fieldCreate( AREA4 *area, FIELD4 *field_ptr, long x, long
 
 /* SEE THE CODEREPORTER MANUAL */
 void S4FUNCTION   obj4totalFree( OBJ4 *obj )
-{
+{     
+/* a total is always created in conjunction with an object, therefore
+   when we delete the object we delete the total as well 
+ */
+      
    if( obj->data )
    {
-      /* a total is always created in conjunction with an object, therefore
-         when we delete the object we delete the total as well */
       report4deleteCalc( obj->area->report, ((PTOTAL4)obj->data)->calcPtr );
       return;
    }
@@ -252,14 +267,10 @@ POBJ4 S4FUNCTION   obj4totalCreate( AREA4 *area, TOTAL4 *total_ptr, long x, long
       return NULL;
    }
 
-   /* set the data ptr to the total */
-   obj->data = (void *)total_ptr;
-
-   /* set the object type */
-   obj->obj_type_num = obj4type_total;
-
-   /* set the internal object members */
-   obj->num_chars = 12;
+   
+   obj->data = (void *)total_ptr;      /* set the data ptr to the total */
+   obj->obj_type_num = obj4type_total; /* set the object type */
+   obj->num_chars = 12;                /* set the internal object members */
    obj->alignment = justify4right;
 
    /* set the totals object pointer */
@@ -268,12 +279,12 @@ POBJ4 S4FUNCTION   obj4totalCreate( AREA4 *area, TOTAL4 *total_ptr, long x, long
    return obj;
 }
 
-/* SEE THE CODEREPORTER MANUAL */
+/* calculations are created independant of objects, therefore we don't
+   delete the associated calculation when the object is deleted. Calc
+   deletion is handled when the report is freed 
+ */
 void S4FUNCTION   obj4calcFree( OBJ4 *obj )
 {
-   /* calculations are created independant of objects, therefore we don't
-      delete the associated calculation when the object is deleted. Calc
-      deletion is handled when the report is freed */
    obj4free( obj );
 }
 
@@ -281,48 +292,47 @@ void S4FUNCTION   obj4calcFree( OBJ4 *obj )
 POBJ4 S4FUNCTION   obj4calcCreate( AREA4 *area, EXPR4CALC *calcPtr, long x, long y, long w, long h )
 {
    OBJ4 *obj;
-   int type;
 
-   if( !area )
+   if ( !area )
       return NULL;
 
-   if( !calcPtr )
+   if ( !calcPtr )
    {
       return NULL;
    }
 
    obj = obj4create( area, x, y, w, h );
-   if( !obj )
+   if ( !obj )
    {
       return NULL;
    }
 
-   /* set the data pointer and the object type */
+/* set the data pointer and the object type 
+ */
    obj->data = (void *)calcPtr;
    obj->obj_type_num = obj4type_calc;
 
-   /* set the default size and alignment */
-   type = expr4type( calcPtr->expr );
-   switch( type )
+
+   switch( expr4type( calcPtr->expr ) )  /* set the default size and alignment */
    {
       case r4num:
       case r4numDoub:
          obj->num_chars = 10;
          obj->alignment = justify4right;
-         break;
+       break;
 
       case r4date:
       case r4dateDoub:
          obj->num_chars = strlen( area->report->default_date_format )+2;
-         break;
+      break;
 
       case r4log:
          obj->num_chars = 2;
-         break;
+      break;
 
       default:
          obj->num_chars = expr4len( calcPtr->expr )+2;
-         break;
+      break;
    }
 
    return obj;
@@ -341,11 +351,11 @@ POBJ4 S4FUNCTION obj4exprCreate( AREA4 *area, EXPR4 *expr_ptr, long x, long y, l
 {
    OBJ4 *obj;
 
-   if( !area )
+   if ( !area )
       return NULL;
 
    obj = obj4create( area, x, y, w, h );
-   if( !obj )
+   if ( !obj )
    {
       return NULL;
    }
@@ -356,8 +366,10 @@ POBJ4 S4FUNCTION obj4exprCreate( AREA4 *area, EXPR4 *expr_ptr, long x, long y, l
 
    /* set the default length and alignment */
    obj->num_chars = expr4len( expr_ptr )+2;
-   if( expr4type( expr_ptr ) == r4num || expr4type( expr_ptr ) == r4numDoub )
-      obj->alignment = justify4right;
+   if ( expr4type( expr_ptr ) == r4num 
+     || expr4type( expr_ptr ) == r4numDoub )
+   {  obj->alignment = justify4right;
+   }
 
    return obj;
 }
@@ -1472,7 +1484,8 @@ int S4FUNCTION obj4frameFill( POBJ4 obj, int fill )
 int S4FUNCTION obj4lookAhead( POBJ4 obj, int lookahead )
 {
    if( !obj )
-      return -1;
+   {  return -1;
+   }
 
    if( lookahead < 0 )
    {
@@ -1499,6 +1512,6 @@ void S4FUNCTION obj4remove( POBJ4 obj )
       obj->container = NULL;
    }
    else
-      l4remove( &obj->area->objects, obj );
-}
+   {  l4remove( &obj->area->objects, obj );
+}  }
 #endif   /* S4OFF_REPORT */

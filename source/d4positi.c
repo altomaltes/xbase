@@ -14,12 +14,7 @@ double S4FUNCTION d4position( DATA4 *data )
       TAG4 *tag ;
    #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E94701 ) )
-         return -1.0 ;
-   #endif
-
-      E4PARHIGH( data, E94701 ) ;
+   C4PARMDATA( data, E94701, -1.0 );
 
    if( error4code( data->codeBase ) < 0 )
       return -1.0 ;
@@ -74,12 +69,7 @@ int S4FUNCTION d4positionSet( DATA4 *data, const double per )
       TAG4 *tag ;
    #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E94702 ) )
-         return -1 ;
-   #endif
-
-      E4PARHIGH( data, E94702 ) ;
+   C4PARMDATA( data, E94702, -1 );
 
    c4 = data->codeBase ;
    if( error4code( c4 ) < 0 )

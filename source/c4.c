@@ -21,7 +21,151 @@
 #include "d4all.h"
 
 
+
+
+int c4ParmCheckField( const FIELD4  * ptr
+                    , const long message )
+{ if ( ptr )
+  { 
+
 #ifdef S4VBASIC
+    if ( ptr->debugInt != E4DEBUG_INT ) 
+    { return( error4describe( 0, e4info, message, "Function was Passed an Invalid Structure Pointer", 0, 0 ));                                                              
+    } 
+#endif
+
+  }
+  else
+  { return( error4( 0, e4parmNull, message ));
+  }
+
+  return( 0 );
+}
+
+int c4ParmCheckCode( const CODE4  * ptr
+                   , const long message )
+{ if ( ptr )
+  { 
+
+#ifdef S4VBASIC
+    if ( ptr->debugInt != E4DEBUG_INT ) 
+    { return( error4describe( 0, e4info, message, "Function was Passed an Invalid Structure Pointer", 0, 0 ));                                                              
+    } 
+#endif
+
+  }
+  else
+  { return( error4( 0, e4parmNull, message ));
+  }
+
+  return( 0 );
+}
+
+int c4ParmCheckData( const DATA4  * ptr
+                   , const long message )
+{ if ( ptr )
+  { 
+
+#ifdef S4VBASIC
+    if ( ptr->debugInt != E4DEBUG_INT ) 
+    { return( error4describe( 0, e4info, message, "Function was Passed an Invalid Structure Pointer", 0, 0 ));                                                              
+    } 
+#endif
+
+  }
+  else
+  { return( error4( 0, e4parmNull, message ));
+  }
+
+  return( 0 );
+}
+
+#ifndef S4OFF_REPORT
+
+int c4ParmCheckReport( const REPORT4  * ptr
+                     , const long message )
+{ if ( ptr )
+  { 
+
+#ifdef S4VBASIC
+    if ( ptr->codeBase->debugInt != E4DEBUG_INT ) 
+    { return( error4describe( 0, e4info, message, "Function was Passed an Invalid Structure Pointer", 0, 0 ));                                                              
+    } 
+#endif
+
+  }
+  else
+  { return( error4( 0, e4parmNull, message ));
+  }
+
+  return( 0 );
+}
+
+#endif
+
+int c4ParmCheckTag( const TAG4  * ptr
+                  , const long message )
+{ if ( ptr )
+  { 
+
+#ifdef S4VBASIC
+    if ( ptr->index->codeBase->debugInt != E4DEBUG_INT ) 
+    { return( error4describe( 0, e4info, message, "Function was Passed an Invalid Structure Pointer", 0, 0 ));                                                              
+    } 
+#endif
+
+  }
+  else
+  { return( error4( 0, e4parmNull, message ));
+  }
+
+  return( 0 );
+}
+
+int c4ParmCheckIndex( const INDEX4  * ptr
+                    , const long message )
+{ if ( ptr )
+  { 
+
+#ifdef S4VBASIC
+    if ( ptr->codeBase->debugInt != E4DEBUG_INT ) 
+    { return( error4describe( 0, e4info, message, "Function was Passed an Invalid Structure Pointer", 0, 0 ));                                                              
+    } 
+#endif
+
+  }
+  else
+  { return( error4( 0, e4parmNull, message ));
+  }
+
+  return( 0 );
+}
+
+int c4ParmCheckRelate( const RELATE4  * ptr
+                     , const long message )
+{ if ( ptr )
+  { 
+
+#ifdef S4VBASIC
+    if ( ptr->codeBase->debugInt != E4DEBUG_INT ) 
+    { return( error4describe( 0, e4info, message, "Function was Passed an Invalid Structure Pointer", 0, 0 ));                                                              
+    } 
+#endif
+
+  }
+  else
+  { return( error4( 0, e4parmNull, message ));
+  }
+
+  return( 0 );
+}
+
+
+#ifdef S4VBASIC
+
+/*
+ */
+
 int c4parm_check( const void *ptr
                 , int doCheck
                 , const long message )

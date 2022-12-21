@@ -29,12 +29,7 @@ int S4FUNCTION d4bottom( DATA4 *data )
       int rc ;
    #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E91201 ) )
-         return -1;
-   #endif  /* S4VBASIC */
-
-      E4PARHIGH( data, E91201 ) ;
+   C4PARMDATA( data, E91201, -1 );
 
    c4 = data->codeBase ;
    if ( error4code( c4 ) < 0 )

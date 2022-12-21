@@ -175,15 +175,7 @@ int code4optRestart( CODE4 *c4 )
          DWORD sectorsPerCluster, bytesPerSector, numberFreeClusters, totalNumberClusters ;
       #endif
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( c4, 1, E92502 ) )
-            return -1 ;
-      #endif  /* S4VBASIC */
-
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-            return error4( 0, e4parmNull, E92502 ) ;
-      #endif
+      C4PARMCODE( c4, E92502, -1 );
 
       #ifdef E4ANALYZE
          if ( c4->debugInt != 0x5281 )
@@ -336,21 +328,21 @@ int code4optRestart( CODE4 *c4 )
       opt->minAccessTimeVariation = (unsigned int)opt->numBlocks / 100 ;
       if ( opt->minAccessTimeVariation < 2 )  /* provide a basic minimum */
          opt->minAccessTimeVariation = 2 ;
-      opt->dbfLo.minLink = (unsigned short int) ((double)opt->numBlocks * OPT4DBF_LO_MIN_LINK) ;
-      opt->dbfLo.maxTime = (unsigned long) ((double)opt->numBlocks * OPT4DBF_LO_MAX_TIME) ;
-      opt->dbfLo.minTime = (unsigned long) ((double)opt->numBlocks * OPT4DBF_LO_MIN_TIME) ;
-      opt->dbfHi.minLink = (unsigned short int) ((double)opt->numBlocks * OPT4DBF_HI_MIN_LINK) ;
-      opt->dbfHi.maxTime = (unsigned long) ((double)opt->numBlocks * OPT4DBF_HI_MAX_TIME) ;
-      opt->dbfHi.minTime = (unsigned long) ((double)opt->numBlocks * OPT4DBF_HI_MIN_TIME) ;
-      opt->indexLo.minLink = (unsigned short int) ((double)opt->numBlocks * OPT4INDEX_LO_MIN_LINK) ;
-      opt->indexLo.maxTime = (unsigned long) ((double)opt->numBlocks * OPT4INDEX_LO_MAX_TIME) ;
-      opt->indexLo.minTime = (unsigned long) ((double)opt->numBlocks * OPT4INDEX_LO_MIN_TIME) ;
-      opt->indexHi.minLink = (unsigned short int) ((double)opt->numBlocks * OPT4INDEX_HI_MIN_LINK) ;
-      opt->indexHi.maxTime = (unsigned long) ((double)opt->numBlocks * OPT4INDEX_HI_MAX_TIME) ;
-      opt->indexHi.minTime = (unsigned long) ((double)opt->numBlocks * OPT4INDEX_HI_MIN_TIME) ;
-      opt->other.minLink = (unsigned short int) ((double)opt->numBlocks * OPT4OTHER_MIN_LINK) ;
-      opt->other.maxTime = (unsigned long) ((double)opt->numBlocks * OPT4OTHER_MAX_TIME) ;
-      opt->other.minTime = (unsigned long) ((double)opt->numBlocks * OPT4OTHER_MIN_TIME) ;
+      opt->dbfLo.minLink  = (unsigned short int) ((double)opt->numBlocks * OPT4DBF_LO_MIN_LINK) ;
+      opt->dbfLo.maxTime  = (unsigned      long) ((double)opt->numBlocks * OPT4DBF_LO_MAX_TIME) ;
+      opt->dbfLo.minTime  = (unsigned      long) ((double)opt->numBlocks * OPT4DBF_LO_MIN_TIME) ;
+      opt->dbfHi.minLink  = (unsigned short int) ((double)opt->numBlocks * OPT4DBF_HI_MIN_LINK) ;
+      opt->dbfHi.maxTime  = (unsigned      long) ((double)opt->numBlocks * OPT4DBF_HI_MAX_TIME) ;
+      opt->dbfHi.minTime  = (unsigned      long) ((double)opt->numBlocks * OPT4DBF_HI_MIN_TIME) ;
+      opt->indexLo.minLink= (unsigned short int) ((double)opt->numBlocks * OPT4INDEX_LO_MIN_LINK) ;
+      opt->indexLo.maxTime= (unsigned      long) ((double)opt->numBlocks * OPT4INDEX_LO_MAX_TIME) ;
+      opt->indexLo.minTime= (unsigned      long) ((double)opt->numBlocks * OPT4INDEX_LO_MIN_TIME) ;
+      opt->indexHi.minLink= (unsigned short int) ((double)opt->numBlocks * OPT4INDEX_HI_MIN_LINK) ;
+      opt->indexHi.maxTime= (unsigned      long) ((double)opt->numBlocks * OPT4INDEX_HI_MAX_TIME) ;
+      opt->indexHi.minTime= (unsigned      long) ((double)opt->numBlocks * OPT4INDEX_HI_MIN_TIME) ;
+      opt->other.minLink  = (unsigned short int) ((double)opt->numBlocks * OPT4OTHER_MIN_LINK) ;
+      opt->other.maxTime  = (unsigned      long) ((double)opt->numBlocks * OPT4OTHER_MAX_TIME) ;
+      opt->other.minTime  = (unsigned      long) ((double)opt->numBlocks * OPT4OTHER_MIN_TIME) ;
 
    #endif /* S4OFF_OPTIMIZE */
    return 0 ;
@@ -366,15 +358,7 @@ int S4FUNCTION code4optSuspend( CODE4 *c4 )
       FILE4 *fileOn ;
       int rc, saveRc ;
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( c4, 1, E92503 ) )
-            return -1 ;
-      #endif  /* S4VBASIC */
-
-      #ifdef E4PARM_HIGH
-         if ( c4 == 0 )
-            return error4( 0, e4parmNull, E92503 ) ;
-      #endif
+      C4PARMCODE( c4, E92503, -1 );
 
       opt = &c4->opt ;
       if ( opt->numBuffers == 0 || c4->hasOpt == 0 )
@@ -412,13 +396,10 @@ int S4FUNCTION code4optSuspend( CODE4 *c4 )
 
 int S4FUNCTION d4optimize( DATA4 *d4, const int optFlag )
 {
-      #ifdef S4VBASIC
-         if ( c4parm_check( d4, 2, E92504 ) )
-            return -1 ;
-      #endif  /* S4VBASIC */
+   C4PARMDATA( d4, E92504, -1 );
 
       #ifdef E4PARM_HIGH
-         if ( d4 == 0 || optFlag < -1 || optFlag > 1 )
+         if ( optFlag < -1 || optFlag > 1 )
             return error4( 0, e4parm, E92504 ) ;
       #endif
       return dfile4optimize( d4->dataFile, optFlag ) ;
@@ -489,13 +470,10 @@ int dfile4optimize( DATA4FILE *d4, const int optFlag )
 
 int S4FUNCTION d4optimizeWrite( DATA4 *d4, const int optFlag )
 {
-      #ifdef S4VBASIC
-         if ( c4parm_check( d4, 2, E92506 ) )
-            return -1 ;
-      #endif  /* S4VBASIC */
+   C4PARMDATA( d4, E92506, -1 );
 
       #ifdef E4PARM_HIGH
-         if ( d4 == 0 || optFlag < -1 || optFlag > 1 )
+         if ( optFlag < -1 || optFlag > 1 )
             return error4( 0, e4parm, E92506 ) ;
       #endif
       return dfile4optimizeWrite( d4->dataFile, optFlag ) ;

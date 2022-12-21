@@ -13,17 +13,10 @@ void S4FUNCTION f4assignDouble( FIELD4 *field, const double dValue )
    #ifdef S4CFOX
       char currencyBuffer[21] ;
    #endif
-   #ifdef S4VBASIC
-      if ( c4parm_check ( field, 3, E90504 ) )
-         return ;
-   #endif
+
+   C4PARMFIELD( field, E90504,  );
 
    #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90504 ) ;
-         return ;
-      }
       switch( field->type )
       {
          case r4log:
@@ -81,17 +74,10 @@ double S4FUNCTION f4double( const FIELD4 *field )
       const char *ptr ;
    #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( (void *)field, 3, E90505 ) )
-         return (double)0 ;
-   #endif
+   C4PARMFIELD( field, E90505, -1.0 );
 
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90505 ) ;
-         return -1.0 ;
-      }
+#ifdef E4PARM_HIGH
+
       switch( field->type )
       {
          case r4log:
@@ -104,7 +90,8 @@ double S4FUNCTION f4double( const FIELD4 *field )
          default:
             break ;
       }
-   #endif
+
+#endif
 
    switch( field->type )
    {

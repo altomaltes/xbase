@@ -203,13 +203,10 @@ int S4FUNCTION d4seekNextN( DATA4 *data, const char *str, const short l )
       char buf[I4MAX_KEY_SIZE] ;
       unsigned char *dbfKey ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E92905 ) )
-         return 0 ;
-   #endif
+   C4PARMDATA( data, E92905, -1 );
 
    #ifdef E4PARM_HIGH
-      if ( data == 0 || str == 0 )
+      if ( str == 0 )
          return error4( 0, e4parmNull, E92905 ) ;
    #endif
 
@@ -401,13 +398,10 @@ int S4FUNCTION d4seekN( DATA4 *data, const char *str, const short l )
       CODE4 *c4 ;
       char buf[I4MAX_KEY_SIZE] ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E92903 ) )
-         return 0 ;
-   #endif
+   C4PARMDATA( data, E92903, -1 );
 
    #ifdef E4PARM_HIGH
-      if ( data == 0 || str == 0 )
+      if ( str == 0 )
          return error4( 0, e4parmNull, E92903 ) ;
    #endif
 
@@ -550,15 +544,7 @@ int S4FUNCTION d4seekDouble( DATA4 *data, const double dkey )
          int len ;
       #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E92903 ) )
-         return 0 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parmNull, E92904 ) ;
-   #endif
+   C4PARMDATA( data, E92903, -1 );
 
       c4 = data->codeBase ;
       if ( c4 == 0 )
@@ -668,15 +654,7 @@ int S4FUNCTION d4seekNextDouble( DATA4 *data, const double dkey )
          int len ;
       #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E92909 ) )
-         return 0 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parmNull, E92909 ) ;
-   #endif
+   C4PARMDATA( data, E92909, -1 );
 
       c4 = data->codeBase ;
 

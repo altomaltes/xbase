@@ -6,18 +6,8 @@ FIELD4 *S4FUNCTION d4field( DATA4 *data, const char *fieldName )
 {
    int i ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E94001 ) )
-         return 0 ;
-   #endif
+   C4PARMDATA( data, E94001, NULL );
 
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-      {
-         error4( 0, e4parmNull, E94001 ) ;
-         return 0 ;
-      }
-   #endif
 
    i =  d4fieldNumber( data, fieldName ) - 1 ;
    if ( i < 0 )
@@ -28,18 +18,10 @@ FIELD4 *S4FUNCTION d4field( DATA4 *data, const char *fieldName )
 
 FIELD4 *S4FUNCTION d4fieldJ( DATA4 *data, const int jField )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E94002 ) )
-         return 0 ;
-   #endif
+   C4PARMDATA( data, E94002, NULL );
 
    #ifdef E4PARM_HIGH
 
-      if ( data == 0 )
-      {
-         error4( 0, e4parmNull, E94002 ) ;
-         return (FIELD4 *)NULL ;
-      }
 
       if ( jField <= 0 || data->fields == 0 || jField > data->dataFile->nFields )
       {

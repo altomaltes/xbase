@@ -47,18 +47,7 @@ INDEX4 *S4FUNCTION d4index( DATA4 *data, const char *indexName )
       unsigned int i, extIndex ;
       int doAlias, hasExt, hasPath ;
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( data, 2, E93002 ) )
-            return 0 ;
-      #endif  /* S4VBASIC */
-
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-         {
-            error4( 0, e4parmNull, E93002 ) ;
-            return 0 ;
-         }
-      #endif
+   C4PARMDATA( data, E93002, -1 );
 
       if ( indexName == 0 )
          doAlias = 1 ;
@@ -204,15 +193,7 @@ int S4FUNCTION d4reindex( DATA4 *data )
             #endif
          #endif
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( data, 2, E93004 ) )
-            return -1 ;
-      #endif  /* S4VBASIC */
-
-      #ifdef E4PARM_HIGH
-         if ( data == 0 )
-            return error4( 0, e4parmNull, E93004 ) ;
-      #endif
+   C4PARMDATA( data, E93004, -1 );
 
       c4 = data->codeBase ;
       if ( error4code( c4 ) < 0 )

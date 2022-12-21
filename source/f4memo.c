@@ -55,12 +55,7 @@ int S4FUNCTION f4memoAssignN( FIELD4 *field, const char *ptr, const unsigned int
       int rc ;
    #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( (void *)field, 3, E90519 ) )
-         return -1 ;
-   #endif
-
-   E4PARHIGH( field, E90519 ) ;
+   C4PARMFIELD( field, E90519, NULL );
 
    #ifdef S4OFF_MEMO
       f4assignN( field, ptr, ptrLen ) ;
@@ -128,19 +123,7 @@ int S4FUNCTION f4memoFree( FIELD4 *field )
 
 unsigned S4FUNCTION f4memoLen( FIELD4 *field )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( (void *)field, 3, E90522 ) )
-         return 0 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90522 ) ;
-         return 0 ;
-      }
-   #endif
-
+   C4PARMFIELD( field, E90522, NULL );
 
    #ifdef S4OFF_MEMO
       return (unsigned)field->len ;
@@ -200,18 +183,7 @@ unsigned S4FUNCTION f4memoNcpy( FIELD4 *field, char *memPtr, const unsigned len 
 
 char *S4FUNCTION f4memoPtr( FIELD4 *field )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( (void *)field, 3, E90524 ) )
-         return 0 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90524 ) ;
-         return 0 ;
-      }
-   #endif
+   C4PARMFIELD( field, E90524, NULL );
 
    #ifdef S4OFF_MEMO
       return f4ptr(field) ;
@@ -395,18 +367,7 @@ int S4FUNCTION f4memoSetLen( FIELD4 *field, const unsigned len )
 
 S4CONST char *S4FUNCTION f4memoStr( FIELD4 *field )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( (void *)field, 3, E90529 ) )
-         return 0 ;
-   #endif
-
-   #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90529 ) ;
-         return 0 ;
-      }
-   #endif
+   C4PARMFIELD( field, E90529, NULL );
 
    #ifdef S4OFF_MEMO
       return f4str( field ) ;

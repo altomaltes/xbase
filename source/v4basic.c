@@ -70,9 +70,7 @@ char c4setLog( char *logValue, short newValue )
 /*  CODE4 CLASS TRANSLATIONS  */
 short S4FUNCTION code4autoOpen( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40101 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, E40101, -1 );
 
    return c4setLog( &(cb->autoOpen), value ) ;
 }
@@ -81,9 +79,7 @@ short S4FUNCTION code4codePage( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, 0 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, 0, -1 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->codePage ) ;
@@ -97,9 +93,7 @@ short S4FUNCTION code4collatingSequence( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, 0 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, 0, -1 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->collatingSequence ) ;
@@ -111,18 +105,15 @@ short S4FUNCTION code4collatingSequence( CODE4 *cb, short value )
 
 short S4FUNCTION code4createTemp( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, 0 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, 0, -1 );
 
    return c4setLog( &(cb->createTemp), value ) ;
 }
 
 short S4FUNCTION code4errCreate( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40102 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, E40102, -1 );
+
 
    return c4setLog( &(cb->errCreate), value ) ;
 }
@@ -131,9 +122,7 @@ short S4FUNCTION code4errCreate( CODE4 *cb, short value )
 
 const char S4PTR *S4FUNCTION code4dateFormatVB( CODE4 *cb )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40103 ) ) return 0 ;
-   #endif
+   C4PARMCODE( cb, E40103, -1 );
 
    return code4dateFormat( cb ) ;
  }
@@ -144,9 +133,7 @@ short S4FUNCTION code4errDefaultUnique( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40104 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, E40104, -1 );
 
    if ( value < 0 && value != r4check && value != e4unique ) return( r4check ) ;
    if ( value == r4check ) return( cb->errDefaultUnique ) ;
@@ -159,9 +146,7 @@ short S4FUNCTION code4errorCode( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40105 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, E40104, -1 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( error4code( cb ) ) ;
@@ -175,9 +160,7 @@ short S4FUNCTION code4errorCode2( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40105 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, E40105, -1 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( (short)error4code2( cb ) ) ;
@@ -190,9 +173,7 @@ short S4FUNCTION code4accessMode( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40106 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, E40106, -1 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->accessMode ) ;
@@ -203,9 +184,7 @@ short S4FUNCTION code4accessMode( CODE4 *cb, short value )
 
 short S4FUNCTION code4errExpr( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40107 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, E40107, -1 );
 
    return c4setLog( &(cb->errExpr), value ) ;
 }
@@ -213,27 +192,21 @@ short S4FUNCTION code4errExpr( CODE4 *cb, short value )
 
 short S4FUNCTION code4errFieldName( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40108 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, E40108, -1 );
 
    return c4setLog( &(cb->errFieldName), value ) ;
 }
 
 short S4FUNCTION code4fileFlush( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40152 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, E40152, -1 );
 
    return c4setLog( &(cb->fileFlush), value ) ;
 }
 
 short S4FUNCTION code4errGo( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40109 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, E40109, -1 );
 
    return c4setLog( &(cb->errGo), value ) ;
 }
@@ -246,9 +219,7 @@ long S4FUNCTION code4hInst( CODE4 *cb, long value )
       short temp ;
    #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40110 ) ) return -1L ;
-   #endif
+   C4PARMCODE( cb, E40110, -1 );
 
    if ( value < 0 && value != r4check ) return (long) r4check ;
    if ( value == r4check ) return (long) cb->hInst ;
@@ -269,9 +240,7 @@ long S4FUNCTION code4hWnd( CODE4 *cb, long value )
       short temp ;
    #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40111 ) ) return -1L ;
-   #endif
+   C4PARMCODE( cb, E40111, -1 );
 
    if ( value < 0 && value != r4check ) return (long) r4check ;
    if ( value == r4check ) return (long) cb->hWnd ;
@@ -286,9 +255,7 @@ long S4FUNCTION code4hWnd( CODE4 *cb, long value )
 
 const char S4PTR* S4FUNCTION code4indexExtensionVB( CODE4 *cb )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E91110 ) ) return 0 ;
-   #endif
+   C4PARMCODE( cb, E91110, NULL );
 
    return code4indexExtension( cb ) ;
 }
@@ -297,9 +264,7 @@ short S4FUNCTION code4lockAttempts( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40112 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, E40112, -1 );
 
    if ( value < -1 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->lockAttempts ) ;
@@ -312,9 +277,7 @@ short S4FUNCTION code4lockAttemptsSingle( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40112 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, E40112, -1 );
 
    if ( value < -1 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->lockAttemptsSingle ) ;
@@ -328,9 +291,7 @@ long S4FUNCTION code4lockDelay( CODE4 *cb, long value )
    long temp ;
 
 /*   'change error code */
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40112 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, E40112, -1 );
 
    if (( value < 0 && value != r4check ) || ( value > UINT_MAX ) )
       return( r4check ) ;
@@ -344,36 +305,28 @@ long S4FUNCTION code4lockDelay( CODE4 *cb, long value )
 
 short S4FUNCTION code4lockEnforce( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, 0 ) ) return -1 ;
-   #endif
+   C4PARMCODE( cb, 0, -1 );
 
    return c4setLog( &(cb->lockEnforce), value ) ;
 }
 
 const char S4PTR* S4FUNCTION code4lockFileNameVB( CODE4 *cb )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E91011 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E91011, NULL );
 
    return code4lockFileName( cb ) ;
 }
 
 const char S4PTR* S4FUNCTION code4lockNetworkIdVB( CODE4 *cb )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E91009 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E91009, NULL );
 
    return code4lockNetworkId( cb ) ;
 }
 
 const char S4PTR* S4FUNCTION code4lockUserIdVB( CODE4 *cb )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E91010 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E91010, NULL );
 
    return code4lockUserId( cb ) ;
 }
@@ -382,9 +335,8 @@ short S4FUNCTION code4log( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40154 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, E40112, 0 );
+
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->log ) ;
@@ -397,9 +349,7 @@ short S4FUNCTION code4memExpandBlock( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40113 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40113, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->memExpandBlock ) ;
@@ -412,9 +362,7 @@ short S4FUNCTION code4memExpandData( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40114 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40114, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->memExpandData ) ;
@@ -427,9 +375,7 @@ short S4FUNCTION code4memExpandIndex( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40115 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40115, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->memExpandIndex ) ;
@@ -443,9 +389,7 @@ short S4FUNCTION code4memExpandLock( CODE4 *cb, short value )
    short temp ;
 
 /*   'change error code */
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40115 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40115, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->memExpandLock ) ;
@@ -458,9 +402,7 @@ short S4FUNCTION code4memExpandTag( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40116 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40116, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->memExpandTag ) ;
@@ -473,9 +415,7 @@ long S4FUNCTION code4memSizeBlock( CODE4 *cb, long value )
 {
    long temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40117 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40117, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return (long)  ( cb->memSizeBlock ) ;
@@ -488,9 +428,7 @@ long S4FUNCTION code4memSizeBuffer( CODE4 *cb, long value )
 {
    long temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40118 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40118, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return (long) cb->memSizeBuffer ;
@@ -503,9 +441,7 @@ short S4FUNCTION code4memSizeMemo( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40119 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40119, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return (int) ( cb->memSizeMemo ) ;
@@ -518,9 +454,7 @@ long S4FUNCTION code4memSizeMemoExpr( CODE4 *cb, long value )
 {
    long temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40120 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40120, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return (long) cb->memSizeMemoExpr ;
@@ -533,9 +467,7 @@ long S4FUNCTION code4memSizeSortBuffer( CODE4 *cb, long value )
 {
    long temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40121 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40121, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return (long) cb->memSizeSortBuffer ;
@@ -548,9 +480,7 @@ long S4FUNCTION code4memSizeSortPool( CODE4 *cb, long value )
 {
    long temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40122 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40122, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return (long) cb->memSizeSortPool ;
@@ -563,9 +493,7 @@ short S4FUNCTION code4memStartBlock( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40123 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40123, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->memStartBlock ) ;
@@ -578,9 +506,7 @@ long S4FUNCTION code4memStartMax( CODE4 *cb, long value )
 {
    long temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40124 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40124, 0 );
 
    if( value < 0 && value != r4check )
       return( r4check ) ;
@@ -595,9 +521,7 @@ short S4FUNCTION code4memStartData( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40125 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40125, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->memStartData ) ;
@@ -610,9 +534,7 @@ short S4FUNCTION code4memStartIndex( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40126 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40126, 0 );
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->memStartIndex ) ;
@@ -626,10 +548,8 @@ short S4FUNCTION code4memStartLock( CODE4 *cb, short value )
    short temp ;
 
 /*   'change error code */
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40115 ) ) return 0 ;
-   #endif
-
+   C4PARMCODE( c4, E40115, 0 );
+ 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->memStartLock ) ;
    temp = cb->memStartLock ;
@@ -641,9 +561,8 @@ short S4FUNCTION code4memStartTag( CODE4 *cb, short value )
 {
    short temp ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40127 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40127, -1 );
+ 
 
    if ( value < 0 && value != r4check ) return( r4check ) ;
    if ( value == r4check ) return( cb->memStartTag ) ;
@@ -654,18 +573,14 @@ short S4FUNCTION code4memStartTag( CODE4 *cb, short value )
 
 short S4FUNCTION code4errOff( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40128 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, E40128, -1 );
 
    return c4setLog( &(cb->errOff), value ) ;
 }
 
 short S4FUNCTION code4errOpen( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40129 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, E40129, -1 );
 
    return c4setLog( &(cb->errOpen), value ) ;
 }
@@ -676,9 +591,7 @@ short S4FUNCTION code4optimize( CODE4 *cb, short value )
    #ifndef S4OPTIMIZE_OFF
       short temp ;
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( cb, 1, E40130 ) ) return -1 ;
-      #endif
+   C4PARMCODE( c4, E40130, -1 );
 
       if ( value < -1 && value != r4check ) return( r4check ) ;
       if ( value == r4check ) return( cb->optimize ) ;
@@ -695,9 +608,7 @@ short S4FUNCTION code4optimizeWrite( CODE4 *cb, short value )
    #ifndef S4OPTIMIZE_OFF
       short temp ;
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( cb, 1, E40131 ) ) return -1 ;
-      #endif
+   C4PARMCODE( c4, E40131, -1 );
 
       if ( value < -1 && value != r4check ) return( r4check ) ;
       if ( value == r4check ) return( cb->S4CONV( optimizeWrite, optimize_write ) ) ;
@@ -712,9 +623,7 @@ short S4FUNCTION code4optimizeWrite( CODE4 *cb, short value )
 short S4FUNCTION code4readLock( CODE4 *cb, short value )
 {
    short temp;
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40132 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, E40132, -1 );
 
    if (value == r4check) return (!!(cb->readLock))*(-1);
 
@@ -725,18 +634,14 @@ short S4FUNCTION code4readLock( CODE4 *cb, short value )
 
 short S4FUNCTION code4readOnly( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40133 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, E40133, -1 );
 
    return c4setLog( &(cb->readOnly), value ) ;
 }
 
 short S4FUNCTION code4errRelate( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40101 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, E40101, -1 );
 
    return c4setLog( &(cb->errRelate), value ) ;
 }
@@ -745,9 +650,7 @@ short S4FUNCTION code4errRelate( CODE4 *cb, short value )
 short S4FUNCTION code4safety( CODE4 *cb, short value )
 {
    short temp;
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40135 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, E40135, -1 );
 
    if (value == r4check) return (!!(cb->safety))*(-1);
 
@@ -757,9 +660,7 @@ short S4FUNCTION code4safety( CODE4 *cb, short value )
 short S4FUNCTION code4singleOpen( CODE4 *cb, short value )
 {
    short temp;
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, 0 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, 0, -1 );
 
    if (value == r4check) return (!!(cb->singleOpen))*(-1);
 
@@ -768,18 +669,14 @@ short S4FUNCTION code4singleOpen( CODE4 *cb, short value )
 
 short S4FUNCTION code4errSkip( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40136 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, E40136, -1 );
 
    return c4setLog( &(cb->errSkip), value ) ;
 }
 
 short S4FUNCTION code4errTagName( CODE4 *cb, short value )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40137 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, E40137, -1 );
 
    return c4setLog( &(cb->errTagName), value ) ;
 }
@@ -788,9 +685,7 @@ short S4FUNCTION code4tranStatusVB( CODE4 *cb )
 {
 
 /*   'change error code */
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40133 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, E40133, -1 );
 
    return code4tranStatus( cb ) ;
 }
@@ -798,21 +693,16 @@ short S4FUNCTION code4tranStatusVB( CODE4 *cb )
 short S4FUNCTION code4unlockAutoVB( CODE4 *cb )
 {
 
-/*   'change error code */
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40133 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, E40133, -1 );
 
    return code4unlockAuto( cb ) ;
 }
 
 short S4FUNCTION code4unlockAutoSetVB( CODE4 *cb, short value )
 {
+   C4PARMCODE( c4, E40139, -1 );
 
 /*   'change error code */
-   #ifdef S4VBASIC
-      if ( c4parm_check( cb, 1, E40133 ) ) return -1 ;
-   #endif
 
    return code4unlockAutoSet( cb, value ) ;
 }
@@ -842,9 +732,7 @@ short S4FUNCTION d4fieldJVB( DATA4 *d4, short jField )
 
 const char S4PTR* S4FUNCTION d4fileNameVB( DATA4 *d4 )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( d4, 2, E40139 ) ) return 0 ;
-   #endif
+   C4PARMCODE( c4, E40139, NULL );
 
       return d4->dataFile->file.name ;
 
@@ -867,9 +755,7 @@ short S4FUNCTION d4initUndo( CODE4 *c4 )
 {
    short rc ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( c4, 1, E40138 ) ) return -1 ;
-   #endif
+   C4PARMCODE( c4, E40138, -1 );
 
    rc = code4initUndo( c4 ) ;
 

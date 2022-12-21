@@ -7,15 +7,7 @@ int S4FUNCTION d4changed( DATA4 *data, int flag )
 {
    int previous ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E94101 ) )
-         return -1;
-   #endif  /* S4VBASIC */
-
-   #ifdef E4PARM_HIGH
-      if ( data == 0 )
-         return error4( 0, e4parmNull, E94101 ) ;
-   #endif
+   C4PARMDATA( data, E94101, -1 );
 
    #ifndef S4OFF_ENFORCE_LOCK
       if ( flag > 0 )
@@ -176,12 +168,7 @@ int S4FUNCTION code4flush( CODE4 *c4 )
       int rc, rcReturn ;
       LIST4 *list ;
 
-      #ifdef S4VBASIC
-         if ( c4parm_check( c4, 1, E94107 ) )
-            return -1;
-      #endif  /* S4VBASIC */
-
-   E4PARHIGH( c4, E94107 ) ;
+   C4PARMCODE( c4, E94107, -1 );
 
       rcReturn = 0 ;
 
@@ -246,13 +233,7 @@ int d4update( DATA4 *data )
 {
    int rc ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E94109 ) )
-         return -1 ;
-   #endif
-
-   if ( data == 0 )
-      return error4( 0, e4parm, E94109 ) ;
+   C4PARMDATA( data, E94109, -1 );
 
    if ( error4code( data->codeBase ) < 0 )
       return -1 ;
@@ -283,12 +264,7 @@ int d4updateRecord( DATA4 *data, const int doUnlock )
       int i ;
    #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E94110 ) )
-         return -1 ;
-   #endif
-
-   E4PARHIGH( data, E94110 ) ;
+   C4PARMDATA( data, E94110, -1 );
 
    #ifdef E4ANALYZE
       if ( data->codeBase == 0 )

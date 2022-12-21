@@ -5,17 +5,9 @@
 #ifndef S4OFF_WRITE
 void S4FUNCTION f4assignChar( FIELD4 *field, const int chr )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90502 ) )
-         return ;
-   #endif
+   C4PARMFIELD( field, E90502,  );
 
    #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90502 ) ;
-         return ;
-      }
       switch( field->type )
       {
          case r4date:
@@ -57,17 +49,9 @@ void S4FUNCTION f4assignChar( FIELD4 *field, const int chr )
 
 int S4FUNCTION f4char( const FIELD4 *field )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90503 ) )
-         return -1 ;
-   #endif
+   C4PARMFIELD( field, E90503,  );
 
    #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90503 ) ;
-         return -1 ;
-      }
       #ifdef S4FOX
          switch( field->type )
          {

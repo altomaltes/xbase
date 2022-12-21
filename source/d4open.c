@@ -26,10 +26,7 @@ static DATA4 *d4openInit( CODE4 *c4 )
          int rc;
       #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( c4, 1, E94301 ) )
-         return 0 ;
-   #endif
+   C4PARMCODE( c4, E94301, NULL );
 
    if ( error4code( c4 ) < 0 )
    {  return 0 ;
@@ -785,13 +782,10 @@ DATA4FILE *dfile4open( CODE4 *c4, DATA4 *data, const char *name, char **info )
          int hasMemo ;
       #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( c4, 1, E91102 ) )
-         return 0 ;
-   #endif
+   C4PARMCODE( c4, E91102, NULL );
 
    #ifdef E4PARM_LOW
-      if ( c4 == 0 || name == 0 )
+      if (  name == 0 )
       {
          error4( c4, e4parmNull, E91102 ) ;
          return 0 ;

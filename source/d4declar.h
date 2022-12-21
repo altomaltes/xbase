@@ -1140,10 +1140,20 @@ double S4FUNCTION x4reverseDouble( const void S4PTR * ) ;
    int file4partLenSet( FILE4 *, unsigned long ) ;
 #endif
 
-/* VISUAL BASIC */
+/* VISUAL BASIC 
+ */
 #ifdef S4VBASIC
       PUBLIC int c4parm_check( const void S4PTR *, int, const long ) ;
 #endif
+
+/* altomaltes ( JACS )
+ */
+int c4ParmCheckTag(    const    TAG4 * , const long message );
+//int c4ParmCheckRelate( const RELATE4 * , const long message );
+int c4ParmCheckData(   const   DATA4 * , const long message );
+int c4ParmCheckCode(   const   CODE4 * , const long message );
+int c4ParmCheckField(  const  FIELD4 * , const long message );
+
 
 #ifndef S4OFF_THREAD
    int semaphore4init( SEMAPHORE4 * ) ;

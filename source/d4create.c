@@ -27,13 +27,11 @@ DATA4 *S4FUNCTION d4createTemp( CODE4 *c4, const FIELD4INFO *fieldData, const TA
    int oldTemp ;
    DATA4 *data ;
 
-#ifdef S4VBASIC
-      if ( c4parm_check( c4, 1, E91401 ) )
-         return 0 ;
-#endif  /* S4VBASIC */
+   C4PARMCODE( c4, E91401, NULL );
+
 
    #ifdef E4PARM_HIGH
-      if ( c4 == 0 || fieldData == 0 )
+      if (  fieldData == 0 )
       {
          error4( c4, e4parmNull, E91401 ) ;
          return 0 ;
@@ -224,16 +222,16 @@ DATA4 *S4FUNCTION d4createLow( CODE4 *c4, const char *name, const FIELD4INFO *fi
       return data ;
 }
 
-DATA4 *S4FUNCTION d4create( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, const TAG4INFO *tagInfo )
+DATA4 *S4FUNCTION d4create( CODE4            * c4
+                          , const char       * name
+                          , const FIELD4INFO * fieldData
+                          , const TAG4INFO *tagInfo )
 {
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( c4, 1, E91401 ) )
-         return 0 ;
-   #endif  /* S4VBASIC */
+   C4PARMCODE( c4, E91401, NULL );
 
    #ifdef E4PARM_HIGH
-      if ( c4 == 0 || fieldData == 0 )
+      if (  fieldData == 0 )
       {
          error4( c4, e4parmNull, E91401 ) ;
          return 0 ;
@@ -309,12 +307,9 @@ int dfile4create( CODE4 *c4, const char *name, const FIELD4INFO *fieldData, cons
       int hasNulls = 0 ;
    #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( c4, 1, E91102 ) )
-         return -1 ;
-   #endif  /* S4VBASIC */
+   C4PARMCODE( c4, E91102, -1 );
 
-   E4PARMLOW( c4 && fieldData, E91102 ) ;
+   E4PARMLOW( fieldData, E91102 ) ;
 /*    if ( name == 0 && c4->createTemp != 1 )
          return error4( c4, e4parmNull, E91102 ) ; */
 

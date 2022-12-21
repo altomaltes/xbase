@@ -9,12 +9,8 @@
 #ifndef S4OFF_WRITE
 void S4FUNCTION f4assign( FIELD4 *field, const char *str )
 {
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90533 ) )
-         return ;
-   #endif
-
-   E4PARM_HRET( field && str, E90533,  ) ;
+ 
+   C4PARMFIELD( field, E90533, );
 
    #ifdef E4ANALYZE
       if ( field->data == 0 )
@@ -49,10 +45,7 @@ void S4FUNCTION f4assignN( FIELD4 *field, const char *ptr, const unsigned ptrLen
    char *fPtr ;
    unsigned pLen ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90534 ) )
-         return ;
-   #endif
+   C4PARMFIELD( field, E90534, NULL );
 
    #ifdef E4PARM_HIGH
       if ( field == 0 || ( ptr == 0 && ptrLen ) )
@@ -99,12 +92,7 @@ unsigned int S4FUNCTION f4ncpy( FIELD4 *field, char *memPtr, const unsigned int 
    if ( memLen == 0 )
       return 0 ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90535 ) )
-         return 0 ;
-   #endif
-
-   E4PARM_HRET( field && memPtr, E90535, 0  ) ;
+   C4PARMFIELD( field, E90535, NULL );
 
    numCpy = field->len ;
    if ( memLen <= numCpy )
@@ -122,12 +110,7 @@ char *S4FUNCTION f4str( FIELD4 *field )
 {
    CODE4 *codeBase ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90536 ) )
-         return 0 ;
-   #endif
-
-   E4PARM_HRET( field, E90536, NULL ) ;
+   C4PARMFIELD( field, E90536, NULL );
 
    codeBase = field->data->codeBase ;
 

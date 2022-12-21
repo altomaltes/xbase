@@ -1148,7 +1148,7 @@ static ERROR4INFO_ARRAY error4array9[] =
    { 96982L, "inter4connectionCheck" },
    { 96983L, "inter4releaseSignal" },
    { 96984L, "connect4threadReadStore" },
-   { 99999L, "Testing Only" },
+   { 99999L, "Testing Only" }
 
 };
 

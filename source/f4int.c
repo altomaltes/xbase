@@ -7,17 +7,9 @@ void S4FUNCTION f4assignInt( FIELD4 *field, const int iValue )
 {
    CODE4 *c4 ;
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90514 ) )
-         return ;
-   #endif
+   C4PARMFIELD( field, E90514,  );
 
    #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parmNull, E90514 ) ;
-         return ;
-      }
       switch( field->type )
       {
          case r4date:
@@ -96,17 +88,10 @@ int S4FUNCTION f4int( const FIELD4 *field )
    #ifdef WORDS_BIGENDIAN
       S4LONG rcLong ;
    #endif
-   #ifdef S4VBASIC
-      if ( c4parm_check( field, 3, E90515 ) )
-         return -1 ;
-   #endif
+
+   C4PARMFIELD( field, E90515, -1 );
 
    #ifdef E4PARM_HIGH
-      if ( field == 0 )
-      {
-         error4( 0, e4parm, E90515 ) ;
-         return -1 ;
-      }
       switch( field->type )
       {
          case r4date:

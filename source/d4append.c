@@ -163,12 +163,7 @@ static int d4doAppend( DATA4 *data )
       }
    #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E91103 ) )
-         return -1 ;
-   #endif  /* S4VBASIC */
-
-   E4PARHIGH( data, E91103 ) ;
+   C4PARMDATA( data, E91103, -1 );
 
    #ifdef E4MISC
       if ( data->record[0] != ' ' && data->record[0] != '*' )
@@ -556,12 +551,7 @@ int S4FUNCTION d4appendStart( DATA4 *data, int useMemoEntries )
          int i, oldLockEnforce ;
       #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E91107 ) )
-         return -1 ;
-   #endif  /* S4VBASIC */
-
-   E4PARHIGH( data, E91107 ) ;
+   C4PARMDATA( data, E91107, -1 ); 
 
    c4 = data->codeBase ;
 
@@ -658,12 +648,7 @@ int S4FUNCTION d4unappend( DATA4 *data )
       int i ;
    #endif
 
-   #ifdef S4VBASIC
-      if ( c4parm_check( data, 2, E91108 ) )
-         return -1 ;
-   #endif  /* S4VBASIC */
-
-   E4PARMLOW( data, E91108 ) ;
+   C4PARMDATA( data, E91108, -1 );
 
    c4 = data->codeBase ;
    rc = 0 ;
